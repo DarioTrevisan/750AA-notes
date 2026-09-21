@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>1&nbsp; Dalla statistica descrittiva al rischio empirico – Statistica II — Introduzione alla Statistica Computazionale</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02-clustering.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-d0ae9245876894da5ac7e18953ecc5cc.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-76a1503f7c92a7917b55a7b5888d2ac1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-16c8d5c3c49bfcc791534bfcd98e32e8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-76a1503f7c92a7917b55a7b5888d2ac1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-statistica-descrittiva-e-rischio-empirico.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Dalla statistica descrittiva al rischio empirico</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Statistica II — Introduzione alla Statistica Computazionale</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefazione</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-statistica-descrittiva-e-rischio-empirico.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Dalla statistica descrittiva al rischio empirico</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-clustering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Clustering</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-riduzione-dimensionalita-pca.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Riduzione della dimensionalità e PCA</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-classificazione-knn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Classificazione: K-Nearest Neighbors e validazione</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-bayes-naive-bayes-roc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Formula di Bayes e classificatori generativi</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-regressione-knn-bias-varianza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regressione: da KNN al metodo dei minimi quadrati</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-regressione-lineare-multipla.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regressione lineare multipla e quantificazione dell’incertezza</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-collinearita-regolarizzazione.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Riduzione dei modelli di regressione: collinearità e regolarizzazione</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-serie-storiche-decomposizione.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Serie storiche I: visualizzazione, decomposizione e previsione elementare</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-serie-storiche-smoothing-esponenziale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Serie storiche II: smoothing esponenziale e famiglia ETS</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-serie-storiche-arima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Processi stocastici e modelli ARIMA</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Riferimenti</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#obiettivi-del-capitolo" id="toc-obiettivi-del-capitolo" class="nav-link active" data-scroll-target="#obiettivi-del-capitolo"><span class="header-section-number">1.1</span> Obiettivi del capitolo</a></li>
+  <li><a href="#indicatori-di-centralità-moda-mediana-e-media" id="toc-indicatori-di-centralità-moda-mediana-e-media" class="nav-link" data-scroll-target="#indicatori-di-centralità-moda-mediana-e-media"><span class="header-section-number">1.2</span> Indicatori di centralità: moda, mediana e media</a>
+  <ul class="collapse">
+  <li><a href="#motivazione" id="toc-motivazione" class="nav-link" data-scroll-target="#motivazione"><span class="header-section-number">1.2.1</span> Motivazione</a></li>
+  <li><a href="#concetto-moda-mediana-media" id="toc-concetto-moda-mediana-media" class="nav-link" data-scroll-target="#concetto-moda-mediana-media"><span class="header-section-number">1.2.2</span> Concetto: moda, mediana, media</a></li>
+  <li><a href="#intuizione" id="toc-intuizione" class="nav-link" data-scroll-target="#intuizione"><span class="header-section-number">1.2.3</span> Intuizione</a></li>
+  <li><a href="#esempio" id="toc-esempio" class="nav-link" data-scroll-target="#esempio"><span class="header-section-number">1.2.4</span> Esempio</a></li>
+  <li><a href="#interpretazione" id="toc-interpretazione" class="nav-link" data-scroll-target="#interpretazione"><span class="header-section-number">1.2.5</span> Interpretazione</a></li>
+  <li><a href="#domande-di-comprensione" id="toc-domande-di-comprensione" class="nav-link" data-scroll-target="#domande-di-comprensione"><span class="header-section-number">1.2.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#indicatori-di-variabilità-quantili-e-varianza" id="toc-indicatori-di-variabilità-quantili-e-varianza" class="nav-link" data-scroll-target="#indicatori-di-variabilità-quantili-e-varianza"><span class="header-section-number">1.3</span> Indicatori di variabilità: quantili e varianza</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-1" id="toc-motivazione-1" class="nav-link" data-scroll-target="#motivazione-1"><span class="header-section-number">1.3.1</span> Motivazione</a></li>
+  <li><a href="#concetto-quantili" id="toc-concetto-quantili" class="nav-link" data-scroll-target="#concetto-quantili"><span class="header-section-number">1.3.2</span> Concetto: quantili</a></li>
+  <li><a href="#concetto-varianza-e-deviazione-standard" id="toc-concetto-varianza-e-deviazione-standard" class="nav-link" data-scroll-target="#concetto-varianza-e-deviazione-standard"><span class="header-section-number">1.3.3</span> Concetto: varianza e deviazione standard</a></li>
+  <li><a href="#intuizione-1" id="toc-intuizione-1" class="nav-link" data-scroll-target="#intuizione-1"><span class="header-section-number">1.3.4</span> Intuizione</a></li>
+  <li><a href="#esempio-1" id="toc-esempio-1" class="nav-link" data-scroll-target="#esempio-1"><span class="header-section-number">1.3.5</span> Esempio</a></li>
+  <li><a href="#interpretazione-1" id="toc-interpretazione-1" class="nav-link" data-scroll-target="#interpretazione-1"><span class="header-section-number">1.3.6</span> Interpretazione</a></li>
+  <li><a href="#domande-di-comprensione-1" id="toc-domande-di-comprensione-1" class="nav-link" data-scroll-target="#domande-di-comprensione-1"><span class="header-section-number">1.3.7</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#dal-rischio-quadratico-al-rischio-empirico" id="toc-dal-rischio-quadratico-al-rischio-empirico" class="nav-link" data-scroll-target="#dal-rischio-quadratico-al-rischio-empirico"><span class="header-section-number">1.4</span> Dal rischio quadratico al rischio empirico</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-2" id="toc-motivazione-2" class="nav-link" data-scroll-target="#motivazione-2"><span class="header-section-number">1.4.1</span> Motivazione</a></li>
+  <li><a href="#concetto-il-rischio-quadratico-e-la-media-come-minimizzante" id="toc-concetto-il-rischio-quadratico-e-la-media-come-minimizzante" class="nav-link" data-scroll-target="#concetto-il-rischio-quadratico-e-la-media-come-minimizzante"><span class="header-section-number">1.4.2</span> Concetto: il rischio quadratico e la media come minimizzante</a></li>
+  <li><a href="#intuizione-2" id="toc-intuizione-2" class="nav-link" data-scroll-target="#intuizione-2"><span class="header-section-number">1.4.3</span> Intuizione</a></li>
+  <li><a href="#concetto-la-minimizzazione-del-rischio-empirico-erm" id="toc-concetto-la-minimizzazione-del-rischio-empirico-erm" class="nav-link" data-scroll-target="#concetto-la-minimizzazione-del-rischio-empirico-erm"><span class="header-section-number">1.4.4</span> Concetto: la minimizzazione del rischio empirico (ERM)</a></li>
+  <li><a href="#interpretazione-2" id="toc-interpretazione-2" class="nav-link" data-scroll-target="#interpretazione-2"><span class="header-section-number">1.4.5</span> Interpretazione</a></li>
+  <li><a href="#domande-di-comprensione-2" id="toc-domande-di-comprensione-2" class="nav-link" data-scroll-target="#domande-di-comprensione-2"><span class="header-section-number">1.4.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#una-famiglia-di-funzioni-di-perdita-mediana-quantili-moda-ed-esponenziale" id="toc-una-famiglia-di-funzioni-di-perdita-mediana-quantili-moda-ed-esponenziale" class="nav-link" data-scroll-target="#una-famiglia-di-funzioni-di-perdita-mediana-quantili-moda-ed-esponenziale"><span class="header-section-number">1.5</span> Una famiglia di funzioni di perdita: mediana, quantili, moda ed esponenziale</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-3" id="toc-motivazione-3" class="nav-link" data-scroll-target="#motivazione-3"><span class="header-section-number">1.5.1</span> Motivazione</a></li>
+  <li><a href="#concetto-lerrore-assoluto-e-la-mediana" id="toc-concetto-lerrore-assoluto-e-la-mediana" class="nav-link" data-scroll-target="#concetto-lerrore-assoluto-e-la-mediana"><span class="header-section-number">1.5.2</span> Concetto: l’errore assoluto e la mediana</a></li>
+  <li><a href="#intuizione-3" id="toc-intuizione-3" class="nav-link" data-scroll-target="#intuizione-3"><span class="header-section-number">1.5.3</span> Intuizione</a></li>
+  <li><a href="#concetto-lerrore-assoluto-asimmetrico-e-i-quantili" id="toc-concetto-lerrore-assoluto-asimmetrico-e-i-quantili" class="nav-link" data-scroll-target="#concetto-lerrore-assoluto-asimmetrico-e-i-quantili"><span class="header-section-number">1.5.4</span> Concetto: l’errore assoluto asimmetrico e i quantili</a></li>
+  <li><a href="#intuizione-4" id="toc-intuizione-4" class="nav-link" data-scroll-target="#intuizione-4"><span class="header-section-number">1.5.5</span> Intuizione</a></li>
+  <li><a href="#concetto-lerrore-0-1-e-la-moda" id="toc-concetto-lerrore-0-1-e-la-moda" class="nav-link" data-scroll-target="#concetto-lerrore-0-1-e-la-moda"><span class="header-section-number">1.5.6</span> Concetto: l’errore 0-1 e la moda</a></li>
+  <li><a href="#esempio-2" id="toc-esempio-2" class="nav-link" data-scroll-target="#esempio-2"><span class="header-section-number">1.5.7</span> Esempio</a></li>
+  <li><a href="#interpretazione-3" id="toc-interpretazione-3" class="nav-link" data-scroll-target="#interpretazione-3"><span class="header-section-number">1.5.8</span> Interpretazione</a></li>
+  <li><a href="#concetto-la-perdita-esponenziale-e-un-cenno-alla-perdita-di-huber" id="toc-concetto-la-perdita-esponenziale-e-un-cenno-alla-perdita-di-huber" class="nav-link" data-scroll-target="#concetto-la-perdita-esponenziale-e-un-cenno-alla-perdita-di-huber"><span class="header-section-number">1.5.9</span> Concetto: la perdita esponenziale e un cenno alla perdita di Huber</a></li>
+  <li><a href="#intuizione-5" id="toc-intuizione-5" class="nav-link" data-scroll-target="#intuizione-5"><span class="header-section-number">1.5.10</span> Intuizione</a></li>
+  <li><a href="#interpretazione-dinsieme" id="toc-interpretazione-dinsieme" class="nav-link" data-scroll-target="#interpretazione-dinsieme"><span class="header-section-number">1.5.11</span> Interpretazione d’insieme</a></li>
+  <li><a href="#domande-di-comprensione-3" id="toc-domande-di-comprensione-3" class="nav-link" data-scroll-target="#domande-di-comprensione-3"><span class="header-section-number">1.5.12</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#dati-multivariati-dal-singolo-carattere-al-vettore-di-caratteristiche" id="toc-dati-multivariati-dal-singolo-carattere-al-vettore-di-caratteristiche" class="nav-link" data-scroll-target="#dati-multivariati-dal-singolo-carattere-al-vettore-di-caratteristiche"><span class="header-section-number">1.6</span> Dati multivariati: dal singolo carattere al vettore di caratteristiche</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-4" id="toc-motivazione-4" class="nav-link" data-scroll-target="#motivazione-4"><span class="header-section-number">1.6.1</span> Motivazione</a></li>
+  <li><a href="#concetto-notazione-e-organizzazione-dei-dati" id="toc-concetto-notazione-e-organizzazione-dei-dati" class="nav-link" data-scroll-target="#concetto-notazione-e-organizzazione-dei-dati"><span class="header-section-number">1.6.2</span> Concetto: notazione e organizzazione dei dati</a></li>
+  <li><a href="#intuizione-6" id="toc-intuizione-6" class="nav-link" data-scroll-target="#intuizione-6"><span class="header-section-number">1.6.3</span> Intuizione</a></li>
+  <li><a href="#esempio-3" id="toc-esempio-3" class="nav-link" data-scroll-target="#esempio-3"><span class="header-section-number">1.6.4</span> Esempio</a></li>
+  <li><a href="#interpretazione-4" id="toc-interpretazione-4" class="nav-link" data-scroll-target="#interpretazione-4"><span class="header-section-number">1.6.5</span> Interpretazione</a></li>
+  <li><a href="#domande-di-comprensione-4" id="toc-domande-di-comprensione-4" class="nav-link" data-scroll-target="#domande-di-comprensione-4"><span class="header-section-number">1.6.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#distanze-tra-osservazioni-multivariate" id="toc-distanze-tra-osservazioni-multivariate" class="nav-link" data-scroll-target="#distanze-tra-osservazioni-multivariate"><span class="header-section-number">1.7</span> Distanze tra osservazioni multivariate</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-5" id="toc-motivazione-5" class="nav-link" data-scroll-target="#motivazione-5"><span class="header-section-number">1.7.1</span> Motivazione</a></li>
+  <li><a href="#concetto-la-distanza-euclidea" id="toc-concetto-la-distanza-euclidea" class="nav-link" data-scroll-target="#concetto-la-distanza-euclidea"><span class="header-section-number">1.7.2</span> Concetto: la distanza euclidea</a></li>
+  <li><a href="#intuizione-7" id="toc-intuizione-7" class="nav-link" data-scroll-target="#intuizione-7"><span class="header-section-number">1.7.3</span> Intuizione</a></li>
+  <li><a href="#concetto-la-distanza-di-manhattan" id="toc-concetto-la-distanza-di-manhattan" class="nav-link" data-scroll-target="#concetto-la-distanza-di-manhattan"><span class="header-section-number">1.7.4</span> Concetto: la distanza di Manhattan</a></li>
+  <li><a href="#intuizione-8" id="toc-intuizione-8" class="nav-link" data-scroll-target="#intuizione-8"><span class="header-section-number">1.7.5</span> Intuizione</a></li>
+  <li><a href="#concetto-la-distanza-ellp-e-la-distanza-del-massimo" id="toc-concetto-la-distanza-ellp-e-la-distanza-del-massimo" class="nav-link" data-scroll-target="#concetto-la-distanza-ellp-e-la-distanza-del-massimo"><span class="header-section-number">1.7.6</span> Concetto: la distanza <span class="math inline">\(\ell^p\)</span> e la distanza del massimo</a></li>
+  <li><a href="#intuizione-9" id="toc-intuizione-9" class="nav-link" data-scroll-target="#intuizione-9"><span class="header-section-number">1.7.7</span> Intuizione</a></li>
+  <li><a href="#esempio-4" id="toc-esempio-4" class="nav-link" data-scroll-target="#esempio-4"><span class="header-section-number">1.7.8</span> Esempio</a></li>
+  <li><a href="#interpretazione-la-geometria-delle-distanze" id="toc-interpretazione-la-geometria-delle-distanze" class="nav-link" data-scroll-target="#interpretazione-la-geometria-delle-distanze"><span class="header-section-number">1.7.9</span> Interpretazione: la geometria delle distanze</a></li>
+  <li><a href="#domande-di-comprensione-5" id="toc-domande-di-comprensione-5" class="nav-link" data-scroll-target="#domande-di-comprensione-5"><span class="header-section-number">1.7.10</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#cosa-ricordare" id="toc-cosa-ricordare" class="nav-link" data-scroll-target="#cosa-ricordare"><span class="header-section-number">1.8</span> Cosa ricordare</a></li>
+  <li><a href="#domande-di-riepilogo" id="toc-domande-di-riepilogo" class="nav-link" data-scroll-target="#domande-di-riepilogo"><span class="header-section-number">1.9</span> Domande di riepilogo</a></li>
+  <li><a href="#laboratorio-r-leggere-i-dati-non-programmare" id="toc-laboratorio-r-leggere-i-dati-non-programmare" class="nav-link" data-scroll-target="#laboratorio-r-leggere-i-dati-non-programmare"><span class="header-section-number">1.10</span> Laboratorio R: leggere i dati, non programmare</a>
+  <ul class="collapse">
+  <li><a href="#robustezza-di-media-e-mediana-uno-stipendio-fuori-scala" id="toc-robustezza-di-media-e-mediana-uno-stipendio-fuori-scala" class="nav-link" data-scroll-target="#robustezza-di-media-e-mediana-uno-stipendio-fuori-scala"><span class="header-section-number">1.10.1</span> Robustezza di media e mediana: uno stipendio fuori scala</a></li>
+  <li><a href="#quantili-e-box-plot-su-un-campione-di-voti" id="toc-quantili-e-box-plot-su-un-campione-di-voti" class="nav-link" data-scroll-target="#quantili-e-box-plot-su-un-campione-di-voti"><span class="header-section-number">1.10.2</span> Quantili e box plot su un campione di voti</a></li>
+  <li><a href="#ricostruire-la-logica-di-werms-la-geometria-di-diverse-funzioni-di-perdita" id="toc-ricostruire-la-logica-di-werms-la-geometria-di-diverse-funzioni-di-perdita" class="nav-link" data-scroll-target="#ricostruire-la-logica-di-werms-la-geometria-di-diverse-funzioni-di-perdita"><span class="header-section-number">1.10.3</span> Ricostruire la logica di WERMS: la geometria di diverse funzioni di perdita</a></li>
+  <li><a href="#la-geometria-delle-distanze-palle-unitarie-a-confronto" id="toc-la-geometria-delle-distanze-palle-unitarie-a-confronto" class="nav-link" data-scroll-target="#la-geometria-delle-distanze-palle-unitarie-a-confronto"><span class="header-section-number">1.10.4</span> La geometria delle distanze: palle unitarie a confronto</a></li>
+  <li><a href="#distanze-multivariate-su-un-piccolo-dataset" id="toc-distanze-multivariate-su-un-piccolo-dataset" class="nav-link" data-scroll-target="#distanze-multivariate-su-un-piccolo-dataset"><span class="header-section-number">1.10.5</span> Distanze multivariate su un piccolo dataset</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-descrittiva" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Dalla statistica descrittiva al rischio empirico</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="obiettivi-del-capitolo" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="obiettivi-del-capitolo"><span class="header-section-number">1.1</span> Obiettivi del capitolo</h2>
+<p>Al termine di questo capitolo dovresti essere in grado di:</p>
+<ul>
+<li>spiegare perché moda, mediana e media possono essere viste come i minimizzatori di funzioni di perdita diverse, e non come tre ricette scollegate tra loro;</li>
+<li>prevedere qualitativamente come cambia un indicatore di centralità o di variabilità in presenza di un’osservazione anomala, sulla base della forma della perdita associata;</li>
+<li>costruire la perdita assimmetrica opportuna per ottenere un quantile arbitrario, e collegarla ai concetti di quartile e box plot;</li>
+<li>riconoscere il paradigma della minimizzazione del rischio empirico (ERM) come schema unificante, discutendone anche i limiti;</li>
+<li>organizzare correttamente un campione multivariato in un data frame, distinguendo il ruolo di individui e variabili;</li>
+<li>calcolare e confrontare le distanze euclidea, di Manhattan, <span class="math inline">\(\ell^p\)</span> e del massimo tra osservazioni multivariate, e interpretarne la diversa geometria.</li>
+</ul>
+<p>Questo capitolo apre il corso riprendendo concetti che probabilmente hai già incontrato in Statistica I — moda, mediana, media, quantili, varianza — ma li presenta sotto una luce diversa: <strong>ogni indicatore statistico è il risultato della minimizzazione di una funzione di perdita</strong>. Questa idea, che a lezione viene chiamata <em>paradigma della minimizzazione del rischio empirico</em> (ERM, dall’inglese <em>empirical risk minimization</em>), è il filo conduttore dell’intero corso: la ritroveremo nel clustering, nella classificazione, nella regressione e persino nelle serie storiche. Il capitolo si chiude introducendo i dati multivariati e le distanze tra osservazioni in <span class="math inline">\(\mathbb{R}^d\)</span>, che sono il prerequisito diretto del prossimo capitolo sul clustering.</p>
+</section>
+<section id="indicatori-di-centralità-moda-mediana-e-media" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="indicatori-di-centralità-moda-mediana-e-media"><span class="header-section-number">1.2</span> Indicatori di centralità: moda, mediana e media</h2>
+<section id="motivazione" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="motivazione"><span class="header-section-number">1.2.1</span> Motivazione</h3>
+<p>Immagina di dover riassumere con un solo numero un insieme di osservazioni: le altezze di una classe, i voti di un esame, il numero di scarpe delle persone in un’aula. Nessun singolo numero può contenere tutta l’informazione del campione, ma alcuni numeri sono più rappresentativi di altri. Gli <strong>indicatori di centralità</strong> rispondono proprio a questa esigenza: qual è il valore “tipico” attorno a cui si concentrano le osservazioni?</p>
+<p>Il punto di partenza è sempre lo stesso: un <strong>campione statistico</strong> <span class="math inline">\(\{x_i\}_{i=1}^n\)</span>, cioè un insieme di <span class="math inline">\(n\)</span> osservazioni raccolte su altrettanti individui estratti da una popolazione. È utile pensare alla popolazione come a un lago da cui peschiamo <span class="math inline">\(n\)</span> pesci: ogni pesce (individuo) porta con sé un’informazione (l’osservazione <span class="math inline">\(x_i\)</span>), e il numero <span class="math inline">\(n\)</span> è la <strong>taglia</strong> del campione.</p>
+</section>
+<section id="concetto-moda-mediana-media" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="concetto-moda-mediana-media"><span class="header-section-number">1.2.2</span> Concetto: moda, mediana, media</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dato un campione <span class="math inline">\(\{x_i\}_{i=1}^n\)</span>:</p>
+<ul>
+<li>la <strong>moda</strong> è il valore (o i valori) osservato con la frequenza assoluta maggiore;</li>
+<li>la <strong>mediana</strong> è, una volta ordinato il campione in <span class="math inline">\(x_{(1)} \le x_{(2)} \le \dots \le x_{(n)}\)</span>, il valore centrale: <span class="math inline">\(x_{((n+1)/2)}\)</span> se <span class="math inline">\(n\)</span> è dispari, la media dei due valori centrali <span class="math inline">\(\tfrac{1}{2}\big(x_{(n/2)} + x_{(n/2+1)}\big)\)</span> se <span class="math inline">\(n\)</span> è pari;</li>
+<li>la <strong>media campionaria</strong> è <span class="math inline">\(\bar x = \dfrac{1}{n}\displaystyle\sum_{i=1}^n x_i\)</span>.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="intuizione" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="intuizione"><span class="header-section-number">1.2.3</span> Intuizione</h3>
+<p>Questi tre indicatori richiedono ipotesi via via più forti sui dati. La moda si applica a qualunque tipo di osservazione, anche puramente qualitativa: basta poter contare quante volte compare ciascun valore. La mediana richiede qualcosa in più, cioè una <strong>relazione d’ordine</strong> — non servono necessariamente numeri, ma bisogna poter dire che un’osservazione “precede” un’altra. La media richiede invece che le osservazioni siano numeri veri e propri, perché dobbiamo poterli sommare.</p>
+<p>Un esempio concreto per la moda: se osserviamo il colore degli occhi di un gruppo di persone (grigio, verde, azzurro, marrone, nero), contiamo la frequenza assoluta di ciascun colore, e la moda è il colore più frequente. È importante notare fin da subito che <strong>la moda può non essere unica</strong>: se due colori compaiono esattamente con la stessa frequenza massima, entrambi sono mode. Lo stesso vale, come vedremo, ogni volta che minimizziamo una perdita che ammette più minimizzanti.</p>
+<p>Per la mediana, la procedura di ordinamento è concettualmente semplice ma nasconde una piccola arbitrarietà quando <span class="math inline">\(n\)</span> è pari: non esiste un singolo valore centrale, e la scelta di prendere la media dei due valori di mezzo è <strong>una convenzione tra le tante possibili</strong>, non un fatto matematico obbligato. Vedremo più avanti che il punto di vista variazionale chiarisce bene perché, in quel caso, qualunque valore tra i due centrali sarebbe ugualmente accettabile.</p>
+<p>Per la media, vale la pena osservare fin da subito la notazione: si scrive <span class="math inline">\(\bar x\)</span> (barra sopra la <span class="math inline">\(x\)</span>), evitando volutamente un pedice <span class="math inline">\(n\)</span> che potrebbe far pensare a “una funzione applicata a <span class="math inline">\(n\)</span>” — la taglia del campione resta un parametro fissato, non una variabile della formula.</p>
+</section>
+<section id="esempio" class="level3" data-number="1.2.4">
+<h3 data-number="1.2.4" class="anchored" data-anchor-id="esempio"><span class="header-section-number">1.2.4</span> Esempio</h3>
+<p>Uno stesso campione può avere moda, mediana e media molto diverse tra loro. Consideriamo il numero di scarpe rilevato in un’aula: la media potrebbe risultare <span class="math inline">\(40\)</span>, ma se nell’aula ci sono due sottopopolazioni ben distinte (per esempio con taglie tipiche diverse), può darsi che <strong>nessuno</strong> nell’aula calzi esattamente il numero <span class="math inline">\(40\)</span>. La media, in questo caso, è un valore matematicamente corretto ma che non descrive bene nessun individuo reale: è un primo indizio che un solo indicatore di centralità non basta, e che serve anche capire quanto i dati siano dispersi attorno ad esso.</p>
+</section>
+<section id="interpretazione" class="level3" data-number="1.2.5">
+<h3 data-number="1.2.5" class="anchored" data-anchor-id="interpretazione"><span class="header-section-number">1.2.5</span> Interpretazione</h3>
+<p>Moda, mediana e media rispondono tutte alla domanda “qual è il valore tipico?”, ma lo fanno con criteri diversi: la moda privilegia la frequenza, la mediana la posizione nell’ordinamento, la media il bilanciamento aritmetico degli scarti. Non esiste un indicatore “giusto” in assoluto: la scelta dipende dal tipo di dati e da cosa vogliamo mettere in evidenza. Più avanti in questo capitolo vedremo che questa scelta è in realtà equivalente alla scelta di una funzione di perdita — un modo molto più generale di ragionare sulla stessa domanda.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Non aspettarti che moda, mediana e media coincidano, nemmeno approssimativamente. Su dati fortemente asimmetrici o multimodali possono essere anche molto distanti tra loro, e ciascuna racconta un pezzo diverso della storia. Confrontarle è già di per sé un’analisi utile, prima ancora di scegliere quale usare.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione" class="level3" data-number="1.2.6">
+<h3 data-number="1.2.6" class="anchored" data-anchor-id="domande-di-comprensione"><span class="header-section-number">1.2.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Un dataset di redditi ha media molto più alta della mediana. Che cosa puoi dedurre, qualitativamente, sulla forma della distribuzione dei redditi?</li>
+<li>Perché la moda è l’unico dei tre indicatori applicabile a dati puramente qualitativi (per esempio colori o categorie senza un ordine naturale)?</li>
+<li>Costruisci mentalmente un piccolo campione di 5 numeri in cui moda, mediana e media siano tutte e tre diverse tra loro. È sempre possibile farlo?</li>
+</ol>
+</section>
+</section>
+<section id="indicatori-di-variabilità-quantili-e-varianza" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="indicatori-di-variabilità-quantili-e-varianza"><span class="header-section-number">1.3</span> Indicatori di variabilità: quantili e varianza</h2>
+<section id="motivazione-1" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="motivazione-1"><span class="header-section-number">1.3.1</span> Motivazione</h3>
+<p>Sapere che il numero medio di scarpe in un’aula è 40 non ci dice se tutti calzano più o meno lo stesso numero, oppure se ci sono due gruppi molto distanti dalla media. Abbiamo bisogno di indicatori che misurino <strong>quanto le osservazioni si allontanano tipicamente</strong> dal valore centrale: gli indicatori di <strong>variabilità</strong> o <strong>dispersione</strong>.</p>
+</section>
+<section id="concetto-quantili" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="concetto-quantili"><span class="header-section-number">1.3.2</span> Concetto: quantili</h3>
+<p>Fissato un livello <span class="math inline">\(\alpha \in (0,1)\)</span>, il <strong>quantile campionario di livello <span class="math inline">\(\alpha\)</span></strong> è (approssimativamente, ignorando i dettagli di arrotondamento quando il taglio non cade esattamente su un’osservazione) il valore che lascia una frazione <span class="math inline">\(\alpha\)</span> del campione ordinato alla sua sinistra e una frazione <span class="math inline">\(1-\alpha\)</span> alla sua destra. I casi <span class="math inline">\(\alpha = 1/4, 1/2, 3/4\)</span> sono chiamati rispettivamente <strong>primo quartile</strong> <span class="math inline">\(Q_1\)</span>, <strong>mediana</strong> (che quindi è anche il quantile di livello <span class="math inline">\(1/2\)</span>) e <strong>terzo quartile</strong> <span class="math inline">\(Q_3\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I quantili sono il linguaggio naturale del <strong>box plot</strong> (diagramma a scatola): la scatola va da <span class="math inline">\(Q_1\)</span> a <span class="math inline">\(Q_3\)</span> e contiene circa metà del campione, la linea al suo interno è la mediana, e i punti isolati oltre i baffi sono i candidati <strong>outlier</strong>. Un box plot molto asimmetrico, o con molti punti isolati da un solo lato, segnala che la distribuzione dei dati non è simmetrica attorno alla mediana.</p>
+</div>
+</div>
+</section>
+<section id="concetto-varianza-e-deviazione-standard" class="level3" data-number="1.3.3">
+<h3 data-number="1.3.3" class="anchored" data-anchor-id="concetto-varianza-e-deviazione-standard"><span class="header-section-number">1.3.3</span> Concetto: varianza e deviazione standard</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La <strong>varianza campionaria</strong> di <span class="math inline">\(\{x_i\}_{i=1}^n\)</span> è <span class="math display">\[
+s^2 = \frac{1}{n-1}\sum_{i=1}^n (x_i - \bar x)^2,
+\]</span> e la <strong>deviazione standard</strong> è <span class="math inline">\(s = \sqrt{s^2}\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="intuizione-1" class="level3" data-number="1.3.4">
+<h3 data-number="1.3.4" class="anchored" data-anchor-id="intuizione-1"><span class="header-section-number">1.3.4</span> Intuizione</h3>
+<p>La varianza si costruisce in tre passi: si calcola lo scarto di ogni osservazione dalla media (<span class="math inline">\(x_i - \bar x\)</span>), che può essere positivo o negativo; si eleva al quadrato per renderlo sempre non negativo (ed eliminare la cancellazione tra scarti positivi e negativi); si somma su tutte le osservazioni. Il fattore <span class="math inline">\(\tfrac{1}{n-1}\)</span> (anziché <span class="math inline">\(\tfrac{1}{n}\)</span>) è una convenzione che diventa importante solo per campioni piccoli — per <span class="math inline">\(n\)</span> grande la differenza tra dividere per <span class="math inline">\(n\)</span> o per <span class="math inline">\(n-1\)</span> è trascurabile.</p>
+<p>Vale la pena osservare fin da ora — lo riprenderemo tra poco in modo rigoroso — che elevare al quadrato ha un prezzo: uno scarto doppio pesa quattro volte tanto, non due. Questo rende la varianza (e quindi anche la media, che ne è l’ingrediente) particolarmente sensibile a <strong>osservazioni estreme</strong>.</p>
+</section>
+<section id="esempio-1" class="level3" data-number="1.3.5">
+<h3 data-number="1.3.5" class="anchored" data-anchor-id="esempio-1"><span class="header-section-number">1.3.5</span> Esempio</h3>
+<p>Consideriamo i voti di un esame universitario: <span class="math inline">\(\{24, 26, 27, 24, 28, 30, 18, 27, 29, 26\}\)</span>. La deviazione standard di questo campione ci dice, approssimativamente, di quanto un voto tipico si discosta dalla media della classe. Se aggiungessimo un solo voto molto basso, per esempio un <span class="math inline">\(6\)</span> dovuto a un ritiro parziale, la varianza aumenterebbe molto più di quanto aumenterebbe, per esempio, la distanza interquartile <span class="math inline">\(Q_3-Q_1\)</span>.</p>
+</section>
+<section id="interpretazione-1" class="level3" data-number="1.3.6">
+<h3 data-number="1.3.6" class="anchored" data-anchor-id="interpretazione-1"><span class="header-section-number">1.3.6</span> Interpretazione</h3>
+<p>Quantili e varianza rispondono entrambi alla domanda “quanto sono dispersi i dati?”, ma con una differenza cruciale di robustezza.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La varianza è <strong>poco robusta</strong>: basta un piccolo numero di osservazioni molto lontane dalla media per farla crescere drasticamente, proprio a causa del quadrato. I quantili (e in particolare la distanza interquartile) sono invece molto più <strong>robusti</strong> agli outlier, perché dipendono solo dalla posizione delle osservazioni nell’ordinamento, non dal loro valore numerico esatto. Ritroveremo questa stessa tensione tra “quadrato” e “valore assoluto/ordine” in tutta la prima parte del corso.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-1" class="level3" data-number="1.3.7">
+<h3 data-number="1.3.7" class="anchored" data-anchor-id="domande-di-comprensione-1"><span class="header-section-number">1.3.7</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Due campioni hanno la stessa mediana e lo stesso <span class="math inline">\(Q_1,Q_3\)</span>, ma uno dei due contiene un valore estremamente grande al di fuori dei baffi del box plot. Come cambia (qualitativamente) la varianza dei due campioni?</li>
+<li>Perché ha senso accompagnare sempre la mediana con i quartili, piuttosto che con la sola media?</li>
+<li>Se scalassimo tutte le osservazioni di un fattore 10 (per esempio passando da metri a decimetri), come cambierebbero la deviazione standard e la distanza interquartile? Cambierebbe il loro rapporto?</li>
+</ol>
+</section>
+</section>
+<section id="dal-rischio-quadratico-al-rischio-empirico" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="dal-rischio-quadratico-al-rischio-empirico"><span class="header-section-number">1.4</span> Dal rischio quadratico al rischio empirico</h2>
+<section id="motivazione-2" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="motivazione-2"><span class="header-section-number">1.4.1</span> Motivazione</h3>
+<p>Fin qui abbiamo trattato moda, mediana, media e varianza come definizioni indipendenti, ciascuna giustificata da un’intuizione diversa. C’è però un punto di vista molto più profondo, che li unifica tutti: <strong>nessuno di questi indicatori è arbitrario</strong>. Ciascuno è il valore che minimizza una specifica misura complessiva di “errore” o “costo” nel riassumere il campione con un unico numero. Questo cambio di prospettiva — dal contare e ordinare al minimizzare — è il contributo concettuale più importante di questa lezione, ed è alla base di gran parte della statistica e del machine learning moderni.</p>
+</section>
+<section id="concetto-il-rischio-quadratico-e-la-media-come-minimizzante" class="level3" data-number="1.4.2">
+<h3 data-number="1.4.2" class="anchored" data-anchor-id="concetto-il-rischio-quadratico-e-la-media-come-minimizzante"><span class="header-section-number">1.4.2</span> Concetto: il rischio quadratico e la media come minimizzante</h3>
+<p>Supponiamo di voler riassumere il campione <span class="math inline">\(\{x_i\}_{i=1}^n\)</span> con un singolo valore <span class="math inline">\(h \in \mathbb{R}\)</span> (una “ipotesi”, o candidato indicatore di centralità). Una misura naturale di quanto <span class="math inline">\(h\)</span> rappresenti bene i dati è il <strong>rischio quadratico</strong> (o <em>mean squared error</em>, MSE): <span class="math display">\[
+R(h) = \sum_{i=1}^n (x_i - h)^2.
+\]</span></p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La media campionaria è il minimizzatore del rischio quadratico: <span class="math display">\[
+\bar x_n \in \arg\min_{h \in \mathbb{R}} \sum_{i=1}^n (x_i - h)^2.
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="intuizione-2" class="level3" data-number="1.4.3">
+<h3 data-number="1.4.3" class="anchored" data-anchor-id="intuizione-2"><span class="header-section-number">1.4.3</span> Intuizione</h3>
+<p>Perché è vero? Il ragionamento (informale, ma istruttivo) è il seguente: <span class="math inline">\(R(h)\)</span> è una funzione di <span class="math inline">\(h\)</span> che tende a <span class="math inline">\(+\infty\)</span> sia per <span class="math inline">\(h \to -\infty\)</span> sia per <span class="math inline">\(h \to +\infty\)</span>, quindi ha un minimo da qualche parte. Per trovarlo deriviamo rispetto a <span class="math inline">\(h\)</span> e imponiamo che la derivata si annulli: <span class="math display">\[
+\frac{d}{dh} \sum_{i=1}^n (x_i-h)^2 = -2\sum_{i=1}^n (x_i - h) = 0
+\quad \Longleftrightarrow \quad
+\sum_{i=1}^n x_i = n h
+\quad \Longleftrightarrow \quad
+h = \frac{1}{n}\sum_{i=1}^n x_i = \bar x.
+\]</span></p>
+<p>Questa derivazione mostra qualcosa di più della sola formula: chiarisce <strong>perché</strong> la media è “il” valore che bilancia gli scarti quadratici. Nota anche un dettaglio tecnico ma concettualmente importante: se nella definizione di varianza usassimo il fattore <span class="math inline">\(\tfrac{1}{n-1}\)</span> invece di <span class="math inline">\(1\)</span>, il minimizzatore <span class="math inline">\(h^\star\)</span> non cambierebbe affatto — moltiplicare il rischio per una costante positiva non sposta il punto di minimo. La media, insomma, non è “quella cosa che si ottiene sommando e dividendo per <span class="math inline">\(n\)</span>” per abitudine: è il punto che minimizza la distanza quadratica complessiva dalle osservazioni, e questa caratterizzazione aiuta anche a capire perché la media sia così sensibile ai valori estremi — uno scarto molto grande, elevato al quadrato, domina completamente la somma.</p>
+</section>
+<section id="concetto-la-minimizzazione-del-rischio-empirico-erm" class="level3" data-number="1.4.4">
+<h3 data-number="1.4.4" class="anchored" data-anchor-id="concetto-la-minimizzazione-del-rischio-empirico-erm"><span class="header-section-number">1.4.4</span> Concetto: la minimizzazione del rischio empirico (ERM)</h3>
+<p>Una volta capito che la media nasce da una scelta specifica di “funzione di errore”, la generalizzazione è immediata: perché fermarsi al quadrato?</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Data una <strong>funzione di perdita</strong> (o <em>costo</em>, o <em>errore</em>) <span class="math inline">\(\ell(x;h)\)</span>, che misura quanto “costa” usare <span class="math inline">\(h\)</span> al posto dell’osservazione <span class="math inline">\(x\)</span>, la <strong>minimizzazione del rischio empirico</strong> (<em>empirical risk minimization</em>, ERM) consiste nel trovare <span class="math display">\[
+h^\star \in \arg\min_{h \in \mathbb{R}} \sum_{i=1}^n \ell(x_i; h).
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="interpretazione-2" class="level3" data-number="1.4.5">
+<h3 data-number="1.4.5" class="anchored" data-anchor-id="interpretazione-2"><span class="header-section-number">1.4.5</span> Interpretazione</h3>
+<p>Questo è il paradigma centrale dell’intero corso, non solo di questa lezione: quasi ogni indicatore o modello statistico che incontreremo — dai centroidi del clustering ai coefficienti della regressione lineare — sarà definito come il minimizzatore di un rischio empirico costruito a partire da una funzione di perdita opportuna. Cambiando la perdita <span class="math inline">\(\ell\)</span>, cambia l’indicatore che emerge come minimizzante: è esattamente questo che esploriamo nella prossima sezione.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Se apri un testo di <em>machine learning</em>, troverai spesso un’affermazione forte: “la statistica è solo questo — trovare <span class="math inline">\(h\)</span> che minimizza una loss, il resto è dettaglio computazionale”. C’è del vero in questa affermazione (il paradigma ERM è oggi centrale: quasi nessuno, in pratica, costruisce più “indicatori esotici” scollegati da un principio di minimizzazione), ma è anche una semplificazione eccessiva. Un corso di statistica come questo si occupa anche di <strong>quantificare l’incertezza</strong> attorno a un minimizzatore stimato su un campione finito — una domanda che il solo paradigma ERM, da solo, non pone. Ci torneremo esplicitamente quando parleremo di intervalli di confidenza nella regressione.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-2" class="level3" data-number="1.4.6">
+<h3 data-number="1.4.6" class="anchored" data-anchor-id="domande-di-comprensione-2"><span class="header-section-number">1.4.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché moltiplicare il rischio <span class="math inline">\(R(h)\)</span> per una costante positiva (per esempio dividerlo per <span class="math inline">\(n\)</span> o per <span class="math inline">\(n-1\)</span>) non cambia il minimizzatore <span class="math inline">\(h^\star\)</span>?</li>
+<li>In che senso la definizione di ERM data qui è “più generale” della definizione originaria di media?</li>
+<li>Se scegliamo <span class="math inline">\(\ell(x;h) = (x-h)^2\)</span> ma sostituiamo la somma su <span class="math inline">\(i\)</span> con la somma pesata <span class="math inline">\(\sum_i w_i (x_i-h)^2\)</span> per pesi <span class="math inline">\(w_i &gt; 0\)</span> fissati, ti aspetti ancora che il minimizzatore sia la media aritmetica semplice? Perché sì o perché no?</li>
+</ol>
+</section>
+</section>
+<section id="una-famiglia-di-funzioni-di-perdita-mediana-quantili-moda-ed-esponenziale" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="una-famiglia-di-funzioni-di-perdita-mediana-quantili-moda-ed-esponenziale"><span class="header-section-number">1.5</span> Una famiglia di funzioni di perdita: mediana, quantili, moda ed esponenziale</h2>
+<section id="motivazione-3" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="motivazione-3"><span class="header-section-number">1.5.1</span> Motivazione</h3>
+<p>Il paradigma ERM diventa davvero potente quando lo applichiamo a funzioni di perdita diverse dal quadrato. Vedremo che perdite apparentemente semplici da scrivere generano indicatori che già conosciamo — mediana, quantili, moda — mostrando che non sono ricette isolate ma casi particolari di un unico schema.</p>
+</section>
+<section id="concetto-lerrore-assoluto-e-la-mediana" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="concetto-lerrore-assoluto-e-la-mediana"><span class="header-section-number">1.5.2</span> Concetto: l’errore assoluto e la mediana</h3>
+<p>Sostituiamo il quadrato con il valore assoluto: <span class="math inline">\(\ell(x;h) = |x-h|\)</span>, ottenendo il <strong>rischio assoluto</strong> <span class="math inline">\(R_1(h) = \sum_i |x_i - h|\)</span>.</p>
+</section>
+<section id="intuizione-3" class="level3" data-number="1.5.3">
+<h3 data-number="1.5.3" class="anchored" data-anchor-id="intuizione-3"><span class="header-section-number">1.5.3</span> Intuizione</h3>
+<p>A differenza del rischio quadratico, <span class="math inline">\(R_1\)</span> non è derivabile nei punti <span class="math inline">\(h = x_i\)</span>, ma è derivabile altrove, e possiamo comunque ragionare sul segno della derivata. Per <span class="math inline">\(h\)</span> in un tratto senza osservazioni, la derivata di <span class="math inline">\(|x_i - h|\)</span> rispetto a <span class="math inline">\(h\)</span> vale <span class="math inline">\(+1\)</span> se <span class="math inline">\(h &gt; x_i\)</span> (l’osservazione è a sinistra) e <span class="math inline">\(-1\)</span> se <span class="math inline">\(h &lt; x_i\)</span> (l’osservazione è a destra). Il minimizzatore, quindi, è il punto in cui il numero di derivate <span class="math inline">\(+1\)</span> e il numero di derivate <span class="math inline">\(-1\)</span> si bilanciano — cioè il punto in cui ci sono <strong>tante osservazioni a sinistra quante a destra</strong>. Questa è, per l’appunto, la definizione di mediana.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La mediana campionaria è (uno dei) minimizzatori del rischio assoluto: <span class="math display">\[
+\text{med}(x) \in \arg\min_{h \in \mathbb{R}} \sum_{i=1}^n |x_i - h|.
+\]</span></p>
+</div>
+</div>
+<p>Quando <span class="math inline">\(n\)</span> è pari, questo ragionamento chiarisce anche perché <em>qualunque</em> valore compreso tra le due osservazioni centrali minimizza <span class="math inline">\(R_1\)</span> allo stesso modo: la convenzione di prendere la loro media, incontrata in precedenza, è solo una scelta tra infinite scelte ugualmente ottimali.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Un po’ di storia.</strong> Il criterio degli scarti assoluti minimi fu proposto storicamente da Laplace, prima che Gauss e Legendre popolarizzassero il criterio dei minimi quadrati (in gran parte per la sua trattabilità analitica, dovuta alla derivabilità del quadrato). La contrapposizione tra i due criteri — comodità del calcolo contro robustezza — è ancora oggi al centro della statistica computazionale, e la ritroveremo pari pari quando confronteremo la regressione ai minimi quadrati con le sue varianti robuste.</p>
+</div>
+</div>
+</section>
+<section id="concetto-lerrore-assoluto-asimmetrico-e-i-quantili" class="level3" data-number="1.5.4">
+<h3 data-number="1.5.4" class="anchored" data-anchor-id="concetto-lerrore-assoluto-asimmetrico-e-i-quantili"><span class="header-section-number">1.5.4</span> Concetto: l’errore assoluto asimmetrico e i quantili</h3>
+<p>Possiamo generalizzare ulteriormente pesando in modo diverso gli scarti a sinistra e a destra di <span class="math inline">\(h\)</span>. Introduciamo la notazione, per <span class="math inline">\(z \in \mathbb{R}\)</span>, <span class="math display">\[
+z^+ = \max(z,0), \qquad z^- = \max(-z,0),
+\]</span> (così che <span class="math inline">\(z = z^+ - z^-\)</span> e <span class="math inline">\(|z| = z^+ + z^-\)</span>), e definiamo, per un parametro <span class="math inline">\(p&gt;0\)</span>, la <strong>perdita assoluta asimmetrica</strong> <span class="math display">\[
+\ell_p(x;h) = p\,(x-h)^- + (x-h)^+.
+\]</span></p>
+</section>
+<section id="intuizione-4" class="level3" data-number="1.5.5">
+<h3 data-number="1.5.5" class="anchored" data-anchor-id="intuizione-4"><span class="header-section-number">1.5.5</span> Intuizione</h3>
+<p>Quando <span class="math inline">\(p=1\)</span> ritroviamo esattamente il valore assoluto simmetrico, e quindi la mediana. Per <span class="math inline">\(p \neq 1\)</span>, invece, pesiamo di più uno dei due lati: aumentare <span class="math inline">\(p\)</span> dà più peso alla parte negativa <span class="math inline">\((x-h)^-\)</span> (cioè ai casi in cui <span class="math inline">\(h\)</span> è “troppo grande” rispetto a <span class="math inline">\(x\)</span>), il che spinge il minimizzatore verso <strong>sinistra</strong>, cioè verso un quantile più basso. Con la scelta <span class="math inline">\(p=3\)</span> si ottiene esattamente il primo quartile <span class="math inline">\(Q_1\)</span>; scambiando i pesi, cioè penalizzando maggiormente la parte positiva, con <span class="math inline">\(\ell(x;h) = (x-h)^- + 3(x-h)^+\)</span> si ottiene il terzo quartile <span class="math inline">\(Q_3\)</span>. In generale, tutti i quantili nascono dallo stesso paradigma ERM, semplicemente scegliendo opportunamente il rapporto tra i due pesi.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Questa famiglia di perdite è nota in letteratura come <strong>pinball loss</strong> (o <em>quantile loss</em>), ed è alla base della <strong>regressione quantilica</strong>: anziché stimare la media condizionata di una variabile risposta (come fa la regressione ai minimi quadrati), si può stimare un quantile condizionato arbitrario, semplicemente cambiando la funzione di perdita usata nella minimizzazione. È un primo assaggio di quanto sia flessibile il paradigma ERM.</p>
+</div>
+</div>
+</section>
+<section id="concetto-lerrore-0-1-e-la-moda" class="level3" data-number="1.5.6">
+<h3 data-number="1.5.6" class="anchored" data-anchor-id="concetto-lerrore-0-1-e-la-moda"><span class="header-section-number">1.5.6</span> Concetto: l’errore 0-1 e la moda</h3>
+<p>Per dati categoriali (o comunque privi di una nozione naturale di “quanto” un errore sia grande), ha senso una perdita ancora più elementare, la <strong>perdita 0-1</strong>: <span class="math display">\[
+\ell(x;h) = \mathbb{1}[h \neq x] = \begin{cases} 0 &amp; \text{se } h = x \\ 1 &amp; \text{se } h \neq x. \end{cases}
+\]</span></p>
+</section>
+<section id="esempio-2" class="level3" data-number="1.5.7">
+<h3 data-number="1.5.7" class="anchored" data-anchor-id="esempio-2"><span class="header-section-number">1.5.7</span> Esempio</h3>
+<p>Immagina un campione di 120 persone di cui 50 hanno gli occhi neri e 70 gli occhi blu (e nessun altro colore). Se scegliamo <span class="math inline">\(h = \text{nero}\)</span>, il rischio empirico vale <span class="math inline">\(70\)</span> (paghiamo <span class="math inline">\(1\)</span> per ciascuna delle 70 persone con occhi blu). Se scegliamo <span class="math inline">\(h=\text{blu}\)</span>, il rischio vale <span class="math inline">\(50\)</span>. Il minimo tra i due è <span class="math inline">\(50\)</span>, ottenuto scegliendo il colore più frequente: la <strong>moda</strong>.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La moda campionaria è (una dei) minimizzatori del rischio 0-1: <span class="math display">\[
+\text{moda}(x) \in \arg\min_{h} \sum_{i=1}^n \mathbb{1}[h \neq x_i].
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="interpretazione-3" class="level3" data-number="1.5.8">
+<h3 data-number="1.5.8" class="anchored" data-anchor-id="interpretazione-3"><span class="header-section-number">1.5.8</span> Interpretazione</h3>
+<p>La perdita 0-1 è la più “cieca” delle perdite viste finora: non distingue tra un errore piccolo e un errore enorme, paga sempre esattamente <span class="math inline">\(1\)</span> se sbagliamo. Per questo è adatta a variabili categoriali prive di una struttura di distanza naturale (come il colore degli occhi), ma diventa un limite serio quando i dati hanno una struttura numerica: sbagliare di poco costa quanto sbagliare di molto. Ritroveremo esattamente questa perdita — con lo stesso nome — quando parleremo di <strong>errore di classificazione</strong> nei capitoli sulla classificazione.</p>
+</section>
+<section id="concetto-la-perdita-esponenziale-e-un-cenno-alla-perdita-di-huber" class="level3" data-number="1.5.9">
+<h3 data-number="1.5.9" class="anchored" data-anchor-id="concetto-la-perdita-esponenziale-e-un-cenno-alla-perdita-di-huber"><span class="header-section-number">1.5.9</span> Concetto: la perdita esponenziale e un cenno alla perdita di Huber</h3>
+<p>Consideriamo infine <span class="math inline">\(\ell(x;h) = \exp(|x-h|)\)</span>.</p>
+</section>
+<section id="intuizione-5" class="level3" data-number="1.5.10">
+<h3 data-number="1.5.10" class="anchored" data-anchor-id="intuizione-5"><span class="header-section-number">1.5.10</span> Intuizione</h3>
+<p>Se <span class="math inline">\(h\)</span> è vicino a <span class="math inline">\(x\)</span>, la perdita è vicina a <span class="math inline">\(\exp(0)=1\)</span>; ma se lo scarto <span class="math inline">\(|x-h|\)</span> cresce anche di poco, la perdita esplode, perché la funzione esponenziale cresce molto più rapidamente di una potenza qualsiasi. Il risultato è una perdita <strong>estremamente sensibile agli outlier</strong>: pochi punti (anche uno solo) molto lontani dalla massa principale dei dati possono spostare drasticamente il minimizzatore.</p>
+<p>Un caso limite istruttivo: se abbiamo solo tre osservazioni, di cui due vicine tra loro e una molto lontana, il minimizzatore della perdita esponenziale <strong>non</strong> si posiziona sulla mediana (come farebbe l’errore assoluto), ma si colloca circa a metà strada tra il valore minimo e il valore massimo del campione — perché il singolo punto lontano, elevato all’esponenziale, “costa” così tanto da dominare completamente la somma, tirando <span class="math inline">\(h\)</span> verso di sé molto più di quanto farebbe una perdita quadratica o assoluta.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Un compromesso tra il comportamento quadratico (vicino a <span class="math inline">\(h\)</span>) e quello lineare/assoluto (lontano da <span class="math inline">\(h\)</span>) è offerto dalla <strong>perdita di Huber</strong>, che unisce le due: <span class="math display">\[
+\ell_\delta(x;h) = \begin{cases} \tfrac12 (x-h)^2 &amp; \text{se } |x-h| \le \delta \\[4pt] \delta\left(|x-h| - \tfrac12\delta\right) &amp; \text{se } |x-h| &gt; \delta, \end{cases}
+\]</span> per una soglia <span class="math inline">\(\delta&gt;0\)</span> fissata. Vicino al minimo si comporta come il rischio quadratico (comodo da un punto di vista analitico), ma lontano dal minimo cresce solo linearmente, come l’errore assoluto, evitando l’esplosione tipica del quadrato o dell’esponenziale in presenza di outlier. È un esempio di come si possa <strong>disegnare su misura</strong> una funzione di perdita, combinando le proprietà di più perdite elementari.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il corso mette a disposizione una demo interattiva (<strong>WERMS</strong>, disponibile online) in cui puoi scegliere un piccolo campione, provare a indovinare a occhio il minimizzatore per diverse perdite (quadratica, assoluta, asimmetrica, esponenziale, di Huber) e confrontare il tuo intuito con il risultato esatto. Nel laboratorio R di questo capitolo ne ricostruiamo una versione semplificata.</p>
+</div>
+</div>
+</section>
+<section id="interpretazione-dinsieme" class="level3" data-number="1.5.11">
+<h3 data-number="1.5.11" class="anchored" data-anchor-id="interpretazione-dinsieme"><span class="header-section-number">1.5.11</span> Interpretazione d’insieme</h3>
+<p>La tabella seguente riassume la corrispondenza tra perdita e indicatore che emerge dal paradigma ERM.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Funzione di perdita <span class="math inline">\(\ell(x;h)\)</span></th>
+<th>Minimizzatore</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\((x-h)^2\)</span></td>
+<td>media <span class="math inline">\(\bar x\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\lvert x-h\rvert\)</span></td>
+<td>mediana</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(p\,(x-h)^- + (x-h)^+\)</span></td>
+<td>quantile di livello legato a <span class="math inline">\(p\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbb{1}[h\neq x]\)</span></td>
+<td>moda</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\exp(\lvert x-h\rvert)\)</span></td>
+<td>punto sensibile agli outlier (in casi estremi, punto medio tra min e max)</td>
+</tr>
+</tbody>
+</table>
+<p>Il messaggio pedagogico è che <strong>non stiamo imparando indicatori scollegati</strong>, ma stiamo osservando lo stesso principio — minimizzare un rischio empirico — applicato a scelte diverse di perdita. Una volta interiorizzato questo schema, diventa naturale chiedersi: quale perdita è più adatta al mio problema? È una domanda che guiderà buona parte del resto del corso.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il paradigma ERM è potentissimo, ma non esaurisce la statistica. Sapere che <span class="math inline">\(h^\star\)</span> minimizza un certo rischio empirico sul campione osservato non ci dice nulla, di per sé, su <strong>quanto ci possiamo fidare</strong> di <span class="math inline">\(h^\star\)</span> come stima di una quantità della popolazione, né su come cambierebbe <span class="math inline">\(h^\star\)</span> ripetendo l’esperimento con un campione diverso. Questa domanda sull’incertezza — tipica della statistica inferenziale più che del solo machine learning — tornerà esplicitamente più avanti nel corso.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-3" class="level3" data-number="1.5.12">
+<h3 data-number="1.5.12" class="anchored" data-anchor-id="domande-di-comprensione-3"><span class="header-section-number">1.5.12</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché la perdita 0-1 è adatta a colori degli occhi ma sarebbe una scelta discutibile per riassumere un campione di voti d’esame (numeri da 0 a 30)?</li>
+<li>Costruisci un esempio (anche solo a parole) in cui il minimizzatore della perdita esponenziale è visibilmente diverso sia dalla media sia dalla mediana. Che tipo di campione serve per ottenere questo effetto?</li>
+<li>Se in <span class="math inline">\(\ell_p(x;h) = p\,(x-h)^- + (x-h)^+\)</span> aumentiamo <span class="math inline">\(p\)</span> da <span class="math inline">\(1\)</span> a un valore molto grande, verso quale estremo del campione ti aspetti che si sposti il minimizzatore? Perché?</li>
+<li>La perdita di Huber “diventa” quadratica per <span class="math inline">\(|x-h|\le\delta\)</span> e assoluta per <span class="math inline">\(|x-h|&gt;\delta\)</span>. Che cosa succede al comportamento della perdita se facciamo tendere <span class="math inline">\(\delta \to 0\)</span>? E se <span class="math inline">\(\delta \to \infty\)</span>?</li>
+</ol>
+</section>
+</section>
+<section id="dati-multivariati-dal-singolo-carattere-al-vettore-di-caratteristiche" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="dati-multivariati-dal-singolo-carattere-al-vettore-di-caratteristiche"><span class="header-section-number">1.6</span> Dati multivariati: dal singolo carattere al vettore di caratteristiche</h2>
+<section id="motivazione-4" class="level3" data-number="1.6.1">
+<h3 data-number="1.6.1" class="anchored" data-anchor-id="motivazione-4"><span class="header-section-number">1.6.1</span> Motivazione</h3>
+<p>Fin qui abbiamo sempre lavorato con osservazioni <strong>univariate</strong>: un solo numero (o categoria) per individuo. Ma nella pratica raramente osserviamo una sola caratteristica: per ogni persona potremmo misurare altezza, peso, numero di scarpe, colore degli occhi, e così via. Serve quindi passare dalla statistica univariata alla <strong>statistica multivariata</strong>.</p>
+</section>
+<section id="concetto-notazione-e-organizzazione-dei-dati" class="level3" data-number="1.6.2">
+<h3 data-number="1.6.2" class="anchored" data-anchor-id="concetto-notazione-e-organizzazione-dei-dati"><span class="header-section-number">1.6.2</span> Concetto: notazione e organizzazione dei dati</h3>
+<p>Un campione di <span class="math inline">\(n\)</span> individui, ciascuno descritto da <span class="math inline">\(d\)</span> caratteristiche (o <strong>feature</strong>), si indica con <span class="math inline">\(x_{i,j}\)</span>, dove <span class="math inline">\(i=1,\dots,n\)</span> indicizza gli individui e <span class="math inline">\(j=1,\dots,d\)</span> le caratteristiche. Ogni individuo <span class="math inline">\(i\)</span> porta con sé un vettore <span class="math inline">\(x_i = (x_{i,1},\dots,x_{i,d}) \in \mathbb{R}^d\)</span> (o, più in generale, uno spazio con componenti anche non numeriche).</p>
+<p>La convenzione tabellare standard è: <strong>individui sulle righe, variabili sulle colonne</strong>. Il risultato è una tabella <span class="math inline">\(n \times d\)</span>.</p>
+</section>
+<section id="intuizione-6" class="level3" data-number="1.6.3">
+<h3 data-number="1.6.3" class="anchored" data-anchor-id="intuizione-6"><span class="header-section-number">1.6.3</span> Intuizione</h3>
+<p>Numericamente, questa tabella è una matrice. Ma in R (e nella pratica statistica) la chiamiamo <strong>data frame</strong>, non matrice, e la distinzione non è pedante: una matrice, in senso stretto, contiene elementi tutti dello stesso tipo, mentre le colonne di un data frame possono avere tipi diversi (una colonna numerica per l’altezza, una colonna categoriale per il colore degli occhi, e così via). Il data frame è quindi il contenitore giusto per rappresentare dati eterogenei mantenendo comunque, quando serve, la possibilità di trattare le colonne numeriche come una vera matrice.</p>
+</section>
+<section id="esempio-3" class="level3" data-number="1.6.4">
+<h3 data-number="1.6.4" class="anchored" data-anchor-id="esempio-3"><span class="header-section-number">1.6.4</span> Esempio</h3>
+<p>Un piccolo data frame di 4 studenti con due caratteristiche numeriche (voto di matematica, voto di fisica):</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>studente</th>
+<th>matematica</th>
+<th>fisica</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>28</td>
+<td>25</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>22</td>
+<td>27</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>30</td>
+<td>29</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>19</td>
+<td>21</td>
+</tr>
+</tbody>
+</table>
+<p>Ogni riga è un vettore <span class="math inline">\(x_i \in \mathbb{R}^2\)</span>.</p>
+</section>
+<section id="interpretazione-4" class="level3" data-number="1.6.5">
+<h3 data-number="1.6.5" class="anchored" data-anchor-id="interpretazione-4"><span class="header-section-number">1.6.5</span> Interpretazione</h3>
+<p>L’assunzione implicita più comune è che il numero di individui <span class="math inline">\(n\)</span> sia molto più grande del numero di caratteristiche <span class="math inline">\(d\)</span> (<span class="math inline">\(n \gg d\)</span>): tante osservazioni, poche variabili per ciascuna.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Questa assunzione non è sempre valida. In ambito biomedico, per esempio, un singolo sequenziamento genetico può produrre <strong>decine di migliaia</strong> di caratteristiche per individuo, mentre il numero di pazienti disponibili (specie per malattie rare) può essere molto piccolo: il regime tipico è <span class="math inline">\(d \gg n\)</span>. Questo capovolgimento ha conseguenze profonde su quasi tutti i metodi che vedremo nel corso — non è solo un dettaglio di conteggio, ed è uno dei motivi per cui la riduzione della dimensionalità (che vedremo più avanti, discutendo la PCA) è così importante nella statistica moderna.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-4" class="level3" data-number="1.6.6">
+<h3 data-number="1.6.6" class="anchored" data-anchor-id="domande-di-comprensione-4"><span class="header-section-number">1.6.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché un data frame non è semplicemente “una matrice con un altro nome”? Fai un esempio concreto in cui la distinzione conta.</li>
+<li>Nel caso <span class="math inline">\(d \gg n\)</span>, perché ti aspetti che indicatori come la varianza campionaria di ogni singola variabile diventino meno affidabili?</li>
+<li>Se ogni individuo del tuo campione fosse descritto da un’unica caratteristica numerica, la distinzione tra “matrice” e “data frame” avrebbe ancora senso?</li>
+</ol>
+</section>
+</section>
+<section id="distanze-tra-osservazioni-multivariate" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="distanze-tra-osservazioni-multivariate"><span class="header-section-number">1.7</span> Distanze tra osservazioni multivariate</h2>
+<section id="motivazione-5" class="level3" data-number="1.7.1">
+<h3 data-number="1.7.1" class="anchored" data-anchor-id="motivazione-5"><span class="header-section-number">1.7.1</span> Motivazione</h3>
+<p>Con osservazioni univariate, confrontare due valori è semplice: basta la differenza <span class="math inline">\(x - h\)</span>. Con osservazioni multivariate, <span class="math inline">\(x\)</span> e <span class="math inline">\(h\)</span> sono vettori in <span class="math inline">\(\mathbb{R}^d\)</span>, e la sottrazione componente per componente lascia ancora un vettore, non un numero. Abbiamo bisogno di un modo per riassumere “quanto sono lontani” due vettori con un singolo numero: una <strong>distanza</strong>.</p>
+</section>
+<section id="concetto-la-distanza-euclidea" class="level3" data-number="1.7.2">
+<h3 data-number="1.7.2" class="anchored" data-anchor-id="concetto-la-distanza-euclidea"><span class="header-section-number">1.7.2</span> Concetto: la distanza euclidea</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dati <span class="math inline">\(x,h \in \mathbb{R}^d\)</span>, la <strong>distanza euclidea</strong> è <span class="math display">\[
+\|x-h\|_2 = \sqrt{\sum_{j=1}^d (x_j - h_j)^2}.
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="intuizione-7" class="level3" data-number="1.7.3">
+<h3 data-number="1.7.3" class="anchored" data-anchor-id="intuizione-7"><span class="header-section-number">1.7.3</span> Intuizione</h3>
+<p>È la distanza “in linea d’aria”: la lunghezza del segmento che congiunge i due punti nello spazio, esattamente come il teorema di Pitagora in due o tre dimensioni. Nota bene: nonostante la somiglianza nella formula, questa <strong>non è</strong> la varianza o la deviazione standard — lì si confrontava ogni singola osservazione con la media dell’intero campione lungo una sola variabile; qui stiamo confrontando due singole osservazioni multivariate, componente per componente, lungo tutte le <span class="math inline">\(d\)</span> caratteristiche.</p>
+</section>
+<section id="concetto-la-distanza-di-manhattan" class="level3" data-number="1.7.4">
+<h3 data-number="1.7.4" class="anchored" data-anchor-id="concetto-la-distanza-di-manhattan"><span class="header-section-number">1.7.4</span> Concetto: la distanza di Manhattan</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La <strong>distanza di Manhattan</strong> (o <span class="math inline">\(\ell^1\)</span>, o “del tassista”) è <span class="math display">\[
+\|x-h\|_1 = \sum_{j=1}^d |x_j - h_j|.
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="intuizione-8" class="level3" data-number="1.7.5">
+<h3 data-number="1.7.5" class="anchored" data-anchor-id="intuizione-8"><span class="header-section-number">1.7.5</span> Intuizione</h3>
+<p>Il nome viene da un’immagine efficace: a Manhattan le strade formano una griglia regolare, e per andare da un incrocio all’altro non si può tagliare in diagonale come farebbe un uccello in volo — bisogna percorrere isolati, prima in una direzione poi nell’altra. La distanza di Manhattan somma gli spostamenti necessari lungo ciascun asse, senza mai “accorciare” per la diagonale. Poiché non eleva al quadrato gli scarti, tende a essere più robusta agli scarti anomali su una singola coordinata rispetto alla distanza euclidea — esattamente come il valore assoluto è più robusto del quadrato nel caso univariato.</p>
+</section>
+<section id="concetto-la-distanza-ellp-e-la-distanza-del-massimo" class="level3" data-number="1.7.6">
+<h3 data-number="1.7.6" class="anchored" data-anchor-id="concetto-la-distanza-ellp-e-la-distanza-del-massimo"><span class="header-section-number">1.7.6</span> Concetto: la distanza <span class="math inline">\(\ell^p\)</span> e la distanza del massimo</h3>
+<p>Le due distanze precedenti sono casi particolari di una famiglia più ampia.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Per <span class="math inline">\(p \ge 1\)</span>, la <strong>distanza <span class="math inline">\(\ell^p\)</span> (o di Minkowski)</strong> è <span class="math display">\[
+\|x-h\|_p = \left(\sum_{j=1}^d |x_j - h_j|^p\right)^{1/p}.
+\]</span> Il caso limite <span class="math inline">\(p \to \infty\)</span> dà la <strong>distanza del massimo</strong>: <span class="math display">\[
+\|x-h\|_\infty = \max_{j=1,\dots,d} |x_j - h_j|.
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="intuizione-9" class="level3" data-number="1.7.7">
+<h3 data-number="1.7.7" class="anchored" data-anchor-id="intuizione-9"><span class="header-section-number">1.7.7</span> Intuizione</h3>
+<p>La distanza <span class="math inline">\(\ell^p\)</span> interpola tra Manhattan (<span class="math inline">\(p=1\)</span>) ed euclidea (<span class="math inline">\(p=2\)</span>), e per <span class="math inline">\(p\)</span> sempre più grande dà peso via via crescente alla coordinata in cui lo scarto è maggiore, fino a “guardare solo quella” nel limite <span class="math inline">\(p\to\infty\)</span>: la distanza del massimo, infatti, ignora completamente tutte le coordinate tranne quella con lo scarto più grande.</p>
+</section>
+<section id="esempio-4" class="level3" data-number="1.7.8">
+<h3 data-number="1.7.8" class="anchored" data-anchor-id="esempio-4"><span class="header-section-number">1.7.8</span> Esempio</h3>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Considera due studenti con voti (matematica, fisica, chimica) pari a <span class="math inline">\(x=(28,20,25)\)</span> e <span class="math inline">\(h=(20,20,29)\)</span>. Gli scarti componente per componente sono <span class="math inline">\((8,0,-4)\)</span>. La distanza euclidea è <span class="math inline">\(\sqrt{8^2+0^2+4^2}=\sqrt{80}\approx 8.9\)</span>; quella di Manhattan è <span class="math inline">\(8+0+4=12\)</span>; quella del massimo è <span class="math inline">\(8\)</span>. Nota che tutte e tre concordano nel dire che gli studenti non sono identici, ma <strong>quantificano</strong> la distanza in modo diverso, e in problemi con più variabili l’ordinamento delle coppie di punti dal più vicino al più lontano può cambiare a seconda della distanza scelta.</p>
+</div>
+</div>
+</section>
+<section id="interpretazione-la-geometria-delle-distanze" class="level3" data-number="1.7.9">
+<h3 data-number="1.7.9" class="anchored" data-anchor-id="interpretazione-la-geometria-delle-distanze"><span class="header-section-number">1.7.9</span> Interpretazione: la geometria delle distanze</h3>
+<p>Un modo efficace per visualizzare le differenze tra queste distanze è disegnare, per ciascuna, l’insieme dei punti a distanza (al più) <span class="math inline">\(1\)</span> dall’origine — la cosiddetta <strong>palla unitaria</strong>. In dimensione 2, la palla euclidea è un disco circolare; la palla <span class="math inline">\(\ell^1\)</span> è un quadrato ruotato di 45° (un “rombo”); la palla <span class="math inline">\(\ell^\infty\)</span> è un quadrato allineato agli assi; le palle <span class="math inline">\(\ell^p\)</span> intermedie interpolano tra queste forme, diventando via via più “squadrate” al crescere di <span class="math inline">\(p\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Questa geometria non è solo un esercizio grafico: la forma della palla unitaria associata a una distanza (o, equivalentemente, a una norma) determina proprietà importanti dei problemi di ottimizzazione costruiti su di essa. Vedremo, quando parleremo di regolarizzazione nella regressione lineare (Ridge e LASSO), che la scelta tra una penalizzazione basata sulla norma <span class="math inline">\(\ell^2\)</span> o sulla norma <span class="math inline">\(\ell^1\)</span> ha conseguenze molto concrete — in particolare, la forma “a punta” della palla <span class="math inline">\(\ell^1\)</span> è responsabile del fatto che LASSO tende a produrre soluzioni con molte coordinate esattamente nulle, mentre Ridge no. Per ora basti notare che stiamo già incontrando, nella sua forma più elementare, la stessa geometria che tornerà utile molto più avanti nel corso.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Tutte queste distanze trattano le <span class="math inline">\(d\)</span> caratteristiche come se fossero misurate sulla stessa scala. Se una variabile è espressa in metri e un’altra in migliaia di euro, la seconda dominerà quasi sempre la distanza complessiva, indipendentemente dalla scelta di <span class="math inline">\(p\)</span>, semplicemente perché i suoi valori numerici sono più grandi. Questo problema della <strong>scala delle variabili</strong> è cruciale, e lo ritroveremo — con la stessa soluzione pratica, la standardizzazione — quando parleremo di clustering, di <span class="math inline">\(K\)</span>-nearest neighbors e di analisi delle componenti principali.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Abbiamo definito le distanze, ma non ancora come riassumere un intero gruppo di osservazioni multivariate con un unico punto rappresentativo — l’analogo multivariato di media o mediana. Questo richiede i concetti di <strong>centroide</strong> e <strong>medoide</strong>, che sono il punto di partenza del prossimo capitolo, dedicato al clustering: lì vedremo come le distanze introdotte qui diventino gli ingredienti principali per definire e trovare gruppi di osservazioni simili tra loro.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-5" class="level3" data-number="1.7.10">
+<h3 data-number="1.7.10" class="anchored" data-anchor-id="domande-di-comprensione-5"><span class="header-section-number">1.7.10</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Due punti hanno la stessa distanza euclidea da un terzo punto, ma distanze di Manhattan diverse. È una situazione possibile? Prova a costruire un esempio con <span class="math inline">\(d=2\)</span>.</li>
+<li>Perché la distanza <span class="math inline">\(\ell^\infty\)</span> può essere “ingannevole” se una sola caratteristica, per motivi puramente di scala (per esempio è misurata in millimetri invece che in metri), assume valori numericamente molto più grandi delle altre?</li>
+<li>Disegnando (anche solo mentalmente) le palle unitarie per <span class="math inline">\(p=1,2,4,\infty\)</span> in <span class="math inline">\(\mathbb{R}^2\)</span>, in che modo cambia la loro forma al crescere di <span class="math inline">\(p\)</span>? Che cosa “guadagna” e che cosa “perde” la distanza <span class="math inline">\(\ell^\infty\)</span> rispetto alle altre?</li>
+</ol>
+</section>
+</section>
+<section id="cosa-ricordare" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="cosa-ricordare"><span class="header-section-number">1.8</span> Cosa ricordare</h2>
+<ul>
+<li>Moda, mediana, media, quantili e varianza non sono definizioni scollegate: sono tutte minimizzatori di funzioni di perdita specifiche, applicate allo stesso schema di minimizzazione del rischio empirico (ERM).</li>
+<li>La media minimizza il rischio quadratico <span class="math inline">\(\sum_i (x_i-h)^2\)</span>; la mediana minimizza il rischio assoluto <span class="math inline">\(\sum_i |x_i-h|\)</span>; i quantili minimizzano una versione asimmetrica del rischio assoluto (perdita “pinball”); la moda minimizza il rischio 0-1.</li>
+<li>Il quadrato rende la media (e la varianza) analiticamente comode ma poco robuste agli outlier; il valore assoluto rende mediana e quantili più robusti ma meno “lisci” da un punto di vista analitico; la perdita esponenziale è un caso estremo di sensibilità agli outlier, mentre la perdita di Huber è un compromesso costruito su misura.</li>
+<li>Il paradigma ERM è centrale in tutto il corso, ma non esaurisce la statistica: non dice nulla, di per sé, sull’incertezza di una stima calcolata su un campione finito.</li>
+<li>I dati multivariati si organizzano in un data frame <span class="math inline">\(n\times d\)</span> (individui per righe, variabili per colonne), distinto concettualmente da una matrice perché le colonne possono avere tipi diversi.</li>
+<li>Il regime abituale <span class="math inline">\(n \gg d\)</span> non è universale: in ambito biomedico e in altri contesti si incontra spesso il regime opposto <span class="math inline">\(d \gg n\)</span>.</li>
+<li>Le distanze euclidea, di Manhattan, <span class="math inline">\(\ell^p\)</span> e del massimo generalizzano in modo diverso il concetto di “scarto” al caso multivariato, e la loro geometria (le palle unitarie) prefigura temi che ritorneremo a incontrare nel clustering e nella regolarizzazione.</li>
+<li>La scelta della distanza (così come la scelta della funzione di perdita) non è neutra: dipende dai dati, dalla scala delle variabili e da cosa vogliamo mettere in evidenza.</li>
+</ul>
+</section>
+<section id="domande-di-riepilogo" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="domande-di-riepilogo"><span class="header-section-number">1.9</span> Domande di riepilogo</h2>
+<p><strong>Comprendere</strong></p>
+<ol type="1">
+<li>Spiega, con parole tue, in che senso “la media non è solo una convenzione, ma il minimizzatore di qualcosa”.</li>
+<li>Perché la perdita 0-1 non fa distinzione tra un errore piccolo e un errore grande, e in quali contesti questo è un limite serio?</li>
+</ol>
+<p><strong>Ragionare</strong></p>
+<ol start="3" type="1">
+<li>Confronta la sensibilità agli outlier di media, mediana e minimizzatore della perdita esponenziale. Ordinale dalla più alla meno sensibile e giustifica l’ordinamento.</li>
+<li>Un collega sostiene che, poiché sia la mediana sia il quantile di livello <span class="math inline">\(\alpha=0{,}5\)</span> risolvono lo stesso problema di minimizzazione, non è mai necessario introdurre la notazione <span class="math inline">\(z^+,z^-\)</span>. È d’accordo? In quali situazioni quella notazione diventa invece indispensabile?</li>
+<li>Perché la distanza euclidea e la varianza campionaria, pur avendo formule che “sembrano” simili (entrambe coinvolgono somme di quadrati), rispondono a domande statistiche completamente diverse?</li>
+</ol>
+<p><strong>Esplorare con R</strong></p>
+<ol start="6" type="1">
+<li>Nel laboratorio di questo capitolo confronterai media e mediana su un campione con un valore anomalo. Prima di eseguire il codice, prevedi qualitativamente quale delle due statistiche cambierà di più rimuovendo quel valore.</li>
+<li>Prova a modificare il parametro <span class="math inline">\(p\)</span> nella perdita asimmetrica <span class="math inline">\(\ell_p(x;h)=p(x-h)^- + (x-h)^+\)</span> nel codice del laboratorio. Come si sposta il minimizzatore al crescere di <span class="math inline">\(p\)</span>, e perché questo è coerente con l’interpretazione data nel capitolo?</li>
+</ol>
+</section>
+<section id="laboratorio-r-leggere-i-dati-non-programmare" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="laboratorio-r-leggere-i-dati-non-programmare"><span class="header-section-number">1.10</span> Laboratorio R: leggere i dati, non programmare</h2>
+<p>L’obiettivo di questo laboratorio non è scrivere codice complesso, ma usare R per <strong>vedere concretamente</strong> ciò che abbiamo appena discusso: quanto media e mediana possono differire, come si comportano geometricamente le diverse funzioni di perdita, e come cambiano le distanze tra osservazioni multivariate a seconda della norma scelta.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="robustezza-di-media-e-mediana-uno-stipendio-fuori-scala" class="level3" data-number="1.10.1">
+<h3 data-number="1.10.1" class="anchored" data-anchor-id="robustezza-di-media-e-mediana-uno-stipendio-fuori-scala"><span class="header-section-number">1.10.1</span> Robustezza di media e mediana: uno stipendio fuori scala</h3>
+<p>Immaginiamo gli stipendi mensili netti (in euro) di 20 dipendenti di una piccola azienda, quasi tutti con stipendi simili, tranne uno (il titolare) molto più alto.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Prima di calcolare">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prima di calcolare
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sulla base di ciò che abbiamo visto (la media minimizza un rischio quadratico, la mediana un rischio assoluto), cosa ti aspetti: quale delle due statistiche pensi risentirà maggiormente della presenza dello stipendio del titolare? Prova a rispondere prima di guardare l’output.</p>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2024</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>stipendi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">round</span>(<span class="fu">rnorm</span>(<span class="dv">19</span>, <span class="at">mean =</span> <span class="dv">1600</span>, <span class="at">sd =</span> <span class="dv">120</span>)), <span class="dv">9800</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>stipendi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 1718 1656 1587 1574 1739 1755 1664 1585 1453 1465 1399 1656 1700 1635 1207
+[16] 1582 1488 1655 1407 9800</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(stipendi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1986.25</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(stipendi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1611</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rimuoviamo temporaneamente lo stipendio del titolare</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>stipendi_senza_outlier <span class="ot">&lt;-</span> stipendi[stipendi <span class="sc">&lt;</span> <span class="dv">9800</span>]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(stipendi_senza_outlier)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1575</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(stipendi_senza_outlier)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1587</code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Confronta i quattro numeri ottenuti. Di quanto (in valore assoluto e in percentuale) cambia la media togliendo l’osservazione anomala? Di quanto cambia la mediana?</li>
+<li>La tua previsione iniziale era corretta?</li>
+<li>Quale delle due statistiche, mediana o media, useresti per descrivere “lo stipendio tipico” di questa azienda in un articolo di giornale? Motiva la scelta collegandola alla nozione di robustezza.</li>
+<li>Prova a immaginare (senza ricalcolare) cosa succederebbe se, invece di un solo titolare, ci fossero <em>cinque</em> dipendenti con stipendi altrettanto alti. Ti aspetti che la mediana resti robusta anche in quel caso?</li>
+</ol>
+</section>
+<section id="quantili-e-box-plot-su-un-campione-di-voti" class="level3" data-number="1.10.2">
+<h3 data-number="1.10.2" class="anchored" data-anchor-id="quantili-e-box-plot-su-un-campione-di-voti"><span class="header-section-number">1.10.2</span> Quantili e box plot su un campione di voti</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>voti <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">18</span>, <span class="dv">30</span>, <span class="dv">24</span>, <span class="dv">27</span>, <span class="dv">21</span>, <span class="dv">26</span>, <span class="dv">24</span>, <span class="dv">29</span>, <span class="dv">30</span>, <span class="dv">22</span>, <span class="dv">25</span>, <span class="dv">27</span>, <span class="dv">18</span>, <span class="dv">30</span>, <span class="dv">23</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(voti, <span class="at">probs =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  0%  25%  50%  75% 100% 
+18.0 22.5 25.0 28.0 30.0 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">voto =</span> voti), <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> voto)) <span class="sc">+</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"grey85"</span>) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.05</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Voto"</span>, <span class="at">title =</span> <span class="st">"Box plot dei voti d'esame"</span>) <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01-statistica-descrittiva-e-rischio-empirico_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol type="1">
+<li>Individua sul grafico la mediana, <span class="math inline">\(Q_1\)</span> e <span class="math inline">\(Q_3\)</span>: corrispondono ai valori restituiti da <code>quantile()</code>?</li>
+<li>Ci sono punti che il box plot segnalerebbe come possibili outlier? Guardando i dati grezzi, ti sembra una segnalazione ragionevole?</li>
+<li>Cosa cambierebbe nel box plot se aggiungessimo un solo voto pari a 3 (per esempio per un compito consegnato in bianco)?</li>
+</ol>
+</section>
+<section id="ricostruire-la-logica-di-werms-la-geometria-di-diverse-funzioni-di-perdita" class="level3" data-number="1.10.3">
+<h3 data-number="1.10.3" class="anchored" data-anchor-id="ricostruire-la-logica-di-werms-la-geometria-di-diverse-funzioni-di-perdita"><span class="header-section-number">1.10.3</span> Ricostruire la logica di WERMS: la geometria di diverse funzioni di perdita</h3>
+<p>Costruiamo un piccolo campione (analogo a quelli usati nella demo interattiva WERMS vista a lezione) e osserviamo come cambia la forma del rischio empirico — e il suo minimizzatore — al variare della funzione di perdita.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="fl">4.5</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">15</span>)  <span class="co"># un campione di 7 punti, con un valore isolato</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>h_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">16</span>, <span class="at">by =</span> <span class="fl">0.02</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>rischio_quadratico <span class="ot">&lt;-</span> <span class="fu">sapply</span>(h_grid, <span class="cf">function</span>(h) <span class="fu">sum</span>((x <span class="sc">-</span> h)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>rischio_assoluto    <span class="ot">&lt;-</span> <span class="fu">sapply</span>(h_grid, <span class="cf">function</span>(h) <span class="fu">sum</span>(<span class="fu">abs</span>(x <span class="sc">-</span> h)))</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>rischio_esponenziale <span class="ot">&lt;-</span> <span class="fu">sapply</span>(h_grid, <span class="cf">function</span>(h) <span class="fu">sum</span>(<span class="fu">exp</span>(<span class="fu">abs</span>(x <span class="sc">-</span> h))))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>risultati <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">h =</span> <span class="fu">rep</span>(h_grid, <span class="dv">3</span>),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">rischio =</span> <span class="fu">c</span>(rischio_quadratico, rischio_assoluto, rischio_esponenziale) <span class="sc">/</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fu">max</span>(rischio_quadratico), <span class="fu">length</span>(h_grid)),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rep</span>(<span class="fu">max</span>(rischio_assoluto), <span class="fu">length</span>(h_grid)),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rep</span>(<span class="fu">max</span>(rischio_esponenziale), <span class="fu">length</span>(h_grid))),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">perdita =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"quadratica"</span>, <span class="st">"assoluta"</span>, <span class="st">"esponenziale"</span>), <span class="at">each =</span> <span class="fu">length</span>(h_grid))</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(risultati, <span class="fu">aes</span>(<span class="at">x =</span> h, <span class="at">y =</span> rischio, <span class="at">color =</span> perdita)) <span class="sc">+</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(x), <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">median</span>(x), <span class="at">linetype =</span> <span class="st">"dotted"</span>) <span class="sc">+</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"rischio (riscalato per confronto visivo)"</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Rischio empirico al variare di h, per tre funzioni di perdita"</span>) <span class="sc">+</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01-statistica-descrittiva-e-rischio-empirico_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Le curve sono state riscalate solo per poterle confrontare sullo stesso grafico (le unità di misura del rischio quadratico, assoluto ed esponenziale non sono comparabili tra loro). La linea tratteggiata segna la media, quella punteggiata la mediana: osserva dove si trova il minimo di ciascuna curva rispetto a queste due linee di riferimento.</p>
+</div>
+</div>
+<ol type="1">
+<li>Il minimo della curva “quadratica” cade esattamente sulla linea tratteggiata (la media)? E quello della curva “assoluta” sulla linea punteggiata (la mediana)?</li>
+<li>Dove si colloca il minimo della curva “esponenziale” rispetto agli altri due? È più vicino al punto isolato <span class="math inline">\(15\)</span> o al resto del campione?</li>
+<li>Prova a cambiare il valore <span class="math inline">\(15\)</span> in qualcosa di più estremo (per esempio <span class="math inline">\(50\)</span>) e a rieseguire il codice. Come si sposta il minimizzatore della perdita esponenziale? E quello della mediana?</li>
+</ol>
+<p>Verifichiamo ora numericamente la perdita asimmetrica per ottenere un quartile, usando lo stesso campione:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">3</span>  <span class="co"># peso maggiore sulla parte negativa: dovremmo avvicinarci a Q1</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>rischio_asimmetrico <span class="ot">&lt;-</span> <span class="fu">sapply</span>(h_grid, <span class="cf">function</span>(h) {</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> x <span class="sc">-</span> h</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  z_pos <span class="ot">&lt;-</span> <span class="fu">pmax</span>(z, <span class="dv">0</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  z_neg <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="sc">-</span>z, <span class="dv">0</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(p <span class="sc">*</span> z_neg <span class="sc">+</span> z_pos)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>h_min_asimmetrico <span class="ot">&lt;-</span> h_grid[<span class="fu">which.min</span>(rischio_asimmetrico)]</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>h_min_asimmetrico</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(x, <span class="at">probs =</span> <span class="fl">0.25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>25% 
+3.5 </code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Il minimizzatore trovato per via numerica è vicino al primo quartile calcolato con <code>quantile()</code>? Le piccole differenze che eventualmente osservi da cosa possono dipendere (pensa alla griglia <code>h_grid</code> e alle diverse convenzioni con cui R calcola i quantili)?</li>
+<li>Modifica <code>p</code> a <code>1/3</code> invece di <code>3</code>. Quale quartile ti aspetti di ottenere adesso? Verifica.</li>
+</ol>
+</section>
+<section id="la-geometria-delle-distanze-palle-unitarie-a-confronto" class="level3" data-number="1.10.4">
+<h3 data-number="1.10.4" class="anchored" data-anchor-id="la-geometria-delle-distanze-palle-unitarie-a-confronto"><span class="header-section-number">1.10.4</span> La geometria delle distanze: palle unitarie a confronto</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>angoli <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span> <span class="sc">*</span> pi, <span class="at">length.out =</span> <span class="dv">400</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>palla_euclidea <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">cos</span>(angoli), <span class="at">y =</span> <span class="fu">sin</span>(angoli), <span class="at">norma =</span> <span class="st">"l2 (euclidea)"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>palla_manhattan <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>), <span class="at">norma =</span> <span class="st">"l1 (Manhattan)"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>palla_max <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">norma =</span> <span class="st">"l-infinito"</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>palle <span class="ot">&lt;-</span> <span class="fu">rbind</span>(palla_euclidea, palla_manhattan, palla_max)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(palle, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> norma)) <span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>() <span class="sc">+</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Palle unitarie per tre distanze diverse in R^2"</span>) <span class="sc">+</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01-statistica-descrittiva-e-rischio-empirico_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="600"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol type="1">
+<li>Quale delle tre “palle” contiene le altre due, e quale è contenuta nelle altre due? Che relazione d’ordine osservi tra <span class="math inline">\(\|\cdot\|_1\)</span>, <span class="math inline">\(\|\cdot\|_2\)</span> e <span class="math inline">\(\|\cdot\|_\infty\)</span>?</li>
+<li>Il punto <span class="math inline">\((1,1)\)</span> ha norma euclidea <span class="math inline">\(\sqrt2 \approx 1{,}41\)</span>, norma di Manhattan <span class="math inline">\(2\)</span> e norma del massimo <span class="math inline">\(1\)</span>. Colloca questo punto rispetto alle tre curve disegnate: conferma quanto trovato nella domanda precedente?</li>
+<li>Aumentando l’esponente <span class="math inline">\(p\)</span> da <span class="math inline">\(2\)</span> a valori sempre più grandi, verso quale delle forme già disegnate ti aspetti che la palla <span class="math inline">\(\ell^p\)</span> si avvicini?</li>
+</ol>
+</section>
+<section id="distanze-multivariate-su-un-piccolo-dataset" class="level3" data-number="1.10.5">
+<h3 data-number="1.10.5" class="anchored" data-anchor-id="distanze-multivariate-su-un-piccolo-dataset"><span class="header-section-number">1.10.5</span> Distanze multivariate su un piccolo dataset</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>studenti <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">matematica =</span> <span class="fu">c</span>(<span class="dv">28</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">19</span>, <span class="dv">24</span>),</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fisica     =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">27</span>, <span class="dv">29</span>, <span class="dv">21</span>, <span class="dv">24</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names  =</span> <span class="fu">paste0</span>(<span class="st">"Studente "</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>studenti</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           matematica fisica
+Studente 1         28     25
+Studente 2         20     27
+Studente 3         30     29
+Studente 4         19     21
+Studente 5         24     24</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">as.matrix</span>(<span class="fu">dist</span>(studenti, <span class="at">method =</span> <span class="st">"euclidean"</span>)), <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Studente 1 Studente 2 Studente 3 Studente 4 Studente 5
+Studente 1        0.0        8.2        4.5        9.8        4.1
+Studente 2        8.2        0.0       10.2        6.1        5.0
+Studente 3        4.5       10.2        0.0       13.6        7.8
+Studente 4        9.8        6.1       13.6        0.0        5.8
+Studente 5        4.1        5.0        7.8        5.8        0.0</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">as.matrix</span>(<span class="fu">dist</span>(studenti, <span class="at">method =</span> <span class="st">"manhattan"</span>)), <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Studente 1 Studente 2 Studente 3 Studente 4 Studente 5
+Studente 1          0         10          6         13          5
+Studente 2         10          0         12          7          7
+Studente 3          6         12          0         19         11
+Studente 4         13          7         19          0          8
+Studente 5          5          7         11          8          0</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">as.matrix</span>(<span class="fu">dist</span>(studenti, <span class="at">method =</span> <span class="st">"maximum"</span>)), <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Studente 1 Studente 2 Studente 3 Studente 4 Studente 5
+Studente 1          0          8          4          9          4
+Studente 2          8          0         10          6          4
+Studente 3          4         10          0         11          6
+Studente 4          9          6         11          0          5
+Studente 5          4          4          6          5          0</code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Individua, per ciascuna delle tre matrici di distanza, la coppia di studenti più vicina tra loro. È sempre la stessa coppia indipendentemente dalla distanza scelta, oppure la scelta della distanza cambia la risposta?</li>
+<li>Lo Studente 4 ha voti piuttosto bassi su entrambe le materie. In quale delle tre distanze risulta “più isolato” rispetto agli altri (cioè con le distanze medie più grandi verso il resto del gruppo)?</li>
+<li>Se una delle due materie fosse invece misurata su una scala da 0 a 100 anziché da 0 a 30 (per esempio un punteggio di un test standardizzato), come cambierebbe l’importanza relativa delle due materie in ciascuna delle tre distanze, anche senza rifare il calcolo? Questo problema ti ricorda quello discusso a proposito della scala delle variabili nella sezione precedente — lo ritroveremo in modo cruciale quando parleremo di clustering e di <span class="math inline">\(K\)</span>-nearest neighbors.</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Prefazione">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Prefazione</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02-clustering.html" class="pagination-link" aria-label="Clustering">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Clustering</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Statistica II (750AA) — note del corso</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Costruito con Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

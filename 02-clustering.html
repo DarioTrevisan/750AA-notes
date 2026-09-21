@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Clustering – Statistica II — Introduzione alla Statistica Computazionale</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-riduzione-dimensionalita-pca.html" rel="next">
+<link href="./01-statistica-descrittiva-e-rischio-empirico.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-d0ae9245876894da5ac7e18953ecc5cc.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-76a1503f7c92a7917b55a7b5888d2ac1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-16c8d5c3c49bfcc791534bfcd98e32e8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-76a1503f7c92a7917b55a7b5888d2ac1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02-clustering.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Clustering</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Statistica II — Introduzione alla Statistica Computazionale</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefazione</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-statistica-descrittiva-e-rischio-empirico.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Dalla statistica descrittiva al rischio empirico</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-clustering.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Clustering</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-riduzione-dimensionalita-pca.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Riduzione della dimensionalità e PCA</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-classificazione-knn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Classificazione: K-Nearest Neighbors e validazione</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-bayes-naive-bayes-roc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Formula di Bayes e classificatori generativi</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-regressione-knn-bias-varianza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regressione: da KNN al metodo dei minimi quadrati</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-regressione-lineare-multipla.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regressione lineare multipla e quantificazione dell’incertezza</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-collinearita-regolarizzazione.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Riduzione dei modelli di regressione: collinearità e regolarizzazione</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-serie-storiche-decomposizione.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Serie storiche I: visualizzazione, decomposizione e previsione elementare</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-serie-storiche-smoothing-esponenziale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Serie storiche II: smoothing esponenziale e famiglia ETS</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-serie-storiche-arima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Processi stocastici e modelli ARIMA</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Riferimenti</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#obiettivi-del-capitolo" id="toc-obiettivi-del-capitolo" class="nav-link active" data-scroll-target="#obiettivi-del-capitolo"><span class="header-section-number">2.1</span> Obiettivi del capitolo</a></li>
+  <li><a href="#da-centroide-a-medoide-due-nozioni-di-centro" id="toc-da-centroide-a-medoide-due-nozioni-di-centro" class="nav-link" data-scroll-target="#da-centroide-a-medoide-due-nozioni-di-centro"><span class="header-section-number">2.2</span> Da centroide a medoide: due nozioni di “centro”</a>
+  <ul class="collapse">
+  <li><a href="#motivazione" id="toc-motivazione" class="nav-link" data-scroll-target="#motivazione"><span class="header-section-number">2.2.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-definizione" id="toc-concetto-e-definizione" class="nav-link" data-scroll-target="#concetto-e-definizione"><span class="header-section-number">2.2.2</span> Concetto e definizione</a></li>
+  <li><a href="#intuizione" id="toc-intuizione" class="nav-link" data-scroll-target="#intuizione"><span class="header-section-number">2.2.3</span> Intuizione</a></li>
+  <li><a href="#esempio" id="toc-esempio" class="nav-link" data-scroll-target="#esempio"><span class="header-section-number">2.2.4</span> Esempio</a></li>
+  <li><a href="#interpretazione" id="toc-interpretazione" class="nav-link" data-scroll-target="#interpretazione"><span class="header-section-number">2.2.5</span> Interpretazione</a></li>
+  <li><a href="#domande-di-comprensione" id="toc-domande-di-comprensione" class="nav-link" data-scroll-target="#domande-di-comprensione"><span class="header-section-number">2.2.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#il-problema-del-clustering" id="toc-il-problema-del-clustering" class="nav-link" data-scroll-target="#il-problema-del-clustering"><span class="header-section-number">2.3</span> Il problema del clustering</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-1" id="toc-motivazione-1" class="nav-link" data-scroll-target="#motivazione-1"><span class="header-section-number">2.3.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-definizione-1" id="toc-concetto-e-definizione-1" class="nav-link" data-scroll-target="#concetto-e-definizione-1"><span class="header-section-number">2.3.2</span> Concetto e definizione</a></li>
+  <li><a href="#intuizione-tre-problemi-in-uno" id="toc-intuizione-tre-problemi-in-uno" class="nav-link" data-scroll-target="#intuizione-tre-problemi-in-uno"><span class="header-section-number">2.3.3</span> Intuizione: tre problemi in uno</a></li>
+  <li><a href="#domande-di-comprensione-1" id="toc-domande-di-comprensione-1" class="nav-link" data-scroll-target="#domande-di-comprensione-1"><span class="header-section-number">2.3.4</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#panoramica-dei-metodi-gerarchici-e-non-gerarchici" id="toc-panoramica-dei-metodi-gerarchici-e-non-gerarchici" class="nav-link" data-scroll-target="#panoramica-dei-metodi-gerarchici-e-non-gerarchici"><span class="header-section-number">2.4</span> Panoramica dei metodi: gerarchici e non gerarchici</a></li>
+  <li><a href="#k-means-e-lalgoritmo-di-lloyd" id="toc-k-means-e-lalgoritmo-di-lloyd" class="nav-link" data-scroll-target="#k-means-e-lalgoritmo-di-lloyd"><span class="header-section-number">2.5</span> <span class="math inline">\(k\)</span>-means e l’algoritmo di Lloyd</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-2" id="toc-motivazione-2" class="nav-link" data-scroll-target="#motivazione-2"><span class="header-section-number">2.5.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-definizione-2" id="toc-concetto-e-definizione-2" class="nav-link" data-scroll-target="#concetto-e-definizione-2"><span class="header-section-number">2.5.2</span> Concetto e definizione</a></li>
+  <li><a href="#intuizione-lalgoritmo-di-lloyd-e-le-celle-di-voronoi" id="toc-intuizione-lalgoritmo-di-lloyd-e-le-celle-di-voronoi" class="nav-link" data-scroll-target="#intuizione-lalgoritmo-di-lloyd-e-le-celle-di-voronoi"><span class="header-section-number">2.5.3</span> Intuizione: l’algoritmo di Lloyd e le celle di Voronoi</a></li>
+  <li><a href="#esempio-1" id="toc-esempio-1" class="nav-link" data-scroll-target="#esempio-1"><span class="header-section-number">2.5.4</span> Esempio</a></li>
+  <li><a href="#interpretazione-1" id="toc-interpretazione-1" class="nav-link" data-scroll-target="#interpretazione-1"><span class="header-section-number">2.5.5</span> Interpretazione</a></li>
+  <li><a href="#limiti" id="toc-limiti" class="nav-link" data-scroll-target="#limiti"><span class="header-section-number">2.5.6</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-2" id="toc-domande-di-comprensione-2" class="nav-link" data-scroll-target="#domande-di-comprensione-2"><span class="header-section-number">2.5.7</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#k-medoids-e-lalgoritmo-pam" id="toc-k-medoids-e-lalgoritmo-pam" class="nav-link" data-scroll-target="#k-medoids-e-lalgoritmo-pam"><span class="header-section-number">2.6</span> <span class="math inline">\(k\)</span>-medoids e l’algoritmo PAM</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-3" id="toc-motivazione-3" class="nav-link" data-scroll-target="#motivazione-3"><span class="header-section-number">2.6.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-definizione-3" id="toc-concetto-e-definizione-3" class="nav-link" data-scroll-target="#concetto-e-definizione-3"><span class="header-section-number">2.6.2</span> Concetto e definizione</a></li>
+  <li><a href="#intuizione-1" id="toc-intuizione-1" class="nav-link" data-scroll-target="#intuizione-1"><span class="header-section-number">2.6.3</span> Intuizione</a></li>
+  <li><a href="#esempio-segmentazione-clienti-con-un-outlier" id="toc-esempio-segmentazione-clienti-con-un-outlier" class="nav-link" data-scroll-target="#esempio-segmentazione-clienti-con-un-outlier"><span class="header-section-number">2.6.4</span> Esempio: segmentazione clienti con un outlier</a></li>
+  <li><a href="#interpretazione-2" id="toc-interpretazione-2" class="nav-link" data-scroll-target="#interpretazione-2"><span class="header-section-number">2.6.5</span> Interpretazione</a></li>
+  <li><a href="#limiti-1" id="toc-limiti-1" class="nav-link" data-scroll-target="#limiti-1"><span class="header-section-number">2.6.6</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-3" id="toc-domande-di-comprensione-3" class="nav-link" data-scroll-target="#domande-di-comprensione-3"><span class="header-section-number">2.6.7</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#clustering-gerarchico-dendrogramma-agnes-e-diana" id="toc-clustering-gerarchico-dendrogramma-agnes-e-diana" class="nav-link" data-scroll-target="#clustering-gerarchico-dendrogramma-agnes-e-diana"><span class="header-section-number">2.7</span> Clustering gerarchico: dendrogramma, AGNES e DIANA</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-4" id="toc-motivazione-4" class="nav-link" data-scroll-target="#motivazione-4"><span class="header-section-number">2.7.1</span> Motivazione</a></li>
+  <li><a href="#concetto-il-dendrogramma" id="toc-concetto-il-dendrogramma" class="nav-link" data-scroll-target="#concetto-il-dendrogramma"><span class="header-section-number">2.7.2</span> Concetto: il dendrogramma</a></li>
+  <li><a href="#agnes-lapproccio-agglomerativo" id="toc-agnes-lapproccio-agglomerativo" class="nav-link" data-scroll-target="#agnes-lapproccio-agglomerativo"><span class="header-section-number">2.7.3</span> AGNES: l’approccio agglomerativo</a></li>
+  <li><a href="#diana-lapproccio-divisivo" id="toc-diana-lapproccio-divisivo" class="nav-link" data-scroll-target="#diana-lapproccio-divisivo"><span class="header-section-number">2.7.4</span> DIANA: l’approccio divisivo</a></li>
+  <li><a href="#esempio-costruzione-passo-passo-di-un-dendrogramma" id="toc-esempio-costruzione-passo-passo-di-un-dendrogramma" class="nav-link" data-scroll-target="#esempio-costruzione-passo-passo-di-un-dendrogramma"><span class="header-section-number">2.7.5</span> Esempio: costruzione passo-passo di un dendrogramma</a></li>
+  <li><a href="#interpretazione-3" id="toc-interpretazione-3" class="nav-link" data-scroll-target="#interpretazione-3"><span class="header-section-number">2.7.6</span> Interpretazione</a></li>
+  <li><a href="#limiti-2" id="toc-limiti-2" class="nav-link" data-scroll-target="#limiti-2"><span class="header-section-number">2.7.7</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-4" id="toc-domande-di-comprensione-4" class="nav-link" data-scroll-target="#domande-di-comprensione-4"><span class="header-section-number">2.7.8</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#come-scegliere-il-numero-di-cluster" id="toc-come-scegliere-il-numero-di-cluster" class="nav-link" data-scroll-target="#come-scegliere-il-numero-di-cluster"><span class="header-section-number">2.8</span> Come scegliere il numero di cluster</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-5" id="toc-motivazione-5" class="nav-link" data-scroll-target="#motivazione-5"><span class="header-section-number">2.8.1</span> Motivazione</a></li>
+  <li><a href="#il-metodo-del-gomito-elbow" id="toc-il-metodo-del-gomito-elbow" class="nav-link" data-scroll-target="#il-metodo-del-gomito-elbow"><span class="header-section-number">2.8.2</span> Il metodo del gomito (Elbow)</a></li>
+  <li><a href="#lindice-di-dunn" id="toc-lindice-di-dunn" class="nav-link" data-scroll-target="#lindice-di-dunn"><span class="header-section-number">2.8.3</span> L’indice di Dunn</a></li>
+  <li><a href="#la-silhouette" id="toc-la-silhouette" class="nav-link" data-scroll-target="#la-silhouette"><span class="header-section-number">2.8.4</span> La silhouette</a></li>
+  <li><a href="#domande-di-comprensione-5" id="toc-domande-di-comprensione-5" class="nav-link" data-scroll-target="#domande-di-comprensione-5"><span class="header-section-number">2.8.5</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#cosa-ricordare" id="toc-cosa-ricordare" class="nav-link" data-scroll-target="#cosa-ricordare"><span class="header-section-number">2.9</span> Cosa ricordare</a></li>
+  <li><a href="#domande-di-riepilogo" id="toc-domande-di-riepilogo" class="nav-link" data-scroll-target="#domande-di-riepilogo"><span class="header-section-number">2.10</span> Domande di riepilogo</a></li>
+  <li><a href="#laboratorio-r-leggere-i-dati-non-programmare" id="toc-laboratorio-r-leggere-i-dati-non-programmare" class="nav-link" data-scroll-target="#laboratorio-r-leggere-i-dati-non-programmare"><span class="header-section-number">2.11</span> Laboratorio R: leggere i dati, non programmare</a>
+  <ul class="collapse">
+  <li><a href="#k-means-su-dati-reali" id="toc-k-means-su-dati-reali" class="nav-link" data-scroll-target="#k-means-su-dati-reali"><span class="header-section-number">2.11.1</span> <span class="math inline">\(k\)</span>-means su dati reali</a></li>
+  <li><a href="#confronto-tra-k-means-e-pam" id="toc-confronto-tra-k-means-e-pam" class="nav-link" data-scroll-target="#confronto-tra-k-means-e-pam"><span class="header-section-number">2.11.2</span> Confronto tra <span class="math inline">\(k\)</span>-means e PAM</a></li>
+  <li><a href="#clustering-gerarchico-agnes-diana-e-il-dendrogramma" id="toc-clustering-gerarchico-agnes-diana-e-il-dendrogramma" class="nav-link" data-scroll-target="#clustering-gerarchico-agnes-diana-e-il-dendrogramma"><span class="header-section-number">2.11.3</span> Clustering gerarchico: AGNES, DIANA e il dendrogramma</a></li>
+  <li><a href="#scegliere-k-elbow-dunn-e-silhouette-insieme" id="toc-scegliere-k-elbow-dunn-e-silhouette-insieme" class="nav-link" data-scroll-target="#scegliere-k-elbow-dunn-e-silhouette-insieme"><span class="header-section-number">2.11.4</span> Scegliere <span class="math inline">\(k\)</span>: Elbow, Dunn e silhouette insieme</a></li>
+  <li><a href="#leffetto-della-scala" id="toc-leffetto-della-scala" class="nav-link" data-scroll-target="#leffetto-della-scala"><span class="header-section-number">2.11.5</span> L’effetto della scala</a></li>
+  <li><a href="#per-esplorare-oltre" id="toc-per-esplorare-oltre" class="nav-link" data-scroll-target="#per-esplorare-oltre"><span class="header-section-number">2.11.6</span> Per esplorare oltre</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-clustering" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Clustering</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="obiettivi-del-capitolo" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="obiettivi-del-capitolo"><span class="header-section-number">2.1</span> Obiettivi del capitolo</h2>
+<p>Al termine del capitolo dovresti essere in grado di:</p>
+<ul>
+<li>distinguere centroide e medoide come due diversi minimizzatori di uno stesso rischio empirico, e spiegare quando conviene usare l’uno o l’altro;</li>
+<li>descrivere l’obiettivo di <span class="math inline">\(k\)</span>-means e di PAM, e spiegare perché il secondo tende a essere più robusto agli outlier;</li>
+<li>ricostruire il funzionamento dell’algoritmo di Lloyd e interpretare geometricamente le celle di Voronoi che produce;</li>
+<li>leggere un dendrogramma, spiegare la differenza tra approccio agglomerativo (AGNES) e divisivo (DIANA), e collegare un taglio dell’albero a un numero di cluster;</li>
+<li>confrontare criticamente Elbow, indice di Dunn e silhouette come criteri per scegliere il numero di cluster, riconoscendone i limiti;</li>
+<li>valutare, di fronte a un output di clustering, se il risultato è statisticamente sensato o se è solo un artefatto dell’algoritmo o della scala dei dati.</li>
+</ul>
+<p>Il clustering è il primo argomento del corso in cui i dati sono davvero multivariati e in cui, per la prima volta, non abbiamo alcuna “risposta giusta” da confrontare con il risultato del metodo. Per questo motivo è anche il primo argomento in cui l’atteggiamento critico verso l’output — più che la sola capacità di eseguire un algoritmo — diventa la competenza centrale.</p>
+</section>
+<section id="da-centroide-a-medoide-due-nozioni-di-centro" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="da-centroide-a-medoide-due-nozioni-di-centro"><span class="header-section-number">2.2</span> Da centroide a medoide: due nozioni di “centro”</h2>
+<section id="motivazione" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="motivazione"><span class="header-section-number">2.2.1</span> Motivazione</h3>
+<p>Nel capitolo precedente abbiamo visto la media come il minimizzatore di un rischio empirico quadratico: dato un campione <span class="math inline">\(\{x_i\}_{i=1}^n\)</span>, la media <span class="math inline">\(\bar x\)</span> è il valore <span class="math inline">\(m\)</span> che minimizza <span class="math inline">\(\sum_i (x_i-m)^2\)</span>. La stessa idea si estende senza difficoltà a osservazioni multivariate <span class="math inline">\(x_i\in\mathbb R^d\)</span>: la media si calcola componente per componente, e continua a minimizzare la somma dei quadrati delle distanze euclidee.</p>
+<p>C’è però una situazione in cui questa costruzione comincia a scricchiolare. Immagina di estrarre ripetutamente palline da un’urna e di contare quante sono rosse: le tue osservazioni sono numeri interi (0, 1, 2, 3, …). Se calcoli la media di queste osservazioni puoi tranquillamente ottenere <span class="math inline">\(4{,}5\)</span>. Il problema è che <span class="math inline">\(4{,}5\)</span> palline rosse non è un’osservazione possibile: la media, in generale, <strong>non è uno dei valori che abbiamo effettivamente osservato</strong>. In una dimensione questo inconveniente si risolve spesso passando alla mediana, che (per costruzione, quando <span class="math inline">\(n\)</span> è dispari) coincide con un’osservazione reale. In più dimensioni, o quando alcune variabili sono categoriche, la mediana componente per componente perde senso, e serve un’idea diversa: forzare il “centro” a essere una delle osservazioni. Questa idea è il <strong>medoide</strong>.</p>
+</section>
+<section id="concetto-e-definizione" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="concetto-e-definizione"><span class="header-section-number">2.2.2</span> Concetto e definizione</h3>
+<p>Riprendiamo il rischio quadratico della media, ma restringiamo l’insieme su cui minimizziamo.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione: centroide e medoide">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione: centroide e medoide
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dato un campione multivariato <span class="math inline">\(\{x_i\}_{i=1}^n\)</span>, con <span class="math inline">\(x_i\in\mathbb R^d\)</span>, il <strong>centroide</strong> (o media) è <span class="math display">\[
+\bar x := \frac1n \sum_{i=1}^n x_i \in \operatorname*{argmin}_{m\,\in\,\mathbb R^d} \sum_{i=1}^n \|x_i - m\|^2,
+\]</span> cioè il minimizzatore del rischio quadratico calcolato su <strong>tutto</strong> lo spazio <span class="math inline">\(\mathbb R^d\)</span>.</p>
+<p>Il <strong>medoide</strong> è invece definito come il minimizzatore dello stesso rischio, ma ristretto alle sole osservazioni: <span class="math display">\[
+x^* \in \operatorname*{argmin}_{h\,\in\,\{x_1,\ldots,x_n\}} \sum_{i=1}^n \|h - x_i\|^2.
+\]</span></p>
+<p>Più in generale, sostituendo la distanza euclidea al quadrato con una funzione di costo qualsiasi <span class="math inline">\(\ell(x,h)\)</span>, si definisce il medoide rispetto a <span class="math inline">\(\ell\)</span> come <span class="math display">\[
+x^* \in \operatorname*{argmin}_{h\,\in\,\{x_1,\ldots,x_n\}} \sum_{i=1}^n \ell(x_i, h).
+\]</span></p>
+</div>
+</div>
+<p>Il centroide e il medoide risolvono <strong>lo stesso problema di minimo</strong>, con un unico vincolo aggiuntivo per il secondo: il candidato <span class="math inline">\(h\)</span> deve appartenere all’insieme finito delle osservazioni. È esattamente la relazione che già conosci tra media e mediana, generalizzata al caso multivariato e a costi arbitrari.</p>
+</section>
+<section id="intuizione" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="intuizione"><span class="header-section-number">2.2.3</span> Intuizione</h3>
+<p>Restringere la ricerca del minimo a un insieme finito ha una conseguenza pratica immediata: <strong>non esiste una formula chiusa per il medoide</strong>, così come non esiste per la mediana in più di una dimensione. Questo non deve sorprendere né spaventare: significa solo che, per trovare il medoide, in generale bisogna confrontare esplicitamente il valore del rischio in corrispondenza di ciascuna osservazione candidata, invece di applicare una formula come <span class="math inline">\(\frac1n\sum_i x_i\)</span>.</p>
+<p>C’è un modo visivo efficace per capire quando centroide e medoide coincidono (a meno di arrotondamenti) e quando invece si allontanano molto. Se tra le osservazioni esiste un punto che si trova realmente “in mezzo” alla nuvola di dati, quel punto tenderà a essere sia vicino al centroide sia il medoide: la restrizione all’insieme delle osservazioni non costa quasi nulla. Se invece nessuna osservazione occupa una posizione realmente centrale — per esempio perché i dati si dispongono su due gruppetti ben separati senza nulla nel mezzo — il medoide è <strong>costretto</strong> a “cadere” su uno dei punti periferici di uno dei due gruppetti, pur di rimanere un’osservazione reale. Il centroide, in quel caso, può trovarsi in una zona dello spazio dove non c’è alcun dato osservato: geometricamente ragionevole come “punto medio”, ma statisticamente vuoto, perché nessuno degli individui osservati si trova lì.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento: parametro vs iperparametro">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento: parametro vs iperparametro
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nella scelta del medoide, il candidato <span class="math inline">\(h\)</span> è un esempio di <strong>parametro</strong>: qualcosa che viene ottimizzato direttamente all’interno dello stesso passo di minimizzazione. Più avanti nel capitolo incontreremo invece il numero di cluster <span class="math inline">\(k\)</span>, che è un <strong>iperparametro</strong>: una quantità che va decisa in un passo <em>diverso</em> (spesso successivo), per cui non esiste un unico criterio universalmente valido. La distinzione tra parametro e iperparametro tornerà più volte nel corso, ogni volta che un metodo statistico avrà una parte “ottimizzabile direttamente dai dati” e una parte che richiede invece una scelta esterna.</p>
+</div>
+</div>
+</section>
+<section id="esempio" class="level3" data-number="2.2.4">
+<h3 data-number="2.2.4" class="anchored" data-anchor-id="esempio"><span class="header-section-number">2.2.4</span> Esempio</h3>
+<p>Consideriamo sei osservazioni bivariate molto semplici, quattro raccolte “in basso” e due “in alto”, pensando a un dataset giocattolo simile alla demo interattiva usata a lezione.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>punti <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">4</span>, <span class="fl">4.5</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.3</span>, <span class="sc">-</span><span class="fl">0.2</span>, <span class="sc">-</span><span class="fl">0.4</span>, <span class="dv">3</span>, <span class="fl">3.2</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>punti</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     x    y
+1  0.0  0.0
+2  1.0  0.3
+3 -1.0 -0.2
+4  0.5 -0.4
+5  4.0  3.0
+6  4.5  3.2</code></pre>
+</div>
+</div>
+<p>Calcoliamo il centroide componente per componente, e poi cerchiamo il medoide confrontando, per ciascuna osservazione candidata, la somma dei quadrati delle distanze da tutte le altre.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>centroide <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(punti)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>centroide</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        x         y 
+1.5000000 0.9833333 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dist_quadrate <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(punti))<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>rischio_per_candidato <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(dist_quadrate)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>rischio_per_candidato</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     1      2      3      4      5      6 
+ 58.03  43.03  84.63  56.21 100.63 122.21 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>medoide <span class="ot">&lt;-</span> punti[<span class="fu">which.min</span>(rischio_per_candidato), ]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>medoide</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  x   y
+2 1 0.3</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>rischio_per_candidato</code> contiene, per ciascuna osservazione, il valore del rischio <span class="math inline">\(\sum_i \|h-x_i\|^2\)</span> se scegliessimo quell’osservazione come “centro”. Il medoide è semplicemente l’osservazione con il valore più basso. Nota che non abbiamo implementato un algoritmo di ottimizzazione: abbiamo solo <em>valutato</em> la definizione su tutte le alternative possibili, cosa che qui è fattibile perché le osservazioni sono poche.</p>
+</div>
+</div>
+<p><strong>Prima di guardare l’output</strong>: aspettandoti che il centroide cada “a metà strada” tra i due gruppetti di punti, quale pensi sarà il medoide? Uno dei quattro punti in basso, uno dei due in alto, o non è possibile prevederlo?</p>
+</section>
+<section id="interpretazione" class="level3" data-number="2.2.5">
+<h3 data-number="2.2.5" class="anchored" data-anchor-id="interpretazione"><span class="header-section-number">2.2.5</span> Interpretazione</h3>
+<p>Il centroide di questo dataset cade in una zona dello spazio compresa tra i due gruppetti, in un punto dove non c’è nessuna osservazione reale: è un compromesso geometrico, non un individuo effettivamente osservato. Il medoide, invece, è vincolato a essere uno dei sei punti: risulterà quindi uno dei punti del gruppo più numeroso (quello “in basso”), semplicemente perché stare vicino a tre vicini pesa più, nella somma delle distanze quadratiche, che stare vicino a due. Questo è già un piccolo indizio di un comportamento che ritroveremo nel clustering: il medoide “sceglie un rappresentante reale”, ma quel rappresentante non è necessariamente equidistante da tutti i punti come vorrebbe essere un ipotetico centro geometrico.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La distinzione centroide/medoide è a volte sottile e viene talvolta trascurata nella pratica. Ma nel momento in cui una variabile è categorica, o in cui la media di osservazioni discrete produce valori privi di senso (come <span class="math inline">\(4{,}5\)</span> palline rosse, o un “cliente medio” con <span class="math inline">\(2{,}3\)</span> figli), il centroide smette di essere interpretabile come individuo reale, mentre il medoide resta sempre un’osservazione autentica. Questa differenza sarà il punto di partenza per capire perché esistono due famiglie di metodi di clustering non gerarchico: <span class="math inline">\(k\)</span>-means (basato sui centroidi) e PAM (basato sui medoidi).</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione" class="level3" data-number="2.2.6">
+<h3 data-number="2.2.6" class="anchored" data-anchor-id="domande-di-comprensione"><span class="header-section-number">2.2.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché non esiste, in generale, una formula chiusa per calcolare il medoide, mentre per il centroide sì?</li>
+<li>Costruisci mentalmente un insieme di punti in cui centroide e medoide coincidono quasi esattamente. Che caratteristica geometrica ha questo insieme?</li>
+<li>Se una delle variabili osservate è categorica (per esempio il colore preferito di un cliente), ha senso parlare di centroide per quella variabile? E di medoide?</li>
+</ol>
+</section>
+</section>
+<section id="il-problema-del-clustering" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="il-problema-del-clustering"><span class="header-section-number">2.3</span> Il problema del clustering</h2>
+<section id="motivazione-1" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="motivazione-1"><span class="header-section-number">2.3.1</span> Motivazione</h3>
+<p>Immagina un biologo che raccoglie decine di misure morfologiche (lunghezza, peso, forma del becco, …) su un gruppo di animali, senza sapere in anticipo quante specie diverse sta osservando. Oppure immagina un’azienda che raccoglie dati sul comportamento d’acquisto dei propri clienti e vuole capire se esistono gruppi di clienti con esigenze simili, per poter costruire strategie di marketing differenziate. In entrambi i casi il problema è lo stesso: <strong>partizionare</strong> un insieme di osservazioni in gruppi internamente omogenei, senza che nessuno ci dica in anticipo quali sono i gruppi “giusti”.</p>
+<p>Questo è il problema del <strong>clustering</strong>: una tecnica <strong>non supervisionata</strong>, nel senso preciso che non esiste, nei dati, un’etichetta osservata da riprodurre. È bene tenere a mente fin da subito questo aspetto: il clustering è per sua natura una tecnica <strong>esplorativa</strong>. Non esiste una “risposta corretta” con cui confrontare il risultato, a differenza di quanto accadrà quando affronteremo la classificazione (nel capitolo su K-Nearest Neighbors), dove ogni osservazione ha davvero un’etichetta di classe nota e il compito del metodo è impararla.</p>
+</section>
+<section id="concetto-e-definizione-1" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="concetto-e-definizione-1"><span class="header-section-number">2.3.2</span> Concetto e definizione</h3>
+<p>Formalmente, dato un campione <span class="math inline">\(\{x_i\}_{i=1,\ldots,n}\)</span>, l’obiettivo del clustering è trovare <span class="math inline">\(k\)</span> gruppi disgiunti (cluster) <span class="math inline">\((C_j)_{j=1,\ldots,k}\)</span> tali che <span class="math display">\[
+\{x_i\}_{i=1,\ldots,n} = \bigcup_{j=1}^k C_j, \qquad C_i \cap C_j = \varnothing \text{ per } i\neq j,
+\]</span> minimizzando la <strong>variabilità interna</strong> a ciascun gruppo: vogliamo che, all’interno di uno stesso cluster, le osservazioni si assomiglino il più possibile, mentre osservazioni in cluster diversi possono essere anche molto diverse tra loro.</p>
+<p>Il caso limite <span class="math inline">\(k=n\)</span>, in cui ogni osservazione forma un cluster a sé — “ogni individuo nella sua isoletta felice” — rende banalmente nulla la variabilità interna, ma è ovviamente inutile: serve un criterio ragionevole per scegliere <span class="math inline">\(k\)</span>.</p>
+</section>
+<section id="intuizione-tre-problemi-in-uno" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="intuizione-tre-problemi-in-uno"><span class="header-section-number">2.3.3</span> Intuizione: tre problemi in uno</h3>
+<p>Dietro la definizione, apparentemente semplice, si nascondono <strong>tre problemi distinti</strong>, ed è utile tenerli separati fin da subito:</p>
+<ol type="1">
+<li><strong>Quale nozione di similarità/costo usare?</strong> Come per la media e la mediana, tutto dipende dalla scelta della funzione di costo (o della distanza) usata per confrontare le osservazioni. Le distanze multivariate viste nel capitolo precedente — euclidea, Manhattan, del massimo — sono il prerequisito diretto: il clustering, in fondo, non fa che riorganizzare quelle distanze in gruppi.</li>
+<li><strong>Quanti cluster <span class="math inline">\(k\)</span>?</strong> <span class="math inline">\(k\)</span> è un iperparametro: nessuna formula “ottimizza” <span class="math inline">\(k\)</span> nello stesso passo in cui si trovano i cluster. Serve un criterio a parte, e — come vedremo — non esiste un criterio universalmente giusto: la scelta dipende da cosa vogliamo <em>fare</em> con quei cluster.</li>
+<li><strong>Come si calcolano concretamente i cluster?</strong> Una volta fissati costo e <span class="math inline">\(k\)</span>, resta il problema algoritmico di trovare (o approssimare) la partizione ottimale. Questo è un problema più vicino all’ottimizzazione computazionale che alla statistica in senso stretto, ma condiziona fortemente ciò che osserviamo nella pratica.</li>
+</ol>
+<p>Il clustering è inoltre concettualmente propedeutico alla classificazione, che affronteremo più avanti: una volta costruiti dei cluster su un insieme di dati, ci si può chiedere a quale cluster andrebbe assegnata una nuova osservazione non ancora vista. Questo problema — chiamato spesso <em>imputation</em> — è essenzialmente un problema di classificazione supervisionata, con la differenza che qui le “classi” sono i cluster che abbiamo appena costruito, e non etichette date a priori.</p>
+</section>
+<section id="domande-di-comprensione-1" class="level3" data-number="2.3.4">
+<h3 data-number="2.3.4" class="anchored" data-anchor-id="domande-di-comprensione-1"><span class="header-section-number">2.3.4</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché il clustering viene definito una tecnica “esplorativa”, e cosa significa in pratica questo aggettivo quando si presentano i risultati a qualcuno?</li>
+<li>In che senso il numero di cluster <span class="math inline">\(k\)</span> è “un parametro diverso dagli altri”? Prova a spiegarlo con parole tue, senza usare il termine “iperparametro”.</li>
+<li>Un collega ti dice: “Ho fatto girare un algoritmo di clustering e ho ottenuto 4 cluster, quindi il dataset ha davvero 4 gruppi”. Cosa risponderesti?</li>
+</ol>
+</section>
+</section>
+<section id="panoramica-dei-metodi-gerarchici-e-non-gerarchici" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="panoramica-dei-metodi-gerarchici-e-non-gerarchici"><span class="header-section-number">2.4</span> Panoramica dei metodi: gerarchici e non gerarchici</h2>
+<p>Prima di entrare nei dettagli, conviene avere una mappa dei metodi che affronteremo. Si dividono in due grandi famiglie.</p>
+<p>I metodi <strong>non gerarchici</strong> fissano <span class="math inline">\(k\)</span> <em>prima</em> di calcolare i cluster: si sceglie il numero di gruppi desiderato, e l’algoritmo restituisce una singola partizione con esattamente <span class="math inline">\(k\)</span> cluster. In questa famiglia rientrano <strong><span class="math inline">\(k\)</span>-means</strong>, basato sui centroidi, e <strong>PAM</strong> (<em>Partitioning Around Medoids</em>), basato sui medoidi.</p>
+<p>I metodi <strong>gerarchici</strong> (<em>Hierarchical Cluster Analysis</em>, HCA) non richiedono di fissare <span class="math inline">\(k\)</span> in anticipo: costruiscono un’intera gerarchia di partizioni annidate, dalla situazione con un solo cluster fino a quella con <span class="math inline">\(n\)</span> cluster singoli (o viceversa), e permettono di “tagliare” questa gerarchia al livello desiderato solo alla fine. Si dividono a loro volta in <strong>agglomerativi</strong> (bottom-up, es. AGNES), che partono dai singoli punti e li fondono progressivamente, e <strong>divisivi</strong> (top-down, es. DIANA), che partono da un unico cluster e lo suddividono progressivamente.</p>
+<p>Il vantaggio principale dei metodi gerarchici è proprio questa flessibilità: si esegue l’algoritmo una sola volta e si dispone, a quel punto, di <em>tutte</em> le partizioni possibili in <span class="math inline">\(k=1,\ldots,n\)</span> cluster, tra cui scegliere in un secondo momento. Il costo è che, in generale, questi metodi sono più lenti dei metodi non gerarchici, perché devono costruire l’intera gerarchia anche se poi si è interessati a un solo valore di <span class="math inline">\(k\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il resto del capitolo">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il resto del capitolo
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Tratteremo prima i due metodi non gerarchici (<span class="math inline">\(k\)</span>-means e PAM), poi i due metodi gerarchici (AGNES e DIANA), e infine i criteri con cui scegliere <span class="math inline">\(k\)</span> (che si applicano, con qualche adattamento, a entrambe le famiglie). Questa lezione è dichiaratamente teorica: nessuna delle funzioni R (<code>kmeans</code>, <code>pam</code>, <code>hclust</code>, <code>agnes</code>, <code>diana</code>) compare nelle slide originali. Le trovi comunque già usate nel corso del capitolo, e sistematicamente nel Laboratorio R finale, in modo da collegare da subito la teoria alla pratica.</p>
+</div>
+</div>
+</section>
+<section id="k-means-e-lalgoritmo-di-lloyd" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="k-means-e-lalgoritmo-di-lloyd"><span class="header-section-number">2.5</span> <span class="math inline">\(k\)</span>-means e l’algoritmo di Lloyd</h2>
+<section id="motivazione-2" class="level3" data-number="2.5.1">
+<h3 data-number="2.5.1" class="anchored" data-anchor-id="motivazione-2"><span class="header-section-number">2.5.1</span> Motivazione</h3>
+<p><span class="math inline">\(k\)</span>-means è il metodo di clustering più semplice e, non a caso, il primo che vale la pena provare su un nuovo dataset. L’idea riprende direttamente il centroide: invece di cercare un solo centro per l’intero campione, cerchiamo <span class="math inline">\(k\)</span> centri, uno per ciascun cluster, e assegniamo ogni osservazione al centro più vicino.</p>
+</section>
+<section id="concetto-e-definizione-2" class="level3" data-number="2.5.2">
+<h3 data-number="2.5.2" class="anchored" data-anchor-id="concetto-e-definizione-2"><span class="header-section-number">2.5.2</span> Concetto e definizione</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione: $k$-means">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione: <span class="math inline">\(k\)</span>-means
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dati <span class="math inline">\(k\)</span> cluster <span class="math inline">\((C_j)_{j=1}^k\)</span>, il rischio empirico da minimizzare è la <strong>Within Clusters Sum of Squares</strong> (WCSS), detta anche <em>inerzia</em>: <span class="math display">\[
+\operatorname{WCSS}\big((C_j)_{j=1}^k\big) = \sum_{j=1}^k \sum_{x_i \in C_j} \|x_i - c_j\|^2, \qquad c_j := \frac{1}{\#C_j} \sum_{x_i \in C_j} x_i,
+\]</span> dove <span class="math inline">\(c_j\)</span> è il centroide del cluster <span class="math inline">\(C_j\)</span>. <span class="math inline">\(k\)</span>-means cerca la partizione <span class="math inline">\((C_j)_{j=1}^k\)</span> che minimizza questo rischio.</p>
+</div>
+</div>
+<p>Si tratta della stessa loss quadratica del centroide, solo applicata separatamente a ciascun gruppo: se ci fosse un solo cluster contenente tutte le osservazioni, il problema si ridurrebbe esattamente al calcolo della media che già conosciamo dal capitolo precedente.</p>
+</section>
+<section id="intuizione-lalgoritmo-di-lloyd-e-le-celle-di-voronoi" class="level3" data-number="2.5.3">
+<h3 data-number="2.5.3" class="anchored" data-anchor-id="intuizione-lalgoritmo-di-lloyd-e-le-celle-di-voronoi"><span class="header-section-number">2.5.3</span> Intuizione: l’algoritmo di Lloyd e le celle di Voronoi</h3>
+<p>Trovare la partizione che minimizza esattamente la WCSS è un problema <strong>NP-hard</strong>: al crescere di <span class="math inline">\(n\)</span> e <span class="math inline">\(k\)</span>, il numero di partizioni possibili è enorme, e non esiste un algoritmo efficiente che garantisca il minimo globale. Si osserva però una condizione di ottimalità molto naturale: in un ottimo (anche solo locale), ogni osservazione deve essere assegnata al centroide più vicino, altrimenti basterebbe riassegnarla per abbassare ulteriormente la WCSS.</p>
+<p>Questa osservazione suggerisce un algoritmo iterativo — attribuito a Lloyd — che alterna due passi:</p>
+<ol start="0" type="1">
+<li><strong>Inizializzazione</strong>: si scelgono <span class="math inline">\(k\)</span> centroidi casuali.</li>
+<li><strong>Assegnazione</strong>: ogni osservazione viene assegnata al cluster con il centroide più vicino.</li>
+<li><strong>Aggiornamento</strong>: ogni centroide viene ricalcolato come la media delle osservazioni assegnate al suo cluster. Si ripetono i passi 1–2 fino alla convergenza.</li>
+</ol>
+<p>Una volta fissati i centri, il passo di assegnazione partiziona lo spazio in regioni geometriche note come <strong>celle di Voronoi</strong>: la cella del centro <span class="math inline">\(c_j\)</span> è l’insieme dei punti dello spazio più vicini a <span class="math inline">\(c_j\)</span> che a qualunque altro centro. È un’immagine utile da tenere a mente: <span class="math inline">\(k\)</span>-means, in ogni sua iterazione, non fa altro che tracciare (implicitamente) queste celle e spostare i centri verso il baricentro dei punti che ricadono in ciascuna cella.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento: inizializzazioni migliori">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento: inizializzazioni migliori
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>L’algoritmo di Lloyd, così come descritto, parte da centroidi scelti <strong>a caso</strong>. Esistono strategie di inizializzazione più sofisticate (la più nota è nota come <em>k-means++</em>) che scelgono i centroidi iniziali in modo da favorire punti già ben distanziati tra loro, riducendo il rischio di convergere a soluzioni chiaramente subottimali. Torneremo su questo aspetto — e sull’effetto pratico di inizializzazioni diverse sullo stesso dataset — quando useremo <code>kmeans()</code> su dati reali.</p>
+</div>
+</div>
+</section>
+<section id="esempio-1" class="level3" data-number="2.5.4">
+<h3 data-number="2.5.4" class="anchored" data-anchor-id="esempio-1"><span class="header-section-number">2.5.4</span> Esempio</h3>
+<p>Prima di calcolare, prova a rispondere: se un dataset è composto da due nuvole di punti ben separate, quanto pensi che il risultato di <span class="math inline">\(k\)</span>-means con <span class="math inline">\(k=2\)</span> dipenda dall’inizializzazione casuale dei centroidi? Molto, poco, per niente?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>gruppo_a <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">15</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>), <span class="at">y =</span> <span class="fu">rnorm</span>(<span class="dv">15</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.5</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>gruppo_b <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">15</span>, <span class="at">mean =</span> <span class="dv">4</span>, <span class="at">sd =</span> <span class="fl">0.5</span>), <span class="at">y =</span> <span class="fu">rnorm</span>(<span class="dv">15</span>, <span class="at">mean =</span> <span class="dv">4</span>, <span class="at">sd =</span> <span class="fl">0.5</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>dati_semplici <span class="ot">&lt;-</span> <span class="fu">rbind</span>(gruppo_a, gruppo_b)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>km_semplice <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(dati_semplici, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">1</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>km_semplice<span class="sc">$</span>centers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           x          y
+1 0.05042142 0.03203675
+2 4.04514292 4.08763166</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>km_semplice<span class="sc">$</span>tot.withinss</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10.76131</code></pre>
+</div>
+</div>
+<p><strong>Dopo il calcolo</strong>: i due centroidi trovati corrispondono, più o meno, ai centri delle due nuvole simulate (<span class="math inline">\((0,0)\)</span> e <span class="math inline">\((4,4)\)</span>)? Se il dataset è ben separato in due gruppi evidenti, l’algoritmo trova la soluzione corretta quasi indipendentemente dall’inizializzazione: il problema dell’inizializzazione diventa serio soprattutto quando i gruppi si sovrappongono o quando <span class="math inline">\(k\)</span> non corrisponde alla struttura reale dei dati — un esperimento che approfondiremo nel prossimo capitolo.</p>
+</section>
+<section id="interpretazione-1" class="level3" data-number="2.5.5">
+<h3 data-number="2.5.5" class="anchored" data-anchor-id="interpretazione-1"><span class="header-section-number">2.5.5</span> Interpretazione</h3>
+<p><span class="math inline">\(k\)</span>-means ha tre vantaggi pratici importanti: è concettualmente semplice, è <strong>veloce</strong> anche su dataset di grandi dimensioni (ogni iterazione richiede solo calcoli di distanze e medie), e si aggiorna facilmente quando arrivano nuove osservazioni, perché l’algoritmo è già iterativo per costruzione — non serve ripartire da zero, basta continuare le iterazioni includendo i nuovi punti.</p>
+</section>
+<section id="limiti" class="level3" data-number="2.5.6">
+<h3 data-number="2.5.6" class="anchored" data-anchor-id="limiti"><span class="header-section-number">2.5.6</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(k\)</span>-means eredita <strong>esattamente gli stessi difetti della media</strong>: essendo basato sulla loss quadratica, è molto sensibile agli outlier. Un singolo punto molto lontano dagli altri può spostare significativamente un centroide, “trascinando” con sé l’intero cluster. A questo si aggiungono altri tre limiti:</p>
+<ul>
+<li>bisogna <strong>fissare <span class="math inline">\(k\)</span></strong> in anticipo, e la scelta non è ovvia (ne parliamo più avanti);</li>
+<li>il risultato <strong>dipende dall’inizializzazione</strong>: run diversi possono restituire cluster diversi sullo stesso dataset, soprattutto se <span class="math inline">\(k\)</span> non riflette bene la struttura dei dati;</li>
+<li>come ogni metodo basato su una distanza (qui, quella euclidea), <span class="math inline">\(k\)</span>-means soffre della <strong>curse of dimensionality</strong>: se le osservazioni hanno molte caratteristiche rumorose, la distanza euclidea tra due punti tende a diventare poco informativa, perché il rumore si accumula in ogni componente. Ne riparleremo diffusamente nel capitolo sulla riduzione della dimensionalità, dove vedremo perché questo fenomeno colpisce in generale tutti i metodi basati su distanze — non solo il clustering, ma anche i metodi di classificazione basati sui vicini più prossimi.</li>
+</ul>
+</div>
+</div>
+<p>Una domanda naturale, di fronte alla sensibilità agli outlier, è: perché non usare la mediana al posto della media, cioè un ipotetico “<span class="math inline">\(k\)</span>-medians”? La risposta pratica è che, se si è disposti a rinunciare alla comodità computazionale della media, tanto vale spingersi fino in fondo e usare direttamente i medoidi — il metodo che vediamo ora.</p>
+</section>
+<section id="domande-di-comprensione-2" class="level3" data-number="2.5.7">
+<h3 data-number="2.5.7" class="anchored" data-anchor-id="domande-di-comprensione-2"><span class="header-section-number">2.5.7</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché il problema di minimizzazione della WCSS è considerato “difficile” (NP-hard), e cosa comporta in pratica questa difficoltà per l’algoritmo che usiamo davvero?</li>
+<li>Disegna mentalmente tre centroidi in un piano. Come cambia la forma delle celle di Voronoi se sposti uno dei tre centroidi molto lontano dagli altri due?</li>
+<li>Un dataset ha una singola osservazione con un valore estremamente grande su una variabile. Cosa ti aspetti che succeda al centroide del cluster a cui questa osservazione viene assegnata da <span class="math inline">\(k\)</span>-means?</li>
+</ol>
+</section>
+</section>
+<section id="k-medoids-e-lalgoritmo-pam" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="k-medoids-e-lalgoritmo-pam"><span class="header-section-number">2.6</span> <span class="math inline">\(k\)</span>-medoids e l’algoritmo PAM</h2>
+<section id="motivazione-3" class="level3" data-number="2.6.1">
+<h3 data-number="2.6.1" class="anchored" data-anchor-id="motivazione-3"><span class="header-section-number">2.6.1</span> Motivazione</h3>
+<p>Torniamo all’esempio della ricchezza, questa volta su scala di popolazione. Immagina un piccolo paese in cui la maggior parte delle famiglie ha un reddito modesto, ma una singola famiglia possiede una fortuna miliardaria.</p>
+<p><strong>Prima di calcolare</strong>: se aggiungiamo un singolo miliardario a un gruppo di famiglie “normali”, ti aspetti che la ricchezza <em>media</em> del gruppo cambi molto o poco? E la ricchezza <em>mediana</em>?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>redditi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">28</span>, <span class="dv">31</span>, <span class="dv">25</span>, <span class="dv">33</span>, <span class="dv">29</span>, <span class="dv">27</span>, <span class="dv">30</span>, <span class="dv">26</span>, <span class="dv">32</span>, <span class="dv">28</span>) <span class="co"># in migliaia di euro</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>redditi_con_miliardario <span class="ot">&lt;-</span> <span class="fu">c</span>(redditi, <span class="dv">5000000</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(redditi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 28.9</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(redditi_con_miliardario)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 454571.7</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(redditi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 28.5</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(redditi_con_miliardario)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 29</code></pre>
+</div>
+</div>
+<p><strong>Dopo il calcolo</strong>: la media si è spostata da una ventina di migliaia di euro a diverse centinaia di migliaia — sembrerebbe che “in media” tutti si siano arricchiti, il che è chiaramente fuorviante. La mediana, invece, resta stabile: continua a descrivere correttamente il livello di reddito della famiglia “tipica”. Questo è precisamente il motivo per cui, quando il centroide (la media) può essere pesantemente distorto da poche osservazioni estreme, conviene sostituirlo con il medoide, che — essendo vincolato a essere un’osservazione reale — è molto più simile, nel comportamento, alla mediana.</p>
+</section>
+<section id="concetto-e-definizione-3" class="level3" data-number="2.6.2">
+<h3 data-number="2.6.2" class="anchored" data-anchor-id="concetto-e-definizione-3"><span class="header-section-number">2.6.2</span> Concetto e definizione</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione: PAM (Partitioning Around Medoids)">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione: PAM (Partitioning Around Medoids)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>PAM generalizza <span class="math inline">\(k\)</span>-means in due direzioni contemporaneamente: sostituisce il centroide con il medoide, e permette di sostituire la distanza euclidea al quadrato con una funzione di costo <span class="math inline">\(\ell\)</span> arbitraria. Il rischio da minimizzare è la <strong>Within Clusters Risk</strong> (WCR): <span class="math display">\[
+\operatorname{WCR}\big((C_j)_{j=1}^k\big) = \sum_{j=1}^k \sum_{x_i \in C_j} \ell(x_i, c_j),
+\]</span> dove <span class="math inline">\(c_j\)</span> è ora il <strong>medoide</strong> del cluster <span class="math inline">\(C_j\)</span>, e <span class="math inline">\(\ell(x,h)\)</span> è una funzione di costo scelta dall’utente (spesso, ma non necessariamente, una distanza).</p>
+</div>
+</div>
+</section>
+<section id="intuizione-1" class="level3" data-number="2.6.3">
+<h3 data-number="2.6.3" class="anchored" data-anchor-id="intuizione-1"><span class="header-section-number">2.6.3</span> Intuizione</h3>
+<p>L’algoritmo che minimizza (approssimativamente) la WCR ha la stessa struttura concettuale dell’algoritmo di Lloyd — assegnazione, aggiornamento, ripeti — ma con una complicazione: mentre trovare il centroide di un gruppo di punti è immediato (basta fare la media), trovare il medoide di un gruppo richiede di confrontare il rischio associato a ogni possibile osservazione candidata. Per questo motivo, gli algoritmi che implementano PAM sono generalmente più lenti di quelli per <span class="math inline">\(k\)</span>-means, pur risolvendo un problema concettualmente molto simile.</p>
+<p>Il vantaggio di questa maggiore complessità computazionale è una flessibilità molto maggiore. Il costo <span class="math inline">\(\ell\)</span> non deve essere per forza una distanza euclidea: può essere una qualunque funzione che quantifichi la dissimilarità tra due osservazioni, incluse variabili <strong>categoriche</strong>. Questo apre la porta a dataset con variabili <strong>miste</strong> (alcune numeriche, altre categoriche): per queste ultime si possono usare costi basati sulla moda invece che sulla media, ottenendo così una combinazione di criteri (per esempio moda per le variabili categoriche e mediana o media per quelle numeriche). Il caso estremo in cui tutte le variabili sono categoriche prende il nome di <strong><span class="math inline">\(k\)</span>-modes</strong>, una variante di PAM pensata apposta per questo scenario.</p>
+</section>
+<section id="esempio-segmentazione-clienti-con-un-outlier" class="level3" data-number="2.6.4">
+<h3 data-number="2.6.4" class="anchored" data-anchor-id="esempio-segmentazione-clienti-con-un-outlier"><span class="header-section-number">2.6.4</span> Esempio: segmentazione clienti con un outlier</h3>
+<p>Consideriamo un piccolo dataset di clienti di un negozio online, descritti da due variabili: la spesa media annua (in euro) e la frequenza di acquisto (numero di ordini all’anno). La maggior parte dei clienti forma due gruppi ragionevoli — clienti occasionali e clienti abituali — ma un singolo cliente è in realtà un <strong>grande acquirente aziendale</strong>, con una spesa annua molto più alta di chiunque altro.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>occasionali <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">spesa =</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">150</span>, <span class="dv">30</span>), <span class="at">ordini =</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>abituali <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">spesa =</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">500</span>, <span class="dv">40</span>), <span class="at">ordini =</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">12</span>, <span class="dv">2</span>))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>outlier_aziendale <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">spesa =</span> <span class="dv">9000</span>, <span class="at">ordini =</span> <span class="dv">40</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>clienti <span class="ot">&lt;-</span> <span class="fu">rbind</span>(occasionali, abituali, outlier_aziendale)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Prima di calcolare</strong>: pensi che l’aggiunta del singolo cliente aziendale modificherà di più il risultato di <span class="math inline">\(k\)</span>-means o quello di PAM, entrambi calcolati con <span class="math inline">\(k=2\)</span>?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>km_clienti <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(clienti, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">10</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>pam_clienti <span class="ot">&lt;-</span> <span class="fu">pam</span>(clienti, <span class="at">k =</span> <span class="dv">2</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>km_clienti<span class="sc">$</span>centers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      spesa    ordini
+1  327.8606  7.525105
+2 9000.0000 40.000000</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>pam_clienti<span class="sc">$</span>medoids</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         spesa    ordini
+[1,]  218.5994  3.704837
+[2,] 9000.0000 40.000000</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">kmeans =</span> km_clienti<span class="sc">$</span>cluster, <span class="at">pam =</span> pam_clienti<span class="sc">$</span>clustering)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      pam
+kmeans  1  2
+     1 40  0
+     2  0  1</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Guarda i centri prodotti da <code>kmeans</code>: uno dei due centroidi viene attirato verso il cliente aziendale, spostandosi lontano dal centro reale del gruppo di clienti abituali. I medoidi di PAM restano invece due clienti “tipici” e realistici, uno per ciascun segmento comportamentale. La tabella di confronto mostra tipicamente che il cliente aziendale finisce isolato o forza una ripartizione diversa in <span class="math inline">\(k\)</span>-means, mentre PAM tende a preservare la struttura dei due segmenti originali, relegando l’outlier come caso a parte all’interno di uno dei due gruppi.</p>
+</div>
+</div>
+</section>
+<section id="interpretazione-2" class="level3" data-number="2.6.5">
+<h3 data-number="2.6.5" class="anchored" data-anchor-id="interpretazione-2"><span class="header-section-number">2.6.5</span> Interpretazione</h3>
+<p>Questo esempio illustra bene perché PAM è spesso preferito a <span class="math inline">\(k\)</span>-means quando si sospetta la presenza di osservazioni anomale: la scelta del medoide (o, più in generale, di un costo diverso dal quadrato) rende l’algoritmo meno sensibile a singole osservazioni estreme, esattamente come la mediana lo è rispetto alla media.</p>
+</section>
+<section id="limiti-1" class="level3" data-number="2.6.6">
+<h3 data-number="2.6.6" class="anchored" data-anchor-id="limiti-1"><span class="header-section-number">2.6.6</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La maggiore robustezza e flessibilità di PAM ha un costo: gli algoritmi che lo implementano sono generalmente <strong>più lenti</strong> di <span class="math inline">\(k\)</span>-means, perché a ogni passo devono cercare il medoide ottimale confrontando le osservazioni candidate, invece di calcolare una semplice media. Anche PAM, come <span class="math inline">\(k\)</span>-means, soffre della <strong>curse of dimensionality</strong> quando si usano distanze come costo, per lo stesso motivo discusso sopra.</p>
+<p>Un consiglio pratico, utile soprattutto in fase esplorativa: se il dataset è molto grande (centinaia di migliaia o milioni di osservazioni), evita di far girare direttamente PAM sull’intero dataset. Estrai prima un <strong>sottocampione casuale</strong> ragionevole, esplora la struttura su quello, e solo in un secondo momento — se necessario — valuta come estendere l’analisi all’intero dataset.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-3" class="level3" data-number="2.6.7">
+<h3 data-number="2.6.7" class="anchored" data-anchor-id="domande-di-comprensione-3"><span class="header-section-number">2.6.7</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché sostituire il centroide con un’osservazione reale rende PAM meno sensibile agli outlier rispetto a <span class="math inline">\(k\)</span>-means?</li>
+<li>Un dataset contiene sia il reddito annuo (numerico) sia il livello di istruzione (categorico: nessun titolo, diploma, laurea). Perché <span class="math inline">\(k\)</span>-means non è direttamente applicabile a questo dataset, mentre PAM sì?</li>
+<li>Nell’esempio della segmentazione clienti, cosa ti aspetteresti se il cliente aziendale non fosse un singolo caso isolato ma un intero terzo segmento di 15 clienti “grandi acquirenti”? La differenza tra <span class="math inline">\(k\)</span>-means e PAM resterebbe altrettanto marcata?</li>
+</ol>
+</section>
+</section>
+<section id="clustering-gerarchico-dendrogramma-agnes-e-diana" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="clustering-gerarchico-dendrogramma-agnes-e-diana"><span class="header-section-number">2.7</span> Clustering gerarchico: dendrogramma, AGNES e DIANA</h2>
+<section id="motivazione-4" class="level3" data-number="2.7.1">
+<h3 data-number="2.7.1" class="anchored" data-anchor-id="motivazione-4"><span class="header-section-number">2.7.1</span> Motivazione</h3>
+<p>I metodi non gerarchici richiedono di fissare <span class="math inline">\(k\)</span> prima ancora di vedere il risultato. Ma se non abbiamo alcuna idea di quale <span class="math inline">\(k\)</span> sia ragionevole, sarebbe comodo poter esplorare più valori di <span class="math inline">\(k\)</span> senza dover rieseguire l’intero algoritmo ogni volta. È esattamente ciò che offrono i metodi gerarchici: costruiscono, con un’unica esecuzione, un’intera famiglia di partizioni annidate, lasciando la scelta di <span class="math inline">\(k\)</span> per un momento successivo.</p>
+</section>
+<section id="concetto-il-dendrogramma" class="level3" data-number="2.7.2">
+<h3 data-number="2.7.2" class="anchored" data-anchor-id="concetto-il-dendrogramma"><span class="header-section-number">2.7.2</span> Concetto: il dendrogramma</h3>
+<p>Il risultato di un metodo gerarchico si rappresenta con un <strong>dendrogramma</strong>, un grafo ad albero in cui le foglie corrispondono alle singole osservazioni. I punti di fusione (o di divisione) mostrano a quale <strong>altezza</strong> — una misura di distanza o dissimilarità — due cluster vengono uniti (o separati): più in alto avviene l’unione, più i due cluster sono dissimili tra loro.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere un dendrogramma">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere un dendrogramma
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sull’asse orizzontale trovi le osservazioni (o i cluster), organizzate in modo che le fusioni si possano disegnare senza incroci; sull’asse verticale trovi l’altezza, cioè la dissimilarità alla quale un certo gruppo si è formato. Se noti che alcune fusioni avvengono a un’altezza molto bassa (rami “corti”), quelle osservazioni sono molto simili tra loro; fusioni che avvengono molto più in alto indicano invece che si stanno unendo gruppi già piuttosto eterogenei al loro interno.</p>
+<p>Per ottenere una partizione con un numero specifico di cluster <span class="math inline">\(k\)</span>, si effettua un <strong>taglio orizzontale</strong> del dendrogramma: il numero di rami intersecati dal taglio è il numero di cluster ottenuti. In R questo si fa con il comando <code>cutree()</code>, specificando direttamente <span class="math inline">\(k\)</span> (non l’altezza del taglio, anche se in linea di principio si potrebbe tagliare a un’altezza specifica).</p>
+</div>
+</div>
+</section>
+<section id="agnes-lapproccio-agglomerativo" class="level3" data-number="2.7.3">
+<h3 data-number="2.7.3" class="anchored" data-anchor-id="agnes-lapproccio-agglomerativo"><span class="header-section-number">2.7.3</span> AGNES: l’approccio agglomerativo</h3>
+<p>AGNES (“AGglomerative NESting”) parte da <span class="math inline">\(n\)</span> cluster, uno per ciascuna osservazione, e a ogni passo fonde i due cluster più simili, secondo un <strong>criterio di collegamento</strong> (<em>linkage</em>). L’algoritmo, in sintesi: (1) calcola la matrice delle distanze tra tutti i cluster correnti; (2) unisce i due cluster più vicini; (3) aggiorna la matrice delle distanze; (4) ripete fino a ottenere un unico cluster con tutte le osservazioni.</p>
+<p>Il punto delicato è decidere cosa significhi “distanza tra due cluster”, dato che ormai non stiamo più confrontando singole osservazioni ma insiemi di osservazioni. I tre criteri più comuni sono:</p>
+<ul>
+<li><strong>minimum</strong> (o <em>single linkage</em>): <span class="math inline">\(L_{\min}(C_i, C_j) = \min_{x\in C_i, y\in C_j} \|x-y\|\)</span>, il minimo tra tutte le distanze tra un punto di <span class="math inline">\(C_i\)</span> e un punto di <span class="math inline">\(C_j\)</span>;</li>
+<li><strong>maximum</strong> (o <em>complete linkage</em>): l’analogo con il massimo al posto del minimo;</li>
+<li><strong>average</strong>: la media di tutte le distanze tra coppie di punti nei due cluster.</li>
+</ul>
+<p>Il single linkage ha un’interpretazione intuitiva particolarmente vivida: pensa a due cluster come a due isole, la Sicilia e la Calabria, che vuoi collegare con un ponte. Costruirai il ponte nel punto in cui le due coste sono più vicine, indipendentemente da quanto siano grandi o estese le due isole nel resto della loro superficie. Questo è esattamente ciò che fa il minimum linkage: basta <strong>una singola coppia</strong> di punti particolarmente vicini, uno in ciascun cluster, per far sembrare i due cluster “vicini” nel loro complesso, anche se il resto delle osservazioni nei due gruppi è molto distante. Questo rende il single linkage sensibile a coppie di punti vicine per puro caso, e produce talvolta un effetto “a catena”, in cui cluster molto allungati si formano collegando punti via via più lontani lungo una sequenza.</p>
+<p>Il complete linkage ha il difetto opposto e simmetrico: guardando solo la coppia di punti più lontana, basta un singolo outlier in uno dei due cluster per farli sembrare molto dissimili, anche se la maggior parte delle osservazioni nei due gruppi sono in realtà vicine. L’average linkage è il compromesso più utilizzato nella pratica — è, di fatto, l’opzione predefinita nella maggior parte delle implementazioni software — proprio perché non dipende da un singolo valore estremo (né il minimo né il massimo), ma da una media su tutte le coppie possibili.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Se confronti due dendrogrammi ottenuti con criteri di linkage diversi sullo stesso dataset, la topologia (l’ordine delle fusioni) può sembrare simile, ma <strong>le altezze non sono direttamente confrontabili tra criteri diversi</strong>: minimum, maximum e average linkage misurano “distanza tra cluster” in modi diversi, e quindi producono scale diverse sull’asse verticale.</p>
+</div>
+</div>
+</section>
+<section id="diana-lapproccio-divisivo" class="level3" data-number="2.7.4">
+<h3 data-number="2.7.4" class="anchored" data-anchor-id="diana-lapproccio-divisivo"><span class="header-section-number">2.7.4</span> DIANA: l’approccio divisivo</h3>
+<p>DIANA (“DIvisive ANAlysis”) procede nella direzione opposta: parte da un unico cluster contenente tutte le osservazioni e lo suddivide progressivamente. A ogni passo, l’algoritmo:</p>
+<ol type="1">
+<li>individua il cluster con <strong>diametro</strong> maggiore, dove il diametro è definito come <span class="math inline">\(\operatorname{diametro}(C) = \max_{x,y \in C} \|x-y\|\)</span>, cioè la distanza massima tra due punti dello stesso cluster;</li>
+<li>all’interno di quel cluster, individua il punto più <strong>dissimile</strong> dagli altri (l’osservazione più “periferica”, quasi un outlier locale) e lo usa come seme di un nuovo sotto-cluster, aggregandogli via via i punti che gli sono più simili rispetto al resto del gruppo originario;</li>
+<li>ripete finché ogni osservazione non è isolata, oppure finché non si raggiunge il numero di cluster desiderato.</li>
+</ol>
+<p>A differenza degli alberi di classificazione — che tagliano lungo una singola variabile e un singolo valore soglia — la divisione di DIANA non è un taglio netto lungo una componente: è costruita punto per punto, confrontando ogni volta la distanza di ciascuna osservazione dal seme appena identificato rispetto al resto del cluster originario. I dettagli procedurali sono lasciati alla documentazione delle funzioni R (che permettono di specificare vari criteri), perché non aggiungono molta comprensione statistica in più.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento: quando conviene un approccio o l'altro">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento: quando conviene un approccio o l’altro
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Se sei interessato a <strong>pochi</strong> cluster (per esempio <span class="math inline">\(k=2\)</span>), un approccio divisivo può essere più conveniente: basta fermarsi dopo pochi tagli. Se invece ti interessano <strong>molti</strong> cluster, conviene un approccio agglomerativo, che parte già dal basso. Con un approccio agglomerativo e un <span class="math inline">\(k\)</span> piccolo, invece, bisogna comunque costruire (concettualmente) l’intera gerarchia fino in cima, anche se poi si userà solo una parte del dendrogramma.</p>
+</div>
+</div>
+</section>
+<section id="esempio-costruzione-passo-passo-di-un-dendrogramma" class="level3" data-number="2.7.5">
+<h3 data-number="2.7.5" class="anchored" data-anchor-id="esempio-costruzione-passo-passo-di-un-dendrogramma"><span class="header-section-number">2.7.5</span> Esempio: costruzione passo-passo di un dendrogramma</h3>
+<p>Consideriamo sette individui, numerati da 1 a 7, e seguiamo passo dopo passo una possibile sequenza di fusioni agglomerative: prima si uniscono gli individui 1 e 2 (i più simili in assoluto); poi si aggiunge l’individuo 3 al cluster <span class="math inline">\(\{1,2\}\)</span>; separatamente, si uniscono gli individui 4 e 5, e poi 6 e 7; infine, i due macro-cluster <span class="math inline">\(\{1,2,3\}\)</span> e <span class="math inline">\(\{4,5,6,7\}\)</span> vengono fusi nell’unico cluster radice.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>sette_punti <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.3</span>, <span class="fl">0.6</span>, <span class="dv">5</span>, <span class="fl">5.4</span>, <span class="fl">5.1</span>, <span class="fl">5.6</span>),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>, <span class="sc">-</span><span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.3</span>, <span class="fl">3.2</span>, <span class="fl">3.5</span>),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="fu">as.character</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>distanze <span class="ot">&lt;-</span> <span class="fu">dist</span>(sette_punti)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>gerarchia <span class="ot">&lt;-</span> <span class="fu">hclust</span>(distanze, <span class="at">method =</span> <span class="st">"average"</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(gerarchia, <span class="at">main =</span> <span class="st">"Dendrogramma (average linkage)"</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">sub =</span> <span class="st">""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-clustering_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Osserva l’ordine e l’altezza delle fusioni: gli individui che si assomigliano di più (qui, 1-2-3 da un lato e 4-5 dall’altro) si uniscono a un’altezza bassa; il cluster <span class="math inline">\(\{6,7\}\)</span> si unisce a <span class="math inline">\(\{4,5\}\)</span> a un’altezza intermedia; infine i due macro-gruppi si fondono nella radice, a un’altezza nettamente più alta, segnalando che sono davvero due strutture diverse. Un taglio a un’altezza intermedia separerebbe naturalmente <span class="math inline">\(\{1,2,3\}\)</span> da <span class="math inline">\(\{4,5,6,7\}\)</span>, restituendo <span class="math inline">\(k=2\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="interpretazione-3" class="level3" data-number="2.7.6">
+<h3 data-number="2.7.6" class="anchored" data-anchor-id="interpretazione-3"><span class="header-section-number">2.7.6</span> Interpretazione</h3>
+<p>Il vantaggio pratico dei metodi gerarchici, in questo esempio, è evidente: con un’unica esecuzione dell’algoritmo abbiamo a disposizione tutte le partizioni possibili, da <span class="math inline">\(k=1\)</span> a <span class="math inline">\(k=7\)</span>, semplicemente scegliendo dove tagliare l’albero.</p>
+</section>
+<section id="limiti-2" class="level3" data-number="2.7.7">
+<h3 data-number="2.7.7" class="anchored" data-anchor-id="limiti-2"><span class="header-section-number">2.7.7</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I metodi gerarchici, in generale, sono più lenti dei metodi non gerarchici, soprattutto su dataset di grandi dimensioni, perché la matrice delle distanze tra tutte le coppie di osservazioni cresce rapidamente con <span class="math inline">\(n\)</span>. Inoltre, una volta che due osservazioni sono state fuse in un cluster, <strong>la fusione non può essere disfatta</strong> nei passi successivi: un errore fatto presto nella costruzione della gerarchia si propaga fino alla fine.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-4" class="level3" data-number="2.7.8">
+<h3 data-number="2.7.8" class="anchored" data-anchor-id="domande-di-comprensione-4"><span class="header-section-number">2.7.8</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché il single linkage è più vulnerabile all’effetto “a catena” rispetto al complete linkage?</li>
+<li>Guardando un dendrogramma, come riconosceresti visivamente due cluster ben separati rispetto a una situazione in cui la struttura a gruppi è debole o assente?</li>
+<li>Confronta un dendrogramma costruito con linkage minimo e uno costruito con linkage medio sullo stesso dataset: perché confrontare direttamente le altezze dei due dendrogrammi può essere fuorviante?</li>
+</ol>
+</section>
+</section>
+<section id="come-scegliere-il-numero-di-cluster" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="come-scegliere-il-numero-di-cluster"><span class="header-section-number">2.8</span> Come scegliere il numero di cluster</h2>
+<section id="motivazione-5" class="level3" data-number="2.8.1">
+<h3 data-number="2.8.1" class="anchored" data-anchor-id="motivazione-5"><span class="header-section-number">2.8.1</span> Motivazione</h3>
+<p>In tutti i metodi visti finora resta una domanda aperta: quanti cluster scegliere? La risposta onesta è che <strong>non esiste un <span class="math inline">\(k\)</span> “giusto” in assoluto</strong>: la scelta dipende da cosa si vuole fare con i cluster trovati. Se l’obiettivo è produrre segmenti interpretabili da un essere umano, probabilmente vorrai un <span class="math inline">\(k\)</span> piccolo (2-5, diciamo); se l’obiettivo è un’analisi esplorativa in un contesto scientifico con strutture fini (per esempio in genomica), un <span class="math inline">\(k\)</span> anche molto più grande può avere senso. Proprio per questo esistono numerosi criteri diversi in letteratura: se ne esistesse uno solo, definitivamente migliore in ogni situazione, gli altri non sarebbero mai stati proposti. Vediamo i tre criteri più classici, nell’ordine in cui vengono tipicamente presentati: Elbow, indice di Dunn, silhouette.</p>
+</section>
+<section id="il-metodo-del-gomito-elbow" class="level3" data-number="2.8.2">
+<h3 data-number="2.8.2" class="anchored" data-anchor-id="il-metodo-del-gomito-elbow"><span class="header-section-number">2.8.2</span> Il metodo del gomito (Elbow)</h3>
+<p><strong>Concetto.</strong> Il metodo dell’<em>elbow</em> (gomito) confronta la WCSS ottimale ottenuta da <span class="math inline">\(k\)</span>-means (o da un altro metodo) al variare di <span class="math inline">\(k\)</span>. All’aumentare di <span class="math inline">\(k\)</span>, la WCSS diminuisce sempre (aggiungere cluster non può che ridurre la variabilità interna, nel caso limite <span class="math inline">\(k=n\)</span> diventa nulla): l’idea è cercare il valore <span class="math inline">\(k_{\text{elbow}}\)</span> in corrispondenza del quale l’incremento <span class="math inline">\(\operatorname{WCSS}_k - \operatorname{WCSS}_{k+1}\)</span> <strong>comincia a diminuire</strong> significativamente, disegnando visivamente un “gomito” nel grafico.</p>
+<p><strong>Intuizione.</strong> Finché stiamo separando cluster realmente distinti nei dati, ogni nuovo cluster produce un grande guadagno in termini di riduzione della WCSS. Una volta che i cluster “veri” sono già stati separati, aggiungere ulteriori cluster comincia a suddividere gruppi che erano già internamente omogenei, e il guadagno diventa marginale.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>blob1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="dv">0</span>, <span class="fl">0.6</span>), <span class="at">y =</span> <span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="dv">0</span>, <span class="fl">0.6</span>))</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>blob2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="dv">4</span>, <span class="fl">0.6</span>), <span class="at">y =</span> <span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="dv">0</span>, <span class="fl">0.6</span>))</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>blob3 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="dv">2</span>, <span class="fl">0.6</span>), <span class="at">y =</span> <span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">3.5</span>, <span class="fl">0.6</span>))</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>dati_blob <span class="ot">&lt;-</span> <span class="fu">rbind</span>(blob1, blob2, blob3)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>wcss <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, <span class="cf">function</span>(k) <span class="fu">kmeans</span>(dati_blob, <span class="at">centers =</span> k, <span class="at">nstart =</span> <span class="dv">10</span>)<span class="sc">$</span>tot.withinss)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, wcss, <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">pch =</span> <span class="dv">19</span>,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Numero di cluster k"</span>, <span class="at">ylab =</span> <span class="st">"WCSS"</span>,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Grafico elbow su un dataset a tre gruppi simulati"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-clustering_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il dataset simulato ha davvero tre gruppi ben separati per costruzione. Osserva se il grafico mostra una diminuzione marcata fino a <span class="math inline">\(k=3\)</span> e poi un rallentamento: se sì, il “gomito” è in <span class="math inline">\(k=3\)</span>, coerentemente con la struttura reale. Prova a immaginare — o a verificare tu stesso modificando il codice — cosa succederebbe se i tre gruppi si sovrapponessero molto di più: il gomito resterebbe altrettanto visibile?</p>
+</div>
+</div>
+<p><strong>Limiti.</strong> Il metodo elbow presenta diversi problemi, al punto che si può ragionevolmente considerarlo un <strong>criterio debole</strong>, da usare sempre in combinazione con altri indicatori, mai da solo:</p>
+<ul>
+<li>il punto di gomito, nella pratica, spesso <strong>non è affatto ben definito</strong>: la curva decresce in modo più graduale di quanto suggerisca l’esempio didattico;</li>
+<li>si possono costruire dataset visivamente molto diversi tra loro che producono curve WCSS pressoché identiche, portando lo stesso <span class="math inline">\(k_{\text{elbow}}\)</span> anche quando la struttura reale è del tutto diversa;</li>
+<li>dal punto di vista computazionale, se stiamo usando <span class="math inline">\(k\)</span>-means o PAM (a differenza dei metodi gerarchici, che restituiscono tutti i <span class="math inline">\(k\)</span> con un’unica esecuzione), calcolare la curva richiede di <strong>rieseguire l’intero algoritmo per ogni valore di <span class="math inline">\(k\)</span></strong>, il che può diventare costoso;</li>
+<li>la WCSS è espressa in <strong>unità di misura al quadrato</strong>: non è una quantità adimensionale, a differenza dell’indice di Dunn e della silhouette (che sono rapporti di distanze), e questo la rende meno confrontabile tra dataset diversi o tra scelte diverse di variabili.</li>
+</ul>
+<p>Il consiglio pratico è usare comunque il grafico elbow, se disponibile a costo contenuto, ma sempre <strong>accoppiato</strong> ad altri indici — mai come criterio isolato e definitivo.</p>
+</section>
+<section id="lindice-di-dunn" class="level3" data-number="2.8.3">
+<h3 data-number="2.8.3" class="anchored" data-anchor-id="lindice-di-dunn"><span class="header-section-number">2.8.3</span> L’indice di Dunn</h3>
+<p><strong>Concetto.</strong> L’indice di Dunn riprende due quantità già incontrate a proposito dei metodi gerarchici: il <strong>diametro</strong> di un cluster (usato in DIANA) e la <strong>distanza minima tra cluster</strong> (il criterio single linkage usato in AGNES).</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione: indice di Dunn">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione: indice di Dunn
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dati <span class="math inline">\(\operatorname{diametro}(C_j) := \max_{x,y\in C_j}\|x-y\|\)</span> e <span class="math inline">\(\operatorname{distanza}(C_i,C_j) := \min_{x\in C_i, y\in C_j}\|x-y\|\)</span>, l’<strong>indice di Dunn</strong> della partizione <span class="math inline">\((C_j)_{j=1}^k\)</span> è <span class="math display">\[
+\operatorname{DunnIndex}\big((C_j)_{j=1}^k\big) := \frac{\displaystyle\min_{i\neq j} \operatorname{distanza}(C_i, C_j)}{\displaystyle\max_{j} \operatorname{diametro}(C_j)}.
+\]</span></p>
+</div>
+</div>
+<p>Il numeratore misura quanto sono ben <strong>separati</strong> i cluster tra loro (la coppia di cluster più vicina); il denominatore misura quanto sono <strong>compatti</strong> i cluster (il cluster con la maggiore dispersione interna). Un buon clustering dovrebbe avere cluster ben separati e compatti: numeratore grande, denominatore piccolo, quindi indice di Dunn <strong>grande</strong>. Essendo un rapporto tra due distanze, l’indice non ha unità di misura, il che lo rende più facilmente confrontabile tra dataset diversi rispetto alla WCSS.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Nota storica sul denominatore">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Nota storica sul denominatore
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nella formula, il massimo dei diametri va calcolato sull’indice <span class="math inline">\(j\)</span> che percorre i cluster <span class="math inline">\((C_j)_{j=1}^k\)</span> — coerentemente con la definizione di diametro data una riga sopra — e non su un indice diverso, come talvolta si trova scritto per errore in fonti poco accurate.</p>
+</div>
+</div>
+<p><strong>Interpretazione.</strong> Per scegliere <span class="math inline">\(k\)</span> tramite l’indice di Dunn, si calcola l’indice per ciascun valore di <span class="math inline">\(k\)</span> in un intervallo ragionevole (per esempio <span class="math inline">\(k=2,\ldots,10\)</span>) e si sceglie il valore che massimizza l’indice.</p>
+<p><strong>Limiti.</strong> L’indice di Dunn eredita la stessa fragilità del single linkage: essendo basato su un <strong>minimo</strong> di distanze, basta una singola coppia di punti insolitamente vicini appartenenti a due cluster diversi per abbassare drasticamente il numeratore, anche se il resto dei due cluster è ben separato. È quindi un indicatore utile, ma non “definitivo”: si presta bene a essere accoppiato con il grafico elbow.</p>
+</section>
+<section id="la-silhouette" class="level3" data-number="2.8.4">
+<h3 data-number="2.8.4" class="anchored" data-anchor-id="la-silhouette"><span class="header-section-number">2.8.4</span> La silhouette</h3>
+<p><strong>Concetto.</strong> La silhouette è, in un certo senso, un’evoluzione dell’indice di Dunn: invece di guardare solo il caso peggiore (minimo e massimo), calcola per <strong>ogni singola osservazione</strong> quanto essa è più vicina al proprio cluster rispetto al cluster più vicino tra gli altri.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione: silhouette">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione: silhouette
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Per un’osservazione <span class="math inline">\(x\)</span> appartenente al cluster <span class="math inline">\(C_j\)</span>, definiamo:</p>
+<ul>
+<li>l’<strong>adesione</strong> (coesione interna): <span class="math inline">\(a(x) := \dfrac{1}{\#C_j - 1} \displaystyle\sum_{y \in C_j,\, y\neq x} \|x-y\|\)</span>, la distanza media di <span class="math inline">\(x\)</span> dagli altri punti del proprio cluster;</li>
+<li>la <strong>separazione</strong>: <span class="math inline">\(b(x) := \displaystyle\min_{u \neq j} \dfrac{1}{\#C_u} \sum_{y \in C_u} \|x-y\|\)</span>, la distanza media di <span class="math inline">\(x\)</span> dal cluster più vicino tra gli altri;</li>
+<li>la <strong>silhouette</strong> di <span class="math inline">\(x\)</span>: <span class="math inline">\(s(x) = \dfrac{b(x) - a(x)}{\max(a(x), b(x))} \in [-1, 1]\)</span>.</li>
+</ul>
+<p>La silhouette media del cluster <span class="math inline">\(C_i\)</span> è <span class="math inline">\(s(C_i) := \frac{1}{\#C_i}\sum_{x\in C_i} s(x)\)</span>, e la <strong>silhouette media</strong> (score) dell’intera partizione è <span class="math inline">\(s = \frac1k \sum_{i=1}^k s(C_i)\)</span>.</p>
+</div>
+</div>
+<p><strong>Intuizione.</strong> <span class="math inline">\(a(x)\)</span> piccola significa che <span class="math inline">\(x\)</span> si trova bene tra i suoi compagni di cluster; <span class="math inline">\(b(x)\)</span> grande significa che il cluster alternativo più vicino resta comunque lontano. Se <span class="math inline">\(s(x)\approx 1\)</span>, l’osservazione <span class="math inline">\(x\)</span> è ben assegnata: sta molto più vicina al proprio cluster che a qualsiasi altro. Se <span class="math inline">\(s(x)\approx 0\)</span>, <span class="math inline">\(x\)</span> è indecisa: si trova a distanza confrontabile dal proprio cluster e dal successivo più vicino, come un punto “sul bordo”. Se <span class="math inline">\(s(x)&lt;0\)</span>, è probabile che <span class="math inline">\(x\)</span> sia stata assegnata al cluster sbagliato: si troverebbe meglio in quello alternativo.</p>
+<p>Sono disponibili delle soglie indicative per la silhouette media dell’intera partizione: <span class="math inline">\(s&gt;0{,}7\)</span> è considerato un clustering forte, <span class="math inline">\(0{,}5 &lt; s \le 0{,}7\)</span> un clustering buono, <span class="math inline">\(0{,}25 &lt; s \le 0{,}5\)</span> un clustering debole, e valori più bassi (vicini a zero o negativi) segnalano una struttura di cluster assente o inadeguata.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione: non trasformare le soglie in un dogma">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione: non trasformare le soglie in un dogma
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Le soglie appena elencate sono puramente <strong>indicative</strong>, non regole matematiche: dipendono dal contesto applicativo esattamente come qualunque altro criterio statistico visto finora. Un modo utile per ricordarsene è pensare a un’analogia con il <span class="math inline">\(p\)</span>-value: così come una soglia di significatività di <span class="math inline">\(0{,}05\)</span> non è una legge di natura ma una convenzione, allo stesso modo una silhouette di <span class="math inline">\(0{,}5\)</span> non “certifica” un buon clustering né una silhouette di <span class="math inline">\(0{,}4\)</span> ne certifica uno cattivo. Quello che conta di più, nella pratica, è spesso la <strong>stabilità</strong> del valore attraverso metodi diversi: se metodi molto diversi (k-means, PAM, gerarchico) restituiscono tutti una silhouette simile su uno stesso dataset, quel valore — per quanto modesto — è più informativo di una singola cifra isolata.</p>
+</div>
+</div>
+<p><strong>Esempio: la silhouette non è solo un numero medio.</strong> Oltre alla media globale, la silhouette è utile calcolata per singolo cluster o per singolo punto: questo permette di individuare cluster “cattivi” (con silhouette media bassa) o singole osservazioni mal assegnate, magari candidate a essere trattate come outlier. Consideriamo un piccolo dataset ispirato a statistiche sportive: dodici giocatori di una squadra di basket, descritti da punti segnati, rimbalzi catturati e assist forniti a partita, con tre ruoli tipici (playmaker, ali, centri) ma un giocatore “ibrido” (un’ala che gioca anche da playmaker) volutamente ambiguo.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>giocatori <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">punti    =</span> <span class="fu">c</span>(<span class="dv">18</span>, <span class="dv">16</span>, <span class="dv">20</span>, <span class="dv">14</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">9</span>, <span class="dv">6</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">11</span>),</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">rimbalzi =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">8</span>, <span class="dv">11</span>, <span class="dv">10</span>, <span class="dv">9</span>, <span class="dv">12</span>, <span class="dv">6</span>),</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">assist   =</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">6</span>, <span class="dv">9</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">5</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>km_giocatori <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(giocatori, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">20</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>sil_giocatori <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km_giocatori<span class="sc">$</span>cluster, <span class="fu">dist</span>(giocatori))</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sil_giocatori)<span class="sc">$</span>avg.width</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4871503</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>sil_giocatori</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      cluster neighbor  sil_width
+ [1,]       2        1 0.70722683
+ [2,]       2        1 0.67639604
+ [3,]       2        1 0.59906264
+ [4,]       2        1 0.48829228
+ [5,]       1        3 0.07628829
+ [6,]       3        1 0.27086671
+ [7,]       1        3 0.42889130
+ [8,]       3        1 0.55134245
+ [9,]       3        1 0.63123988
+[10,]       3        1 0.46242784
+[11,]       3        1 0.57402641
+[12,]       1        2 0.37974258
+attr(,"Ordered")
+[1] FALSE
+attr(,"call")
+silhouette.default(x = km_giocatori$cluster, dist = dist(giocatori))
+attr(,"class")
+[1] "silhouette"</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La silhouette media complessiva è un valore intermedio, né chiaramente “forte” né chiaramente “assente”. Guardando i valori riga per riga, però, noterai che la maggior parte dei giocatori ha una silhouette alta (playmaker e centri “puri” sono ben distinti), mentre il giocatore ibrido — quello con statistiche intermedie tra ala e playmaker — ha una silhouette molto più bassa, vicina allo zero. La media globale, da sola, avrebbe nascosto questa informazione: guardare i punteggi individuali rivela che il clustering funziona bene per la maggior parte dei giocatori, ma esiste un caso strutturalmente ambiguo. Questa è precisamente la situazione descritta a lezione: una silhouette moderata può convivere con una parte del dataset molto ben separata e un’altra parte intrinsecamente sfumata.</p>
+</div>
+</div>
+<p><strong>Interpretazione.</strong> La silhouette è generalmente considerata uno degli indicatori più validi e informativi tra quelli classici, proprio perché combina l’idea di adesione e separazione a livello di singola osservazione, permettendo diagnosi più fini della semplice media globale.</p>
+<p><strong>Limiti.</strong> Come tutti i criteri basati su distanze, anche la silhouette soffre della curse of dimensionality: in spazi ad alta dimensione le distanze tendono a diventare meno informative, e con esse anche <span class="math inline">\(a(x)\)</span> e <span class="math inline">\(b(x)\)</span>.</p>
+</section>
+<section id="domande-di-comprensione-5" class="level3" data-number="2.8.5">
+<h3 data-number="2.8.5" class="anchored" data-anchor-id="domande-di-comprensione-5"><span class="header-section-number">2.8.5</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Un dataset produce una WCSS che scende in modo pressoché lineare, senza alcun gomito visibile. Cosa suggerisce questo sulla struttura a cluster del dataset (o sull’utilità del metodo elbow per quel dataset)?</li>
+<li>Due partizioni diverse hanno lo stesso indice di Dunn, ma una ha un solo cluster molto compatto e distante dagli altri due, mentre l’altra ha tre cluster di dimensioni comparabili. L’indice di Dunn da solo ti permette di distinguere questi due scenari?</li>
+<li>Perché una silhouette media di <span class="math inline">\(0{,}46\)</span>, ottenuta in modo stabile su più metodi diversi, può essere considerata più informativa di una singola silhouette di <span class="math inline">\(0{,}8\)</span> ottenuta con un solo metodo?</li>
+<li>In quali situazioni preferiresti guardare la silhouette per singolo punto invece della sola silhouette media dell’intera partizione?</li>
+</ol>
+</section>
+</section>
+<section id="cosa-ricordare" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="cosa-ricordare"><span class="header-section-number">2.9</span> Cosa ricordare</h2>
+<ul>
+<li>Il centroide (media) e il medoide sono entrambi minimizzatori dello stesso rischio empirico quadratico (o di un costo più generale): il centroide minimizza su tutto <span class="math inline">\(\mathbb R^d\)</span>, il medoide solo tra le osservazioni effettivamente disponibili.</li>
+<li>Il clustering è un problema non supervisionato ed esplorativo: non esiste un’unica partizione “corretta” da confrontare con il risultato dell’algoritmo.</li>
+<li><span class="math inline">\(k\)</span>-means minimizza la WCSS tramite l’algoritmo iterativo di Lloyd (assegnazione + aggiornamento), producendo cluster corrispondenti a celle di Voronoi attorno ai centroidi; è veloce ma sensibile a outlier e inizializzazione.</li>
+<li>PAM generalizza <span class="math inline">\(k\)</span>-means sostituendo il centroide con il medoide e permettendo costi più generali; è più robusto e flessibile (anche su dati misti/categorici), ma più lento.</li>
+<li>I metodi gerarchici (AGNES agglomerativo, DIANA divisivo) non richiedono di fissare <span class="math inline">\(k\)</span> in anticipo: costruiscono un dendrogramma da cui si estrae la partizione desiderata tramite un taglio (<code>cutree</code>).</li>
+<li>Il criterio di linkage (minimum, maximum, average) determina come si misura la distanza tra cluster in AGNES; l’average linkage è lo standard più diffuso, mentre il minimum linkage è particolarmente sensibile a coppie di punti vicine per caso.</li>
+<li>Non esiste un <span class="math inline">\(k\)</span> “giusto”: Elbow, indice di Dunn e silhouette sono criteri esplorativi complementari, ciascuno con limiti propri, da usare in combinazione e mai come regola meccanica.</li>
+<li>Le soglie indicative (per Dunn e silhouette) non vanno trattate come un dogma statistico, allo stesso modo in cui una soglia di significatività del <span class="math inline">\(p\)</span>-value non è una legge di natura.</li>
+<li>Tutti i metodi visti in questo capitolo dipendono dalla scelta di una distanza o di un costo, e per questo condividono la stessa vulnerabilità alla curse of dimensionality, che riprenderemo nel prossimo capitolo.</li>
+</ul>
+</section>
+<section id="domande-di-riepilogo" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="domande-di-riepilogo"><span class="header-section-number">2.10</span> Domande di riepilogo</h2>
+<ol type="1">
+<li>Spiega, con parole tue, perché centroide e medoide risolvono “lo stesso problema” ma con un vincolo diverso, e fai un esempio concreto in cui la differenza tra i due è rilevante.</li>
+<li>Confronta <span class="math inline">\(k\)</span>-means e PAM: in quali situazioni preferiresti l’uno rispetto all’altro, e perché?</li>
+<li>Descrivi l’algoritmo di Lloyd nei suoi due passi principali e spiega cosa sono le celle di Voronoi che produce.</li>
+<li>Un dataset ha <span class="math inline">\(n = 200\)</span> osservazioni. Preferiresti un approccio agglomerativo o divisivo se il tuo obiettivo finale è <span class="math inline">\(k=3\)</span>? E se fosse <span class="math inline">\(k=150\)</span>?</li>
+<li>Elenca almeno due limiti del metodo elbow e spiega perché, nonostante questi limiti, può ancora avere un ruolo utile in un’analisi esplorativa.</li>
+<li>Perché l’indice di Dunn e la silhouette sono considerati quantità “adimensionali”, a differenza della WCSS? Perché questo è un vantaggio pratico?</li>
+<li>Un’analisi produce una silhouette media di <span class="math inline">\(0{,}3\)</span>. Un collega conclude che il clustering “non è valido” e va scartato. Sei d’accordo? Cosa vorresti sapere in più prima di rispondere?</li>
+<li>In che senso il clustering, pur essendo una tecnica non supervisionata, è concettualmente collegato al problema della classificazione che affronteremo più avanti nel corso?</li>
+</ol>
+</section>
+<section id="laboratorio-r-leggere-i-dati-non-programmare" class="level2" data-number="2.11">
+<h2 data-number="2.11" class="anchored" data-anchor-id="laboratorio-r-leggere-i-dati-non-programmare"><span class="header-section-number">2.11</span> Laboratorio R: leggere i dati, non programmare</h2>
+<p>In questo laboratorio usiamo un dataset reale — il classico <code>iris</code>, limitato a due sole variabili numeriche per poter visualizzare facilmente i risultati — per mettere alla prova, su dati concreti, i metodi discussi in questo capitolo. Il compito non è scrivere codice da zero, ma <strong>eseguire, confrontare e interpretare</strong>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>dati_iris <span class="ot">&lt;-</span> iris[, <span class="fu">c</span>(<span class="st">"Petal.Length"</span>, <span class="st">"Petal.Width"</span>)]</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dati_iris, <span class="at">main =</span> <span class="st">"Iris: lunghezza e larghezza del petalo"</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"gray40"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-clustering_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="k-means-su-dati-reali" class="level3" data-number="2.11.1">
+<h3 data-number="2.11.1" class="anchored" data-anchor-id="k-means-su-dati-reali"><span class="header-section-number">2.11.1</span> <span class="math inline">\(k\)</span>-means su dati reali</h3>
+<p><strong>Prima di calcolare</strong>: guardando solo il grafico sopra (senza usare le etichette di specie, che nella realtà non useremmo perché il clustering è non supervisionato), quanti gruppi visivamente distinguibili ti sembra di vedere?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>km_iris <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(dati_iris, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">20</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dati_iris, <span class="at">col =</span> km_iris<span class="sc">$</span>cluster, <span class="at">pch =</span> <span class="dv">19</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"k-means, k = 3"</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(km_iris<span class="sc">$</span>centers, <span class="at">pch =</span> <span class="dv">8</span>, <span class="at">cex =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-clustering_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol type="1">
+<li>Il risultato di <code>kmeans</code> con <span class="math inline">\(k=3\)</span> corrisponde, visivamente, a quanto avevi previsto guardando il grafico originale?</li>
+<li>Confronta l’assegnazione ottenuta con la variabile <code>iris$Species</code> (che nella pratica non avresti a disposizione, ma qui serve come controllo): <code>table(km_iris$cluster, iris$Species)</code>. Il clustering non supervisionato ha ritrovato, almeno in buona parte, i tre gruppi biologici reali?</li>
+</ol>
+</section>
+<section id="confronto-tra-k-means-e-pam" class="level3" data-number="2.11.2">
+<h3 data-number="2.11.2" class="anchored" data-anchor-id="confronto-tra-k-means-e-pam"><span class="header-section-number">2.11.2</span> Confronto tra <span class="math inline">\(k\)</span>-means e PAM</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>pam_iris <span class="ot">&lt;-</span> <span class="fu">pam</span>(dati_iris, <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">kmeans =</span> km_iris<span class="sc">$</span>cluster, <span class="at">pam =</span> pam_iris<span class="sc">$</span>clustering)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      pam
+kmeans  1  2  3
+     1  0 52  0
+     2  0  4 44
+     3 50  0  0</code></pre>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Le due partizioni coincidono quasi del tutto o ci sono osservazioni che cambiano cluster tra un metodo e l’altro? Guardando il grafico, dove si trovano tipicamente le osservazioni “controverse”?</li>
+</ol>
+</section>
+<section id="clustering-gerarchico-agnes-diana-e-il-dendrogramma" class="level3" data-number="2.11.3">
+<h3 data-number="2.11.3" class="anchored" data-anchor-id="clustering-gerarchico-agnes-diana-e-il-dendrogramma"><span class="header-section-number">2.11.3</span> Clustering gerarchico: AGNES, DIANA e il dendrogramma</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>distanze_iris <span class="ot">&lt;-</span> <span class="fu">dist</span>(dati_iris)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>agnes_iris <span class="ot">&lt;-</span> <span class="fu">agnes</span>(distanze_iris, <span class="at">method =</span> <span class="st">"average"</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>diana_iris <span class="ot">&lt;-</span> <span class="fu">diana</span>(distanze_iris)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.hclust</span>(agnes_iris), <span class="at">main =</span> <span class="st">"AGNES (average linkage)"</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">sub =</span> <span class="st">""</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-clustering_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>cluster_agnes_3 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(<span class="fu">as.hclust</span>(agnes_iris), <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>cluster_diana_3 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(<span class="fu">as.hclust</span>(diana_iris), <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">agnes =</span> cluster_agnes_3, <span class="at">diana =</span> cluster_diana_3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     diana
+agnes  1  2  3
+    1 50  0  0
+    2  1 45  0
+    3  0 11 43</code></pre>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Osserva il dendrogramma. Quali fusioni appaiono più naturali, cioè avvengono ad altezze molto basse? Dove collocheresti un taglio se non sapessi già che vuoi <span class="math inline">\(k=3\)</span>?</li>
+<li>AGNES e DIANA, entrambi tagliati a <span class="math inline">\(k=3\)</span>, producono partizioni simili tra loro su questo dataset? Motiva la risposta guardando la tabella di confronto.</li>
+</ol>
+</section>
+<section id="scegliere-k-elbow-dunn-e-silhouette-insieme" class="level3" data-number="2.11.4">
+<h3 data-number="2.11.4" class="anchored" data-anchor-id="scegliere-k-elbow-dunn-e-silhouette-insieme"><span class="header-section-number">2.11.4</span> Scegliere <span class="math inline">\(k\)</span>: Elbow, Dunn e silhouette insieme</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>wcss_iris <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, <span class="cf">function</span>(k) <span class="fu">kmeans</span>(dati_iris, <span class="at">centers =</span> k, <span class="at">nstart =</span> <span class="dv">20</span>)<span class="sc">$</span>tot.withinss)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, wcss_iris, <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"WCSS"</span>,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Elbow su Iris (Petal.Length, Petal.Width)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-clustering_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>sil_iris_k2 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(<span class="fu">kmeans</span>(dati_iris, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">20</span>)<span class="sc">$</span>cluster, distanze_iris)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>sil_iris_k3 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(<span class="fu">kmeans</span>(dati_iris, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">20</span>)<span class="sc">$</span>cluster, distanze_iris)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>sil_iris_k4 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(<span class="fu">kmeans</span>(dati_iris, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">20</span>)<span class="sc">$</span>cluster, distanze_iris)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">k2 =</span> <span class="fu">summary</span>(sil_iris_k2)<span class="sc">$</span>avg.width,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">k3 =</span> <span class="fu">summary</span>(sil_iris_k3)<span class="sc">$</span>avg.width,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">k4 =</span> <span class="fu">summary</span>(sil_iris_k4)<span class="sc">$</span>avg.width)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       k2        k3        k4 
+0.7653904 0.6604800 0.6128715 </code></pre>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Il grafico elbow suggerisce un valore di <span class="math inline">\(k\)</span> chiaro, o l’individuazione del gomito resta ambigua?</li>
+<li>Il valore di <span class="math inline">\(k\)</span> che massimizza la silhouette media coincide con quello suggerito dal grafico elbow? In caso di disaccordo, quale informazione aggiuntiva useresti per decidere?</li>
+</ol>
+</section>
+<section id="leffetto-della-scala" class="level3" data-number="2.11.5">
+<h3 data-number="2.11.5" class="anchored" data-anchor-id="leffetto-della-scala"><span class="header-section-number">2.11.5</span> L’effetto della scala</h3>
+<p>Ripeti l’analisi standardizzando le variabili:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dati_iris_scalati <span class="ot">&lt;-</span> <span class="fu">scale</span>(dati_iris)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>km_iris_scalato <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(dati_iris_scalati, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">20</span>)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">originale =</span> km_iris<span class="sc">$</span>cluster, <span class="at">scalato =</span> km_iris_scalato<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         scalato
+originale  1  2  3
+        1  3  0 49
+        2 45  0  3
+        3  0 50  0</code></pre>
+</div>
+</div>
+<ol start="8" type="1">
+<li>La standardizzazione cambia sostanzialmente i cluster trovati su questo dataset? In questo caso specifico, le due variabili avevano scale molto diverse?</li>
+<li>In generale, quando la standardizzazione è più o meno necessaria prima di applicare un metodo di clustering basato su distanze? (Suggerimento: pensa a un dataset in cui una variabile è misurata in millimetri e un’altra in chilometri.)</li>
+</ol>
+</section>
+<section id="per-esplorare-oltre" class="level3" data-number="2.11.6">
+<h3 data-number="2.11.6" class="anchored" data-anchor-id="per-esplorare-oltre"><span class="header-section-number">2.11.6</span> Per esplorare oltre</h3>
+<p>Prova a ripetere l’intera analisi usando tutte e quattro le variabili numeriche di <code>iris</code> invece di sole due. I risultati di <span class="math inline">\(k\)</span>-means, PAM e del clustering gerarchico restano coerenti con quanto trovato con due sole variabili? Cosa succede alla silhouette quando aggiungi dimensioni — è coerente con l’avvertimento sulla curse of dimensionality discusso in questo capitolo? Terremo aperta questa domanda: la riprenderemo esplicitamente nel prossimo capitolo, dedicato alla riduzione della dimensionalità e alla PCA.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-statistica-descrittiva-e-rischio-empirico.html" class="pagination-link" aria-label="Dalla statistica descrittiva al rischio empirico">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Dalla statistica descrittiva al rischio empirico</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-riduzione-dimensionalita-pca.html" class="pagination-link" aria-label="Riduzione della dimensionalità e PCA">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Riduzione della dimensionalità e PCA</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Statistica II (750AA) — note del corso</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Costruito con Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

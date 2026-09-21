@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Regressione: da KNN al metodo dei minimi quadrati – Statistica II — Introduzione alla Statistica Computazionale</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./07-regressione-lineare-multipla.html" rel="next">
+<link href="./05-bayes-naive-bayes-roc.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-d0ae9245876894da5ac7e18953ecc5cc.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-76a1503f7c92a7917b55a7b5888d2ac1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-16c8d5c3c49bfcc791534bfcd98e32e8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-76a1503f7c92a7917b55a7b5888d2ac1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06-regressione-knn-bias-varianza.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regressione: da KNN al metodo dei minimi quadrati</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Statistica II — Introduzione alla Statistica Computazionale</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefazione</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-statistica-descrittiva-e-rischio-empirico.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Dalla statistica descrittiva al rischio empirico</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-clustering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Clustering</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-riduzione-dimensionalita-pca.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Riduzione della dimensionalità e PCA</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-classificazione-knn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Classificazione: K-Nearest Neighbors e validazione</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-bayes-naive-bayes-roc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Formula di Bayes e classificatori generativi</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-regressione-knn-bias-varianza.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regressione: da KNN al metodo dei minimi quadrati</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-regressione-lineare-multipla.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regressione lineare multipla e quantificazione dell’incertezza</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-collinearita-regolarizzazione.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Riduzione dei modelli di regressione: collinearità e regolarizzazione</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-serie-storiche-decomposizione.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Serie storiche I: visualizzazione, decomposizione e previsione elementare</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-serie-storiche-smoothing-esponenziale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Serie storiche II: smoothing esponenziale e famiglia ETS</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-serie-storiche-arima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Processi stocastici e modelli ARIMA</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Riferimenti</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#obiettivi-del-capitolo" id="toc-obiettivi-del-capitolo" class="nav-link active" data-scroll-target="#obiettivi-del-capitolo"><span class="header-section-number">6.1</span> Obiettivi del capitolo</a></li>
+  <li><a href="#dalla-classificazione-alla-regressione" id="toc-dalla-classificazione-alla-regressione" class="nav-link" data-scroll-target="#dalla-classificazione-alla-regressione"><span class="header-section-number">6.2</span> Dalla classificazione alla regressione</a>
+  <ul class="collapse">
+  <li><a href="#motivazione" id="toc-motivazione" class="nav-link" data-scroll-target="#motivazione"><span class="header-section-number">6.2.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-notazione" id="toc-concetto-e-notazione" class="nav-link" data-scroll-target="#concetto-e-notazione"><span class="header-section-number">6.2.2</span> Concetto e notazione</a></li>
+  <li><a href="#domande-di-comprensione" id="toc-domande-di-comprensione" class="nav-link" data-scroll-target="#domande-di-comprensione"><span class="header-section-number">6.2.3</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#regressione-e-interpolazione" id="toc-regressione-e-interpolazione" class="nav-link" data-scroll-target="#regressione-e-interpolazione"><span class="header-section-number">6.3</span> Regressione e interpolazione</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-1" id="toc-motivazione-1" class="nav-link" data-scroll-target="#motivazione-1"><span class="header-section-number">6.3.1</span> Motivazione</a></li>
+  <li><a href="#concetto-interpolazione" id="toc-concetto-interpolazione" class="nav-link" data-scroll-target="#concetto-interpolazione"><span class="header-section-number">6.3.2</span> Concetto: interpolazione</a></li>
+  <li><a href="#esempio" id="toc-esempio" class="nav-link" data-scroll-target="#esempio"><span class="header-section-number">6.3.3</span> Esempio</a></li>
+  <li><a href="#interpretazione" id="toc-interpretazione" class="nav-link" data-scroll-target="#interpretazione"><span class="header-section-number">6.3.4</span> Interpretazione</a></li>
+  <li><a href="#limiti" id="toc-limiti" class="nav-link" data-scroll-target="#limiti"><span class="header-section-number">6.3.5</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-1" id="toc-domande-di-comprensione-1" class="nav-link" data-scroll-target="#domande-di-comprensione-1"><span class="header-section-number">6.3.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#k-nn-per-la-regressione" id="toc-k-nn-per-la-regressione" class="nav-link" data-scroll-target="#k-nn-per-la-regressione"><span class="header-section-number">6.4</span> K-NN per la regressione</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-2" id="toc-motivazione-2" class="nav-link" data-scroll-target="#motivazione-2"><span class="header-section-number">6.4.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-formula" id="toc-concetto-e-formula" class="nav-link" data-scroll-target="#concetto-e-formula"><span class="header-section-number">6.4.2</span> Concetto e formula</a></li>
+  <li><a href="#intuizione" id="toc-intuizione" class="nav-link" data-scroll-target="#intuizione"><span class="header-section-number">6.4.3</span> Intuizione</a></li>
+  <li><a href="#esempio-1" id="toc-esempio-1" class="nav-link" data-scroll-target="#esempio-1"><span class="header-section-number">6.4.4</span> Esempio</a></li>
+  <li><a href="#interpretazione-1" id="toc-interpretazione-1" class="nav-link" data-scroll-target="#interpretazione-1"><span class="header-section-number">6.4.5</span> Interpretazione</a></li>
+  <li><a href="#limiti-1" id="toc-limiti-1" class="nav-link" data-scroll-target="#limiti-1"><span class="header-section-number">6.4.6</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-2" id="toc-domande-di-comprensione-2" class="nav-link" data-scroll-target="#domande-di-comprensione-2"><span class="header-section-number">6.4.7</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#misurare-la-performance-in-regressione" id="toc-misurare-la-performance-in-regressione" class="nav-link" data-scroll-target="#misurare-la-performance-in-regressione"><span class="header-section-number">6.5</span> Misurare la performance in regressione</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-3" id="toc-motivazione-3" class="nav-link" data-scroll-target="#motivazione-3"><span class="header-section-number">6.5.1</span> Motivazione</a></li>
+  <li><a href="#concetto-mse-rmse-mae" id="toc-concetto-mse-rmse-mae" class="nav-link" data-scroll-target="#concetto-mse-rmse-mae"><span class="header-section-number">6.5.2</span> Concetto: MSE, RMSE, MAE</a></li>
+  <li><a href="#intuizione-1" id="toc-intuizione-1" class="nav-link" data-scroll-target="#intuizione-1"><span class="header-section-number">6.5.3</span> Intuizione</a></li>
+  <li><a href="#altri-indicatori-mape-e-r2" id="toc-altri-indicatori-mape-e-r2" class="nav-link" data-scroll-target="#altri-indicatori-mape-e-r2"><span class="header-section-number">6.5.4</span> Altri indicatori: MAPE e <span class="math inline">\(R^2\)</span></a></li>
+  <li><a href="#limiti-2" id="toc-limiti-2" class="nav-link" data-scroll-target="#limiti-2"><span class="header-section-number">6.5.5</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-3" id="toc-domande-di-comprensione-3" class="nav-link" data-scroll-target="#domande-di-comprensione-3"><span class="header-section-number">6.5.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#errori-di-training-validation-test-e-generalizzazione" id="toc-errori-di-training-validation-test-e-generalizzazione" class="nav-link" data-scroll-target="#errori-di-training-validation-test-e-generalizzazione"><span class="header-section-number">6.6</span> Errori di training, validation, test e generalizzazione</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-4" id="toc-motivazione-4" class="nav-link" data-scroll-target="#motivazione-4"><span class="header-section-number">6.6.1</span> Motivazione</a></li>
+  <li><a href="#concetto" id="toc-concetto" class="nav-link" data-scroll-target="#concetto"><span class="header-section-number">6.6.2</span> Concetto</a></li>
+  <li><a href="#cross-validation" id="toc-cross-validation" class="nav-link" data-scroll-target="#cross-validation"><span class="header-section-number">6.6.3</span> Cross-validation</a></li>
+  <li><a href="#esempio-2" id="toc-esempio-2" class="nav-link" data-scroll-target="#esempio-2"><span class="header-section-number">6.6.4</span> Esempio</a></li>
+  <li><a href="#interpretazione-2" id="toc-interpretazione-2" class="nav-link" data-scroll-target="#interpretazione-2"><span class="header-section-number">6.6.5</span> Interpretazione</a></li>
+  <li><a href="#domande-di-comprensione-4" id="toc-domande-di-comprensione-4" class="nav-link" data-scroll-target="#domande-di-comprensione-4"><span class="header-section-number">6.6.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#il-dilemma-bias-varianza-evidenza-empirica" id="toc-il-dilemma-bias-varianza-evidenza-empirica" class="nav-link" data-scroll-target="#il-dilemma-bias-varianza-evidenza-empirica"><span class="header-section-number">6.7</span> Il dilemma bias-varianza: evidenza empirica</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-5" id="toc-motivazione-5" class="nav-link" data-scroll-target="#motivazione-5"><span class="header-section-number">6.7.1</span> Motivazione</a></li>
+  <li><a href="#esempio-3" id="toc-esempio-3" class="nav-link" data-scroll-target="#esempio-3"><span class="header-section-number">6.7.2</span> Esempio</a></li>
+  <li><a href="#interpretazione-3" id="toc-interpretazione-3" class="nav-link" data-scroll-target="#interpretazione-3"><span class="header-section-number">6.7.3</span> Interpretazione</a></li>
+  <li><a href="#indicazioni-pratiche-e-rimedi" id="toc-indicazioni-pratiche-e-rimedi" class="nav-link" data-scroll-target="#indicazioni-pratiche-e-rimedi"><span class="header-section-number">6.7.4</span> Indicazioni pratiche e rimedi</a></li>
+  <li><a href="#limiti-3" id="toc-limiti-3" class="nav-link" data-scroll-target="#limiti-3"><span class="header-section-number">6.7.5</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-5" id="toc-domande-di-comprensione-5" class="nav-link" data-scroll-target="#domande-di-comprensione-5"><span class="header-section-number">6.7.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#decomposizione-formale-dellerrore-bias²-varianza-rumore" id="toc-decomposizione-formale-dellerrore-bias²-varianza-rumore" class="nav-link" data-scroll-target="#decomposizione-formale-dellerrore-bias²-varianza-rumore"><span class="header-section-number">6.8</span> Decomposizione formale dell’errore: bias² + varianza + rumore</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-6" id="toc-motivazione-6" class="nav-link" data-scroll-target="#motivazione-6"><span class="header-section-number">6.8.1</span> Motivazione</a></li>
+  <li><a href="#i-due-lemmi" id="toc-i-due-lemmi" class="nav-link" data-scroll-target="#i-due-lemmi"><span class="header-section-number">6.8.2</span> I due lemmi</a></li>
+  <li><a href="#intuizione-sul-lemma-1" id="toc-intuizione-sul-lemma-1" class="nav-link" data-scroll-target="#intuizione-sul-lemma-1"><span class="header-section-number">6.8.3</span> Intuizione sul Lemma 1</a></li>
+  <li><a href="#ipotesi-della-dimostrazione" id="toc-ipotesi-della-dimostrazione" class="nav-link" data-scroll-target="#ipotesi-della-dimostrazione"><span class="header-section-number">6.8.4</span> Ipotesi della dimostrazione</a></li>
+  <li><a href="#dimostrazione-passo-per-passo" id="toc-dimostrazione-passo-per-passo" class="nav-link" data-scroll-target="#dimostrazione-passo-per-passo"><span class="header-section-number">6.8.5</span> Dimostrazione, passo per passo</a></li>
+  <li><a href="#intuizione-sui-tre-termini" id="toc-intuizione-sui-tre-termini" class="nav-link" data-scroll-target="#intuizione-sui-tre-termini"><span class="header-section-number">6.8.6</span> Intuizione sui tre termini</a></li>
+  <li><a href="#interpretazione-con-il-bersaglio" id="toc-interpretazione-con-il-bersaglio" class="nav-link" data-scroll-target="#interpretazione-con-il-bersaglio"><span class="header-section-number">6.8.7</span> Interpretazione con il bersaglio</a></li>
+  <li><a href="#limiti-4" id="toc-limiti-4" class="nav-link" data-scroll-target="#limiti-4"><span class="header-section-number">6.8.8</span> Limiti</a></li>
+  <li><a href="#domande-di-comprensione-6" id="toc-domande-di-comprensione-6" class="nav-link" data-scroll-target="#domande-di-comprensione-6"><span class="header-section-number">6.8.9</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#verso-i-modelli-parametrici" id="toc-verso-i-modelli-parametrici" class="nav-link" data-scroll-target="#verso-i-modelli-parametrici"><span class="header-section-number">6.9</span> Verso i modelli parametrici</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-7" id="toc-motivazione-7" class="nav-link" data-scroll-target="#motivazione-7"><span class="header-section-number">6.9.1</span> Motivazione</a></li>
+  <li><a href="#concetto-modello-parametrico" id="toc-concetto-modello-parametrico" class="nav-link" data-scroll-target="#concetto-modello-parametrico"><span class="header-section-number">6.9.2</span> Concetto: modello parametrico</a></li>
+  <li><a href="#il-metodo-dei-minimi-quadrati-ols" id="toc-il-metodo-dei-minimi-quadrati-ols" class="nav-link" data-scroll-target="#il-metodo-dei-minimi-quadrati-ols"><span class="header-section-number">6.9.3</span> Il metodo dei minimi quadrati (OLS)</a></li>
+  <li><a href="#interpretazione-probabilistica-ols-come-mle" id="toc-interpretazione-probabilistica-ols-come-mle" class="nav-link" data-scroll-target="#interpretazione-probabilistica-ols-come-mle"><span class="header-section-number">6.9.4</span> Interpretazione probabilistica: OLS come MLE</a></li>
+  <li><a href="#problemi-del-metodo" id="toc-problemi-del-metodo" class="nav-link" data-scroll-target="#problemi-del-metodo"><span class="header-section-number">6.9.5</span> Problemi del metodo</a></li>
+  <li><a href="#domande-di-comprensione-7" id="toc-domande-di-comprensione-7" class="nav-link" data-scroll-target="#domande-di-comprensione-7"><span class="header-section-number">6.9.6</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#il-modello-di-regressione-lineare" id="toc-il-modello-di-regressione-lineare" class="nav-link" data-scroll-target="#il-modello-di-regressione-lineare"><span class="header-section-number">6.10</span> Il modello di regressione lineare</a>
+  <ul class="collapse">
+  <li><a href="#motivazione-8" id="toc-motivazione-8" class="nav-link" data-scroll-target="#motivazione-8"><span class="header-section-number">6.10.1</span> Motivazione</a></li>
+  <li><a href="#concetto-e-definizione" id="toc-concetto-e-definizione" class="nav-link" data-scroll-target="#concetto-e-definizione"><span class="header-section-number">6.10.2</span> Concetto e definizione</a></li>
+  <li><a href="#esempi-di-modelli-lineari" id="toc-esempi-di-modelli-lineari" class="nav-link" data-scroll-target="#esempi-di-modelli-lineari"><span class="header-section-number">6.10.3</span> Esempi di modelli lineari</a></li>
+  <li><a href="#esempio-r-dal-semplice-al-polinomiale" id="toc-esempio-r-dal-semplice-al-polinomiale" class="nav-link" data-scroll-target="#esempio-r-dal-semplice-al-polinomiale"><span class="header-section-number">6.10.4</span> Esempio R: dal semplice al polinomiale</a></li>
+  <li><a href="#selezione-del-grado-tramite-cross-validation" id="toc-selezione-del-grado-tramite-cross-validation" class="nav-link" data-scroll-target="#selezione-del-grado-tramite-cross-validation"><span class="header-section-number">6.10.5</span> Selezione del grado tramite cross-validation</a></li>
+  <li><a href="#interpretazione-dei-parametri-nella-regressione-lineare-semplice" id="toc-interpretazione-dei-parametri-nella-regressione-lineare-semplice" class="nav-link" data-scroll-target="#interpretazione-dei-parametri-nella-regressione-lineare-semplice"><span class="header-section-number">6.10.6</span> Interpretazione dei parametri nella regressione lineare semplice</a></li>
+  <li><a href="#derivazione-della-formula-chiusa" id="toc-derivazione-della-formula-chiusa" class="nav-link" data-scroll-target="#derivazione-della-formula-chiusa"><span class="header-section-number">6.10.7</span> Derivazione della formula chiusa</a></li>
+  <li><a href="#verifica-numerica" id="toc-verifica-numerica" class="nav-link" data-scroll-target="#verifica-numerica"><span class="header-section-number">6.10.8</span> Verifica numerica</a></li>
+  <li><a href="#domande-di-comprensione-8" id="toc-domande-di-comprensione-8" class="nav-link" data-scroll-target="#domande-di-comprensione-8"><span class="header-section-number">6.10.9</span> Domande di comprensione</a></li>
+  </ul></li>
+  <li><a href="#cosa-ricordare" id="toc-cosa-ricordare" class="nav-link" data-scroll-target="#cosa-ricordare"><span class="header-section-number">6.11</span> Cosa ricordare</a></li>
+  <li><a href="#domande-di-riepilogo" id="toc-domande-di-riepilogo" class="nav-link" data-scroll-target="#domande-di-riepilogo"><span class="header-section-number">6.12</span> Domande di riepilogo</a></li>
+  <li><a href="#laboratorio-r-leggere-i-dati-non-programmare" id="toc-laboratorio-r-leggere-i-dati-non-programmare" class="nav-link" data-scroll-target="#laboratorio-r-leggere-i-dati-non-programmare"><span class="header-section-number">6.13</span> Laboratorio R: leggere i dati, non programmare</a>
+  <ul class="collapse">
+  <li><a href="#comprendere" id="toc-comprendere" class="nav-link" data-scroll-target="#comprendere"><span class="header-section-number">6.13.1</span> Comprendere</a></li>
+  <li><a href="#ragionare" id="toc-ragionare" class="nav-link" data-scroll-target="#ragionare"><span class="header-section-number">6.13.2</span> Ragionare</a></li>
+  <li><a href="#esplorare-con-r" id="toc-esplorare-con-r" class="nav-link" data-scroll-target="#esplorare-con-r"><span class="header-section-number">6.13.3</span> Esplorare con R</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-regressione-base" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regressione: da KNN al metodo dei minimi quadrati</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="obiettivi-del-capitolo" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="obiettivi-del-capitolo"><span class="header-section-number">6.1</span> Obiettivi del capitolo</h2>
+<p>Al termine del capitolo dovresti essere in grado di:</p>
+<ul>
+<li>spiegare in che senso la regressione può essere vista come un’estensione della classificazione, e ricostruire per la regressione le nozioni di training/test/validation/errore di generalizzazione già viste nel capitolo 4;</li>
+<li>descrivere KNN per la regressione, distinguendolo da KNN per la classificazione, e discuterne vantaggi e limiti;</li>
+<li>scegliere e interpretare correttamente un indicatore di performance per un modello di regressione (MSE, RMSE, MAE, MAPE, <span class="math inline">\(R^2\)</span>), evitando l’errore di leggere un <span class="math inline">\(R^2\)</span> di training come se fosse un <span class="math inline">\(R^2\)</span> di generalizzazione;</li>
+<li>ricostruire, passo per passo, la dimostrazione della decomposizione dell’errore in bias² + varianza + rumore, e spiegare a parole cosa significano i tre termini;</li>
+<li>leggere una coppia di curve training/cross-validation al variare di un iperparametro e riconoscere overfitting, underfitting e un compromesso ragionevole;</li>
+<li>descrivere il passaggio da modelli non parametrici (KNN) a modelli parametrici, il metodo dei minimi quadrati (OLS) e la sua interpretazione come stima di massima verosimiglianza sotto rumore gaussiano;</li>
+<li>riconoscere la struttura di un modello di regressione lineare generale <span class="math inline">\(h(x;\theta)=\theta_0+\sum_j \theta_j \phi_j(x)\)</span> e i suoi casi particolari (semplice, polinomiale, multiplo, con interazioni).</li>
+</ul>
+</section>
+<section id="dalla-classificazione-alla-regressione" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="dalla-classificazione-alla-regressione"><span class="header-section-number">6.2</span> Dalla classificazione alla regressione</h2>
+<section id="motivazione" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="motivazione"><span class="header-section-number">6.2.1</span> Motivazione</h3>
+<p>Nel capitolo 4 abbiamo affrontato il problema della classificazione: dato un insieme di esempi <span class="math inline">\(\{(x_i,y_i)\}_{i=1}^n\)</span>, con <span class="math inline">\(y_i\)</span> appartenente a un insieme <em>discreto</em> e piccolo di classi (spesso solo due), costruire una regola <span class="math inline">\(h\)</span> che assegni la classe corretta a osservazioni nuove. Molte situazioni pratiche, però, chiedono di prevedere una quantità <em>continua</em>: il prezzo di una casa, la temperatura di domani, il voto di un esame, la durata di un processo. Cosa cambia, statisticamente, se la variabile che vogliamo prevedere smette di essere una classe e diventa un numero reale?</p>
+<p>Sorprendentemente poco, dal punto di vista dell’impianto concettuale. Come si dice spesso a lezione, si può pensare alla <strong>classificazione come a un caso speciale della regressione</strong>, ottenuto quando l’insieme di uscita è un insieme finito (nel caso binario, <span class="math inline">\(\{-1,1\}\)</span>); simmetricamente, la <strong>regressione estende la classificazione a un insieme continuo di “classi”</strong>. Tenere a mente questo ponte è utile per due ragioni: da un lato permette di riciclare quasi tutto quello che già sappiamo (training/test, validazione incrociata, bias-varianza); dall’altro aiuta a capire cosa deve essere effettivamente ridefinito — soprattutto la funzione di perdita, perché l’accuratezza 0/1 della classificazione non ha più senso quando l’uscita è un numero reale.</p>
+</section>
+<section id="concetto-e-notazione" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="concetto-e-notazione"><span class="header-section-number">6.2.2</span> Concetto e notazione</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il <strong>problema della regressione</strong> consiste, dato un insieme di osservazioni <span class="math display">\[
+\{(x_i,y_i)\}_{i=1,\ldots,n},
+\]</span> nel determinare un <strong>modello di regressione</strong> <span class="math display">\[
+h: F \to C, \qquad h(x) \approx y,
+\]</span> dove <span class="math inline">\(x_i \in F\)</span> sono le <strong>variabili di input</strong> e <span class="math inline">\(y_i \in C\)</span> le <strong>variabili di output</strong>. L’ipotesi di lavoro è <span class="math inline">\(F \subseteq \mathbb{R}^d\)</span> e <span class="math inline">\(C=\mathbb{R}^k\)</span>; per semplicità, in tutto questo capitolo prendiamo <span class="math inline">\(k=1\)</span>, cioè un’unica variabile di output reale.</p>
+</div>
+</div>
+<p>Le variabili <span class="math inline">\(x_i\)</span> hanno moltissimi sinonimi nella letteratura: fattori di ingresso, regressori, predittori, covariate, variabili esplicative, variabili indipendenti. Analogamente le <span class="math inline">\(y_i\)</span> sono dette fattori di uscita, risposte, variabili dipendenti. In queste note preferiamo, quando possibile, la coppia <strong>fattori di ingresso / fattori di uscita</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Perché evitare “variabili indipendenti/dipendenti”? La terminologia è diffusissima e non è affatto sbagliata usarla, ma porta con sé un’insidia concettuale: suggerisce implicitamente un nesso di causa-effetto (la <span class="math inline">\(x\)</span> “causa” la <span class="math inline">\(y\)</span>), che in generale la regressione <strong>non dimostra e non presuppone</strong>. Un modello di regressione stima un’associazione statistica tra <span class="math inline">\(x\)</span> e <span class="math inline">\(y\)</span>; se questa associazione rifletta davvero una relazione causale è una domanda diversa, che richiede assunzioni aggiuntive (si pensi alla distinzione tra correlazione e causalità già incontrata a proposito della correlazione di Pearson nel capitolo 3). “Fattori di ingresso/uscita” è una nomenclatura più neutra, che non prende posizione su questo punto.</p>
+</div>
+</div>
+<p>Se <span class="math inline">\(C=\{-1,1\}\)</span> siamo esattamente nel problema di classificazione binaria discusso nei capitoli 4 e 5: la regressione, in questo senso, è davvero una generalizzazione.</p>
+</section>
+<section id="domande-di-comprensione" class="level3" data-number="6.2.3">
+<h3 data-number="6.2.3" class="anchored" data-anchor-id="domande-di-comprensione"><span class="header-section-number">6.2.3</span> Domande di comprensione</h3>
+<ol type="1">
+<li>In che senso la classificazione binaria è un caso particolare del problema di regressione qui definito?</li>
+<li>Perché la terminologia “variabili indipendenti/dipendenti” può essere fuorviante in un contesto puramente predittivo?</li>
+<li>Se <span class="math inline">\(y\)</span> rappresenta il numero di clienti che entrano in un negozio in un’ora (un intero non negativo), il framework <span class="math inline">\(C=\mathbb{R}\)</span> è ragionevole? Cosa si perde nell’approssimazione?</li>
+</ol>
+</section>
+</section>
+<section id="regressione-e-interpolazione" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="regressione-e-interpolazione"><span class="header-section-number">6.3</span> Regressione e interpolazione</h2>
+<section id="motivazione-1" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="motivazione-1"><span class="header-section-number">6.3.1</span> Motivazione</h3>
+<p>Una prima idea, ingenua ma istruttiva, è chiedere che <span class="math inline">\(h\)</span> riproduca <em>esattamente</em> i dati osservati. Vediamo perché questa richiesta, pur sembrando la più naturale, è in realtà troppo forte, e cosa succede quando viene messa alla prova con dati rumorosi.</p>
+</section>
+<section id="concetto-interpolazione" class="level3" data-number="6.3.2">
+<h3 data-number="6.3.2" class="anchored" data-anchor-id="concetto-interpolazione"><span class="header-section-number">6.3.2</span> Concetto: interpolazione</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Un modello <span class="math inline">\(h\)</span> <strong>interpola</strong> i dati <span class="math inline">\(\{(x_i,y_i)\}_{i=1}^n\)</span> se <span class="math display">\[
+h(x_i) = y_i \quad \text{per ogni } i=1,\ldots,n.
+\]</span></p>
+</div>
+</div>
+<p>Il problema dell’interpolazione è mal posto per i nostri scopi: se non specifichiamo altro, esistono infinite funzioni che passano esattamente per <span class="math inline">\(n\)</span> punti dati (basta pensare a tutte le curve lisce che si possono far passare per un insieme finito di punti nel piano, oppure, più semplicemente, a un’interpolazione lineare a tratti, costruibile con una singola riga di codice R). Il fatto che una funzione “colga” esattamente i dati osservati non garantisce affatto che si comporti bene su un punto nuovo.</p>
+</section>
+<section id="esempio" class="level3" data-number="6.3.3">
+<h3 data-number="6.3.3" class="anchored" data-anchor-id="esempio"><span class="header-section-number">6.3.3</span> Esempio</h3>
+<p>Generiamo un piccolo dataset sintetico — lo stesso useremo per tutto il capitolo — a partire da una curva nota (<span class="math inline">\(\sin(x)\)</span>) più rumore gaussiano, così da poter confrontare i modelli con la “verità” che li ha generati.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">runif</span>(n, <span class="dv">0</span>, <span class="dv">3</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">sin</span>(x) <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.1</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Dataset sintetico: y = sin(x) + rumore"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/dati-sintetici-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Prima di calcolare.</strong> Se collegassimo i punti in ordine di <span class="math inline">\(x\)</span> con segmenti (interpolazione lineare a tratti), che tipo di curva ti aspetti? Sarà liscia o “a zig-zag”?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Interpolazione lineare a tratti"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/interpolazione-lineare-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Dopo il calcolo.</strong> La curva insegue ogni singolo punto, comprese le sue oscillazioni dovute al rumore: è un comportamento coerente con la definizione di interpolazione, ma il risultato è visibilmente più irregolare della sinusoide che ha generato i dati.</p>
+<p>Il problema si aggrava drasticamente in presenza di outlier. Perturbiamo pochi punti del dataset con uno scostamento molto grande:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>y_out <span class="ot">&lt;-</span> y <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.02</span>, <span class="fl">0.96</span>, <span class="fl">0.02</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df_out <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y_out)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_out, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Interpolazione con outlier"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/outlier-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpretazione" class="level3" data-number="6.3.4">
+<h3 data-number="6.3.4" class="anchored" data-anchor-id="interpretazione"><span class="header-section-number">6.3.4</span> Interpretazione</h3>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Guardando la curva con outlier, possiamo già anticipare il linguaggio bias/varianza che formalizzeremo più avanti nel capitolo. Il modello che interpola esattamente ha <strong>varianza troppo alta</strong>: insegue ogni singolo punto del training set, compresi gli scostamenti dovuti al rumore o a osservazioni anomale, e quindi cambierebbe moltissimo se ripetessimo l’esperimento con un altro campione di dati generato dalla stessa legge. Il suo <strong>bias</strong>, invece, è basso: essendo estremamente flessibile, in media (su molti training set diversi) riesce comunque ad avvicinarsi alla vera relazione. Questo è esattamente lo stesso compromesso già incontrato, qualitativamente, nel capitolo 4 a proposito di KNN per la classificazione.</p>
+</div>
+</div>
+</section>
+<section id="limiti" class="level3" data-number="6.3.5">
+<h3 data-number="6.3.5" class="anchored" data-anchor-id="limiti"><span class="header-section-number">6.3.5</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Interpolare esattamente non è di per sé un errore metodologico (in alcuni contesti, ad esempio l’analisi numerica, è proprio l’obiettivo), ma come strategia di <em>apprendimento statistico</em> da dati rumorosi è quasi sempre una cattiva idea: massimizza la sensibilità al rumore campionario e alle osservazioni anomale, a scapito della capacità di generalizzare a punti nuovi.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-1" class="level3" data-number="6.3.6">
+<h3 data-number="6.3.6" class="anchored" data-anchor-id="domande-di-comprensione-1"><span class="header-section-number">6.3.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché “infinite funzioni passano per <span class="math inline">\(n\)</span> punti dati” è un problema, e non solo un’osservazione tecnica?</li>
+<li>Nell’esempio con outlier, cosa succederebbe alla curva interpolante se rigenerassimo il campione con un seed diverso? E alla curva “vera” <span class="math inline">\(\sin(x)\)</span>?</li>
+<li>In che senso l’interpolazione esatta è un caso estremo di “modello troppo flessibile”?</li>
+</ol>
+</section>
+</section>
+<section id="k-nn-per-la-regressione" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="k-nn-per-la-regressione"><span class="header-section-number">6.4</span> K-NN per la regressione</h2>
+<section id="motivazione-2" class="level3" data-number="6.4.1">
+<h3 data-number="6.4.1" class="anchored" data-anchor-id="motivazione-2"><span class="header-section-number">6.4.1</span> Motivazione</h3>
+<p>Abbiamo bisogno di un modello meno rigido dell’interpolazione esatta, che “medi” l’informazione locale invece di riprodurla puntualmente. L’idea più semplice, che ripropone esattamente la logica di KNN già vista per la classificazione nel capitolo 4, è guardare ai vicini di un punto e usarne il valore medio.</p>
+</section>
+<section id="concetto-e-formula" class="level3" data-number="6.4.2">
+<h3 data-number="6.4.2" class="anchored" data-anchor-id="concetto-e-formula"><span class="header-section-number">6.4.2</span> Concetto e formula</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dato <span class="math inline">\(x \in F \subseteq \mathbb{R}^d\)</span>, siano <span class="math inline">\(i_1(x), i_2(x), \ldots, i_k(x)\)</span> gli indici dei <span class="math inline">\(k\)</span> punti del training set con caratteristiche più vicine a <span class="math inline">\(x\)</span> (rispetto a una distanza fissata, tipicamente quella euclidea). Il <strong>modello K-Nearest Neighbors per la regressione</strong> è <span class="math display">\[
+h(x) = \frac{y_{i_1(x)} + y_{i_2(x)} + \cdots + y_{i_k(x)}}{k}.
+\]</span></p>
+</div>
+</div>
+<p>Per <span class="math inline">\(k=1\)</span>, <span class="math inline">\(h(x)\)</span> restituisce semplicemente il valore di output del punto del training set più vicino a <span class="math inline">\(x\)</span>.</p>
+</section>
+<section id="intuizione" class="level3" data-number="6.4.3">
+<h3 data-number="6.4.3" class="anchored" data-anchor-id="intuizione"><span class="header-section-number">6.4.3</span> Intuizione</h3>
+<p>La differenza rispetto a KNN per la classificazione è minima ma istruttiva: in classificazione i <span class="math inline">\(k\)</span> vicini “votano” e vince la classe di maggioranza; in regressione, poiché le <span class="math inline">\(y\)</span> sono numeri reali (e non etichette), ha senso fare direttamente la <strong>media aritmetica</strong>. Non c’è più il problema dei pareggi di voto (che imponeva, in classificazione, di preferire valori dispari di <span class="math inline">\(k\)</span>): con la media, qualunque <span class="math inline">\(k\)</span> va bene.</p>
+<p>Vantaggi e svantaggi sono gli stessi già discussi per KNN in classificazione: la scelta di <span class="math inline">\(k\)</span> è cruciale, il metodo usa la distanza euclidea (quindi richiede di riscalare le variabili quando hanno scale molto diverse — lo stesso avvertimento incontrato con la standardizzazione in PCA al capitolo 3 e in KNN al capitolo 4, altrimenti alcune feature “schiacciano” le altre nel calcolo delle distanze), e soffre della <em>curse of dimensionality</em> discussa nel capitolo 3.</p>
+</section>
+<section id="esempio-1" class="level3" data-number="6.4.4">
+<h3 data-number="6.4.4" class="anchored" data-anchor-id="esempio-1"><span class="header-section-number">6.4.4</span> Esempio</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(FNN)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>y_pred <span class="ot">&lt;-</span> <span class="fu">knn.reg</span>(<span class="at">train =</span> <span class="fu">as.matrix</span>(df<span class="sc">$</span>x), <span class="at">test =</span> <span class="fu">as.matrix</span>(x), <span class="at">y =</span> df<span class="sc">$</span>y, <span class="at">k =</span> k)<span class="sc">$</span>pred</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df_pred <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y_pred)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_pred, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y), <span class="at">colour =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="fu">paste</span>(<span class="st">"KNN Regressione con k ="</span>, k))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/knn-reg-k5-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Prima di calcolare.</strong> Ripetiamo l’esempio con outlier di prima, ma usando KNN con <span class="math inline">\(k=5\)</span> invece dell’interpolazione esatta. Ti aspetti che l’effetto del singolo outlier sulla curva sia più o meno marcato?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y_pred_out <span class="ot">&lt;-</span> <span class="fu">knn.reg</span>(<span class="at">train =</span> <span class="fu">as.matrix</span>(df_out<span class="sc">$</span>x), <span class="at">test =</span> <span class="fu">as.matrix</span>(x), <span class="at">y =</span> df_out<span class="sc">$</span>y, <span class="at">k =</span> <span class="dv">5</span>)<span class="sc">$</span>pred</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df_pred_out <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y_pred_out)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_out, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_pred_out, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y), <span class="at">colour =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"KNN Regressione (k=5) sui dati con outlier"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/knn-reg-outlier-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpretazione-1" class="level3" data-number="6.4.5">
+<h3 data-number="6.4.5" class="anchored" data-anchor-id="interpretazione-1"><span class="header-section-number">6.4.5</span> Interpretazione</h3>
+<p>Con <span class="math inline">\(k=5\)</span>, un singolo outlier entra nella media di al più 5 finestre locali di vicinato: il suo effetto è diluito, non annullato. Ci si aspetta un piccolo abbassamento locale della curva nel punto dell’outlier (perché quel valore anomalo “pesa” per <span class="math inline">\(1/5\)</span> nella media), seguito da un pronto ritorno verso l’andamento generale non appena l’outlier esce dalla finestra dei <span class="math inline">\(k\)</span> vicini più prossimi. Questo è già un netto miglioramento rispetto all’interpolazione esatta, che seguiva l’outlier senza alcuna mitigazione.</p>
+</section>
+<section id="limiti-1" class="level3" data-number="6.4.6">
+<h3 data-number="6.4.6" class="anchored" data-anchor-id="limiti-1"><span class="header-section-number">6.4.6</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>KNN per la regressione eredita gli stessi limiti di KNN per la classificazione: dipende dalla scelta di <span class="math inline">\(k\)</span>, richiede di ricalcolare le distanze rispetto a tutto il training set per ogni nuova previsione (costoso quando <span class="math inline">\(n\)</span> è grande) e degrada in alta dimensione. Vedremo più avanti nel capitolo che questi limiti motivano il passaggio a modelli parametrici.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-2" class="level3" data-number="6.4.7">
+<h3 data-number="6.4.7" class="anchored" data-anchor-id="domande-di-comprensione-2"><span class="header-section-number">6.4.7</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché per la regressione, a differenza della classificazione, non c’è motivo di preferire valori dispari di <span class="math inline">\(k\)</span>?</li>
+<li>Cosa succederebbe, qualitativamente, alla curva KNN se aumentassimo <span class="math inline">\(k\)</span> da 5 a 50 sul dataset con outlier?</li>
+<li>Due variabili di input hanno scale molto diverse (una misurata in millimetri, l’altra in chilometri). Perché questo è un problema specifico per KNN e non, ad esempio, per un albero di decisione?</li>
+</ol>
+</section>
+</section>
+<section id="misurare-la-performance-in-regressione" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="misurare-la-performance-in-regressione"><span class="header-section-number">6.5</span> Misurare la performance in regressione</h2>
+<section id="motivazione-3" class="level3" data-number="6.5.1">
+<h3 data-number="6.5.1" class="anchored" data-anchor-id="motivazione-3"><span class="header-section-number">6.5.1</span> Motivazione</h3>
+<p>In classificazione avevamo un indicatore naturale, l’accuratezza — la frazione di casi classificati correttamente: <span class="math display">\[
+Acc(h) = \frac{1}{n}\sum_i 1_{\{h(x_i)=y_i\}}.
+\]</span> In regressione, però, chiedere che <span class="math inline">\(h(x_i)\)</span> coincida <em>esattamente</em> con <span class="math inline">\(y_i\)</span> è un criterio troppo grossolano: quasi nessuna previsione continua sarà mai identica al valore osservato, anche se il modello è ottimo. Un modello che prevede <span class="math inline">\(9.98\)</span> quando il vero valore è <span class="math inline">\(10.00\)</span> dovrebbe essere considerato “quasi giusto”, non “sbagliato” come uno che prevede <span class="math inline">\(-500\)</span>. Serve quindi una famiglia di funzioni di perdita più morbide della perdita 0-1.</p>
+</section>
+<section id="concetto-mse-rmse-mae" class="level3" data-number="6.5.2">
+<h3 data-number="6.5.2" class="anchored" data-anchor-id="concetto-mse-rmse-mae"><span class="header-section-number">6.5.2</span> Concetto: MSE, RMSE, MAE</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Dato un modello <span class="math inline">\(h\)</span> e osservazioni <span class="math inline">\(\{(x_i,y_i)\}\)</span>:</p>
+<ul>
+<li><strong>Errore quadratico medio (MSE)</strong>: <span class="math inline">\(\displaystyle MSE(h) = \frac{1}{n}\sum_{i=1}^n (h(x_i)-y_i)^2\)</span>;</li>
+<li><strong>Radice dell’errore quadratico medio (RMSE)</strong>: <span class="math inline">\(RMSE(h) = \sqrt{MSE(h)}\)</span>;</li>
+<li><strong>Errore assoluto medio (MAE)</strong>: <span class="math inline">\(\displaystyle MAE(h) = \frac{1}{n}\sum_{i=1}^n |h(x_i)-y_i|\)</span>.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="intuizione-1" class="level3" data-number="6.5.3">
+<h3 data-number="6.5.3" class="anchored" data-anchor-id="intuizione-1"><span class="header-section-number">6.5.3</span> Intuizione</h3>
+<p>Perché non fermarsi al MSE? Il problema è di unità di misura: se <span class="math inline">\(y\)</span> è espressa in metri, il MSE è espresso in metri <em>quadrati</em>, una quantità difficile da interpretare direttamente (quanto vale, intuitivamente, un errore di “4 metri quadrati”?). La radice quadrata riporta l’indicatore nella scala originaria: l’RMSE è espresso nella stessa unità di <span class="math inline">\(y\)</span>, ed è quindi molto più leggibile.</p>
+<p>Quanto alla scelta tra RMSE e MAE, vale un parallelo che dovrebbe risultare familiare dal capitolo 1: la stessa contrapposizione tra <strong>media e mediana</strong>. Elevare al quadrato amplifica il contributo degli scarti grandi (un errore doppio pesa quattro volte tanto), quindi il MSE/RMSE è più sensibile agli outlier; il valore assoluto tratta tutti gli scarti in proporzione alla loro grandezza, quindi il MAE è più robusto. Non esiste una scelta “giusta” in assoluto: se un esperto di dominio chiede esplicitamente di minimizzare una particolare funzione di costo (ad esempio perché gli errori grandi hanno conseguenze economiche sproporzionate), quella loss va usata, anche se non è né MSE né MAE.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La scelta tra errore quadratico ed errore assoluto ha anche una storia: il metodo dei minimi quadrati, che vedremo tra poco, risale a <strong>Gauss</strong>; <strong>Laplace</strong>, contemporaneo di Gauss, aveva invece proposto di minimizzare la somma dei valori assoluti degli scarti, anticipando così la stima mediana-simile che oggi associamo alla loss <span class="math inline">\(\ell_1\)</span>. La scelta di Gauss ha avuto più successo storicamente soprattutto per un motivo pratico: porta a formule chiuse, “esplicite e maneggevoli” (come vedremo con OLS), mentre il criterio di Laplace è computazionalmente meno comodo. Questa stessa contrapposizione quadrato/valore assoluto era già comparsa nel capitolo 1 a proposito di media e mediana come minimizzatori di funzioni di perdita.</p>
+</div>
+</div>
+</section>
+<section id="altri-indicatori-mape-e-r2" class="level3" data-number="6.5.4">
+<h3 data-number="6.5.4" class="anchored" data-anchor-id="altri-indicatori-mape-e-r2"><span class="header-section-number">6.5.4</span> Altri indicatori: MAPE e <span class="math inline">\(R^2\)</span></h3>
+<p>RMSE e MAE sono indicatori <strong>in scala</strong>: dipendono dall’unità di misura di <span class="math inline">\(y\)</span> (se rimisurassimo <span class="math inline">\(y\)</span> in centimetri anziché in metri, l’RMSE aumenterebbe di un fattore 100). A volte è utile un indicatore adimensionale, che permetta di confrontare la qualità di modelli su dataset diversi.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Errore percentuale assoluto medio (MAPE)</strong>: <span class="math inline">\(\displaystyle MAPE(h) = \frac{1}{n}\sum_{i=1}^n \frac{|h(x_i)-y_i|}{|y_i|}\)</span>;</li>
+<li><strong>Coefficiente di determinazione (<span class="math inline">\(R^2\)</span>)</strong>: <span class="math display">\[
+R^2(h) = 1 - \frac{\sum_{i=1}^n (h(x_i)-y_i)^2}{\sum_{i=1}^n (y_i - \bar y)^2}, \qquad \bar y = \frac{1}{n}\sum_{i=1}^n y_i.
+\]</span></li>
+</ul>
+</div>
+</div>
+<p>Il denominatore di <span class="math inline">\(R^2\)</span> è (a meno del fattore <span class="math inline">\(1/n\)</span>, che si semplifica comunque tra numeratore e denominatore) proprio la varianza campionaria di <span class="math inline">\(y\)</span>: è l’errore quadratico del <strong>modello banale</strong> costante <span class="math inline">\(\bar h(x) = \bar y\)</span>, che prevede sempre la media, indipendentemente da <span class="math inline">\(x\)</span>. Il numeratore è l’errore quadratico del nostro modello <span class="math inline">\(h\)</span>. <span class="math inline">\(R^2\)</span> confronta quindi <span class="math inline">\(h\)</span> con questo termine di paragone: se <span class="math inline">\(h\)</span> è un buon modello, il suo errore dovrebbe essere molto più piccolo di quello del modello costante, dunque il rapporto è vicino a <span class="math inline">\(0\)</span> e <span class="math inline">\(R^2\)</span> vicino a <span class="math inline">\(1\)</span>. Se <span class="math inline">\(h\)</span> non fa meglio della media, <span class="math inline">\(R^2 \approx 0\)</span>; se addirittura fa peggio (è possibile, anche se raro in pratica), <span class="math inline">\(R^2\)</span> diventa negativo.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(R^2\)</span> misura la <strong>frazione di varianza di <span class="math inline">\(y\)</span> “spiegata”</strong> dal modello: un <span class="math inline">\(R^2=0.85\)</span> significa che l’<span class="math inline">\(85\%\)</span> della variabilità di <span class="math inline">\(y\)</span> nel campione è catturata dal modello, il resto rimane nei residui. Il suo valore massimo è <span class="math inline">\(1\)</span> (previsioni perfette).</p>
+</div>
+</div>
+</section>
+<section id="limiti-2" class="level3" data-number="6.5.5">
+<h3 data-number="6.5.5" class="anchored" data-anchor-id="limiti-2"><span class="header-section-number">6.5.5</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il punto più importante da ricordare su <span class="math inline">\(R^2\)</span> è pratico: i comandi R più comuni (in particolare <code>summary(lm(...))</code>, che vedremo a breve) restituiscono un <span class="math inline">\(R^2\)</span> calcolato sul <strong>training set</strong>. Un <span class="math inline">\(R^2\)</span> alto sul training non garantisce affatto una buona generalizzazione: un modello sufficientemente flessibile può ottenere un <span class="math inline">\(R^2\)</span> vicino a 1 sui dati usati per stimarlo e comportarsi malissimo su dati nuovi. <span class="math inline">\(R^2\)</span>, come RMSE e MAE, va sempre accompagnato dalla domanda “calcolato su quali dati?” — esattamente la stessa cautela già raccomandata per l’accuratezza in classificazione.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento — R come laboratorio: $R^2$ di training vs $R^2$ su un test set">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento — R come laboratorio: <span class="math inline">\(R^2\)</span> di training vs <span class="math inline">\(R^2\)</span> su un test set
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">60</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>x_lab <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="dv">0</span>, <span class="dv">3</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>y_lab <span class="ot">&lt;-</span> <span class="fu">sin</span>(x_lab) <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.1</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="dv">40</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>df_train <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x_lab[train_idx], <span class="at">y =</span> y_lab[train_idx])</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>df_test  <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x_lab[<span class="sc">-</span>train_idx], <span class="at">y =</span> y_lab[<span class="sc">-</span>train_idx])</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># modello volutamente troppo flessibile: polinomio di grado 15</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>modello <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">15</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> df_train)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>r2_train <span class="ot">&lt;-</span> <span class="fu">summary</span>(modello)<span class="sc">$</span>r.squared</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>pred_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(modello, <span class="at">newdata =</span> df_test)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>sse_test <span class="ot">&lt;-</span> <span class="fu">sum</span>((pred_test <span class="sc">-</span> df_test<span class="sc">$</span>y)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>sst_test <span class="ot">&lt;-</span> <span class="fu">sum</span>((df_test<span class="sc">$</span>y <span class="sc">-</span> <span class="fu">mean</span>(df_test<span class="sc">$</span>y))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>r2_test <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> sse_test <span class="sc">/</span> sst_test</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">R2_training =</span> r2_train, <span class="at">R2_test =</span> r2_test)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R2_training     R2_test 
+  0.9399229   0.7681091 </code></pre>
+</div>
+</div>
+<p><strong>Domande.</strong> Il polinomio di grado 15 è deliberatamente troppo complesso per soli 40 punti di training. Confronta i due valori di <span class="math inline">\(R^2\)</span>: cosa suggeriscono sulla capacità di generalizzazione del modello? Riesegui il codice riducendo il grado del polinomio a 2 o 3: cosa cambia nel divario tra <span class="math inline">\(R^2\)</span> di training e di test?</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-3" class="level3" data-number="6.5.6">
+<h3 data-number="6.5.6" class="anchored" data-anchor-id="domande-di-comprensione-3"><span class="header-section-number">6.5.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché il MSE non ha, di per sé, un’interpretazione diretta nell’unità di misura di <span class="math inline">\(y\)</span>, mentre RMSE sì?</li>
+<li>Un modello ha MAE piccolo ma alcuni errori occasionalmente enormi. Cosa ti aspetti succeda al suo RMSE rispetto al MAE?</li>
+<li>Un collega ti mostra <span class="math inline">\(R^2=0.93\)</span> calcolato con <code>summary(lm(...))</code> e conclude che il modello è eccellente. Quale domanda dovresti fargli prima di essere d’accordo?</li>
+<li>In quale situazione <span class="math inline">\(R^2\)</span> può risultare negativo? Cosa direbbe questo del modello rispetto alla semplice media <span class="math inline">\(\bar y\)</span>?</li>
+</ol>
+</section>
+</section>
+<section id="errori-di-training-validation-test-e-generalizzazione" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="errori-di-training-validation-test-e-generalizzazione"><span class="header-section-number">6.6</span> Errori di training, validation, test e generalizzazione</h2>
+<section id="motivazione-4" class="level3" data-number="6.6.1">
+<h3 data-number="6.6.1" class="anchored" data-anchor-id="motivazione-4"><span class="header-section-number">6.6.1</span> Motivazione</h3>
+<p>Fissata una funzione di perdita <span class="math inline">\(\ell(h(x),y)\)</span> (quadratica, assoluta, o altra), valgono esattamente le stesse osservazioni fatte per la classificazione nel capitolo 4: l’obiettivo non è minimizzare l’errore sugli esempi già osservati, ma <strong>generalizzare</strong> su dati nuovi.</p>
+</section>
+<section id="concetto" class="level3" data-number="6.6.2">
+<h3 data-number="6.6.2" class="anchored" data-anchor-id="concetto"><span class="header-section-number">6.6.2</span> Concetto</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sotto l’ipotesi che le coppie <span class="math inline">\((x_i,y_i)\)</span> siano un campione i.i.d. con legge <span class="math inline">\(P(X,Y)\)</span>, l’<strong>errore di generalizzazione</strong> (o <strong>rischio</strong>) di un modello <span class="math inline">\(h\)</span> è <span class="math display">\[
+L(h) := \mathbb{E}[\ell(h(X),Y)].
+\]</span> Non essendo nota <span class="math inline">\(P(X,Y)\)</span>, <span class="math inline">\(L(h)\)</span> non è calcolabile direttamente. Si stima con l’<strong>errore di test</strong> <span class="math display">\[
+L_{test}(h) = \frac{1}{m}\sum_{i=1}^m \ell(h(x_i^{test}), y_i^{test})
+\]</span> su un insieme di dati <span class="math inline">\(\{(x_i^{test},y_i^{test})\}\)</span> non usato per stimare <span class="math inline">\(h\)</span>.</p>
+</div>
+</div>
+<p>Questa è esattamente la stessa impostazione della classificazione: cambia solo la loss (da 0-1 a quadratica, assoluta, ecc.), non la logica.</p>
+</section>
+<section id="cross-validation" class="level3" data-number="6.6.3">
+<h3 data-number="6.6.3" class="anchored" data-anchor-id="cross-validation"><span class="header-section-number">6.6.3</span> Cross-validation</h3>
+<p>Come nel capitolo 4, per una stima più affidabile — e per scegliere iperparametri come il <span class="math inline">\(k\)</span> di KNN senza “consumare” un secondo test set indipendente — si ricorre alla <strong>validazione incrociata (cross-validation)</strong> sul solo training set. Le due varianti principali sono:</p>
+<ul>
+<li><strong>Leave-one-out CV (LOO-CV)</strong>: si toglie un punto alla volta, si allena il modello su tutti gli altri, si valuta la previsione sul punto escluso, si confronta con l’etichetta vera, e si somma (o media) la loss su tutte le <span class="math inline">\(n\)</span> esclusioni possibili;</li>
+<li><strong><span class="math inline">\(k\)</span>-fold CV</strong>: si divide il training set in <span class="math inline">\(k\)</span> blocchi (“fold”), si allena su <span class="math inline">\(k-1\)</span> blocchi e si valuta sul blocco restante, ripetendo per ciascun blocco.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>LOO-CV è il caso limite del <span class="math inline">\(k\)</span>-fold con <span class="math inline">\(k=n\)</span>: ogni “fold” contiene un solo punto. È computazionalmente più costosa (richiede <span class="math inline">\(n\)</span> addestramenti) ma per KNN, come vedremo nell’esempio, resta perfettamente gestibile su dataset di dimensioni moderate. Il <span class="math inline">\(k\)</span>-fold con <span class="math inline">\(k\)</span> più piccolo (5 o 10, tipicamente) è la scelta più comune quando <span class="math inline">\(n\)</span> è grande, per motivi di costo computazionale — è la variante discussa con più dettaglio nel capitolo sulla classificazione.</p>
+</div>
+</div>
+</section>
+<section id="esempio-2" class="level3" data-number="6.6.4">
+<h3 data-number="6.6.4" class="anchored" data-anchor-id="esempio-2"><span class="header-section-number">6.6.4</span> Esempio</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>train_control <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"LOOCV"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>modello_cv <span class="ot">&lt;-</span> <span class="fu">train</span>(y <span class="sc">~</span> x, <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">trControl =</span> train_control,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modello_cv)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/cv-knn-k1-10-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpretazione-2" class="level3" data-number="6.6.5">
+<h3 data-number="6.6.5" class="anchored" data-anchor-id="interpretazione-2"><span class="header-section-number">6.6.5</span> Interpretazione</h3>
+<p>Il grafico mostra l’errore di LOO-CV (una stima dell’errore di generalizzazione) al variare di <span class="math inline">\(k\)</span> da 1 a 10. Come nel capitolo 4, la scelta del modello finale dovrebbe basarsi su questa curva, non sull’errore di training, che sistematicamente favorisce i modelli più flessibili (i.e.&nbsp;<span class="math inline">\(k\)</span> piccolo).</p>
+</section>
+<section id="domande-di-comprensione-4" class="level3" data-number="6.6.6">
+<h3 data-number="6.6.6" class="anchored" data-anchor-id="domande-di-comprensione-4"><span class="header-section-number">6.6.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché l’errore di training non è, in generale, una stima affidabile dell’errore di generalizzazione?</li>
+<li>In cosa differisce concretamente la procedura di LOO-CV rispetto alla <span class="math inline">\(5\)</span>-fold CV, in termini di numero di modelli addestrati?</li>
+<li>Se avessi un dataset con <span class="math inline">\(n=100\,000\)</span> osservazioni, useresti LOO-CV o <span class="math inline">\(k\)</span>-fold CV? Perché?</li>
+</ol>
+</section>
+</section>
+<section id="il-dilemma-bias-varianza-evidenza-empirica" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="il-dilemma-bias-varianza-evidenza-empirica"><span class="header-section-number">6.7</span> Il dilemma bias-varianza: evidenza empirica</h2>
+<section id="motivazione-5" class="level3" data-number="6.7.1">
+<h3 data-number="6.7.1" class="anchored" data-anchor-id="motivazione-5"><span class="header-section-number">6.7.1</span> Motivazione</h3>
+<p>Estendiamo l’analisi CV all’intero intervallo <span class="math inline">\(k=1,\ldots,100\)</span> e confrontiamo l’errore di training con l’errore di cross-validation. Le due curve, viste assieme, raccontano una storia più ricca del solo “quale <span class="math inline">\(k\)</span> scegliere”.</p>
+</section>
+<section id="esempio-3" class="level3" data-number="6.7.2">
+<h3 data-number="6.7.2" class="anchored" data-anchor-id="esempio-3"><span class="header-section-number">6.7.2</span> Esempio</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>modello_cv100 <span class="ot">&lt;-</span> <span class="fu">train</span>(y <span class="sc">~</span> x, <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">trControl =</span> train_control,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modello_cv100, <span class="at">col =</span> <span class="st">"blue"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/cv-knn-k1-100-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Prima di calcolare.</strong> Guardando solo i primi 10 valori di <span class="math inline">\(k\)</span> (l’esempio precedente), l’errore CV sembrava decrescere sempre. Estendendo a <span class="math inline">\(k=100\)</span>, ti aspetti che continui a decrescere indefinitamente, o che a un certo punto ricominci a crescere?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>train_error <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="dv">100</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  y_pred_k <span class="ot">&lt;-</span> <span class="fu">knn.reg</span>(<span class="at">train =</span> <span class="fu">as.matrix</span>(df<span class="sc">$</span>x), <span class="at">test =</span> <span class="fu">as.matrix</span>(x), <span class="at">y =</span> df<span class="sc">$</span>y, <span class="at">k =</span> k)<span class="sc">$</span>pred</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  train_error[k] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((df<span class="sc">$</span>y <span class="sc">-</span> y_pred_k)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>df_error <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                        <span class="at">train_error =</span> train_error,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">cv_error =</span> modello_cv100<span class="sc">$</span>results<span class="sc">$</span>RMSE)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_error, <span class="fu">aes</span>(<span class="at">x =</span> k)) <span class="sc">+</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> train_error, <span class="at">colour =</span> <span class="st">"Training"</span>)) <span class="sc">+</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> train_error, <span class="at">colour =</span> <span class="st">"Training"</span>), <span class="at">shape =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> cv_error, <span class="at">colour =</span> <span class="st">"Cross-validation"</span>)) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> cv_error, <span class="at">colour =</span> <span class="st">"Cross-validation"</span>), <span class="at">shape =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Training vs CV error al variare di k"</span>) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Training"</span> <span class="ot">=</span> <span class="st">"violet"</span>, <span class="st">"Cross-validation"</span> <span class="ot">=</span> <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/training-vs-cv-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpretazione-3" class="level3" data-number="6.7.3">
+<h3 data-number="6.7.3" class="anchored" data-anchor-id="interpretazione-3"><span class="header-section-number">6.7.3</span> Interpretazione</h3>
+<p>Due fenomeni, entrambi già osservati qualitativamente nel capitolo 4 ma qui particolarmente nitidi:</p>
+<ul>
+<li>la curva del <strong>training error</strong> parte da (quasi) zero per <span class="math inline">\(k=1\)</span> — con <span class="math inline">\(k=1\)</span> il modello riproduce esattamente il vicino più prossimo, che per un punto di training è il punto stesso — e cresce monotonamente con <span class="math inline">\(k\)</span>, perché con più vicini nella media il modello diventa via via più simile a una costante e “aderisce” sempre meno ai dati osservati;</li>
+<li>la curva dell’<strong>errore di cross-validation</strong> ha tipicamente un andamento <strong>a “U”</strong> (o “a bacino”): parte alta per <span class="math inline">\(k\)</span> piccolo, scende fino a un minimo, e poi risale gradualmente stabilizzandosi.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Una regola pratica, tipica della statistica classica, è: fermarsi al primo valore di <span class="math inline">\(k\)</span> in cui la curva di cross-validation smette di scendere e ricomincia a salire, e scegliere lì il valore ottimale dell’iperparametro. Questo andamento a “U” era già presente, in linea di principio, anche per KNN in classificazione (capitolo 4), ma lì era meno marcato; nella regressione è tipicamente molto più visibile.</p>
+</div>
+</div>
+<p>Le due situazioni estreme si interpretano così:</p>
+<ul>
+<li>per <span class="math inline">\(k=1\)</span> (modello molto flessibile): errore di training minimo, errore di CV/test elevato → <strong>overfitting</strong>;</li>
+<li>per <span class="math inline">\(k\)</span> molto grande (modello molto rigido, vicino alla costante <span class="math inline">\(\bar y\)</span>): sia l’errore di training che quello di CV/test sono elevati → <strong>underfitting</strong>.</li>
+</ul>
+<p>Il valore di <span class="math inline">\(k\)</span> ottimale è quello che minimizza l’errore di cross-validation (o di test), un compromesso tra i due estremi: è il classico <strong>compromesso bias-varianza</strong> (<em>bias-variance tradeoff</em>).</p>
+</section>
+<section id="indicazioni-pratiche-e-rimedi" class="level3" data-number="6.7.4">
+<h3 data-number="6.7.4" class="anchored" data-anchor-id="indicazioni-pratiche-e-rimedi"><span class="header-section-number">6.7.4</span> Indicazioni pratiche e rimedi</h3>
+<p>Dalla forma delle due curve si possono trarre indicazioni operative:</p>
+<ul>
+<li>training basso + test/CV basso → modello ben bilanciato (situazione ideale, raramente riscontrata esattamente);</li>
+<li>training molto basso, test/CV alto → overfitting: ridurre il numero di parametri effettivi del modello, aumentare la regolarizzazione (in KNN, aumentare <span class="math inline">\(k\)</span>); tecniche più sistematiche includono <em>bagging</em> e <em>dropout</em>, che riducono la varianza aggregando o perturbando modelli;</li>
+<li>training alto, test/CV alto → underfitting: aumentare il numero di parametri effettivi, ridurre la regolarizzazione (in KNN, ridurre <span class="math inline">\(k\)</span>); qui la tecnica sistematica tipica è il <em>boosting</em>, che parte da modelli molto semplici e ne aumenta progressivamente l’espressività.</li>
+</ul>
+</section>
+<section id="limiti-3" class="level3" data-number="6.7.5">
+<h3 data-number="6.7.5" class="anchored" data-anchor-id="limiti-3"><span class="header-section-number">6.7.5</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Non esiste alcun teorema che imponga a <em>tutti</em> i modelli statistici di esibire questo compromesso. Reti neurali profonde e random forest, in particolare, tipicamente <strong>non</strong> mostrano il classico dilemma bias-varianza nella forma appena descritta (pur avendo altre complicazioni pratiche in fase di addestramento). Il compromesso descritto in questa sezione è un fenomeno che si osserva spesso, specialmente nei modelli più semplici come KNN, ma non è una legge universale.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-5" class="level3" data-number="6.7.6">
+<h3 data-number="6.7.6" class="anchored" data-anchor-id="domande-di-comprensione-5"><span class="header-section-number">6.7.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Se osservi che l’errore di training e l’errore di CV sono entrambi alti e molto vicini tra loro, in quale regime ti trovi (overfitting o underfitting)? Perché?</li>
+<li>Perché ridurre il valore di <span class="math inline">\(k\)</span> in KNN aumenta la flessibilità (e quindi il rischio di overfitting) del modello?</li>
+<li>Un collega ti dice: “ho aumentato moltissimo la complessità della mia rete neurale e l’errore di test è comunque migliorato”. È in contraddizione con quanto visto in questa sezione?</li>
+</ol>
+</section>
+</section>
+<section id="decomposizione-formale-dellerrore-bias²-varianza-rumore" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="decomposizione-formale-dellerrore-bias²-varianza-rumore"><span class="header-section-number">6.8</span> Decomposizione formale dell’errore: bias² + varianza + rumore</h2>
+<section id="motivazione-6" class="level3" data-number="6.8.1">
+<h3 data-number="6.8.1" class="anchored" data-anchor-id="motivazione-6"><span class="header-section-number">6.8.1</span> Motivazione</h3>
+<p>L’evidenza empirica della sezione precedente — overfitting/underfitting, curva a “U” — può essere resa rigorosa. Quello che segue è uno dei pochi risultati con statuto di <strong>teorema</strong> in questo corso (non un’euristica, non una regola pratica): per la loss quadratica, l’errore di generalizzazione si decompone <em>esattamente</em> in tre contributi additivi.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Per la loss quadratica, l’errore di generalizzazione di un modello <span class="math inline">\(h\)</span> si decompone come <span class="math display">\[
+L(h) = \underbrace{\text{Bias}^2}_{\text{errore sistematico}} + \underbrace{\text{Varianza}}_{\text{errore da variabilità}} + \underbrace{\text{Rumore}}_{\text{errore intrinseco}},
+\]</span> dove <strong>Bias²</strong> misura l’incapacità del modello di rappresentare la relazione tra input e output, <strong>Varianza</strong> misura la sensibilità del modello alle variazioni nei dati di training, e <strong>Rumore</strong> è la componente intrinseca ai dati, non eliminabile da nessun modello.</p>
+</div>
+</div>
+<p>Una decomposizione analoga esiste anche per la loss 0-1 della classificazione, ma la sua forma è meno pulita da scrivere; per questo la si presenta qui, nel contesto della regressione, dove il calcolo è particolarmente trasparente.</p>
+</section>
+<section id="i-due-lemmi" class="level3" data-number="6.8.2">
+<h3 data-number="6.8.2" class="anchored" data-anchor-id="i-due-lemmi"><span class="header-section-number">6.8.2</span> I due lemmi</h3>
+<p>La dimostrazione si basa su due risultati elementari di teoria della probabilità.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Lemma 1 — “Teorema di Pitagora” per variabili aleatorie.</strong> Siano <span class="math inline">\(U,V\)</span> variabili aleatorie reali e sia <span class="math inline">\(I\)</span> un’informazione tale che, condizionatamente a <span class="math inline">\(I\)</span>, <span class="math inline">\(U\)</span> è nota (cioè costante). Allora <span class="math display">\[
+\mathbb{E}\big[(V-U)^2 \mid I\big] = \mathbb{E}\big[(V-\mathbb{E}[V\mid I])^2 \mid I\big] + \big(\mathbb{E}[V\mid I] - U\big)^2.
+\]</span></p>
+<p><strong>Lemma 2 — Legge della probabilità totale per il valor medio.</strong> Per ogni variabile aleatoria <span class="math inline">\(V\)</span> e informazione <span class="math inline">\(I\)</span>, <span class="math display">\[
+\mathbb{E}[V] = \mathbb{E}\big[\mathbb{E}[V\mid I]\big].
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="intuizione-sul-lemma-1" class="level3" data-number="6.8.3">
+<h3 data-number="6.8.3" class="anchored" data-anchor-id="intuizione-sul-lemma-1"><span class="header-section-number">6.8.3</span> Intuizione sul Lemma 1</h3>
+<p>Il nome “teorema di Pitagora” non è decorativo. Pensiamo a <span class="math inline">\(U\)</span> come a un punto fisso (noto, condizionatamente a <span class="math inline">\(I\)</span>) e a <span class="math inline">\(V\)</span> come a una variabile aleatoria; <span class="math inline">\(\mathbb{E}[V\mid I]\)</span> è, in un senso preciso, la “proiezione” di <span class="math inline">\(V\)</span> più vicina a <span class="math inline">\(U\)</span> in termini di errore quadratico medio. La quantità <span class="math inline">\(\mathbb{E}[(V-U)^2\mid I]\)</span> è l’“ipotenusa al quadrato”: si decompone nella somma dei due “cateti al quadrato”</p>
+<ul>
+<li><span class="math inline">\(\mathbb{E}[(V-\mathbb{E}[V\mid I])^2\mid I]\)</span>: la variabilità di <span class="math inline">\(V\)</span> attorno alla sua media condizionata (un termine di <strong>varianza</strong>);</li>
+<li><span class="math inline">\((\mathbb{E}[V\mid I]-U)^2\)</span>: lo scarto sistematico tra la media condizionata di <span class="math inline">\(V\)</span> e il punto fisso <span class="math inline">\(U\)</span> (un termine di <strong>bias al quadrato</strong>, nel senso già visto per gli stimatori distorti/non distorti).</li>
+</ul>
+<p>Non è un caso che nella statistica di base lo stesso lemma, applicato allo stimatore di un parametro, dia la scomposizione dell’errore quadratico medio di uno stimatore in varianza più bias al quadrato: qui lo applichiamo due volte, con due scelte diverse dell’informazione <span class="math inline">\(I\)</span>, per ottenere tutti e tre i termini della decomposizione dell’errore di generalizzazione.</p>
+</section>
+<section id="ipotesi-della-dimostrazione" class="level3" data-number="6.8.4">
+<h3 data-number="6.8.4" class="anchored" data-anchor-id="ipotesi-della-dimostrazione"><span class="header-section-number">6.8.4</span> Ipotesi della dimostrazione</h3>
+<p>Assumiamo, come nel resto del capitolo, che:</p>
+<ul>
+<li>il modello di regressione dipenda esplicitamente dai dati di training usati per stimarlo, quindi lo scriviamo <span class="math inline">\(h(x;D)\)</span>, dove <span class="math inline">\(D=\{(x_i,y_i)\}_{i=1}^n\)</span> è il training set;</li>
+<li>i dati (sia di training sia di test) siano variabili aleatorie i.i.d. con legge congiunta <span class="math inline">\(P(X,Y)\)</span>, e training set e punto di test siano indipendenti tra loro.</li>
+</ul>
+</section>
+<section id="dimostrazione-passo-per-passo" class="level3" data-number="6.8.5">
+<h3 data-number="6.8.5" class="anchored" data-anchor-id="dimostrazione-passo-per-passo"><span class="header-section-number">6.8.5</span> Dimostrazione, passo per passo</h3>
+<p>Partiamo dalla definizione di errore di generalizzazione, rendendo esplicita la dipendenza di <span class="math inline">\(h\)</span> dal training set <span class="math inline">\(D\)</span>: <span class="math display">\[
+L(h) = \mathbb{E}_{X,D,Y}\Big[\big(h(X;D)-Y\big)^2\Big],
+\]</span> dove il valore atteso è calcolato rispetto a tutte le possibili realizzazioni del punto di test <span class="math inline">\((X,Y)\)</span> <strong>e</strong> del training set <span class="math inline">\(D\)</span>.</p>
+<p><strong>Passo 1 — estrazione del rumore.</strong> Introduciamo l’informazione <span class="math inline">\(I=(X,D)\)</span>: “facciamo finta” di conoscere sia il punto di test <span class="math inline">\(X\)</span> sia l’intero training set <span class="math inline">\(D\)</span>. Con questa informazione, <span class="math inline">\(U := h(X;D)\)</span> è una quantità nota (deterministica, dato <span class="math inline">\(I\)</span>), mentre <span class="math inline">\(V:=Y\)</span> resta aleatoria (perché anche conoscendo <span class="math inline">\(X\)</span> e <span class="math inline">\(D\)</span> non conosciamo esattamente <span class="math inline">\(Y\)</span>, a causa del rumore). Applicando il Lemma 1 con <span class="math inline">\(U=h(X;D)\)</span> e <span class="math inline">\(V=Y\)</span>: <span class="math display">\[
+\mathbb{E}\big[(h(X;D)-Y)^2 \mid X,D\big] = \underbrace{\mathbb{E}\big[(Y-\mathbb{E}[Y\mid X,D])^2 \mid X,D\big]}_{\text{Rumore}} + \big(\mathbb{E}[Y\mid X,D] - h(X;D)\big)^2.
+\]</span></p>
+<p>Il primo termine <strong>non dipende mai da <span class="math inline">\(h\)</span></strong>: qualunque sia il modello scelto, per quanto sofisticato, questa quantità resta la stessa. Per questo lo chiamiamo <strong>Rumore</strong>: rappresenta la variabilità di <span class="math inline">\(Y\)</span> attorno al suo valore medio condizionato, cioè quello che nessun modello può eliminare, per quanto ben stimato.</p>
+<p>Poiché training set e punto di test sono indipendenti, condizionare a conoscere anche <span class="math inline">\(D\)</span> non cambia il valore atteso di <span class="math inline">\(Y\)</span> dato <span class="math inline">\(X\)</span>: <span class="math display">\[
+\mathbb{E}[Y\mid X,D] = \mathbb{E}[Y\mid X] =: h_B(X),
+\]</span> dove <span class="math inline">\(h_B\)</span> è il cosiddetto <strong>modello ottimale</strong> (o bayesiano): la miglior previsione possibile se conoscessimo esattamente <span class="math inline">\(P(X,Y)\)</span>, calcolabile solo in teoria. Il secondo termine del Passo 1 diventa quindi <span class="math inline">\(\big(h_B(X) - h(X;D)\big)^2\)</span>, che dipende ancora sia da <span class="math inline">\(X\)</span> sia da <span class="math inline">\(D\)</span>.</p>
+<p>Applicando il Lemma 2 (probabilità totale per il valor medio) rispetto all’informazione <span class="math inline">\((X,D)\)</span> si ottiene <span class="math display">\[
+L(h) = \mathbb{E}_{X,D}\Big[\text{Rumore}(X,D)\Big] + \mathbb{E}_{X,D}\Big[\big(h_B(X)-h(X;D)\big)^2\Big].
+\]</span></p>
+<p>Il termine di rumore, mediato su <span class="math inline">\(X\)</span> e <span class="math inline">\(D\)</span>, resta separato dal resto della decomposizione e non richiede ulteriore lavoro: è il termine <strong>Rumore</strong> definitivo.</p>
+<p><strong>Passo 2 — decomposizione in bias² e varianza.</strong> Resta da lavorare sul secondo termine, <span class="math inline">\(\mathbb{E}_{X,D}\big[(h_B(X)-h(X;D))^2\big]\)</span>. Osserviamo che <span class="math inline">\(h_B(X)\)</span> dipende solo da <span class="math inline">\(X\)</span>, mentre <span class="math inline">\(h(X;D)\)</span> dipende sia da <span class="math inline">\(X\)</span> sia da <span class="math inline">\(D\)</span>. Introduciamo ora l’informazione <span class="math inline">\(I=X\)</span> soltanto (conosciamo il punto di test, non il training set), e applichiamo di nuovo il Lemma 1, questa volta con <span class="math inline">\(U := h_B(X)\)</span> (costante, nota conoscendo <span class="math inline">\(X\)</span>) e <span class="math inline">\(V := h(X;D)\)</span> (ancora aleatoria, perché <span class="math inline">\(D\)</span> non è nota): <span class="math display">\[
+\mathbb{E}\big[(h(X;D)-h_B(X))^2 \mid X\big] = \underbrace{\mathbb{E}\big[(h(X;D)-\mathbb{E}_D[h(X;D)\mid X])^2 \mid X\big]}_{\text{Varianza}} + \underbrace{\big(\mathbb{E}_D[h(X;D)\mid X] - h_B(X)\big)^2}_{\text{Bias}^2}.
+\]</span></p>
+<p>Applicando infine il Lemma 2 anche rispetto a <span class="math inline">\(X\)</span>, e riunendo tutti i pezzi, otteniamo la decomposizione cercata: <span class="math display">\[
+L(h) = \underbrace{\mathbb{E}_X\Big[\big(\mathbb{E}_D[h(X;D)\mid X] - h_B(X)\big)^2\Big]}_{\text{Bias}^2} \;+\; \underbrace{\mathbb{E}_X\Big[\mathbb{E}_D\big[(h(X;D)-\mathbb{E}_D[h(X;D)\mid X])^2 \mid X\big]\Big]}_{\text{Varianza}} \;+\; \underbrace{\mathbb{E}_{X,D}[\text{Rumore}(X,D)]}_{\text{Rumore}}.
+\]</span></p>
+</section>
+<section id="intuizione-sui-tre-termini" class="level3" data-number="6.8.6">
+<h3 data-number="6.8.6" class="anchored" data-anchor-id="intuizione-sui-tre-termini"><span class="header-section-number">6.8.6</span> Intuizione sui tre termini</h3>
+<ul>
+<li><strong>Varianza</strong> <span class="math inline">\(= \mathbb{E}_X\big[\mathbb{E}_D[(h(X;D)-\mathbb{E}_D[h(X;D)\mid X])^2\mid X]\big]\)</span>: fissato il punto di test <span class="math inline">\(X\)</span>, quanto varia la previsione <span class="math inline">\(h(X;D)\)</span> al variare del training set <span class="math inline">\(D\)</span> effettivamente osservato, rispetto alla previsione media su tutti i possibili training set? Misura la <strong>sensibilità del modello ai dati specifici</strong> che gli vengono presentati. È esattamente il termine che rende conto dell’overfitting: un modello con <span class="math inline">\(k=1\)</span> in KNN ha varianza alta perché, cambiando anche di poco il training set, la previsione in un dato punto può cambiare radicalmente.</li>
+<li><strong>Bias²</strong> <span class="math inline">\(= \mathbb{E}_X\big[(\mathbb{E}_D[h(X;D)\mid X] - h_B(X))^2\big]\)</span>: quanto la previsione <strong>mediata su tutti i possibili training set</strong> si discosta dal modello ottimale <span class="math inline">\(h_B\)</span>. Misura l’incapacità <strong>sistematica</strong> del modello di rappresentare la vera relazione, anche eliminando idealmente la variabilità dovuta al campionamento. Un modello con <span class="math inline">\(k\)</span> molto grande in KNN (quasi costante) ha bias alto perché, per quanti training set diversi si considerino, la sua previsione media resta lontana dalla vera relazione.</li>
+<li><strong>Rumore</strong> <span class="math inline">\(= \mathbb{E}_{X,D}[\mathbb{E}[(Y-\mathbb{E}[Y\mid X,D])^2\mid X,D]]\)</span>: la parte di variabilità di <span class="math inline">\(Y\)</span> che nessun modello, per quanto ben scelto, può catturare, perché è intrinseca al fenomeno osservato (misure imprecise, fattori non inclusi tra le variabili di input, ecc.).</li>
+</ul>
+</section>
+<section id="interpretazione-con-il-bersaglio" class="level3" data-number="6.8.7">
+<h3 data-number="6.8.7" class="anchored" data-anchor-id="interpretazione-con-il-bersaglio"><span class="header-section-number">6.8.7</span> Interpretazione con il bersaglio</h3>
+<p>Un modo classico di visualizzare i quattro casi (bias, varianza) alto/basso è il <strong>bersaglio</strong>: immaginiamo di “sparare” ripetutamente (una volta per ogni training set possibile) verso il centro, che rappresenta il valore vero <span class="math inline">\(y\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>create_target <span class="ot">&lt;-</span> <span class="cf">function</span>(bias, variance) {</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  radius <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  df_t <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="at">length.out =</span> <span class="dv">100</span>), <span class="at">y =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="at">length.out =</span> <span class="dv">100</span>))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  df_t<span class="sc">$</span>dist <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(df_t<span class="sc">$</span>x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> df_t<span class="sc">$</span>y<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  df_t<span class="sc">$</span>target <span class="ot">&lt;-</span> <span class="fu">cut</span>(df_t<span class="sc">$</span>dist, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, radius),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Dentro"</span>, <span class="st">"Primo cerchio"</span>, <span class="st">"Secondo cerchio"</span>, <span class="st">"Terzo cerchio"</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"green"</span>, <span class="st">"yellow"</span>, <span class="st">"orange"</span>, <span class="st">"red"</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df_t, <span class="fu">aes</span>(x, y, <span class="at">fill =</span> target)) <span class="sc">+</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_raster</span>(<span class="at">interpolate =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> colors, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> <span class="dv">0</span>), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Bias:"</span>, bias, <span class="st">"- Varianza:"</span>, variance), <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>() <span class="sc">+</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(<span class="fu">create_target</span>(<span class="st">"Alto"</span>, <span class="st">"Alto"</span>), <span class="fu">create_target</span>(<span class="st">"Alto"</span>, <span class="st">"Basso"</span>),</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>             <span class="fu">create_target</span>(<span class="st">"Basso"</span>, <span class="st">"Alto"</span>), <span class="fu">create_target</span>(<span class="st">"Basso"</span>, <span class="st">"Basso"</span>),</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/bersaglio-bias-varianza-1.png" class="img-fluid figure-img" width="780"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>bias alto, varianza alta</strong>: i “colpi” sono sia sistematicamente lontani dal centro sia molto dispersi tra loro — il modello sbaglia sempre, in modi diversi;</li>
+<li><strong>bias alto, varianza bassa</strong>: colpi concentrati ma sistematicamente fuori dal centro — il modello è mal calibrato, ma in modo consistente (prevedibile);</li>
+<li><strong>bias basso, varianza alta</strong>: colpi molto dispersi, ma centrati in media sul bersaglio — “in media ci si azzecca” (mediando su tutti i possibili training set), ma ogni singolo addestramento dà un risultato molto diverso. È il caso tipico di KNN con <span class="math inline">\(k\)</span> piccolo;</li>
+<li><strong>bias basso, varianza bassa</strong>: colpi concentrati vicino al centro — la situazione ideale, raramente raggiungibile esattamente nella pratica.</li>
+</ul>
+</section>
+<section id="limiti-4" class="level3" data-number="6.8.8">
+<h3 data-number="6.8.8" class="anchored" data-anchor-id="limiti-4"><span class="header-section-number">6.8.8</span> Limiti</h3>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La decomposizione è un teorema esatto per la loss quadratica sotto le ipotesi elencate (dati i.i.d., training/test indipendenti), non una regola empirica. Ciò che <em>resta</em> empirico è l’osservazione che, al variare di un iperparametro come <span class="math inline">\(k\)</span>, molti modelli (ma non tutti — si pensi di nuovo a reti neurali profonde e random forest) mostrano bias decrescente e varianza crescente con la complessità, dando origine al tipico compromesso a “U” osservato nella sezione precedente.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-6" class="level3" data-number="6.8.9">
+<h3 data-number="6.8.9" class="anchored" data-anchor-id="domande-di-comprensione-6"><span class="header-section-number">6.8.9</span> Domande di comprensione</h3>
+<ol type="1">
+<li>In quale dei due passi della dimostrazione si usa esplicitamente l’indipendenza tra training set e punto di test? Cosa cambierebbe se questa ipotesi non valesse?</li>
+<li>Il termine di rumore non dipende mai da <span class="math inline">\(h\)</span>: cosa implica questo per la ricerca del “modello perfetto” (rischio nullo)?</li>
+<li>Perché il modello <span class="math inline">\(h_B(X) = \mathbb{E}[Y\mid X]\)</span> è chiamato “ottimale”, nel senso della decomposizione appena vista?</li>
+<li>Prova a descrivere a parole, senza formule, cosa distingue il termine di bias² dal termine di varianza, usando l’analogia del bersaglio.</li>
+</ol>
+</section>
+</section>
+<section id="verso-i-modelli-parametrici" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="verso-i-modelli-parametrici"><span class="header-section-number">6.9</span> Verso i modelli parametrici</h2>
+<section id="motivazione-7" class="level3" data-number="6.9.1">
+<h3 data-number="6.9.1" class="anchored" data-anchor-id="motivazione-7"><span class="header-section-number">6.9.1</span> Motivazione</h3>
+<p>KNN, per quanto semplice ed efficace in molte situazioni, ha tre limiti strutturali: (1) è computazionalmente costoso quando <span class="math inline">\(n\)</span> è grande, perché ogni previsione richiede di scandire (concettualmente) l’intero training set; (2) soffre della <em>curse of dimensionality</em>, perché si basa sulla distanza euclidea; (3) — forse il limite più importante nel lungo periodo — è poco <strong>interpretabile</strong>: la ricetta “guarda i <span class="math inline">\(k\)</span> vicini e fai la media” non offre alcuna spiegazione del <em>perché</em> la relazione tra <span class="math inline">\(x\)</span> e <span class="math inline">\(y\)</span> abbia una certa forma. È lo stesso limite di interpretabilità che, sotto altra forma, affligge modelli moderni come le reti neurali.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>KNN e i modelli parametrici hanno anche una differenza concettuale nella gestione di training e test: in KNN le due fasi non sono nettamente separate (l’intero training set deve essere disponibile anche al momento della previsione), mentre nei modelli parametrici la fase di stima dei parametri (training) è completamente distinta dalla fase di previsione (test), che usa solo il vettore di parametri stimato.</p>
+</div>
+</div>
+</section>
+<section id="concetto-modello-parametrico" class="level3" data-number="6.9.2">
+<h3 data-number="6.9.2" class="anchored" data-anchor-id="concetto-modello-parametrico"><span class="header-section-number">6.9.2</span> Concetto: modello parametrico</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Un <strong>modello parametrico</strong> per la regressione assume che <span class="math inline">\(h\)</span> appartenga a una famiglia di funzioni indicizzata da un vettore di parametri <span class="math inline">\(\theta \in \mathbb{R}^p\)</span>: <span class="math display">\[
+h(x;\theta), \qquad \theta \in \mathbb{R}^p.
+\]</span> Il procedimento si articola in due fasi distinte: (1) <strong>stima dei parametri</strong> (training del modello) a partire dai dati osservati; (2) <strong>previsione</strong> su nuovi dati, usando il modello con i parametri stimati.</p>
+</div>
+</div>
+<p>L’idea chiave è ridurre la dipendenza da un intero training set (potenzialmente enorme) a un vettore finito <span class="math inline">\(\theta \in \mathbb{R}^p\)</span>, tipicamente con <span class="math inline">\(p \ll n\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>“Tipicamente <span class="math inline">\(p \ll n\)</span>” è la situazione classica, ma non universale: esistono modelli moderni (in particolare in machine learning) che operano nel regime opposto, con <span class="math inline">\(p\)</span> confrontabile o addirittura maggiore di <span class="math inline">\(n\)</span>. Questo apre questioni statistiche delicate (come evitare l’overfitting quando ci sono più parametri che osservazioni) che esulano dagli obiettivi di questo corso, ma è utile sapere che l’assunzione <span class="math inline">\(p\ll n\)</span> non è sempre valida.</p>
+</div>
+</div>
+</section>
+<section id="il-metodo-dei-minimi-quadrati-ols" class="level3" data-number="6.9.3">
+<h3 data-number="6.9.3" class="anchored" data-anchor-id="il-metodo-dei-minimi-quadrati-ols"><span class="header-section-number">6.9.3</span> Il metodo dei minimi quadrati (OLS)</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il metodo dei <strong>minimi quadrati</strong> (<em>Ordinary Least Squares</em>, OLS) sceglie, tra tutti i possibili valori di <span class="math inline">\(\theta\)</span>, quello che minimizza l’errore quadratico medio sul training set: <span class="math display">\[
+\theta_{OLS} = \arg\min_{\theta \in \mathbb{R}^p} \frac{1}{n}\sum_{i=1}^n \big(h(x_i;\theta)-y_i\big)^2.
+\]</span> La previsione su un nuovo punto <span class="math inline">\(x\)</span> è <span class="math inline">\(x \mapsto h(x;\theta_{OLS})\)</span>.</p>
+</div>
+</div>
+<p>Il metodo può essere applicato a <em>qualunque</em> modello parametrico — lineare, polinomiale, ma anche a modelli non lineari come le reti neurali — e risale, storicamente, a Gauss.</p>
+</section>
+<section id="interpretazione-probabilistica-ols-come-mle" class="level3" data-number="6.9.4">
+<h3 data-number="6.9.4" class="anchored" data-anchor-id="interpretazione-probabilistica-ols-come-mle"><span class="header-section-number">6.9.4</span> Interpretazione probabilistica: OLS come MLE</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Supponiamo che la relazione tra <span class="math inline">\(x\)</span> e <span class="math inline">\(y\)</span> sia della forma <span class="math display">\[
+Y = h(X;\theta) + \varepsilon, \qquad \varepsilon \sim \mathcal{N}(0,\sigma^2), \quad \varepsilon \perp X,
+\]</span> con <span class="math inline">\(\varepsilon\)</span> (il <strong>residuo</strong>) gaussiano e indipendente da <span class="math inline">\(X\)</span>. Dato un training set i.i.d. <span class="math inline">\(D=\{(x_i,y_i)\}_{i=1}^n\)</span>, la sua <strong>verosimiglianza</strong> rispetto a <span class="math inline">\(\theta\)</span> è <span class="math display">\[
+\mathcal{L}(\theta;D) = \prod_{i=1}^n p(Y=y_i, X=x_i\mid\theta).
+\]</span></p>
+</div>
+</div>
+<p>Sviluppiamo il prodotto usando la regola della probabilità composta, <span class="math inline">\(p(X,Y\mid\theta) = p(Y\mid X,\theta)\,p(X\mid\theta)\)</span>. Poiché <span class="math inline">\(\theta\)</span> modella solo la relazione tra <span class="math inline">\(X\)</span> e <span class="math inline">\(Y\)</span> e non la distribuzione marginale di <span class="math inline">\(X\)</span>, è naturale assumere l’indipendenza <span class="math inline">\(\theta \perp X\)</span>, cioè <span class="math inline">\(p(X\mid\theta)=p(X)\)</span>. Sotto il modello <span class="math inline">\(Y=h(X;\theta)+\varepsilon\)</span>, conoscendo <span class="math inline">\(x_i\)</span> e <span class="math inline">\(\theta\)</span>, l’unica fonte di aleatorietà residua è <span class="math inline">\(\varepsilon\)</span>, e quindi <span class="math display">\[
+p(Y=y_i\mid X=x_i,\theta) = p_\varepsilon(y_i - h(x_i;\theta)) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y_i-h(x_i;\theta))^2}{2\sigma^2}\right).
+\]</span> Mettendo insieme i pezzi, <span class="math display">\[
+\mathcal{L}(\theta;D) = \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y_i-h(x_i;\theta))^2}{2\sigma^2}\right) p(X=x_i).
+\]</span> Massimizzare <span class="math inline">\(\mathcal{L}(\theta;D)\)</span> rispetto a <span class="math inline">\(\theta\)</span> (i fattori <span class="math inline">\(p(X=x_i)\)</span> non dipendono da <span class="math inline">\(\theta\)</span> e non contano nell’ottimizzazione) equivale a <em>minimizzare</em> la somma degli esponenti al quadrato, cioè esattamente il criterio dei minimi quadrati: <span class="math display">\[
+\theta_{MLE} = \arg\max_{\theta\in\mathbb{R}^p} \mathcal{L}(\theta;D) = \arg\min_{\theta\in\mathbb{R}^p}\sum_{i=1}^n (y_i - h(x_i;\theta))^2 = \theta_{OLS}.
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Questo risultato non è un mero “abbellimento” teorico: stabilisce un legame diretto con l’approccio alla stima già visto per la classificazione tramite classificatori generativi (capitolo 5). L’ipotesi di gaussianità del residuo, in particolare, sarà cruciale nel capitolo 7 per costruire intervalli di confidenza sui parametri e sulle previsioni: è proprio l’assunzione probabilistica che rende possibile, non solo la stima puntuale <span class="math inline">\(\theta_{OLS}\)</span>, ma anche la quantificazione dell’incertezza attorno ad essa.</p>
+</div>
+</div>
+</section>
+<section id="problemi-del-metodo" class="level3" data-number="6.9.5">
+<h3 data-number="6.9.5" class="anchored" data-anchor-id="problemi-del-metodo"><span class="header-section-number">6.9.5</span> Problemi del metodo</h3>
+<p>L’apparato OLS/MLE lascia aperti tre problemi, che motivano il contenuto dei prossimi capitoli:</p>
+<ol type="1">
+<li>la minimizzazione può essere difficile in generale (funzione obiettivo non convessa, presenza di più minimi locali);</li>
+<li>rischio di overfitting se il modello parametrico è troppo complesso rispetto ai dati disponibili: come regolarizzare?</li>
+<li><span class="math inline">\(h(x;\theta_{OLS})\)</span> è una previsione puntuale: come valutarne l’incertezza?</li>
+</ol>
+<p>Una prima soluzione a questi problemi, che vale la pena studiare in dettaglio prima di affrontare modelli più generali, è restringere l’attenzione ai <strong>modelli di regressione lineare</strong>.</p>
+</section>
+<section id="domande-di-comprensione-7" class="level3" data-number="6.9.6">
+<h3 data-number="6.9.6" class="anchored" data-anchor-id="domande-di-comprensione-7"><span class="header-section-number">6.9.6</span> Domande di comprensione</h3>
+<ol type="1">
+<li>Perché KNN non ha una fase di training e una fase di test nettamente separate, mentre un modello parametrico sì?</li>
+<li>Nella derivazione della verosimiglianza, perché è ragionevole assumere <span class="math inline">\(p(X\mid\theta)=p(X)\)</span>?</li>
+<li>In che senso “OLS = MLE sotto rumore gaussiano” non è solo una coincidenza algebrica, ma una scelta di modellazione con conseguenze pratiche (ad esempio per gli intervalli di confidenza del capitolo 7)?</li>
+<li>Quale dei tre “problemi del metodo” elencati ti sembra risolto, almeno in parte, restringendosi a modelli <em>lineari</em> nei parametri? Prova a formulare un’ipotesi prima di leggere il capitolo 7.</li>
+</ol>
+</section>
+</section>
+<section id="il-modello-di-regressione-lineare" class="level2" data-number="6.10">
+<h2 data-number="6.10" class="anchored" data-anchor-id="il-modello-di-regressione-lineare"><span class="header-section-number">6.10</span> Il modello di regressione lineare</h2>
+<div class="callout callout-style-default callout-note callout-titled" title="Nota sulla fonte di questa sezione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Nota sulla fonte di questa sezione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A differenza del resto del capitolo, questa sezione finale è ricostruita <strong>solo dalle slide</strong>: la lezione si è fermata subito dopo “problemi del metodo”, rimandando la trattazione pratica dei modelli lineari alla lezione successiva (capitolo 7, dove viene sviluppata in dettaglio, insieme alla notazione matriciale e alla quantificazione dell’incertezza). Qui presentiamo comunque la definizione generale e gli esempi già anticipati sulle slide, perché chiudono naturalmente il percorso di questo capitolo: dal problema generale della regressione, a KNN, ai modelli parametrici, fino al primo esempio concreto di modello parametrico — quello lineare.</p>
+</div>
+</div>
+<section id="motivazione-8" class="level3" data-number="6.10.1">
+<h3 data-number="6.10.1" class="anchored" data-anchor-id="motivazione-8"><span class="header-section-number">6.10.1</span> Motivazione</h3>
+<p>Tra tutti i possibili modelli parametrici, i modelli <strong>lineari nei parametri</strong> occupano un posto speciale: sono i più semplici da stimare (il problema di minimizzazione di OLS ammette, come vedremo, soluzione esplicita), i più interpretabili, e costituiscono la base su cui si costruiscono estensioni più sofisticate (regressione polinomiale, con interazioni, regolarizzata — capitolo 8).</p>
+</section>
+<section id="concetto-e-definizione" class="level3" data-number="6.10.2">
+<h3 data-number="6.10.2" class="anchored" data-anchor-id="concetto-e-definizione"><span class="header-section-number">6.10.2</span> Concetto e definizione</h3>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Un modello di regressione parametrico <span class="math inline">\(h(x;\theta)\)</span> è <strong>lineare</strong> se ha la forma <span class="math display">\[
+h(x;\theta) = \theta_0 + \sum_{j=1}^p \theta_j\, \phi_j(x),
+\]</span> dove <span class="math inline">\(\phi_j: F \to \mathbb{R}\)</span> sono funzioni <strong>note</strong> (dette funzioni base, o <em>feature</em>), che possono anche essere trasformazioni non lineari delle variabili di input.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="Attenzione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Attenzione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il modello è lineare <strong>nei parametri</strong> <span class="math inline">\(\theta_j\)</span>, non necessariamente nelle variabili originarie <span class="math inline">\(x\)</span>: le funzioni <span class="math inline">\(\phi_j\)</span> possono essere arbitrariamente non lineari (potenze, logaritmi, prodotti di variabili, ecc.). Questa distinzione è cruciale e spesso fonte di confusione: un modello polinomiale, ad esempio, è “lineare” in questo senso tecnico pur descrivendo relazioni curve.</p>
+</div>
+</div>
+</section>
+<section id="esempi-di-modelli-lineari" class="level3" data-number="6.10.3">
+<h3 data-number="6.10.3" class="anchored" data-anchor-id="esempi-di-modelli-lineari"><span class="header-section-number">6.10.3</span> Esempi di modelli lineari</h3>
+<ul>
+<li><strong>Regressione lineare semplice</strong> (<span class="math inline">\(p=1\)</span>, <span class="math inline">\(\phi_1(x)=x\)</span>): <span class="math inline">\(h(x;\theta) = \theta_0 + \theta_1 x\)</span>.</li>
+<li><strong>Regressione polinomiale di grado <span class="math inline">\(p\)</span></strong> (una sola variabile, <span class="math inline">\(\phi_j(x)=x^j\)</span>): <span class="math inline">\(h(x;\theta) = \theta_0 + \theta_1 x + \theta_2 x^2 + \cdots + \theta_p x^p\)</span>.</li>
+<li><strong>Regressione lineare multipla</strong> (<span class="math inline">\(d\)</span> variabili, <span class="math inline">\(\phi_j(x)=x_j\)</span>): <span class="math inline">\(h(x;\theta) = \theta_0 + \sum_{j=1}^d \theta_j x_j\)</span>.</li>
+<li><strong>Regressione con interazioni</strong>: <span class="math inline">\(h(x;\theta) = \theta_0 + \sum_{j=1}^d \theta_j x_j + \sum_{j=1}^d\sum_{k=j+1}^d \theta_{jk}\, x_j x_k\)</span>, dove i termini <span class="math inline">\(x_j x_k\)</span> catturano un effetto congiunto delle due variabili che non si riduce alla somma dei loro effetti singoli.</li>
+</ul>
+</section>
+<section id="esempio-r-dal-semplice-al-polinomiale" class="level3" data-number="6.10.4">
+<h3 data-number="6.10.4" class="anchored" data-anchor-id="esempio-r-dal-semplice-al-polinomiale"><span class="header-section-number">6.10.4</span> Esempio R: dal semplice al polinomiale</h3>
+<p>Riprendiamo il dataset sintetico <span class="math inline">\(y=\sin(x)+\text{rumore}\)</span> e stimiamo modelli lineari di grado crescente con <code>lm()</code> e <code>poly()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>modello_lineare <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">1</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> df)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>pred_lineare <span class="ot">&lt;-</span> <span class="fu">predict</span>(modello_lineare, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> pred_lineare), <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y), <span class="at">colour =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Regressione lineare semplice"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/lm-semplice-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Prima di calcolare.</strong> La relazione vera è <span class="math inline">\(\sin(x)\)</span> su un intervallo <span class="math inline">\([0,3]\)</span>, che ha una curvatura marcata. Ti aspetti che un polinomio di grado 1 (una retta) catturi bene questa forma? E un polinomio di grado molto alto?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>gradi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">30</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_pred_poly <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (p <span class="cf">in</span> gradi) {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  modello_p <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, p, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> df)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  df_pred_poly[[<span class="fu">paste0</span>(<span class="st">"y_deg_"</span>, p)]] <span class="ot">&lt;-</span> <span class="fu">predict</span>(modello_p, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_pred_poly, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y_deg_1), <span class="at">colour =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_pred_poly, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y_deg_2), <span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_pred_poly, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y_deg_30), <span class="at">colour =</span> <span class="st">"violet"</span>) <span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Regressione polinomiale di gradi 1 (rosso), 2 (blu), 30 (viola)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/lm-polinomiale-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Dopo il calcolo.</strong> Il grado 1 sottostima la curvatura (bias evidente); il grado 30 la insegue eccessivamente, producendo oscillazioni spurie soprattutto agli estremi dell’intervallo — un comportamento del tutto analogo all’overfitting già osservato con KNN a <span class="math inline">\(k\)</span> piccolo. Il grado del polinomio gioca qui lo stesso ruolo di iperparametro di complessità che aveva <span class="math inline">\(k\)</span> in KNN.</p>
+</section>
+<section id="selezione-del-grado-tramite-cross-validation" class="level3" data-number="6.10.5">
+<h3 data-number="6.10.5" class="anchored" data-anchor-id="selezione-del-grado-tramite-cross-validation"><span class="header-section-number">6.10.5</span> Selezione del grado tramite cross-validation</h3>
+<p>Esattamente come per <span class="math inline">\(k\)</span> in KNN, il grado “giusto” del polinomio si sceglie con cross-validation, non guardando l’adattamento sul training set.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(boot)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>cv_rmse <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="cf">function</span>(p) {</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  modello_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="at">degree =</span> p, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> df)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  cv_res <span class="ot">&lt;-</span> <span class="fu">cv.glm</span>(df, modello_glm, <span class="at">K =</span> <span class="fu">nrow</span>(df))  <span class="co"># LOOCV</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(cv_res<span class="sc">$</span>delta[<span class="dv">1</span>])</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">grado =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">RMSE =</span> cv_rmse), <span class="fu">aes</span>(<span class="at">x =</span> grado, <span class="at">y =</span> RMSE)) <span class="sc">+</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"LOOCV RMSE al variare del grado del polinomio"</span>) <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Grado del polinomio"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"LOOCV RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-regressione-knn-bias-varianza_files/figure-html/cv-grado-polinomio-1.png" class="img-fluid figure-img" width="840"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Come leggere il risultato">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Come leggere il risultato
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>cv.glm()</code> (pacchetto <code>boot</code>) esegue LOO-CV automaticamente su un modello adattato con <code>glm()</code>; <code>$delta[1]</code> restituisce l’errore quadratico medio stimato per validazione incrociata. La stessa identica logica della curva a “U” per <span class="math inline">\(k\)</span> in KNN si applica qui al grado del polinomio: gradi troppo bassi danno bias alto (underfitting), gradi troppo alti danno varianza alta (overfitting), e la cross-validation indica un compromesso.</p>
+</div>
+</div>
+</section>
+<section id="interpretazione-dei-parametri-nella-regressione-lineare-semplice" class="level3" data-number="6.10.6">
+<h3 data-number="6.10.6" class="anchored" data-anchor-id="interpretazione-dei-parametri-nella-regressione-lineare-semplice"><span class="header-section-number">6.10.6</span> Interpretazione dei parametri nella regressione lineare semplice</h3>
+<p>Nel caso <span class="math inline">\(p=1\)</span>, <span class="math inline">\(h(x;\theta)=\theta_0+\theta_1 x\)</span>, i due parametri hanno un’interpretazione diretta: <span class="math inline">\(\theta_0\)</span> è l’<strong>intercetta</strong> (il valore di <span class="math inline">\(h\)</span> per <span class="math inline">\(x=0\)</span>), <span class="math inline">\(\theta_1\)</span> è la <strong>pendenza</strong> (la variazione di <span class="math inline">\(h\)</span> per un’unità di variazione di <span class="math inline">\(x\)</span>).</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Definizione">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Definizione
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Le stime OLS dei due parametri, nel caso della regressione lineare semplice, hanno <strong>forma chiusa</strong>: <span class="math display">\[
+\theta_{OLS,1} = \operatorname{cor}(x,y)\, \frac{\sigma_y}{\sigma_x}, \qquad \theta_{OLS,0} = \bar y - \theta_{OLS,1}\, \bar x,
+\]</span> dove <span class="math inline">\(\operatorname{cor}(x,y)\)</span> è la correlazione campionaria, <span class="math inline">\(\sigma_x,\sigma_y\)</span> le deviazioni standard campionarie e <span class="math inline">\(\bar x,\bar y\)</span> le medie campionarie.</p>
+</div>
+</div>
+</section>
+<section id="derivazione-della-formula-chiusa" class="level3" data-number="6.10.7">
+<h3 data-number="6.10.7" class="anchored" data-anchor-id="derivazione-della-formula-chiusa"><span class="header-section-number">6.10.7</span> Derivazione della formula chiusa</h3>
+<p>Il problema di minimizzazione è <span class="math display">\[
+\min_{\theta_0,\theta_1} \sum_{i=1}^n (y_i-\theta_0-\theta_1 x_i)^2 = \min_{\theta_0}\left(\min_{\theta_1}\sum_{i=1}^n (y_i-\theta_0-\theta_1 x_i)^2\right).
+\]</span> Annullando la derivata rispetto a <span class="math inline">\(\theta_0\)</span> a <span class="math inline">\(\theta_1\)</span> fissato, si trova che <span class="math inline">\(\theta_0\)</span> deve essere la media dei residui <span class="math inline">\(y_i-\theta_1 x_i\)</span>, cioè <span class="math display">\[
+\theta_0 = \bar y - \theta_1 \bar x.
+\]</span> Sostituendo questa espressione e annullando ora la derivata rispetto a <span class="math inline">\(\theta_1\)</span>, <span class="math display">\[
+0 = \frac{d}{d\theta_1}\sum_{i=1}^n (y_i-\theta_0-\theta_1 x_i)^2 = -2\sum_{i=1}^n (y_i-\theta_0-\theta_1 x_i)\, x_i,
+\]</span> si ottiene, dopo aver raccolto i termini e riconosciuto covarianza e varianza campionarie nelle somme risultanti, <span class="math display">\[
+\theta_1 = \frac{\operatorname{cov}(x,y)}{\operatorname{var}(x)} = \operatorname{cor}(x,y)\,\frac{\sigma_y}{\sigma_x}.
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Il passaggio finale (da <span class="math inline">\(\operatorname{cov}(x,y)/\operatorname{var}(x)\)</span> a <span class="math inline">\(\operatorname{cor}(x,y)\,\sigma_y/\sigma_x\)</span>) usa semplicemente la definizione <span class="math inline">\(\operatorname{cor}(x,y) = \operatorname{cov}(x,y)/(\sigma_x\sigma_y)\)</span>. La derivazione completa in notazione matriciale, valida per il caso generale con <span class="math inline">\(p\)</span> predittori, sarà l’oggetto del capitolo 7.</p>
+</div>
+</div>
+</section>
+<section id="verifica-numerica" class="level3" data-number="6.10.8">
+<h3 data-number="6.10.8" class="anchored" data-anchor-id="verifica-numerica"><span class="header-section-number">6.10.8</span> Verifica numerica</h3>
+<div class="callout callout-style-default callout-tip callout-titled" title="Approfondimento — R come laboratorio: verificare la formula chiusa">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Approfondimento — R come laboratorio: verificare la formula chiusa
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>theta1_formula <span class="ot">&lt;-</span> <span class="fu">cor</span>(df<span class="sc">$</span>x, df<span class="sc">$</span>y) <span class="sc">*</span> <span class="fu">sd</span>(df<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sd</span>(df<span class="sc">$</span>x)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>theta0_formula <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>y) <span class="sc">-</span> theta1_formula <span class="sc">*</span> <span class="fu">mean</span>(df<span class="sc">$</span>x)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>modello_semplice <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> df)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">parametro =</span> <span class="fu">c</span>(<span class="st">"theta_0 (intercetta)"</span>, <span class="st">"theta_1 (pendenza)"</span>),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula_chiusa =</span> <span class="fu">c</span>(theta0_formula, theta1_formula),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">lm_R =</span> <span class="fu">coef</span>(modello_semplice)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                       parametro formula_chiusa       lm_R
+(Intercept) theta_0 (intercetta)     0.58865966 0.58865966
+x             theta_1 (pendenza)     0.03146096 0.03146096</code></pre>
+</div>
+</div>
+<p>La formula chiusa e <code>lm()</code> devono restituire (a meno di arrotondamenti numerici trascurabili) esattamente gli stessi valori: non stiamo “implementando OLS da zero”, ma verificando che la formula analitica derivata sopra coincida con ciò che <code>lm()</code> calcola internamente con un algoritmo numerico più generale.</p>
+</div>
+</div>
+</section>
+<section id="domande-di-comprensione-8" class="level3" data-number="6.10.9">
+<h3 data-number="6.10.9" class="anchored" data-anchor-id="domande-di-comprensione-8"><span class="header-section-number">6.10.9</span> Domande di comprensione</h3>
+<ol type="1">
+<li>In cosa un modello “lineare” nel senso di questa sezione differisce da un modello “lineare” nel senso comune di “retta”? Fai un esempio di modello non lineare in <span class="math inline">\(x\)</span> ma lineare nei parametri.</li>
+<li>Nel grafico con gradi 1, 2, 30, quale grado ti sembra generalizzare meglio, solo guardando l’adattamento visivo ai punti di training? Coincide con quanto suggerito dalla curva di LOOCV?</li>
+<li>Cosa succede alla stima <span class="math inline">\(\theta_{OLS,1}\)</span> se <span class="math inline">\(x\)</span> e <span class="math inline">\(y\)</span> sono scorrelate (<span class="math inline">\(\operatorname{cor}(x,y)=0\)</span>)? È coerente con l’interpretazione di <span class="math inline">\(\theta_1\)</span> come pendenza?</li>
+<li>Perché la regressione con interazioni non è semplicemente “la somma” delle regressioni lineari multiple sulle singole variabili?</li>
+</ol>
+</section>
+</section>
+<section id="cosa-ricordare" class="level2" data-number="6.11">
+<h2 data-number="6.11" class="anchored" data-anchor-id="cosa-ricordare"><span class="header-section-number">6.11</span> Cosa ricordare</h2>
+<ul>
+<li>La regressione generalizza la classificazione a un insieme continuo di uscite; l’impianto concettuale (training/test/validation, cross-validation, errore di generalizzazione) è identico, cambia solo la funzione di perdita.</li>
+<li>L’interpolazione esatta è, in generale, una cattiva strategia statistica: massimizza la varianza a scapito della capacità di generalizzare.</li>
+<li>KNN per la regressione sostituisce il voto di maggioranza della classificazione con una media aritmetica sui <span class="math inline">\(k\)</span> vicini più prossimi; eredita vantaggi e svantaggi di KNN per la classificazione (scelta di <span class="math inline">\(k\)</span>, curse of dimensionality, necessità di standardizzare le feature).</li>
+<li>MSE/RMSE penalizzano fortemente gli scarti grandi (parallelo con la media), MAE è più robusto (parallelo con la mediana); <span class="math inline">\(R^2\)</span> confronta l’errore del modello con quello del modello costante <span class="math inline">\(\bar y\)</span>, ma va sempre distinto se calcolato su training o su test/CV.</li>
+<li>La cross-validation (LOO-CV, <span class="math inline">\(k\)</span>-fold) stima l’errore di generalizzazione senza dover sacrificare un secondo test set indipendente.</li>
+<li>Il compromesso bias-varianza si osserva empiricamente confrontando le curve di errore di training e di cross-validation al variare di un iperparametro di complessità (es. <span class="math inline">\(k\)</span> in KNN, il grado di un polinomio).</li>
+<li>La decomposizione <span class="math inline">\(L(h)=\text{Bias}^2+\text{Varianza}+\text{Rumore}\)</span> è un teorema esatto per la loss quadratica, dimostrato applicando due volte il “teorema di Pitagora per variabili aleatorie”: prima condizionando su <span class="math inline">\((X,D)\)</span> per isolare il rumore, poi condizionando su <span class="math inline">\(X\)</span> soltanto per separare bias² e varianza.</li>
+<li>Il rumore non dipende mai dal modello scelto: è un limite intrinseco ai dati, non eliminabile.</li>
+<li>Il metodo dei minimi quadrati (OLS) è equivalente alla stima di massima verosimiglianza (MLE) sotto l’ipotesi di rumore additivo gaussiano; questa equivalenza sarà la base per costruire intervalli di confidenza nel capitolo 7.</li>
+<li>Un modello di regressione lineare <span class="math inline">\(h(x;\theta)=\theta_0+\sum_j\theta_j\phi_j(x)\)</span> è lineare nei parametri, non necessariamente nelle variabili di input; include come casi particolari la regressione semplice, polinomiale, multipla e con interazioni.</li>
+</ul>
+</section>
+<section id="domande-di-riepilogo" class="level2" data-number="6.12">
+<h2 data-number="6.12" class="anchored" data-anchor-id="domande-di-riepilogo"><span class="header-section-number">6.12</span> Domande di riepilogo</h2>
+<ol type="1">
+<li>Descrivi, con parole tue, in che senso la regressione è “la classificazione con infinite classi”, e cosa di questa analogia si estende senza modifiche e cosa richiede invece una nuova definizione.</li>
+<li>Un modello di regressione ha <span class="math inline">\(MSE=4\)</span> su dati la cui <span class="math inline">\(y\)</span> è misurata in ore. Qual è l’errore tipico in unità naturali (ore)? E se la stessa <span class="math inline">\(y\)</span> fosse misurata in minuti?</li>
+<li>Spiega perché un <span class="math inline">\(R^2\)</span> molto alto calcolato su tutto il dataset usato per stimare il modello non è, di per sé, una prova di buona generalizzazione.</li>
+<li>Ricostruisci a parole i due passi della dimostrazione della decomposizione bias-varianza-rumore: quale informazione si condiziona nel primo passo, quale nel secondo, e perché in quest’ordine?</li>
+<li>Perché il termine di rumore non compare mai nelle discussioni pratiche su “come migliorare un modello troppo complesso o troppo semplice”?</li>
+<li>In quali situazioni pratiche ti aspetteresti che il classico compromesso bias-varianza non si manifesti chiaramente?</li>
+<li>Spiega la frase “OLS è MLE sotto rumore gaussiano” a uno studente che non ha mai sentito parlare di verosimiglianza.</li>
+<li>Un modello lineare nei parametri può rappresentare relazioni fortemente non lineari in <span class="math inline">\(x\)</span>: come si concilia questo con il nome “modello lineare”?</li>
+</ol>
+</section>
+<section id="laboratorio-r-leggere-i-dati-non-programmare" class="level2" data-number="6.13">
+<h2 data-number="6.13" class="anchored" data-anchor-id="laboratorio-r-leggere-i-dati-non-programmare"><span class="header-section-number">6.13</span> Laboratorio R: leggere i dati, non programmare</h2>
+<p>Gli esercizi seguenti riusano il dataset sintetico del capitolo (<code>df</code>, generato con <code>set.seed(42)</code>) e le funzioni R già introdotte (<code>FNN::knn.reg</code>, <code>caret::train</code>, <code>lm()</code>, <code>boot::cv.glm</code>). L’obiettivo, come sempre in questo libro, non è scrivere codice nuovo ma <strong>eseguire, confrontare e interpretare</strong>.</p>
+<section id="comprendere" class="level3" data-number="6.13.1">
+<h3 data-number="6.13.1" class="anchored" data-anchor-id="comprendere"><span class="header-section-number">6.13.1</span> Comprendere</h3>
+<ol type="1">
+<li>Esegui di nuovo l’esempio di KNN con <span class="math inline">\(k=1\)</span> e con <span class="math inline">\(k=50\)</span> sul dataset con outlier. Osserva le due curve fianco a fianco: quale ha training error più basso? Quale ti aspetti abbia errore di generalizzazione più basso? Verifica con la cross-validation.</li>
+<li>Calcola MSE, RMSE, MAE e <span class="math inline">\(R^2\)</span> per il modello KNN con <span class="math inline">\(k=5\)</span> sul dataset senza outlier. Ripeti sostituendo <span class="math inline">\(y\)</span> misurata “in centimetri” (cioè moltiplicando <code>df$y</code> per 100). Quali indicatori cambiano numericamente e quali no? Perché?</li>
+</ol>
+</section>
+<section id="ragionare" class="level3" data-number="6.13.2">
+<h3 data-number="6.13.2" class="anchored" data-anchor-id="ragionare"><span class="header-section-number">6.13.2</span> Ragionare</h3>
+<ol start="3" type="1">
+<li>Nella dimostrazione della decomposizione bias-varianza, il termine di rumore si ottiene condizionando su <span class="math inline">\((X,D)\)</span> e sfruttando l’indipendenza tra training set e punto di test. Se il training set e il punto di test <strong>non</strong> fossero indipendenti (ad esempio in una serie storica, dove le osservazioni sono ordinate nel tempo e correlate), quale passaggio della dimostrazione smetterebbe di valere?</li>
+<li>Confronta la curva CV di KNN al variare di <span class="math inline">\(k\)</span> (fino a <span class="math inline">\(k=100\)</span>) con la curva CV del grado del polinomio (fino a grado 10). Le due curve hanno la stessa forma qualitativa? In quale dei due casi la nozione di “complessità del modello” cresce con l’iperparametro, e in quale decresce?</li>
+</ol>
+</section>
+<section id="esplorare-con-r" class="level3" data-number="6.13.3">
+<h3 data-number="6.13.3" class="anchored" data-anchor-id="esplorare-con-r"><span class="header-section-number">6.13.3</span> Esplorare con R</h3>
+<ol start="5" type="1">
+<li><strong>Esercizio suggerito dal docente.</strong> Torna al capitolo 4 (classificazione) e individua le definizioni di errore di training, errore di test, errore di validazione ed errore di generalizzazione date per KNN in classificazione. Riscrivile per la regressione, sostituendo la loss 0-1 con la loss quadratica: cosa cambia nella forma delle formule? Cosa resta identico nella struttura logica?</li>
+<li>Genera un nuovo dataset sintetico con <code>set.seed()</code> diverso e <span class="math inline">\(y = x^2 + \text{rumore}\)</span> invece di <span class="math inline">\(\sin(x)+\text{rumore}\)</span>. Esegui <code>caret::train()</code> con LOO-CV per KNN (<span class="math inline">\(k=1,\ldots,50\)</span>) e separatamente la selezione del grado polinomiale con <code>boot::cv.glm()</code> (gradi <span class="math inline">\(1,\ldots,6\)</span>). Quale grado polinomiale ti aspetti che risulti ottimale, sapendo come è stato generato il dataset? Il risultato della cross-validation conferma la tua aspettativa?</li>
+<li>Con il dataset del punto precedente, adatta un modello <code>lm(y ~ poly(x, 1))</code> (lineare semplice) e confronta <span class="math inline">\(\theta_{OLS,1}\)</span> calcolato con la formula chiusa <code>cor(x,y)*sd(y)/sd(x)</code> e con <code>coef(lm(y~x))</code>. Ripeti standardizzando prima <code>x</code> con <code>scale()</code>: la pendenza stimata cambia? È un risultato atteso, vista la formula chiusa?</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./05-bayes-naive-bayes-roc.html" class="pagination-link" aria-label="Formula di Bayes e classificatori generativi">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Formula di Bayes e classificatori generativi</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./07-regressione-lineare-multipla.html" class="pagination-link" aria-label="Regressione lineare multipla e quantificazione dell'incertezza">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regressione lineare multipla e quantificazione dell’incertezza</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Statistica II (750AA) — note del corso</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Costruito con Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
