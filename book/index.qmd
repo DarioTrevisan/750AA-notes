@@ -1,0 +1,32 @@
+# Prefazione {.unnumbered}
+
+Queste note accompagnano il corso di **Statistica II / Introduzione alla Statistica Computazionale** (750AA). Coprono le undici lezioni di teoria del corso, organizzate in quattro blocchi tematici: statistica descrittiva e clustering, classificazione, regressione, serie storiche.
+
+## Cosa sono (e cosa non sono) queste note
+
+Queste note **non sostituiscono** le lezioni né le slide del corso. Le slide restano il riferimento primario per formule, notazione e per gli esempi discussi in aula; le registrazioni restano il modo più fedele per rivivere le spiegazioni del docente.
+
+Queste note hanno un obiettivo diverso e complementare: dove le slide sono necessariamente sintetiche (una formula, un grafico, un elenco puntato), il testo prova a rispondere alle domande che la slide da sola non può porre — perché questa quantità è definita così, cosa succede se cambiamo un'ipotesi, come si legge questo grafico, quando questo metodo può trarci in inganno. L'enfasi è sulla **comprensione e sull'interpretazione statistica**, non sulla sola esposizione di definizioni e algoritmi.
+
+R compare in tutto il libro, ma non come oggetto di studio: viene usato come **laboratorio statistico**. Gli esercizi R chiedono di eseguire comandi già scritti, leggere output e grafici, confrontare metodi e capirne il comportamento — non di scrivere codice da zero. Se un esercizio richiede di programmare un algoritmo, non è un esercizio di questo libro.
+
+## Come usare queste note
+
+Per ogni sezione, l'uso consigliato è:
+
+1. Leggere prima la parte concettuale (Motivazione → Concetto → Intuizione), provando a immaginare la risposta prima di leggerla.
+2. Rispondere mentalmente alle domande poste nel testo *prima* di proseguire nella lettura o di eseguire il codice che segue: sono pensate per far emergere un'intuizione, non solo per essere verificate a posteriori.
+3. Riprodurre gli esempi R nel proprio ambiente, guardando gli output con attenzione (non solo eseguendo il codice).
+4. Provare le domande di comprensione a fine sezione e le domande di riepilogo a fine capitolo.
+5. Usare le slide del corso per un ripasso rapido di formule e notazione una volta che i concetti sono chiari.
+
+Il libro è pensato per essere letto sia **durante il corso**, in parallelo alle lezioni, sia **in vista dell'esame**, come ripasso organico che ricollega argomenti trattati in lezioni diverse.
+
+## Struttura del libro
+
+- **Capitoli 1–3**: statistica descrittiva come minimizzazione del rischio empirico, distanze multivariate, clustering, curse of dimensionality e analisi delle componenti principali.
+- **Capitoli 4–5**: classificazione supervisionata, K-Nearest Neighbors, validazione dei modelli, classificatori bayesiani (Naive Bayes, LDA/QDA, regressione logistica).
+- **Capitoli 6–8**: regressione, dilemma bias-varianza, regressione lineare multipla, quantificazione dell'incertezza, collinearità e regolarizzazione.
+- **Capitoli 9–11**: serie storiche — decomposizione e previsione elementare, smoothing esponenziale (ETS/Holt-Winters), processi stocastici e modelli ARIMA.
+
+Alcuni temi — funzioni di perdita, distanze, cross-validation, bootstrap, il compromesso bias-varianza — attraversano più capitoli: quando questo accade, il testo lo segnala esplicitamente, perché riconoscere lo stesso principio in contesti diversi è parte dell'obiettivo del corso.

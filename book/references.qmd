@@ -1,0 +1,6 @@
+# Riferimenti {.unnumbered}
+
+Questo capitolo raccoglie i riferimenti bibliografici citati nel testo. La maggior parte del materiale del corso segue impostazioni ormai standard nei testi di statistica e apprendimento automatico; le citazioni sono riservate ai casi in cui un risultato, un metodo o un dataset ha una paternità specifica degna di nota.
+
+::: {#refs}
+:::

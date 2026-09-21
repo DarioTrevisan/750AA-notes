@@ -1,0 +1,2183 @@
+
+IT
+750AA 2025 11 03 lezione 13
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+204 views  4 Nov 2025
+Regressione lineare generale (multipla): formula per la stima OLS dei parametri. Quantificazione dell'incertezza: metodo bootstrap, intervalli di fiducia e intervalli di previsione; confronto (generale) metodi parametrici frequentisti/bayesiani. Caso di regressione a una costante: stima bayesiana (Student-t).
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:00
+0 seconds
+Iniziamo la lezione e riprendiamo dove abbiamo lasciato la volta scorsa
+0:07
+7 seconds
+sulla regressione. Ok, stiamo parlando di regressione, ma abbiamo visto soltanto il caso di KNN come algoritmo.
+0:17
+17 seconds
+Poi abbiamo parlato in generale del modello di regressione lineare, parametrici in generale, poi abbiamo detto lineare e ora ci occupiamo della
+0:26
+26 seconds
+regressione lineare multipla perché il caso di regressione semplice l'abbiamo già trattato, abbiamo visto anche esplicitamente com'erano i coefficienti,
+0:33
+33 seconds
+no? Nel caso ottimale. Quindi questa volta ci poniamo il problema. Abbiamo un fattore d'uscita. Ah, questi sono solo
+0:41
+41 seconds
+richiami, eh, scusate. A partire da uno o più fattori di ingresso, cioè uno di ingresso, intendo dire, potrebbe essere anche un vettore.
+0:49
+49 seconds
+Allora, cosa facevamo? Vi ricordate? Ci sono i vari indicatori di performance che sono un po' analoghi all'accuratezza del nel caso della classificazione.
+0:57
+57 seconds
+Poi KNN abbiamo detto che è un bell'algoritmo, però come nel caso della classificazione è non parametrico, quindi ha i suoi difetti.
+1:06
+1 minute, 6 seconds
+Ad esempio, ci tocca portare tutto il training set ogni volta. Quindi abamo detto impariamo questi modelli parametrici, cioè introduciamo dei
+1:14
+1 minute, 14 seconds
+parametri idealmente meno dei dati se lo pensiamo in termini, no, di una sintesi dei dei nostro training set e poi come
+1:23
+1 minute, 23 seconds
+li stimiamo ad esempio col metodo dei minimi quadrati. Quindi ricordatevi che si definivano questi residui. La differenza tra la y osservata. Nel
+1:32
+1 minute, 32 seconds
+training set avete anche la y osservata, quindi fate y - hx con il parametro teta. Il residuo lo elevate al quadrato
+1:40
+1 minute, 40 seconds
+e trovate il teta che ottimizza. E abbiamo visto, come dicevamo, per il caso della regressione semplice, ora eh
+1:47
+1 minute, 47 seconds
+mi adeguo alle notazioni standard. Per la regressione. I parametri, quindi invece di chiamarli teta0 teta1 si
+1:54
+1 minute, 54 seconds
+chiamano beta0 beta 1. Ok? Questo perché ora vedremo c'è anche un altro parametro che potrebbe essere noto o non noto che è la varianza del nostro residuo. Ok?
+2:05
+2 minutes, 5 seconds
+Quindi veri parametri teta includeranno i beta che sono i parametri che uno dice nel modello, ma anche il la deviazione
+2:13
+2 minutes, 13 seconds
+standard del residuo. Comunque allora i coefficienti erano il coefficiente angolare che era proporzionale alla correlazione
+2:21
+2 minutes, 21 seconds
+e eh l'intercetta che era semplicemente ottenuta mediando, insomma, avete l'abbiamo visto la volta scorsa. Beh, allora oggi estendiamo questo discorso.
+2:31
+2 minutes, 31 seconds
+Beh, qua c'è un esempietto. Vabbè, ce lo portiamo avanti un po' un po' tutta la lezione perché poi lo riprendiamo. È quello abbiamo visto anche mercoledì,
+2:39
+2 minutes, 39 seconds
+no? Questo è un caso semplice. Questo è generato artificialmente, abbiamo preso una dei punti già su una retta, abbiamo aggiunto del rumore.
+2:46
+2 minutes, 46 seconds
+Ora la domanda è: cosa possiamo dire in generale invece su un modello di regressione lineare ma con più parametri? Ok? Quindi non abbiamo più
+2:55
+2 minutes, 55 seconds
+soltanto beta0 beta 1, ma ci poniamo nel modello più generale possibile. A questo punto io direi il costo, se volete, è lo
+3:04
+3 minutes, 4 seconds
+stesso, cioè di descriverlo nel modello lineare multiplo o nel modello più generale possibile che era questo, dicevamo, dove avete delle
+3:11
+3 minutes, 11 seconds
+trasformazioni anche non lineari della x e pensate che la x potrebbe essere un vettore e quindi trasformate, fate f1,
+3:20
+3 minutes, 20 seconds
+avete una prima feature della x, una seconda f2 e fino a FP e poi ciascuna di queste viene moltiplicata per il suo coefficiente del modello lineare, ok?
+3:30
+3 minutes, 30 seconds
+Quindi avete Pametri, beta 1, beta 2, beta P e eh le feature che sono insomma
+3:38
+3 minutes, 38 seconds
+queste caratteristiche che per noi sono comunque estratte, no? Adesso facciamo di nuovo gli esempi della volta scorsa, sono comunque delle funzioni e ne
+3:46
+3 minutes, 46 seconds
+abbiamo P anche queste. Potreste pensare che il vettore è già un vettore in RP.
+3:51
+3 minutes, 51 seconds
+Oppure ora vediamo un altri esempi, no? Che sono quelli, eh?
+3:57
+3 minutes, 57 seconds
+Ok, eccoli qua. La regressione lineare semplice e la regressione polinomiale. Abbiamo già visti la volta scorsa, ancora un po'
+4:05
+4 minutes, 5 seconds
+un recupero questo, no? Vi ricordate nel caso di regressione polinomiale, se voi fissate il grado del polinomio, diciamo grado Q, avete il coefficiente per il
+4:14
+4 minutes, 14 seconds
+termine noto, l'intercetta, diciamo, e poi avete i vari coefficienti, quindi avete il numero di parametri è p + 1.
+4:21
+4 minutes, 21 seconds
+Nel modello lineare semplice ne avete due di parametri, beta0 beta 1, quindi potreste pensare che sono beta1 beta2 e
+4:30
+4 minutes, 30 seconds
+le fto semplici. Avete una f che è costante, f(x) = 1 e f(x) = x.
+4:37
+4 minutes, 37 seconds
+Ok? Quindi questa scrittura comprende anche casi in cui una di queste f potrebbe essere la costante fx = x e fx = 1. Ok?
+4:48
+4 minutes, 48 seconds
+E quindi una scrittura abbastanza compatta. E ora vediamo un po' che formula ci dà il metodo dei minimi quadrati. Ok? Allora, visto che parliamo
+4:56
+4 minutes, 56 seconds
+ancora di notazioni, appunto, questo sarebbe un prodotto scalare, se volete, no, tra f di x, tra questo vettore delle
+5:04
+5 minutes, 4 seconds
+caratteristiche di x e beta. Allora, siccome non voglio portarmi dietro prodotti scalari, semplicemente pensiamo
+5:11
+5 minutes, 11 seconds
+e facciamolo, abbiamo già fatto in precedenza anche con la PCA, cioè pensiamo dati, dato un X, un punto di
+5:19
+5 minutes, 19 seconds
+training set o di test, fate, pensatelo sempre come un vettore riga e anche la f di x, quando avete queste potrebbero
+5:27
+5 minutes, 27 seconds
+essere x, xx qu così via, pensatele sempre come un vettore riga, ok? Così le formule avranno tutta il significato che
+5:35
+5 minutes, 35 seconds
+devono avere la consistenza. Qui diciamo la f di x sarà sempre la uso questa f maiuscola per indicare f1, f2, fono
+5:43
+5 minutes, 43 seconds
+tutte righe e invece i vettori continuiamo a pensarli come vettori colonne, i vettori di parametri come colonna, ok? Così questo effettivamente
+5:51
+5 minutes, 51 seconds
+il modello è lineare ed è della forma f(x) b, ok? Inteso come matrice, una è
+5:58
+5 minutes, 58 seconds
+una matrice che è una riga e l'altra è una matrice che è una colonna, insomma. I residui, come li definiamo i residui?
+6:05
+6 minutes, 5 seconds
+Come al solito, prendete la y, se avete la y osservata, potete a quel punto calcolare il residuo e fare la y meno la
+6:13
+6 minutes, 13 seconds
+previsione, no, hx beta. Ovviamente ora si tratterà di determinare il parametro
+6:20
+6 minutes, 20 seconds
+beta che minimizza il quadrato dei residui.
+6:24
+6 minutes, 24 seconds
+Prima di farlo, perché la formula esplicita c'è, non è neanche troppo complicata, però è bene prepararsi con la notazione giusta e quindi, come
+6:32
+6 minutes, 32 seconds
+dicevamo, se abbiamo un singolo punto x, facciamo f x, lo pensiamo come riga, quindi abbiamo la riga f1, f2, f p di x.
+6:42
+6 minutes, 42 seconds
+Ora, se avete un intero training set di n punti, eh, come abbiamo fatto per la PCA eccetera, li li pensiamo o come un
+6:50
+6 minutes, 50 seconds
+data frame, cioè pensiamo su ogni riga, mettiamo le corrispondenti x e y, quindi facciamo y, lo metto in grassetto, no?
+6:58
+6 minutes, 58 seconds
+Per indicare il vettore, questa volta diventa una colonna di n osservazioni delle y. E in corrispondenza prendiamo
+7:06
+7 minutes, 6 seconds
+anche le f di x, lo lo indico con il con il grassetto pure e sono semplicemente
+7:13
+7 minutes, 13 seconds
+le righe corrispondenti delle f di x1, f x2 fino a f di xn. Ok? Abbastanza naturale. E questo è quello che avete
+7:22
+7 minutes, 22 seconds
+già in R presentato. I vostri dati se di solito sono organizzati con un dataframe. Ogni riga sono un'osservazione diversa. Va bene? Però,
+7:31
+7 minutes, 31 seconds
+quindi usiamo questa notazione. Quindi le le matrici sono rispettivamente
+7:37
+7 minutes, 37 seconds
+n * 1, solo la colonna delle y e n * p nel caso della f(x).
+7:45
+7 minutes, 45 seconds
+Ok? Allora, perché ci piace questa notazione? Perché allora se voglio fare i residui mi basta fare la y.
+7:52
+7 minutes, 52 seconds
+Eh, manca la beta. Sì, scusate. Ecco qua. Correggiamolo. Soò. Quindi fate la y che è già un vettore di lunghezza n
+8:01
+8 minutes, 1 second
+righe. Ora fx di per sé non poteva andare bene, ma chiaramente se fate fx per beta, che è un vettore di eh colonna
+8:10
+8 minutes, 10 seconds
+di lunghezza P, in effetti trovate proprio le combinazioni lineari e quindi avete y - f(x) beta. Se li sottraete
+8:17
+8 minutes, 17 seconds
+avete proprio il vettore dei residui, ok? Per ogni componente nel vostro training set avete un vettore di residui. Quindi attenti, aggiungete il
+8:25
+8 minutes, 25 seconds
+beta lì, poi va va aggiunto. Ok? Allora, con questa notazione possiamo porci l'obiettivo.
+8:33
+8 minutes, 33 seconds
+Cosa ci dà il metodo dei minimi quadrati nella soluzione generale. Abbiamo visto che nel caso di regressione lineare era un'espressione semplice. Vediamo un po' cosa succede nell'espressione generale.
+8:45
+8 minutes, 45 seconds
+Allora, cosa dobbiamo fare? Dobbiamo trovare un beta, chiamiamolo beta OLS, che ordinary list squares, quindi minimi
+8:54
+8 minutes, 54 seconds
+quadrati. Minimizziamo al vari possibili beta i residui. Ora questo il residui è quadrato, eh, non il residuo e basta.
+9:02
+9 minutes, 2 seconds
+Volendo potete anche moltiplicare per 1 su n, diventa il mean square error, no?
+9:08
+9 minutes, 8 seconds
+Ms. Comunque moltiplicare per n o no non cambia. noi interessa trovare il beta che minimizza questa somma dei quadrati
+9:16
+9 minutes, 16 seconds
+dei residui. E allora c'è una formula esplicita, non è così complicata, però va un attimo descritta. Quindi, allora,
+9:24
+9 minutes, 24 seconds
+si introduce una matrice che è una specie di matrice di di covarianze che è una matrice però che chiamiamola matrice di gram, ok? Com'è fatta questa matrice?
+9:35
+9 minutes, 35 seconds
+Prendete la vostra f(x), che era questo questa grossa matrice n * p, fate f(x)
+9:42
+9 minutes, 42 seconds
+trasposta, quindi avete una matrice p * n e fate prodotto, quindi f (x) trasposta per f (x). Quindi complessivamente questa è una matrice P
+9:52
+9 minutes, 52 seconds
+* P, ok? Quindi a è una matrice quadrata e la cui taglia, righe colonne sono uguali al numero di parametri che avete. Ok?
+10:02
+10 minutes, 2 seconds
+Allora, questa è una matrice quadrata.
+10:05
+10 minutes, 5 seconds
+Se siamo fortunati ed è invertibile, calcolate G^ -1, quindi la invertite nel senso delle matrici e poi moltiplicate
+10:12
+10 minutes, 12 seconds
+per cosa? Per f trasposto y. Vediamo se almeno torna eh dimensionalmente, no? Vi ricordo che y è un vettore Rn.
+10:21
+10 minutes, 21 seconds
+F trasposto, quindi questo è in Rn, questo è un vettore in RP * N. Ok? Quindi,
+10:30
+10 minutes, 30 seconds
+complessivamente, questo prodotto vi dà un vettore in RP e questa vi dà una matrice P* P, vi ricordate, no? Come si moltiplicano le matrici? Quindi avete in
+10:39
+10 minutes, 39 seconds
+effetti una formula, non è poi così complicata, avete le vostre y trasformate con questo fx trasposto,
+10:47
+10 minutes, 47 seconds
+quindi sono combinate con le fx e poi viene tutto riscalato con questa matrice di gram inversa. Ovviamente questa formula è quella che nasce dal metodo
+10:56
+10 minutes, 56 seconds
+dei minimi quadrati. Uno si può anche chiedere cosa succede se G non è invertibile. Allora, in quali situazioni G questa matrice che dobbiamo invertire nella formula non risulta invertibile?
+11:07
+11 minutes, 7 seconds
+Poi vedremo anche la settimana prossima perché ci apre delle situazioni interessanti. Diciamo se è invertibile, questa è la formula, se non è
+11:15
+11 minutes, 15 seconds
+invertibile, intanto quand'è che non è invertibile? Allora, non è invertibile se solo se il numero dei parametri p è più grande dei dati, del numero di dati.
+11:26
+11 minutes, 26 seconds
+Qui in quel caso siete sicuri che non è invertibile. Quindi se avete più parametri che dati, questa formula non può funzionare o quantomeno l'inversa
+11:35
+11 minutes, 35 seconds
+non è chiaro cosa sia. Oppure, in realtà il vero il vero criterio è questo, le colonne le colonne di FX sono
+11:43
+11 minutes, 43 seconds
+linearmente dipendenti perché tipicamente almeno quando usate questa regressione lineare avete più dati che parametri. Se, insomma, uno dei motivi
+11:52
+11 minutes, 52 seconds
+per cui non fa la regressione lineare con parametrica è di avere un modello più semplice, altrimenti usa KNN volendo. Poi vabbè, ci sono altri motivi per usare più parametri che dati.
+12:03
+12 minutes, 3 seconds
+Comunque il vero, insomma, la vera situazione che interesserà a noi è quando le colonne di fx che sono pi colonne in realtà sono linearmente
+12:11
+12 minutes, 11 seconds
+dipendenti. Cosa vuol dire? Vuol dire che ci sono queste caratteristiche che sono allineate. Seè un fenomeno di cosiddetta colinearità dei dati. E
+12:19
+12 minutes, 19 seconds
+vabbè, questo potrebbe creare dei problemi e vedremo più avanti l'ultima lezione che facciamo sulla regressione lunedì prossimo teorica, vediamo come si
+12:27
+12 minutes, 27 seconds
+può risolvere questo problema e che vantaggi ci può dare. Si usano dei cosiddetti metodi di regolarizzazione.
+12:33
+12 minutes, 33 seconds
+Va bene? Quindi per il momento, però supponiamo che G sia invertibile. Ogni volta che scriverò una G sarà invertibile e supponiamo quindi di poter
+12:41
+12 minutes, 41 seconds
+usare questa formula. e andiamo avanti con con i conti, diciamo. Quindi, intanto vediamo che effettivamente questa è la formula e perché risulta
+12:50
+12 minutes, 50 seconds
+questa formula. Ok? Ora lo facciamo perché è un calcolo che poi ci apre anche a delle interpretazioni
+12:57
+12 minutes, 57 seconds
+successive, va bene? Quindi non lo faccio per lo per la desiderio di mostrarvi un calcolo.
+13:02
+13 minutes, 2 seconds
+E quindi dimostriamo quella formula, cioè che il beta dei minimi quadrati è quella g^ -1 fx trasposto y. Allora,
+13:10
+13 minutes, 10 seconds
+però fatemi semplificare un po' la notazione. Facciamo finta che la f di x proprio le x, cioè avete, che so una regressione multipla e e proprio le caratteristiche sono le x stesse. Ok?
+13:21
+13 minutes, 21 seconds
+Questo non è una vera semplificazione perché stiamo soltanto dicendo al posto di chiamare x quelle originarie, chiamiamo x quelle che sono le fx. Però
+13:30
+13 minutes, 30 seconds
+se facciamo questa cosa un po' di di simboli si semplificano e in particolare anche la g diventa semplicemente x trasposto x. Ok?
+13:39
+13 minutes, 39 seconds
+Vabbè, allora, quindi cosa facciamo?
+13:41
+13 minutes, 41 seconds
+Facciamo il calcolo. Si tratta di sviluppare e completare un quadrato, non è complicatissimo, però se uno lo fa con la notazione giusta e viene in due
+13:49
+13 minutes, 49 seconds
+passi. Allora, il punto è questo. Questo è cominciamo dall'errore, no? L'errore quadratico medio, meno di moltiplicarlo
+13:56
+13 minutes, 56 seconds
+per n. Quindi questo è n means square error relativo ad h di beta.
+14:03
+14 minutes, 3 seconds
+Ok? Noi dobbiamo trovare il beta che minimizza questo. Intanto pensiamolo, no? Come una somma, ok? Ma è una somma
+14:11
+14 minutes, 11 seconds
+su cosa? Sulle i, sui nostri punti del training set. Avete y i che è la componente iima, no? - xi beta. Ma e
+14:19
+14 minutes, 19 seconds
+questo era il residuo, ok? Il residuo, abbiamo detto che possiamo anche pensarlo come un lungo vettore di residui, però ogni dato abbiamo il suo
+14:27
+14 minutes, 27 seconds
+residuo. Quindi questa somma dei quadrati non è nient'altro che la norma del vettore dei residui, la norma quadra del vettore di residui, quindi la scrivo
+14:36
+14 minutes, 36 seconds
+come norma del vettore dei residui, questo potete chiamarlo anche epsilon, vettore di tutti i residui sul nostro
+14:43
+14 minutes, 43 seconds
+training set. Perché mi piace pensarlo come norma, no? Perché la norma di un vettore, vi ricordate? La norma di un
+14:50
+14 minutes, 50 seconds
+vettore, se la se la volete calcolare con notazione matriciale, dovete prendere il vettore vettore dei residui è già una colonna, quindi prendete il
+14:58
+14 minutes, 58 seconds
+vettore, lo trasponete e fate vettore trasposto per il vettore stesso. Questo vi dà il prodotto scalare. Ok? Quindi allora penso di scrivere la norma
+15:07
+15 minutes, 7 seconds
+quadra, la penso come vettore trasposto per il vettore stesso, ok?
+15:13
+15 minutes, 13 seconds
+trasposto e adesso si vede subito che questa quantità è un è un praticamente un quadrato, no? Quindi sviluppiamola.
+15:21
+15 minutes, 21 seconds
+Allora, sviluppiamo. Avete y trasposto contro Y. Attenti che la trasposizione si porta dentro, quindi avreste y trasposto - x beta trasposto.
+15:34
+15 minutes, 34 seconds
+Però il primo è y trasposto Y, che è quindi la norma quadra di y. Poi abbiamo un altro fattore facile che è questo qui. Vedete? Quando quando avete questo
+15:43
+15 minutes, 43 seconds
+contro questo, bisogna solo stare un attimo attenti con l'ordine perché y facciamolo un'altra volta, questo
+15:49
+15 minutes, 49 seconds
+sarebbe y trasposto meno quando trasponete ricordatevi che bisogna cambiare anche l'ordine, no? Avete mai
+15:57
+15 minutes, 57 seconds
+fatto il se avete mai fatto verificate che fare la trasposta di AB bisogna fare trasposta di B per trasposta di A.
+16:03
+16 minutes, 3 seconds
+Bisogna anche cambiare l'ordine se le matrici altrimenti neanche si possono moltiplicare. Quindi allora un fattore era y trasposto y, perfetto. L'altro
+16:11
+16 minutes, 11 seconds
+fattore facile è beta trasposto x trasposto x beta. Ok? Sono i due fattori,
+16:18
+16 minutes, 18 seconds
+sarebbero i due quadrati, no? Avrebbe il quadrato del primo più il quadrato del secondo e poi ci sarebbe i doppi prodotti. Attenti, il doppio prodotto
+16:26
+16 minutes, 26 seconds
+siccome sono matrici bisogna stare attenti. Uno come non è che tutto si sia si sia commutativo, insomma. Quindi
+16:32
+16 minutes, 32 seconds
+scriviamo y cont x beta ed è qua perché c'è un y trasposto x
+16:39
+16 minutes, 39 seconds
+beta e l'altro viene x beta trasposto che quindi è beta trasposto x trasposto per y vi dà quest'altro fattore qui. Ok?
+16:47
+16 minutes, 47 seconds
+Questo ho semplicemente sviluppato un quadrato, niente di eccezionale.
+16:52
+16 minutes, 52 seconds
+Ok? Semplicemente non posso scriverlo in modo, cioè o o se lo scrivete esplicitamente è un disastro. Non potete trattarli come numeri perché sono
+17:01
+17 minutes, 1 second
+matrici, ok? O vettori, però la notazione è molto simile l'algebra.
+17:06
+17 minutes, 6 seconds
+Adesso però vedete c'è un una quantità che c'è dove c'è un quadrato di beta,
+17:14
+17 minutes, 14 seconds
+una quantità che invece è di grado 1 in beta perché c'è un beta trasposto e di là c'è solo beta, quindi di grado 1 in beta. E quindi qual è l'idea? è
+17:22
+17 minutes, 22 seconds
+completiamo quello eh e quell'altro come un quadrato perfetto.
+17:28
+17 minutes, 28 seconds
+E l'altra volta avevamo invece fatto una derivata. Si può anche fare la derivata, non è sbagliato. Però qui la cosa più semplice è di dire, ok, questa espressione è come un beta quad per g.
+17:38
+17 minutes, 38 seconds
+Tra l'altro vedete questa è la matrice g, è come un beta quad per g e poi c'è un meno o qualcosa che è lineare in beta e
+17:47
+17 minutes, 47 seconds
+quindi aggiungiamo e togliamo qualcosa per completare un quadrato. Allora, bisogna un po' pensare a cosa uno deve aggiungere e togliere, però risulta che
+17:55
+17 minutes, 55 seconds
+la quantità da aggiungere e da togliere è questa. Ok? Ora non sembra bellissima, però avete y trasposto x g ^ -1, quindi
+18:04
+18 minutes, 4 seconds
+g deve essere invertibile, x trasposto y. Ora non vi voglio fare indovinare, insomma bisogna capire cosa bisogna
+18:11
+18 minutes, 11 seconds
+aggiungere, però se uno l'aggiunge e la toglie, allora vedete qui l'ho tolta,
+18:18
+18 minutes, 18 seconds
+no? Poi quando la riaggiungo ottengo qualcosa che diventa un quadrato. Questa è una specie di di quadrato perfetto.
+18:25
+18 minutes, 25 seconds
+Quadrato.
+18:27
+18 minutes, 27 seconds
+Un quadrato. Ora scritto così non sembra un quadrato, però vedete c'è un fattore beta - g^ -1 x tras y che è il nostro
+18:35
+18 minutes, 35 seconds
+beta di minimi quadrati per g * beta - g^ -1 x y. Ok? Qui in effetti questo
+18:42
+18 minutes, 42 seconds
+risulta una quantità sempre non negativa, la propria proprietà di un quadrato, ok?
+18:48
+18 minutes, 48 seconds
+È sempre non negativa ed è minima quando il termine è zero, ok? Quando è zero quello lì, allora sappiamo che è minima, ok?
+18:57
+18 minutes, 57 seconds
+Ora bisognerebbe mostrare che effettivamente questa è sempre non negativa. Il fatto che G è una matrice, questa matrice di gram x trasposto X è a
+19:04
+19 minutes, 4 seconds
+sua volta un prodotto di x trasposto X, quindi si può in effetti scrivere tutto come un altro un grosso quadrato. Ok?
+19:14
+19 minutes, 14 seconds
+Ecco, allora se uno aggiunge e toglie, ora si può verificare perché risulta effettivamente questa? Andiamo a vederlo, dai. Allora, se uno sviluppa questo quadrato, abbiamo beta * g * beta
+19:24
+19 minutes, 24 seconds
+e ci dà il primo termine. Poi avete g^ -1 x trasposto. Attenti che va tutto trasposto, poi moltiplicato per g e
+19:33
+19 minutes, 33 seconds
+quest'altro. Vedete? C'è un g^ -1 che si semplifica e quindi recuperate questo termine qui col segno più. E poi se uno
+19:41
+19 minutes, 41 seconds
+fa i conti dei doppi prodotti, si ricorda cos'è la G, trova esattamente l'altro l'altro pezzo che manca con i doppi prodotti. Ok?
+19:49
+19 minutes, 49 seconds
+Quindi uno ha semplicemente completato un quadrato, non è una cosa così strana e per tanto sapeva che era quadratica in
+19:57
+19 minutes, 57 seconds
+beta perché è una somma di quadrati e dei residui che sono lineari in beta.
+20:02
+20 minutes, 2 seconds
+Eh, allora alla fine uno dice "Ok, devo minimizzare in beta". Dov'è che compare beta? Beta compare qui e qui. Qui non
+20:09
+20 minutes, 9 seconds
+compare beta, quindi perfetto, non c'è molto da fare lì. Quindi quand'è che questa quantità è minima? Dicevo, questa quantità è come se fosse un beta - g^ -1
+20:18
+20 minutes, 18 seconds
+x trasposto y al quadrato, come se fosse quella quantità, tra parentesi al quadrato. Allora, quand'è che è minima?
+20:25
+20 minutes, 25 seconds
+Beh, è minima quando la quantità nelle parentesi è zero, quindi quando beta è uguale a g^ -1 x trasposto y, che era la nostra formula per i minimi quadrati.
+20:36
+20 minutes, 36 seconds
+Ok? Quindi davvero questo metodo sui modelli lineari generali risale quantomeno a Gaus. che sapeva
+20:45
+20 minutes, 45 seconds
+completare i quadrati e insomma e comunque insomma il vantaggio è questo che c'è una formula molto semplice, esplicita. Ora come viene ottenuta,
+20:52
+20 minutes, 52 seconds
+vedete, non è complicatissimo. Si tratta di sviluppare un quadrato, completare con un altro quadrato e e l'algebra funziona.
+21:00
+21 minutes
+Ora però andiamo a vedere un attimino cosa succede se io metto effettivamente questo. Ora riscriviamola in un modo un po' diverso, se volete la stessa
+21:08
+21 minutes, 8 seconds
+formula, la stessa identità. Allora, stiamo dicendo che se divido per n ho l'errore quadratico medio per un beta qualsiasi.
+21:18
+21 minutes, 18 seconds
+Eh, allora lo sto riscrivendo. Ora qui se si se tagliato un pezzetto. C'era questa espressione qui che è quel quadrato che dicevamo prima, quindi
+21:27
+21 minutes, 27 seconds
+l'avete. Avete beta - il beta dei minimi quadrati trasposto moltiplicato per g e di nuovo beta - beta dei minimi
+21:35
+21 minutes, 35 seconds
+quadrati. Quindi questa è la quantità sempre non negativa.
+21:39
+21 minutes, 39 seconds
+Attenti che se fate l'errore quadrato e medio è 1 su n, cioè anche è comparso un 1 su n a denominatore.
+21:46
+21 minutes, 46 seconds
+E l'altra quantità cos'è? Beh, l'altra quantità e siccome siamo partiti dal dall'errore quadratico medio, se noi
+21:53
+21 minutes, 53 seconds
+mettiamo beta = beta, quello dei minimi quadrati, quello beta ottimale, beh, quella quella quantità in giallo, quella
+22:01
+22 minutes, 1 second
+che è sempre positiva, diventa zero e quindi quello che rimane deve essere per forza l'errore quadratico medio quando
+22:08
+22 minutes, 8 seconds
+metto proprio il beta dei minimi quadrati, cioè quindi il minimo errore quadratico medio che posso fare, ok? e
+22:15
+22 minutes, 15 seconds
+quindi ho beta eh sarebbe min square error nel caso di beta dei minimi quadrati. Ok? Quindi questa formula ci
+22:24
+22 minutes, 24 seconds
+dice che l'errore quadratico per un beta qualsiasi è almeno quello minimo più qualcosa che è questa quantità che è una
+22:31
+22 minutes, 31 seconds
+specie di quadrato in beta, no? Una parabola, pensate che è una grossa parabola vicina al minimi quadrati.
+22:38
+22 minutes, 38 seconds
+Ok? E se non va a vedere un po' meglio questo errore quadratico medio per il beta ottimale, cosa scopre? Vabbè, a prima vista l'espressione è questa qui.
+22:47
+22 minutes, 47 seconds
+C'era la norma della y quo quella quantità che avevamo aggiunto e tolto che uno dice vabbè l'abbiamo aggiunta e tolta in modo un po' strano.
+22:55
+22 minutes, 55 seconds
+Beh, però uno ci può un po' bisogna un po' lavorarci, però risulta essere uguale a una norma
+23:02
+23 minutes, 2 seconds
+di chi? Beh, la norma della y, quindi i nostri le nostre osservazioni, però le nostre osservazioni proiettate,
+23:09
+23 minutes, 9 seconds
+quindi immaginate, avete questo vettore lunghissimo di tutte le osservazioni, vi ricordate? Abbiamo fatto anche con la PCA, no? Di proiettare lungo certe
+23:17
+23 minutes, 17 seconds
+direzioni. Beh, allora dove viene proiettata? Beh, viene proiettata, vediamo se l'ho scritta, eccolo qua.
+23:25
+23 minutes, 25 seconds
+Viene proiettata sul complemento ortogonale dello spazio dell fx. Quindi immaginate, avete le
+23:33
+23 minutes, 33 seconds
+vostre caratteristiche, le vostre FX X che vi coprono alcune direzioni dello spazio e poi avete la Y. Quindi voi
+23:40
+23 minutes, 40 seconds
+prendete la vostra Y e l' andate a proiettare, beh, non sulle caratteristiche, perché quello è quello che riuscite a spiegare, se volendo con
+23:47
+23 minutes, 47 seconds
+la regressione, ma l'ortogonale di quelle vi dà il residuo, ok? Quindi il residuo, quello che non viene spiegato
+23:55
+23 minutes, 55 seconds
+dalla vostra f di x, dal vostro modello, è l'ortogonale dello spazio generato dall fx. Ok?
+24:02
+24 minutes, 2 seconds
+Quindi l'errore quadratico ha anche questa interpretazione più geometrica come proiezione norma della proiezione
+24:10
+24 minutes, 10 seconds
+delle y su quello che non è insomma non è raggiunto dalle f(x), diciamo così, dalle vostre feature, dalle vostre caratteristiche. Ok?
+24:20
+24 minutes, 20 seconds
+Va bene? Quindi questo è il la derivazione. Poi nella pratica abbiamo già visto la volta scorsa, il comando è LM e uno lo calcola automaticamente,
+24:29
+24 minutes, 29 seconds
+però allora facciamo un esempio un po' così giocattolo sul dataset Iris.
+24:35
+24 minutes, 35 seconds
+Allora, qua c'è il solito grafico, cerca un po' di mostrare tutto quanto. Quindi avete le coefficienti di correlazione.
+24:42
+24 minutes, 42 seconds
+Qua sono addirittura per specie, ma la regressione facciamola tutta su su tutto il dataset, va bene? E quindi, ad esempio, uno potrebbe cercare di
+24:50
+24 minutes, 50 seconds
+spiegare, non lo so, la lunghezza dei sepali. Vediamo cosa ho fatto. Eh, la lunghezza dei sepali è la nostra Y, ok?
+24:58
+24 minutes, 58 seconds
+In funzione di tutte le altre quantità.
+25:01
+25 minutes, 1 second
+In Iris avete cinque quantità, però una sono la specie. La specie non potete usarla, diciamo, se non è numerica, doveste prima trasformarla in un vettore
+25:10
+25 minutes, 10 seconds
+numerico. Quindi, facciamo così, togliamo la specie, ci teniamo le altre tre, ok? c'è la larghezza di sepali, lunghezza di petali e larghezza dei
+25:18
+25 minutes, 18 seconds
+petali. Ok? Quindi allora il comando l'abbiamo quasi visto, ma poi lo rivediamo anche mercoledì. Il comando è sempre LM, dovete dare la formula e nel
+25:27
+25 minutes, 27 seconds
+momento in cui lo caricate avete a disposizione i coefficienti, ok? Una delle cose più importanti è vedere i coefficienti. Allora, i coefficienti
+25:35
+25 minutes, 35 seconds
+saranno comunque quattro perché avete anche il beta 0 in R vi calcola comunque anche l'intercetta, quindi avete l'intercetta e questi che sono i
+25:43
+25 minutes, 43 seconds
+coefficienti, uno da moltiplicare la larghezza dei petali, l'altro la lunghezza di petali e la larghezza di petali. Ora sono più complicati da da
+25:52
+25 minutes, 52 seconds
+interpretare rispetto al caso di regressione semplice, ok? Perché in questo caso abbiamo una funzione che dipende da tre variabili in ingresso e
+25:59
+25 minutes, 59 seconds
+vi dà una variabile in uscita. però comunque è una funzione lineare, ok?
+26:03
+26 minutes, 3 seconds
+Quindi, ad esempio, come si interpreta questo coefficiente -0,55?
+26:08
+26 minutes, 8 seconds
+Come si interpreta? Beh, si interpreta dicendo questo. Se avessi un fiore, diciamo, in cui rimane fissa la
+26:16
+26 minutes, 16 seconds
+larghezza dei petali e la lunghezza dei, scusate, la larghezza dei sepali e la lunghezza dei petali, quindi fissate le
+26:22
+26 minutes, 22 seconds
+prime due e faccio variare soltanto la larghezza dei petali. Se se la larghezza
+26:29
+26 minutes, 29 seconds
+no, aumenta di 1, a quel punto la y che è la lunghezza dei sepali diminuisce di -0,55. Ok? Chiaramente non è una singola
+26:39
+26 minutes, 39 seconds
+retta perché avete una funzione di di più parametri, però l'idea qual è? Che se fissate tutti i parametri tranne uno, questo è un coefficiente angolare. Ok?
+26:48
+26 minutes, 48 seconds
+Quindi più in generale e allora in generale cosa fate? Quando avete un coefficiente angolare? Uno dice: "Ok, se la x aumenta x + 1, quant'è l'incremento
+26:57
+26 minutes, 57 seconds
+sulla y?" Sarà lambda. Qua avete una vostra y, avete y + delta y che però è
+27:03
+27 minutes, 3 seconds
+delta y su delta x * delta x. Quindi il coefficiente angolare è quanto aumenta quando cade, se se spostate solo una.
+27:10
+27 minutes, 10 seconds
+Ora questa è una funzione di più parametri, quindi dovreste dire non potete cambiarli tutti quanti. Dice vabbè, se li cambio tutti quanti come cambia? No, per capire un po' questi
+27:19
+27 minutes, 19 seconds
+coefficienti cosa indicano, potreste pensare: "Tengo fissi tutti i coefficienti tranne uno". E allora, se avessi ipoteticamente un esemplare in
+27:27
+27 minutes, 27 seconds
+cui tutti gli coefficienti sono rimasti gli stessi, ma l'ultimo, ad esempio, è aumentato di 1, allora so che la y in corrispondenza viene diminuita di 1/2o.
+27:36
+27 minutes, 36 seconds
+Cioè quello è come se fosse il coefficiente angolare di un'ipotetica situazione in cui tutti quei coefficienti rimangono congelati tranne,
+27:44
+27 minutes, 44 seconds
+cioè tutti i dati, tutte le caratteristiche restano fisse. Magari non lo vedrete mai sto esemplare, però cioè matematicamente potete dire che se
+27:52
+27 minutes, 52 seconds
+fissate tutti quei coefficienti, allora è lineare soltanto nell'ultima e quello è il coefficiente angolare dell'ultima e lo stesso varrebbe per gli altri
+27:59
+27 minutes, 59 seconds
+parametri. Ok? Quindi così potete pensarlo.
+28:05
+28 minutes, 5 seconds
+Sì, eh dove dov'è?
+28:09
+28 minutes, 9 seconds
+Cioè, se io potete scegliere cosa tenere fisso, cioè soltanto dicendo come si interpretano questi coefficienti, cioè non è un semplice coefficiente angolare
+28:18
+28 minutes, 18 seconds
+perché è una funzione lineare di più parametri e insomma di più variabili.
+28:26
+28 minutes, 26 seconds
+Ma perché la retta è così? Cioè quale retta?
+28:29
+28 minutes, 29 seconds
+Di quella che aveva appena des Ma quello era un esempio qualsiasi. No, no, no, non potete rappresentarla come una retta, cioè perché doveste pensarla che appunto è una funzione. Ad esempio,
+28:38
+28 minutes, 38 seconds
+se avete due parametri input, no, avete lunghezza di sepali, si potrebbe fare il grafico 3D in cui vedete un bel piano,
+28:46
+28 minutes, 46 seconds
+ok? Però vabbè, ce l'abbiamo, ce la potete fare anche con un grafico 3D, ma dopo quando avete già tre parametri cosa
+28:54
+28 minutes, 54 seconds
+rappresentate? Ok? Difficile graficamente mostrare questo. Quello che potete fare è esplorare tenendo fissi dei parametri e modificarne un altro,
+29:03
+29 minutes, 3 seconds
+ok? E questo vi dice che questi coefficienti, per esempio, se sono positivi, vuol dire che al crescere, tenendo fissi tutti gli altri parametri,
+29:11
+29 minutes, 11 seconds
+al crescere della larghezza dei sepali, la y, che è la lunghezza dei sepali, crescerà. Oppure qui è negativo, quindi
+29:18
+29 minutes, 18 seconds
+se tengo fissi tutti gli altri parametri, al decrescere, cioè al crescere meglio della larghezza dei petali, la lunghezza dei sepali
+29:26
+29 minutes, 26 seconds
+decresce, la y decresce, ok? Quindi è un'associazione negativa.
+29:32
+29 minutes, 32 seconds
+E ecco questo che volevo mostrarvi è che comunque il comando LM è perfettamente consistente con la formula matriciale.
+29:38
+29 minutes, 38 seconds
+Ora qui non lo vedete, ma e dopo lo vediamo anche mercoledì. Uno implementa a mano quella formula e scopre gli stessi parametri, ok? Quindi non è che
+29:46
+29 minutes, 46 seconds
+sta facendo una cosa tanto strana LM sta calcolando con quei con quella formula i coefficienti. Va bene?
+29:54
+29 minutes, 54 seconds
+D'accordo?
+29:57
+29 minutes, 57 seconds
+Ok. Allora, quindi la regressione multipla è importantissima, la formula è pure importantissima, però diciamo nella pratica uno non è che la va a calcolare, usa il comando LM.
+30:08
+30 minutes, 8 seconds
+Adesso però ci occupiamo di un problema diverso che cioè che si applica anche alla regressione semplice, ma anche a
+30:16
+30 minutes, 16 seconds
+KNN tornando indietro. Insomma, il problema qual è? Noi possiamo dare KNN non immediatamente, ma poi vediamo
+30:25
+30 minutes, 25 seconds
+che si applica anche a KNN volendo. Il problema è questo che noi abbiamo dati, date del nostro training set, date le
+30:33
+30 minutes, 33 seconds
+nostre osservazioni, qua c'è un x con i, scusate. Quindi, dato il nostro training set, forniamo una stima puntuale dei
+30:41
+30 minutes, 41 seconds
+parametri e però sappiamo bene che questa stima puntuale dipenderà dall'effettivo
+30:47
+30 minutes, 47 seconds
+training set che ho osservato. Ok? E ovviamente non possiamo essere sicuri, cioè non abbiamo osservato tutta la
+30:55
+30 minutes, 55 seconds
+popolazione, abbiamo sempre un campione, no? Abbiamo sempre n osservazioni, ci aspettiamo che le future osservazioni saranno più o meno estratte dallo stesso
+31:03
+31 minutes, 3 seconds
+campione, dalla stessa legge, però comunque vorremmo dire "Ok, c'è la stima puntuale, ma non sono completamente sicuro che questi sono i veri parametri,
+31:12
+31 minutes, 12 seconds
+questi sono i parametri immutabili e e dovremmo renderci conto che c'è un po' di incertezza perché è dovuta al fatto che non abbiamo infinite osservazioni,
+31:21
+31 minutes, 21 seconds
+ad esempio, cioè abbiamo quelle piccole osservazioni, pensate il caso di 2 3 e 10 osservazioni, saremmo molto incerti.
+31:28
+31 minutes, 28 seconds
+Se abbiamo già un centinaio un migliaio di osservazioni, magari saremo più sicuri della nostra stima e così via, no? Quindi, quantomeno vorremmo misurare
+31:35
+31 minutes, 35 seconds
+l'incertezza sui nostri parametri e dovute alle osservazioni che abbiamo. E d'altra parte una volta che abbiamo
+31:42
+31 minutes, 42 seconds
+l'incertezza sui parametri, cioè ci rendiamo conto, siamo capaci di misurare di quanto non siamo sicuri su questa scelta di parametri dati dal metodo dei
+31:50
+31 minutes, 50 seconds
+minimi quadrati, a sua volta poi i parametri, questa incertezza si propagherà sulle nostra previsione. Ok?
+31:58
+31 minutes, 58 seconds
+Quindi potremmo dire che non siamo neanche troppo sicuri su quanto sarà il valore di hx teta. Perché se non eravamo sicuri di di teta, cioè il teta dei
+32:07
+32 minutes, 7 seconds
+minimi quadrati va bene, ma non siamo completamente sicuri che sia giusto, allora possiamo propagarlo e dire anche hxa, non sarà non saremo completamente
+32:15
+32 minutes, 15 seconds
+sicuri. E a loro volta, nel momento in cui vogliamo fare una previsione, attenti che dobbiamo renderci conto che
+32:22
+32 minutes, 22 seconds
+non soltanto la previsione è hx teta, cioè quella sì è un valore di previsione, ma se vogliamo dire quanto siamo sicuri sulla previsione, che è il
+32:30
+32 minutes, 30 seconds
+punto importante, eh dovremmo incorporare il fatto che abbiamo anche il rumore, no? Vi ricordate? Il rumore l'abbiamo modellizzato dicendo c'è un
+32:38
+32 minutes, 38 seconds
+residuo gausiano. A volte diciamo che è un gausiano, ma potremmo anche fare a meno di ipotizzare che sia un rumore gausiano, ma sicuramente c'è un po' di
+32:46
+32 minutes, 46 seconds
+rumore. Il nostro modello non fitta esattamente i dati. Ok? Quindi vogliamo quantificare tutta questa incertezza.
+32:54
+32 minutes, 54 seconds
+Come si fa a quantificare l'incertezza? Eh, allora si può fare in due modi.
+33:00
+33 minutes
+Poi se avete altri modi mi vengono in mente è interessante, ok? Però diciamo vi racconto due modi. Il primo è un modo non parametrico che può funzionare
+33:09
+33 minutes, 9 seconds
+sempre ed è basato sull'idea di Bootstrap che vedremo ora. È una specie di validazione crociata, ok? Quindi uno
+33:17
+33 minutes, 17 seconds
+non fa troppe ipotesi e dice "Ok, ho questi dati, devo dire che sono in qualche modo incerto su questi dati ora vedremo come come inserisco l'incertezza usando questa tecnica di Bootstrap".
+33:30
+33 minutes, 30 seconds
+Eh, invece l'altro modo e, se volete più teorico, parte invece dall'idea ok, ho delle osservazioni, ma i miei dati
+33:37
+33 minutes, 37 seconds
+dovevano essere qualcosa, cioè provenivano da delle distribuzioni, ad esempio, gaussiane o delle distribuzioni
+33:44
+33 minutes, 44 seconds
+di altra natura. Quindi inserisco eh delle ipotesi molto forti apparentemente sui dati. Poi nella pratica ora vi mostrerò che funzionano tanto bene
+33:52
+33 minutes, 52 seconds
+quanto quello parametrico in situazioni normali e però appunto inserisco delle ipotesi e poi faccio dei conti più analitici. Allora possiamo complementare
+34:01
+34 minutes, 1 second
+appunto la stima puntuale con degli intervalli di fiducia, intervalli di credibilità. Va bene? Quindi ci
+34:08
+34 minutes, 8 seconds
+occupiamo di queste due cose e perché è importante? perché altrimenti eh finiamo a fare machine learning invece di fare
+34:16
+34 minutes, 16 seconds
+statistica. Cioè tendenzialmente nella statistica abbiamo anche pochi dati, ma riusciamo a quantificare bene le nostre le nostre stime, le nostre previsioni.
+34:25
+34 minutes, 25 seconds
+Nell'ambito, se volete tutto opposto è quello del machine learning in cui avete tantissimi dati, anche modelli complicati, si riesce ad avere una stima
+34:33
+34 minutes, 33 seconds
+puntuale, no? Ma non si riesce a quantificare bene l'incertezza, quindi ci sono questi due estremi volendo. Ok?
+34:41
+34 minutes, 41 seconds
+Quindi se il corso è di statistica, facciamo statistica e quantifichiamo la nostra incertezza.
+34:47
+34 minutes, 47 seconds
+Allora, però tante di queste idee funzionano anche nel nel machine learning, ovviamente. Allora, vediamo un pochino cosa cos'è questo approccio non
+34:54
+34 minutes, 54 seconds
+parametrico. Cominciamo da questo che, secondo me, più accessibile. Allora, e il termine è quello di Bootstrap, ma
+35:01
+35 minutes, 1 second
+l'idea e segue proprio dall'idea di tirarsi su eh sui propri stivali. Vabbè, è tutta una storia che che è anche il
+35:10
+35 minutes, 10 seconds
+motivo per cui quando avviate un computer si chiama appunto Bootstrap, anche quello del computer. Ok? Si tira su da solo questo metodo, ok? Si tira su
+35:18
+35 minutes, 18 seconds
+sui propri stivali. Eh, vabbè, c'è un racconto del barone di Munkausen su questo. Vabbè, allora l'idea qual è?
+35:25
+35 minutes, 25 seconds
+L'idea è che io non ho altri dati se non quelli che ho osservato. Come faccio a quantificare l'incertezza?
+35:33
+35 minutes, 33 seconds
+Beh, faccio finta, cioè genero dei dati nuovi partendo da quelli che ho osservato. Quindi, anche se non conoscono la distribuzione dei dati,
+35:42
+35 minutes, 42 seconds
+quella teorica, posso comunque basarmi sulle mie n osservazioni. Ho queste n osservazioni, quindi le uso, le riciclo,
+35:50
+35 minutes, 50 seconds
+vedremo adesso come le riciclo, ma costruisco delle delle dei dati generati un po' finti che però dovrebbero assomigliare comunque a quelli teorici.
+36:00
+36 minutes
+Ok? E qual è il modo più semplice?
+36:03
+36 minutes, 3 seconds
+Questo Bootstrap cosa dice? Beh, abbiamo questo insieme di n osservazioni Xi, Y I con i che va da 1 a N. Allora, facciamo
+36:11
+36 minutes, 11 seconds
+così, fate finta che sia un sacchetto, si piglia una estrazione e la si mette qui, la si genera, poi se ne prende un'altra e così via. Ora, se facessimo
+36:19
+36 minutes, 19 seconds
+estrazioni, no, senza rimpiazzo e noi vogliamo estrarre N, c'è poco da fare, le estraiamo tutte. Ok? Allora, quello
+36:29
+36 minutes, 29 seconds
+che si fa nel Bootstrap è di dire "Ok, si prende un'osservazione, la si osserva, la si mette nel nostro nel nostro training set generato, però poi
+36:36
+36 minutes, 36 seconds
+la si rimette dentro, cioè si fanno estrazioni con rimpiazzo." Ok? In questo modo potrà capitare, anzi dovrà capitare
+36:44
+36 minutes, 44 seconds
+che delle osservazioni vengono ripetute, ok? Quindi avete dei training set in cui sono casuali, sono un po' generati,
+36:52
+36 minutes, 52 seconds
+sempre riflettono quello che avevate in origine, ma alcune osservazioni vengono ripetute più volte. Ok?
+36:58
+36 minutes, 58 seconds
+Però la cosa interessante è che possiamo farne quante vogliamo di questi trading set, ok? Ne facciamo uno, ne facciamo due, ne generiamo un certo numero B
+37:07
+37 minutes, 7 seconds
+grande, ok? Numero di di finti training set generati, ok? Quindi questi training set saranno
+37:15
+37 minutes, 15 seconds
+tutti leggermente diversi, ma dovrebbero avere in un in un certo senso rispecchiano, no? sono degli stimatori comunque della nostra distribuzione
+37:23
+37 minutes, 23 seconds
+effettiva dei dei dati XY che non conosciamo. Allora, per ogni training set generato, adesso noi andiamo a
+37:31
+37 minutes, 31 seconds
+stimare i parametri del modello, in questo caso modello lineare, ma potrebbe essere un qualsiasi modello in realtà su questi questi dati. Quindi per il primo
+37:39
+37 minutes, 39 seconds
+training set generato troveremo un parametro teta OLS1 per i minimi quadrati. sul primo training set, poi
+37:48
+37 minutes, 48 seconds
+sul secondo avremo un altro parametro theta fino a B. Quindi alla fine abbiamo B di questi parametri.
+37:54
+37 minutes, 54 seconds
+Perfetto che sono tutti leggermente diversi. Ora vi mostro cosa succede in pratica, però a quel punto ne avete B, avete una specie di distribuzione
+38:03
+38 minutes, 3 seconds
+empirica, no, di questi possibili parametri e a quel punto potete fare delle stime. Uno dice: "Ok, il mio B originario era quello che avevo stimato
+38:12
+38 minutes, 12 seconds
+su tutto il training set. Qual è invece la media?
+38:15
+38 minutes, 15 seconds
+dei miei parametri generati tramite i Bootstrap è 1 su B il numero di campioni generati e poi faccio la somma dei di
+38:23
+38 minutes, 23 seconds
+questi vettori. Questo mi dice più o meno qual è la media di quelli generati da Boostrap e posso fare anche la varianza o posso fare i quantili. Adesso
+38:31
+38 minutes, 31 seconds
+vediamo ottenete degli intervalli di di confidenza, ok? Questa, ad esempio, è la varianza più che sigma quad sarebbe
+38:38
+38 minutes, 38 seconds
+forse una una sigma maiuscola quadro, una varianza, insomma.
+38:44
+38 minutes, 44 seconds
+Ok? Beh, vediamo un po' in pratica cosa succede. È più facile da, cioè non è che ci sono tante formule da dire, va implementato questo metodo. Allora, quindi questo è il solito campione di
+38:53
+38 minutes, 53 seconds
+dati generati, quello con tutte le osservazioni e la stima su tutto il training set ci dà un'intercetta di 2,9
+39:02
+39 minutes, 2 seconds
+pendenza 4,11. Ok? Questo sarebbe il teta OLS, sarebbe beta0 e beta1.
+39:09
+39 minutes, 9 seconds
+Ok? Cosa succede se invece comincio a fare questo Bootstrap? Va bene. Ora, in effetti un'altra cosa che potevo plottare, magari lo vediamo mercoledì,
+39:18
+39 minutes, 18 seconds
+eh, uno vedrebbe che effettivamente se scelgo campioni generati le rette cambiano un pochino pendenza e cambiano un pochino eh intercetta. Ok? Qui ad
+39:27
+39 minutes, 27 seconds
+esempio ho plottato soltanto il coefficiente della pendenza. Ok? Quindi, a seconda dei vari dati che ho generato, trovo una pendenza. Si vede poco. È è quella leggermente un po' più scura.
+39:39
+39 minutes, 39 seconds
+Forse qua si vede meglio sullo schermo.
+39:41
+39 minutes, 41 seconds
+Ehm, vedete, ci sono dei dati in cui la pendenza è molto bassa, dei dati in cui la pendenza è molto alta.
+39:47
+39 minutes, 47 seconds
+Tendenzialmente la media di Bootstrap è vicina alla stima su tutti i dati, ok?
+39:53
+39 minutes, 53 seconds
+Quella blu è la stima su tutti i dati, quella rosso è la media di Bootzrap.
+39:57
+39 minutes, 57 seconds
+Quello che interessa di più è soprattutto la variabilità. Vedete, ci sono de delle situazioni in cui ho scelto dei dati campionando e ho ottenuto il coefficiente angolare molto
+40:06
+40 minutes, 6 seconds
+basso. Altre situazioni in cui è molto grande. Ok? Quindi alla fine però cosa farò? Ho questa distribuzione, questa questa questa questo istogramma, questa
+40:15
+40 minutes, 15 seconds
+distribuzione empirica e ad esempio se mi interessa di dire un intervallo di confidenza, posso cercare un intervallo
+40:23
+40 minutes, 23 seconds
+in cui si trovi, che so il 95% dei miei campioni generati, no? 95% dei campioni
+40:30
+40 minutes, 30 seconds
+generati eh e rit cadeva in questo intervallo. Ok? E questo mi dà quindi una una stima non soltanto puntuale di
+40:39
+40 minutes, 39 seconds
+qual è il parametro ottimale, ma anche di un intervallo di incertezza dovuto ai dati che avevo. Ok? Vediamo se eh
+40:49
+40 minutes, 49 seconds
+Ah, non l'ho disegnato. Vabbè, lo lo ce l'abbiamo più avanti sicuramente.
+40:56
+40 minutes, 56 seconds
+Ok, quindi sicuramente avete introdotto una certa variabilità nei dati quando invece i dati apparivano una cosa abbastanza statica. Questi sono stati quelli avete e quelli dovreste usare.
+41:06
+41 minutes, 6 seconds
+Ok? Allora, qualcuno potrebbe avere il dubbio che Bootstrap alla fine sia una specie di cross validation, perché anche
+41:14
+41 minutes, 14 seconds
+con la cross validation avevamo detto devo stimare qualcosa che mi riguardava il mio test set. Avevo diviso i dati,
+41:22
+41 minutes, 22 seconds
+avevo creato, no, dei dei training set artificiali, tipo pensate la Kefold Cross Validation, no? Dividete, avete
+41:29
+41 minutes, 29 seconds
+quindi un grosso training set e poi dei dei test. Ora, in effetti si somigliano molto come tecniche e sarebbero anche
+41:37
+41 minutes, 37 seconds
+abbastanza scambiabili, non è che uno deve fare usare solo Bootstrap o solo cross validation. Tendenzialmente la l'idea è che l'obiettivo è leggermente
+41:45
+41 minutes, 45 seconds
+diverso perché quando fate Bootstrap vi interessa capire come variano i parametri di un modello al variare dei
+41:53
+41 minutes, 53 seconds
+dati e quindi cosa fate? tendenzialmente campionate su tutto il training set e non vi interessano tanto i questo
+42:02
+42 minutes, 2 seconds
+questa piccola differenza pure importante che i dati possono essere ripetuti perché le estrazioni sono corpiazzo e tendenzialmente l'attenzione
+42:10
+42 minutes, 10 seconds
+è sui dati che avete campionato, cioè voi pensate li prendete i vostri dati, le mettete in un bel sacchetto e quello vi crea un dataset, ok? e vi interessano
+42:19
+42 minutes, 19 seconds
+quelli che avete raccolto, non quelli che non avete raccolto tendenzialmente.
+42:23
+42 minutes, 23 seconds
+Nella cross validation invece la cosa è un po' diversa perché vi interessa capire la la performance tendenzialmente e state attenti quando fate la divisione
+42:32
+42 minutes, 32 seconds
+di prendere dei dati, sì, ma li mettete nel training set e altri dati che sono diversi li mettete nel test set perché
+42:39
+42 minutes, 39 seconds
+vi ricordo se voi fate allenamento su un training set poi la previsione tendenzialmente sarà buona sul training set, no? Abbiamo visto anche con KNN che
+42:48
+42 minutes, 48 seconds
+l'errore sul training set era decisamente più basso. Ok? Quindi la cross validation è più che altro eh l'interesse è sui dati, sul test set,
+42:57
+42 minutes, 57 seconds
+quelli che sono rimasti fuori. Ok? Ora però ovviamente nulla vieta di di usare Bootstrap per la cross validation, anzi
+43:04
+43 minutes, 4 seconds
+se usate il pacchetto Caret alla fine faceva anche Bootstrap per la cross validation. Anzi vedremo mercoledì insomma funziona. Qual è la differenza?
+43:13
+43 minutes, 13 seconds
+che uno deve stare attento e dire "Ok, mentre faccio il mio il mio il mio insomma dataset generato con Bootstrap
+43:20
+43 minutes, 20 seconds
+avrò alcuni dati che ho raccolto, che ho campionato e poi sono quelli che sono rimasti fuori dal sacchetto dove ho messo tutti i dati di training set.
+43:28
+43 minutes, 28 seconds
+Quelli li chiamo dati out of bag e allora quelli li posso usare come test set. Ok? Quindi anche Bootstrap si può
+43:35
+43 minutes, 35 seconds
+usare come procedura per la cross validation. Viceversa si potrebbe usare cross validation per fare per fare la stima della degli intervalli di di
+43:45
+43 minutes, 45 seconds
+confidenza. Ok? Quindi vabbè, però così avete visto sia Bootstrap che cross validation. Tendenzialmente questo è l'uso canonico, cioè Bootstrap in questo
+43:54
+43 minutes, 54 seconds
+senso e cross validation nell'altro, però nulla vieta di di fare cose diverse.
+44:00
+44 minutes
+Allora, vi dicevo, quando uno fa Bootstrap trova queste distribuzioni, no, empiriche dovute ai vari dataset che
+44:06
+44 minutes, 6 seconds
+uno ha generato e però vorrebbe un modo per indicare appunto quanto incertezza abbiamo sui nostri parametri. Allora, come si fa a indicare l'incertezza?
+44:17
+44 minutes, 17 seconds
+Chi di voi non aveva mai fatto statistica uno? Se c'è ancora sono già scappati quelli che hanno fatto statistica uno. Ok? Allora, un modo di
+44:26
+44 minutes, 26 seconds
+quantificare l'incertezza è usare gli intervalli di confidenza.
+44:31
+44 minutes, 31 seconds
+Ok? Allora, eh ci sono tanti modi di parlare di intervalli di confidenza, però l'idea quale sarebbe? che uno vuole
+44:39
+44 minutes, 39 seconds
+un intervallo intorno a un valore di interesse in cui sappiamo che con alta confidenza, con alta, insomma,
+44:46
+44 minutes, 46 seconds
+significatività, usatelo in tanti modi, con alta probabilità, uno dovrebbe dire il parametro si trova lì dentro. Ora bisogna stare attenti al modo in cui si
+44:54
+44 minutes, 54 seconds
+precisa questo significato, però ad esempio nel caso di intervalli per il Bootstrap generati da Bootstrapazione è abbastanza semplice perché uno ha
+45:03
+45 minutes, 3 seconds
+generato B campioni. Per ogni campione, per ogni training set ha generato un
+45:10
+45 minutes, 10 seconds
+parametro, quindi ha questi istogrammi che vi disegnavo prima, no? E quindi a quel punto cosa cerca? Beh, cerca i quantili empirici, no? Vi ricordate?
+45:20
+45 minutes, 20 seconds
+Faccio che so se voglio un intervallo al 95% cercherò di lasciare un 2,5% a
+45:28
+45 minutes, 28 seconds
+sinistra e un 2,5% a destra e mi troverò un bell'intervallo che contiene il 95% delle mie osservazioni. Ok? Quindi in
+45:36
+45 minutes, 36 seconds
+generale uno prende la distribuzione empirica, calcola il quantile di livello alfa/2 e il quantile di livello 1 -
+45:43
+45 minutes, 43 seconds
+alfa/2, ok? Di cosa? della distribuzione empirica proprio di quelle che uno ha osservato. Quindi non è che vi posso dare delle formule su queste. Ok?
+45:52
+45 minutes, 52 seconds
+Quindi, qual è l'interpretazione di questi intervalli? Attenti, dipende in realtà da dai dati che avete generato.
+45:58
+45 minutes, 58 seconds
+Ok? Questo che dice è che nel 95% dei miei dati generati
+46:05
+46 minutes, 5 seconds
+il il parametro si trovava dentro questa regione. Ok? Questo in realtà non dice molto su cosa succederà con nuovi dati,
+46:12
+46 minutes, 12 seconds
+ok? però almeno quantifica la mia incertezza sui dati che avevo a disposizione con questa procedura di di Bootstrap. Va bene? Quindi non soltanto
+46:21
+46 minutes, 21 seconds
+abbiamo la stima puntuale, ma abbiamo anche il mio intervallino. Ovviamente uno dice: "Ok, questo l'ho fatto sui dati che avevo, ma in realtà funzionerà
+46:28
+46 minutes, 28 seconds
+anche sui dati che non ho osservato, ma vabbè, questo insomma è un'estensione che uno può può fare, ma insomma non è quello che
+46:36
+46 minutes, 36 seconds
+effettivamente sta facendo, ma nella sua idea vorrebbe fare questo. Quindi vediamo cosa succede qui. Vedete la curva nera è la funzione di di
+46:45
+46 minutes, 45 seconds
+distribuzione della CDF empirica. Quindi cosa significa trovare l'intervallo di fiducia al livello 95%?
+46:53
+46 minutes, 53 seconds
+Significa che dobbiamo fissare qui il livello 2,5%. Ora non è proprio la scala giusta.
+47:00
+47 minutes
+Andiamo a vedere quando la funzione di ripartizione arriva e qua troviamo il primo quantile alfa mezzi perché devo
+47:08
+47 minutes, 8 seconds
+lasciarne 2,5% a destra e 2,5% a sinistra. E quindi di qua vado a trovare il livello cos'è? 97,5%.
+47:20
+47 minutes, 20 seconds
+Quando raggiungerà questo livello? Ora vabbè, sono qui, quindi cosa? Vabbè, non è proprio in scala la cosa. Questo mi dà l'altro quantile al livello 90 97,5%.
+47:33
+47 minutes, 33 seconds
+Ok? Quindi qual è l'intervallo di confidenza Bootstrap? È questo intervallo qua. Ok? Quindi andiamo da
+47:40
+47 minutes, 40 seconds
+3,9 a 4,2. Ok? L'ho fatto, l'ho stimato io a mano. Ok?
+47:45
+47 minutes, 45 seconds
+Quindi capite, il 95% dei nostri dei nostri campioni cade lì dentro. In
+47:53
+47 minutes, 53 seconds
+particolare ci cade anche ci cade anche la media di Bootstrap, ok? La mediana di Bootstrap ci vedrà per forza.
+48:02
+48 minutes, 2 seconds
+Ok? Allora, queste sono cose che chiaramente si si implementano, non è che ci sia molto di teorico da da spiegare. Ok?
+48:10
+48 minutes, 10 seconds
+Quindi, ad esempio, ora qui con i conti veri risulta che per il coefficiente di intercetta, che non è quello che vi ho mostrato, l'intervallo di Bootstrap è
+48:19
+48 minutes, 19 seconds
+266 317, quindi trovate un vero intervallo per la pendenza è 381 e 432, va bene? Quindi avete questo
+48:25
+48 minutes, 25 seconds
+intervallino a livello 95%, ovviamente se volessi un intervallo al 99% secondo voi sarà più grande o più piccolo?
+48:38
+48 minutes, 38 seconds
+Se voglio essere più sicuro sarà più grande, appunto, più è grande l'intervallo di cioè più è grande il livello, quindi più grande la
+48:46
+48 minutes, 46 seconds
+probabilità, più grande la frequenza, più grande sarà l'intervallo. Ok?
+48:51
+48 minutes, 51 seconds
+Quello che ha detto prima sul grafico di prima con le barre che ha fatto. Eh, esatto. Non ho capito.
+48:57
+48 minutes, 57 seconds
+Questo questa cosa qui. Ah, no, sì. Eh beh, perché voi dovete Allora, questa è la funzione di ripartizione, cioè vi
+49:03
+49 minutes, 3 seconds
+conta, fissato un valore t qui o per il coefficiente di pendenza vi conta, in realtà è la frazione perché è
+49:11
+49 minutes, 11 seconds
+normalizzata tra 0 e 1 eh sul totale del numero di di beta che sono tutti minori o uguali di t. Ok? Quindi andate a
+49:19
+49 minutes, 19 seconds
+contare. Vedete qui ad esempio qua ce n'è c'è uno solo. Beh, ora frequenza stranamente la scala un po' strana.
+49:27
+49 minutes, 27 seconds
+Vabbè, non mi fiderei al 100% di questa asse delle Y. Comunque qua direi che ce n'è uno. Ok, probabilmente mi ha messo come scala soltanto questa della CDF.
+49:37
+49 minutes, 37 seconds
+Comunque qua ce n'è uno, quindi qui comincia un po' a salire, no? Poi ce n'è un altro, poi un altro ancora. Qua ce ne sono tantissimi, quindi la vedi che sale
+49:44
+49 minutes, 44 seconds
+un po' di più questa curva. Ok, sto contando quanti sono le osservazioni minori o uguali di t. Ok? È una funzione
+49:51
+49 minutes, 51 seconds
+di di ripartizione si chiama. Si contano quante sono le osservazioni prima di t.
+49:55
+49 minutes, 55 seconds
+Ora noi vogliamo lasciare eh 2,5% di osservazione a sinistra, quindi troveremo quel tore
+50:03
+50 minutes, 3 seconds
+circa 2,5. Ok? Non è detto che lo troviamo esattamente e quello trovi ci darà il quantile del livello eh 2,5% e
+50:13
+50 minutes, 13 seconds
+quindi sarà l'istro sinistro e poi vogliamo lasciarne 2,5% a destra, quindi vuol dire che a sinistra dobbiamo lasciarne 1 - 2,5 che è 97,5%.
+50:24
+50 minutes, 24 seconds
+Ok? E questo ci individua esattamente un bell'intervallo. Ma ad esempio, se avessi voluto una cosa più semplice, avessi voluto un intervallo al 50%, mi
+50:32
+50 minutes, 32 seconds
+bastava trovare il primo quartile e il terzo quartile. Ok? È che tendenzialmente non ci si accontenta di un intervallo al 50%, ok? Uno vuole una
+50:41
+50 minutes, 41 seconds
+probabilità buona, insomma, 95% 99% sembra una buona, cioè sembra più grande, no? rispetto poi chiaramente
+50:49
+50 minutes, 49 seconds
+dipende dalle applicazioni, insomma, se uno vuole una stima, vuole sapere bene, vuole avere una una, cioè non si accontenta neanche del 99%, allora
+50:58
+50 minutes, 58 seconds
+dovrebbe aumentare beta e probabilmente anche Bootstrap non è il massimo come come metodo. Ok? E d'accordo. Quindi
+51:07
+51 minutes, 7 seconds
+questo fornisce degli intervalli per i parametri.
+51:12
+51 minutes, 12 seconds
+Ok? Adesso vediamo cosa succede, però nel momento in cui avete quantificato l'intervete
+51:20
+51 minutes, 20 seconds
+l'incertezza sui parametri che sono intercetta e pendenza.
+51:26
+51 minutes, 26 seconds
+Vi potete chiedere "Va bene, ma se ora prendo un dato X di test, posso dire quanta incertezza ho sulla sul mio modello?" Cioè h dix beta o hxa?
+51:38
+51 minutes, 38 seconds
+Sì, basta fare la stessa cosa con Bootstrap è molto semplice perché uno dice prendo un dato X fisso e ho
+51:46
+51 minutes, 46 seconds
+chiaramente tutte le mie chiamiamo le previsioni, ho i valori del mio modello hx beta o ls o hx teta o ls.
+51:57
+51 minutes, 57 seconds
+E cosa faccio? Beh, semplicemente per i vari valori di parametri che ho trovato faccio l'istogramma anche delle nostre h
+52:05
+52 minutes, 5 seconds
+di x teta I, no? Con i vari parametri che abbiamo ottenuto. E anche qui ottengo un altro istogramma. Questo
+52:12
+52 minutes, 12 seconds
+istogramma è relativo a che cosa? A il mio modello valutato nei diversi beta ottimali, nei valori nei diversi parametri ottimali. E di nuovo, se mi
+52:21
+52 minutes, 21 seconds
+interessa un intervallo di confidenza, faccio un guantile empirico, ne lascio 5% fuori e 95% dentro, se mi interessa il livello 95%.
+52:31
+52 minutes, 31 seconds
+Oppure posso fare la media, la deviazione standard, sono le soliti indicatori puntuali per una distribuzione di di dati. Ok? Quindi ad
+52:39
+52 minutes, 39 seconds
+esempio, uno lo calcola che nel valore x = 1,5 il modello di prima e l'intervallo di la media di Bootstrap è 9,5. Vabbè?
+52:50
+52 minutes, 50 seconds
+l'intervallo di confidenza risulta 857 945. Ora è chiaro che se questo mi interessa per ogni valore x, magari se riesco a fare un grafico è anche meglio.
+53:02
+53 minutes, 2 seconds
+E allora in effetti quello che si fa appunto abbiamo già visto anche la volta scorsa è di inserire queste queste bande, no, di intervalli. Eh, si vede
+53:10
+53 minutes, 10 seconds
+malissimo, perdonate scelta di colori, quindi però un pochino si vede. Avete questa banda intorno alla retta rossa.
+53:20
+53 minutes, 20 seconds
+Ora non è una banda uniforme, eh, perché dipende appunto da dal valore x che state considerando. Ad esempio, no? Se
+53:27
+53 minutes, 27 seconds
+andate in un X molto lontano, avete un valore X che è molto lontano dalla nuvola di punti, hai ragione, vuole aspettare che l'errore aumenti. Però c'è
+53:35
+53 minutes, 35 seconds
+una cosa che salta all'occhio. Uno dice "Vabbè, questa banda ora non la vedete forse benissimo, ma comunque molto più sottile rispetto a effettivamente alla
+53:43
+53 minutes, 43 seconds
+variabilità dei miei dati, cioè i dati non rientrano dentro questa banda perché perché stiamo soltanto plottando
+53:50
+53 minutes, 50 seconds
+l'incertezza del modello relativa ai parametri. non abbiamo aggiunto la parte di rumore, ok?
+53:58
+53 minutes, 58 seconds
+C'è una parte di rumore che dice questa è ineliminabile, dovrò in qualche modo aggiungerla.
+54:03
+54 minutes, 3 seconds
+Quindi quello che si fa e infatti fate attenzione, non non insomma se vi interessa l'incertezza della previsione
+54:11
+54 minutes, 11 seconds
+del modello plotate quella barra lì, altrimenti dovete plottare quello che si chiama un intervallo di fiducia sulla previsione del modello. Ok? Quindi,
+54:20
+54 minutes, 20 seconds
+quando fate un intervallo, che è quello che di solito interessa di più, eh dovete anche tenere conto del rumore, ok? Quindi non soltanto c'è
+54:28
+54 minutes, 28 seconds
+l'incertezza, dicevo, dovuta al fatto che beta non è completamente noto non siamo sicuri che beta sia quello lì, ma anche abbiamo un intervallo, una
+54:36
+54 minutes, 36 seconds
+ulteriore fonte di rumore che è il residuo. Ok? Questo anche intuitivamente allargherà la nostra banda perché abbiamo non soltanto l'incertezza dovuta
+54:45
+54 minutes, 45 seconds
+ad h di x beta, ma anche l'incertezza dovuta al rumore. Ok? Allora, questo è l'intervallo di previsione, ma anche
+54:53
+54 minutes, 53 seconds
+questo si può fare con Bootstrap. Ora, la questione è un po' più delicata, non entriamo nei dettagli qui, perché il punto è questo che per ogni dato di
+55:02
+55 minutes, 2 seconds
+Bootstrap, per ogni dataset generato con Bootstrap, posso calcolare i parametri ottimali,
+55:10
+55 minutes, 10 seconds
+però posso anche stimare posso anche stimare i residui. Ok? Bisogna stare leggermente attenti perché quando vi
+55:18
+55 minutes, 18 seconds
+ricordo voi stimate i residui state comunque facendo il minimo quadrati su quei dati. Quindi in realtà la vera
+55:24
+55 minutes, 24 seconds
+stima che interesserebbe sarebbe i residui sui dati che non avete visto.
+55:29
+55 minutes, 29 seconds
+Ok? Quindi allora bisogna stare un po' attenti, c'è un procedura un po' di di media e tendenzialmente i residui li
+55:37
+55 minutes, 37 seconds
+stimate con i dati di Bootstrap che non avete selezionato, quindi fate una specie di cross validation per stimare la distribuzione dei residui, quindi
+55:45
+55 minutes, 45 seconds
+usate i punti out of bagare i residui. Ok? Ora non entro nei dettagli di come viene fatto, ma appunto
+55:52
+55 minutes, 52 seconds
+quindi avete una una un'interazione anche tra i dati che avete considerato e quelli rimasti fuori. Questa è la parte più noiosa per i Bootstrap perché è un po' anche un po' empirica.
+56:02
+56 minutes, 2 seconds
+Però cosa succede nella pratica? Quindi avete lì, avete questi dati, questi beta i che vi danno un istogramma a cui però
+56:09
+56 minutes, 9 seconds
+avete aggiunto anche gli i, quindi avete questo Instagram con i dati incluso il rumore e a quel punto procedete poi allo stesso modo, cioè fate un intervallo di
+56:17
+56 minutes, 17 seconds
+fiducia, un intervallo eh empirico con i quant, la media, la deviazione standard e così via.
+56:24
+56 minutes, 24 seconds
+E quindi attenzione, appunto, questi intervalli che trovate sono più ampi.
+56:28
+56 minutes, 28 seconds
+Vediamo il grafico direttamente, dopo torniamo sui numeri. Eccolo qua.
+56:33
+56 minutes, 33 seconds
+Eh, ora prima non lo vedevate neanche perché era in giallo, ora non si vede perché è sovrapposto con quello blu. Comunque avete un intervallo più ampio.
+56:40
+56 minutes, 40 seconds
+Vi faccio osservare che questi sono calcolati tramite Bootstrap, quindi vedete anche un po' di, insomma, di rumorosità così. non è proprio una un intervallo bello liscio perché quelli
+56:49
+56 minutes, 49 seconds
+vengono dai metodi, insomma, parametrici. Eh, quello che però osserviamo adesso è che la maggior parte dei dati rientra dentro l'intervallo di
+56:57
+56 minutes, 57 seconds
+previsione. Questa è una bella cosa, cioè, stiamo tenendo conto non soltanto della previsione, dell'incertezza, ma anche di del rumore aggiuntivo che hanno
+57:04
+57 minutes, 4 seconds
+i dati e quindi con probabilità, diciamo, con sicurezza 95% possiamo dire che i dati cadono dentro
+57:11
+57 minutes, 11 seconds
+quella banda. Ok? Ora, attenti, vedete che comunque ci sono dati che cadono fuori. Vabbè, non è non è vietato.
+57:17
+57 minutes, 17 seconds
+Questi sono un centinaio di dati, ci sta che qualcuno rimanga fuori. Ok, ma perché l'intervallo di confidenza
+57:24
+57 minutes, 24 seconds
+si va restring c'è il restringimento nel mezzo dell'intervallo di confidenza?
+57:30
+57 minutes, 30 seconds
+Beh, perché lì è dovuto al fatto che non si vede tantissimo perché l'intervallo di confidenza puoi pensarlo come l'intervallo eh di confidenza sul
+57:39
+57 minutes, 39 seconds
+modello, quindi sul fatto che abbiamo quel beta che non è completamente noto e quello mano mano che ti allontani insomma aumenta un pochino, cioè quella
+57:48
+57 minutes, 48 seconds
+fascia gialla che non si vede più il il residuo, cioè insomma il rumore sui dati e quindi in effetti è più largo agli
+57:55
+57 minutes, 55 seconds
+estremi perché c'è l'errore, c'è l'intervallo di confidenza giallo che è sommato al residuo. Potresti pensare che il residuo è una è una fascia che
+58:03
+58 minutes, 3 seconds
+aggiungi a tutti, non è proprio così in realtà. E poi però ci aggiungi il l'altro intervallo che è quello che si allarga mano mano che ti allontani dai dati. Ok.
+58:13
+58 minutes, 13 seconds
+Allargo perché prevede di avere più residui mano che vado più lontano.
+58:17
+58 minutes, 17 seconds
+Eh beh, no, diciamo, ora vediamo delle formule. Nel caso parametrico è più evidente perché succede questo. Ok.
+58:23
+58 minutes, 23 seconds
+Comunque in effetti è minore certamente lì dentro se ci pensate è minore perché Ok. intuitivamente avete questa nuvola
+58:31
+58 minutes, 31 seconds
+di punti che che lì è concentrata, quindi è chiaro che lì ci sarà meno incertezza. Lì ho avuto localmente lì ho avuto più osservazioni, ok? Quindi lì
+58:40
+58 minutes, 40 seconds
+dovrebbe esserci un po' meno incertezza, ecco, diciamo così. Quindi nei punti lontani da quelli che ho osservato lì l'incertezza deve aumentare, insomma non
+58:48
+58 minutes, 48 seconds
+è eh tenessi conto del fatto che posso sbagliare di più. Esatto. Sì, qui sono lontano, ho pochi dati, pochi esempi e
+58:55
+58 minutes, 55 seconds
+quindi non sono capace di di quantificare bene. Cioè, avviene un'incertezza più grande, non tantissima in questo modello, ma insomma.
+59:03
+59 minutes, 3 seconds
+Ecco, vediamolo poi numericamente. Cioè, ad esempio, quindi uno prende un punto di test x 1,5, la media di Bootstrap risulta 9.
+59:15
+59 minutes, 15 seconds
+Allora, l'intervallo di previsione Bootstrap, che è quello che include il rumore, quando parlate di intervallo di previsione,
+59:23
+59 minutes, 23 seconds
+qualunque metodo usiate, state comunque includendo il rumore. Beh, risulta 7,6 e 1156.
+59:29
+59 minutes, 29 seconds
+Quando invece fate solo l'intervallo di confidenza, cioè quello lì relativo al modello senza il rumore, avete un intervallo più piccolo perché avete 857
+59:38
+59 minutes, 38 seconds
+945. Quindi attenti, quando qualcuno vi presenta, soprattutto a voi anche quando presentate, eh chiedetevi interessa di
+59:46
+59 minutes, 46 seconds
+più l'intervallo di previsione o l'intervallo di confidenza, cioè voglio includere il rumore o no? Perché altrimenti se se giocate un po',
+59:54
+59 minutes, 54 seconds
+insomma, sono quelle situazioni un po' borderline in cui uno magari presenta un grafico e può sembrare che le cose siano meglio di quello che che è in realtà.
+1:00:02
+1 hour, 2 seconds
+Ok? Quindi attenti su su questo, va bene. Potremmo avere pochissima errore, no, nell'intervallo di
+1:00:10
+1 hour, 10 seconds
+confidenza, ma tantissimo rumore e quindi la previsione è pessima. Quindi se siete in questa situazione fatelo
+1:00:17
+1 hour, 17 seconds
+presente. Potenzialmente metteteli tutti e due, insomma, se non sapete quale quale dei due è più interessante.
+1:00:25
+1 hour, 25 seconds
+Va bene? Allora, spero che Bootstrap, insomma, è abbastanza empirico, ma funziona. Funziona in pratica. Però qual è qual è il problema secondo voi di Bootstrap? Quale potrebbe essere il
+1:00:33
+1 hour, 33 seconds
+problema di questo metodo che vi ho presentato? Dove dove potrebbe stare l'inghippo?
+1:00:40
+1 hour, 40 seconds
+Se uno vuole avere delle buone stime, quanti quanti sacchetti di dati dovrà preparare?
+1:00:49
+1 hour, 49 seconds
+Eh, insomma, non può accontentarsi di 1 2 3 sa che dovrà farne un gran numero.
+1:00:53
+1 hour, 53 seconds
+Ok, non quantifichiamo. Però il punto è ogni volta che preparo i miei dati, cosa devo fare? Devo stimare i parametri
+1:01:00
+1 hour, 1 minute
+ottimali. Quindi se il vostro modello è molto complicato, ora i modelli lineari non è il caso, però ci sono modelli,
+1:01:08
+1 hour, 1 minute, 8 seconds
+questo bootstrap funzionerebbe in teoria non ho mai detto che il modello deve essere lineare, no? Quindi se il modello costa tantissimo, il training del
+1:01:15
+1 hour, 1 minute, 15 seconds
+modello è molto costoso, fare Bootstrap, no, si rivela una strategia perdente, no? perché a quel punto dovete fare
+1:01:23
+1 hour, 1 minute, 23 seconds
+tantissimi di questi simulazioni, fare tantissimo training soltanto per vedere un piccolo intervallino. Ecco, allora,
+1:01:30
+1 hour, 1 minute, 30 seconds
+vabbè, non è forse l'unico motivo, ma uno potrebbe preferire un approccio diverso, cioè diciamo parametrico.
+1:01:38
+1 hour, 1 minute, 38 seconds
+Parametrico in che senso? Beh, uno cerca di stabilire delle distribuzioni di probabilità perché Bootstrap non fa praticamente
+1:01:46
+1 hour, 1 minute, 46 seconds
+nessuna ipotesi. Lui dice: "Io ho visto questi dati, ora genero nuovi dati partendo da quelle". Invece nell'approccio parametrico uno
+1:01:53
+1 hour, 1 minute, 53 seconds
+stabilisce delle ipotesi sui param eh notato sì sia sui parametri ma anche sulle osservazioni e in particolare sui
+1:02:01
+1 hour, 2 minutes, 1 second
+residui. Quindi l'ipotesi fondamentale che faremo che farà partire per noi l'approccio parametrico, poi si può anche cambiare, è di imporre che i residui siano delle variabili gausiane.
+1:02:12
+1 hour, 2 minutes, 12 seconds
+Vi ricordate? Questo l'abbiamo già visto la volta scorsa, era un'ipotesi interessante perché faceva coincidere il
+1:02:19
+1 hour, 2 minutes, 19 seconds
+metodo dei minimi quadrati con una stima di massima verosimiglianza. Questa ci piaceva perché in statistica la stima di
+1:02:27
+1 hour, 2 minutes, 27 seconds
+massima verosimiglianza è forse la prima stima che uno che uno trova. Ok? Quindi i parametri diciamo beta di minimi quadrati e sigma quadro.
+1:02:37
+1 hour, 2 minutes, 37 seconds
+Eh beh, ora diciamo scritta così non è il massimo.
+1:02:42
+1 hour, 2 minutes, 42 seconds
+Diciamo il parametro beta dei minimi quadrati era quella che massimizzava il beh, no, anche il sigma quadro. Va
+1:02:50
+1 hour, 2 minutes, 50 seconds
+bene, forse abbiamo visto solo per beta noi, non abbiamo visto anche la varianza. Comunque se uno massimizza la verosimiglianza con le ipotesi che siano
+1:02:57
+1 hour, 2 minutes, 57 seconds
+gausiane trova che sta risolvendo i medi quadrati. essenzialmente, forse, per come l'abbiamo visto, riguardava soltanto beta, quindi tenete fisso sigma
+1:03:06
+1 hour, 3 minutes, 6 seconds
+quadro. Ecco, va bene? E però d'altra parte se uno insomma trova anche il sigma che massimizza i minim quadrati
+1:03:14
+1 hour, 3 minutes, 14 seconds
+trova che in effetti il sigma quadro, cioè la varianza, no, dei nostri residui, risulta proprio con il metodo
+1:03:22
+1 hour, 3 minutes, 22 seconds
+dei mini quadrati risulta proprio l'errore quadratico medio e valutato sul modello ottimale. Ok? Questo è un conto
+1:03:29
+1 hour, 3 minutes, 29 seconds
+che forse l'altra volta non abbiamo fatto, ma adesso lo lo recuperiamo in un attimo. Ok? Allora, l'obiettivo però qual è?
+1:03:37
+1 hour, 3 minutes, 37 seconds
+Diciamo non è tanto di avere la stima puntuale, cosa che abbiamo già già fatto, abbiamo anche la formula generale nel caso lineare, ma trovare
+1:03:45
+1 hour, 3 minutes, 45 seconds
+l'incertezza, no? Allora, come si fa a stimare l'incertezza sui parametri e poi sulla previsione del modello in modo,
+1:03:52
+1 hour, 3 minutes, 52 seconds
+diciamo, partendo da questa ipotesi, senza aggiungere troppo di più, insomma.
+1:03:57
+1 hour, 3 minutes, 57 seconds
+Allora, ci sono almeno due approcci di voi quindi hanno visto statistica uno, siete molto consapevoli
+1:04:05
+1 hour, 4 minutes, 5 seconds
+sull'approccio frequentista. Io però vi presento entrambi perché magari poi nella vita incontrerete qualcuno che preferisce l'altro approccio e di
+1:04:14
+1 hour, 4 minutes, 14 seconds
+conseguenza magari siete un po' non non siete sullo stesso piano. Allora, gli approcci sono tendenzialmente due, cioè quello baesiano e quello frequentista.
+1:04:23
+1 hour, 4 minutes, 23 seconds
+Poi siete liberi di scegliere cosa preferite e tendenzialmente vi dico quando uno quando uno funziona meglio e quale l'altro funziona un po' meglio.
+1:04:31
+1 hour, 4 minutes, 31 seconds
+Allora, nell'approccio baesiano, che è lo stesso che abbiamo visto all'epoca anche per la classificazione, no? Vi ricordate? Uno cosa dice? Uno parte da
+1:04:39
+1 hour, 4 minutes, 39 seconds
+dei parametri e suppone che i parametri siano aleatori.
+1:04:43
+1 hour, 4 minutes, 43 seconds
+E perché sono aleatori? Perché sono cose che non conosciamo. Quindi i parametri sono aleatori perché sono tutto quello che non è noto sono variabili aleatorie.
+1:04:51
+1 hour, 4 minutes, 51 seconds
+Poi i dati, le nostre osservazioni invece che sono quelle sono fissi, sono osservati. Non faccio Bootstrap, non
+1:04:57
+1 hour, 4 minutes, 57 seconds
+faccio genero, dati allucinati, non faccio cose strane, dico semplicemente i dati sono quelli, ormai sono fissi. Ok?
+1:05:06
+1 hour, 5 minutes, 6 seconds
+Allora, come si fa poi a far partire il meccanismo baisiano? Uno doveva dire a priori mi aspettavo che i parametri fossero distribuiti in un certo modo, magari anche in un modo banale, ma
+1:05:14
+1 hour, 5 minutes, 14 seconds
+comunque va stabilito. Poi calcolo dopo aver osservato i dati, qual è la distribuzione dei miei parametri usando la formula di bees e per questo si
+1:05:23
+1 hour, 5 minutes, 23 seconds
+chiama approccio baesiano e poi a quel punto posso dire ho le mie distribuzioni a posteriori, posso dire, ad esempio, trovare un
+1:05:31
+1 hour, 5 minutes, 31 seconds
+intervallo di fiducia o nella statistica baesiana si chiamano di credibilità per distinguerli un po' dagli altri. Perché
+1:05:38
+1 hour, 5 minutes, 38 seconds
+cosa si fa? Sapendo che ho osservato questi dati D, trovo un intervallo che dipende dai dati e cosa dico? Che la
+1:05:47
+1 hour, 5 minutes, 47 seconds
+probabilità che il parametro che non conoscevo che cada nell'intervallo è almeno 1 - alfa che sono fatte 95% o 99%
+1:05:56
+1 hour, 5 minutes, 56 seconds
+così via. E questo si farà trovando i quantili, come facciamo noi Bootstrap con i quantili empirici, ora qua ci sono i quantili teorici. Ora non è detto che
+1:06:05
+1 hour, 6 minutes, 5 seconds
+ci siano proprio formule anche qui poi ci sono tutti i metodi numerici, anche Montecarlo si chiamano per per approssimare queste questi intervalli,
+1:06:13
+1 hour, 6 minutes, 13 seconds
+però in linea teorica se ho delle formule tanto meglio usarle. Poi c'è anche un'altra parte, diciamo, quella dei test, ma forse non ne parliamo tanto
+1:06:21
+1 hour, 6 minutes, 21 seconds
+dal punto di vista baesiano, ma dal punto di vista frequentista. Comunque c'è la controparte dei test anche per per la parte baesiana. Allora, vediamo
+1:06:30
+1 hour, 6 minutes, 30 seconds
+un po' qual è l'approccio frequentista che è quello che abbiamo visto a statistica 1. Avete visto forse non com'è. Allora, in questo approccio è
+1:06:38
+1 hour, 6 minutes, 38 seconds
+rovesciata la situazione, cioè i parametri sono fissi, è come se qualcuno, no, avesse come un avversario
+1:06:45
+1 hour, 6 minutes, 45 seconds
+che ha stabilito un parametro e l'ha e l'ha fissato, ma non ve lo dice ovviamente. Quindi i parametri non sono trattati come variabiliatorie.
+1:06:53
+1 hour, 6 minutes, 53 seconds
+Invece quello che è i dati. E come si pensa e come si può interpretare questo fatto? I dati effettivamente poi li osserviamo e appunto il punto di vista
+1:07:02
+1 hour, 7 minutes, 2 seconds
+frequentista è di dire "Ok, dopo li osserverà i dati, ma facciamo i conti prima se volete di osservare i dati." Quindi i dati sono aleatori perché sono
+1:07:10
+1 hour, 7 minutes, 10 seconds
+da osservare, sono tutte, se volete garanzie a priori, ok? Succederà che se quando osserverà i dati qualcosa
+1:07:18
+1 hour, 7 minutes, 18 seconds
+succederà. Per il momento, immagina immaginate di non averli ancora osservati.
+1:07:23
+1 hour, 7 minutes, 23 seconds
+E la differenza poi tecnica con il caso baesiano è che nel caso frequentista non si lavora quasi mai, non si mette mai
+1:07:31
+1 hour, 7 minutes, 31 seconds
+una distribuzione a priori sui parametri, anche perché i parametri non sono aleatori, sono fissi e quindi si lavora essenzialmente solo con la
+1:07:38
+1 hour, 7 minutes, 38 seconds
+verosimiglianza. Ok? Quindi si si cioè si studia soltanto la probabilità di osservare i dati sapendo beta, cioè si
+1:07:45
+1 hour, 7 minutes, 45 seconds
+lavora sempre, se volete, condizionato a beta perché beta è sempre fissato.
+1:07:51
+1 hour, 7 minutes, 51 seconds
+Allora, però si possono fare anche qui delle stime di incertezza, no? E gli intervalli di fiducia, cosa dicono gli intervalli di fiducia? Eh, allora
+1:07:59
+1 hour, 7 minutes, 59 seconds
+bisogna trovare che cosa? Un intervallo che in effetti alla fine dipenderà sempre dai dati, va bene?
+1:08:08
+1 hour, 8 minutes, 8 seconds
+e quindi sarà aleatorio per questo motivo perché dipende dai dati che uno andrà a osservare in modo tale che la probabilità che il parametro vero, no,
+1:08:17
+1 hour, 8 minutes, 17 seconds
+qualunque esso sia, cadrà dentro l'intervallo con probabilità almeno 1, 1 - alfa, insomma 95% 99% grande. Ora c'è
+1:08:27
+1 hour, 8 minutes, 27 seconds
+un problema però perché se uno non sa qual è il parametro vero, lo vuole comunque mantenere fisso. Allora quello che richiede rispetto al baesiano è che
+1:08:37
+1 hour, 8 minutes, 37 seconds
+sia vero per ogni teta. Cioè qualsiasi fosse il parametro teta sono ho questa garanzia che poi quando andrò a fare il
+1:08:44
+1 hour, 8 minutes, 44 seconds
+mio esperimento il parametro teta cadrà dentro quell'intervallo con probabilità 1 - alfa. Vedete la differenza? Quindi è che qui, nel caso baesiano, ho
+1:08:53
+1 hour, 8 minutes, 53 seconds
+condizionato rispetto ai dati che ho osservato. Qui i dati non li ho ancora osservati, invece immagino di conoscere il parametro. Ok? È una differenza
+1:09:02
+1 hour, 9 minutes, 2 seconds
+sottile e sarà ancora più sottile ora perché vi mostrerò delle formule che sono praticamente identiche, però eh cercate di capire nella vostra testa che
+1:09:11
+1 hour, 9 minutes, 11 seconds
+c'è questa differenza, ok? Quindi baesiano tendenzialmente funziona.
+1:09:17
+1 hour, 9 minutes, 17 seconds
+Beh, funzionano entrambi bene, ma il poi c'è anche i test, poi parliamo dei test più in dettaglio. Ora, baesiano
+1:09:25
+1 hour, 9 minutes, 25 seconds
+funziona, diciamo, meglio quando avete una distribuzione a priori, cioè quindi sapete già qualcosa sui vostri parametri, poi ci giocheremo questa
+1:09:33
+1 hour, 9 minutes, 33 seconds
+distribuzione a priori è una flessibilità in più che c'è. Quindi se uno conosce qualcosa sui suoi parametri può dire "all'inizio mi aspettavo che fossero qui". E ha il vantaggio, se
+1:09:43
+1 hour, 9 minutes, 43 seconds
+volete, quindi che funziona bene anche quando i dati sono pochi, perché magari la mia conoscenza dei parametri era molto forte all'inizio. Quindi questa
+1:09:51
+1 hour, 9 minutes, 51 seconds
+questa è una flessibilità in più che c'è. Il caso frequentista perché ha questo vantaggio? Beh, che vantaggio
+1:09:58
+1 hour, 9 minutes, 58 seconds
+potrebbe avere? Invece caso frequentista ha il vantaggio che ehm Sì, eh diciamo funziona bene quando i dati sono tanti.
+1:10:07
+1 hour, 10 minutes, 7 seconds
+Ok, funziona bene, meglio, diciamo, meglio se n è molto grande. Ora, non è che
+1:10:16
+1 hour, 10 minutes, 16 seconds
+quello non funziona, ma se volete quello è un po' inutilmente complicato perché quando avete tanti dati, quando avete tanti dati, alla fine qualunque cosa
+1:10:24
+1 hour, 10 minutes, 24 seconds
+abbiate detto a priori poi scomparirà, viene un po' fuscata dai dati che sono sono più importanti. Ovviamente quando avete tanti tanti dati è così. Ok,
+1:10:32
+1 hour, 10 minutes, 32 seconds
+quindi indicativamente baesiano è meglio se avete pochi dati, frequentista se avete tanti dati.
+1:10:38
+1 hour, 10 minutes, 38 seconds
+Va bene, tanti tanti dati. Vabbè, ora questo non è proprio Va bene. Allora, vediamo un po', visto
+1:10:46
+1 hour, 10 minutes, 46 seconds
+che però tutti avete fatto statistica uno, quindi questa cosa dovreste già saperla, ma facciamola insieme in un modello il più semplice possibile, ok?
+1:10:54
+1 hour, 10 minutes, 54 seconds
+Voglio fare i conti di un modello lineare dove però faccio la linearità più semplice possibile e prendo una una
+1:11:03
+1 hour, 11 minutes, 3 seconds
+feature, una caratteristica che è 1, cioè f(x) = 1. f(x) è una f di 1, soltanto una
+1:11:10
+1 hour, 11 minutes, 10 seconds
+caratteristica vale 1 per ogni x. Cioè cosa vuol dire? Ho le mie osservazioni x y butto via le x e cerco di stimare solo solo la y con una costante più rumore.
+1:11:22
+1 hour, 11 minutes, 22 seconds
+Ok? Cioè, vabbè, questo è una regressione molto semplice, però, anzi, ancora più semplice della regressione semplice, no? Però qui eh
+1:11:29
+1 hour, 11 minutes, 29 seconds
+cosa ricadiamo? In una cosa che dovreste aver già visto a statistica 1, quando avevamo che cosa? Un campione di
+1:11:37
+1 hour, 11 minutes, 37 seconds
+variabili gaussiane che hanno una certa media beta 0 e una varianza sigma qu. Quindi questo è un
+1:11:45
+1 hour, 11 minutes, 45 seconds
+problema che abbiamo già visto, in realtà è la stima della media e della varianza di un campione gausiano. Ok?
+1:11:51
+1 hour, 11 minutes, 51 seconds
+Quando fate la regressione lineare così semplice, ritornate a statistica 1.
+1:11:56
+1 hour, 11 minutes, 56 seconds
+Allora, quali erano quali sono i parametri? I parametri sono due, sono media che è beta 0 e deviazione standard o varianza, insomma, scegliete voi chi
+1:12:05
+1 hour, 12 minutes, 5 seconds
+stimare. I dati quali sono? Beh, le x le ho buttate via, quindi se volete tengo solo le y, ok? Tengo solo le
+1:12:12
+1 hour, 12 minutes, 12 seconds
+osservazioni delle y, ok? Cos'è la verosimiglianza? La verosimiglianza è la densità di
+1:12:20
+1 hour, 12 minutes, 20 seconds
+probabilità di osservare i miei dati conoscendo il parametri. Allora, se conosco la media e conosco la varianza,
+1:12:28
+1 hour, 12 minutes, 28 seconds
+devo ricordarmi soltanto che è la densità gausiana, no? Vi ricordate?
+1:12:32
+1 hour, 12 minutes, 32 seconds
+Spero di averla richiamata in qualche slide precedente, ma sì, l'abbiamo visto già un paio di volte, no? Abbiamo fatto anche il conto. Quindi, com'è la densità gaussiana? Intanto c'è un prodotto di
+1:12:40
+1 hour, 12 minutes, 40 seconds
+densità gausiane perché sono sempre le ipotesi, vi ricordo, che tutti i dati sono indipendenti tra loro e quindi le moltiplico. E poi la densità gaussiana di media beta0 e di varianza sigma qu.
+1:12:54
+1 hour, 12 minutes, 54 seconds
+Ok? E abbiamo già visto la volta scorsa, no? Che se uno massimizza la verosimiglianza trova, beh, almeno dal punto di vista di beta trova la stima di
+1:13:02
+1 hour, 13 minutes, 2 seconds
+minimi quadrati. Quello che non abbiamo detto è che se si massimizza anche in sigma si trova la l'errore quadratico medio.
+1:13:10
+1 hour, 13 minutes, 10 seconds
+Ok? Questo va benè andrebbe fatto.
+1:13:13
+1 hour, 13 minutes, 13 seconds
+L'altra volta abbiamo forse fatto soltanto la massimizzazione in beta e dopo casomai vediamo che questa effettivamente è la vediamola poi nel
+1:13:22
+1 hour, 13 minutes, 22 seconds
+caso generale, no? Quando uno stema anche il sigma, la sigma di massima verosimiglianza, attenti, eh, non si trova la varianza
+1:13:30
+1 hour, 13 minutes, 30 seconds
+campionaria, quella con 1 su n - 1, ma si trova solo 1 su n, ok? Si trova quello stimatore che non è lo stimatore
+1:13:38
+1 hour, 13 minutes, 38 seconds
+eh non distorto della varianza se uno si ricorda di statistica 1, ma trova 1 su n eh la somma dei residui al quadrato,
+1:13:46
+1 hour, 13 minutes, 46 seconds
+quindi trova quello che è l'errore quadratico medio ottimale.
+1:13:50
+1 hour, 13 minutes, 50 seconds
+Ok? Questo non lo facciamo, ma è una cosa che abbiamo fatto anche in statistica uno, almeno di solito si fa.
+1:13:57
+1 hour, 13 minutes, 57 seconds
+Allora, posto questo problema, quindi la stima puntuale è chi? È lì, è chiara.
+1:14:01
+1 hour, 14 minutes, 1 second
+Come facciamo a quantificare l'incertezza? Dicevamo, approccio baesiano o approccio frequentista?
+1:14:06
+1 hour, 14 minutes, 6 seconds
+Siccome il frequentista, dovreste averlo visto la statistica uno, partiamo da quello baesiano, poi vi dico cosa cambia quello frequentista. Allora, quello
+1:14:15
+1 hour, 14 minutes, 15 seconds
+baesiano ha il vantaggio, ma anche un po' il difetto, a volte che uno deve stabilire la densità a priori. E quindi, dicevamo, a priori cosa possiamo dire?
+1:14:24
+1 hour, 14 minutes, 24 seconds
+Beh, se uno non conosce nulla e di solito fa queste cose nell'approccio bagesiano, prende delle densità molto molto banali. Ad esempio,
+1:14:32
+1 hour, 14 minutes, 32 seconds
+potrebbe prendere una densità che è beta 0 che non dipende da beta 0, quindi se volete è uniforme su un grosso intervallo, pensatela così. e sigma.
+1:14:41
+1 hour, 14 minutes, 41 seconds
+Anche lì uno vorrebbe prendere qualcosa di uniforme, però attenti, siccome deve essere uniforme sui positivi, il vantaggio a volte uno prende una densità
+1:14:49
+1 hour, 14 minutes, 49 seconds
+che è tipo 1 su sigma. Ok? Questa è una densità pure che non andrebbe molto bene, eh, non è si chiamano a volte densità improprie, ma pensatele sempre
+1:14:58
+1 hour, 14 minutes, 58 seconds
+su un intervallo 1 su per la vostra sigma, quindi avete una densità che esplode quando sigma va
+1:15:05
+1 hour, 15 minutes, 5 seconds
+a 0. Questo perché uno vorrebbe che che sia il più uniforme possibile. Ci sono degli argomenti che favoriscono questa.
+1:15:12
+1 hour, 15 minutes, 12 seconds
+Se volete i conti vengono bene con questa densità, ok?
+1:15:16
+1 hour, 15 minutes, 16 seconds
+Questa densità a priori, tanto non è poi così importante quale fissate. Se se scegliete densità simili otterrete risultati simili, però va messa insieme
+1:15:24
+1 hour, 15 minutes, 24 seconds
+alla verosimiglianza. Quindi la verosimiglianza è quella di prima e a quel punto uno trova la densità posteriori che è ottenuta moltiplicando
+1:15:32
+1 hour, 15 minutes, 32 seconds
+la la verosimiglianza con la densità a priori. La forma di be questo: prendete densità a priori, verosimiglianza, moltiplicate. Ok?
+1:15:41
+1 hour, 15 minutes, 41 seconds
+Allora, qui vi risparmio i conti perché uno deve prendere questa espressione qui. Questa è la verosimiglianza.
+1:15:51
+1 hour, 15 minutes, 51 seconds
+Eh, c'è un sigma - n, vedete che che è qui, che è dovuto ai vari fattori 1 su sigma. Poi va moltiplicato con un altro 1 su sigma e troviamo un sigma all^ - n
+1:16:00
+1 hour, 16 minutes
++ 1. Ok? E poi però deve si conviene un po' lavorare qui dentro. Ora, qui dentro uno ha la somma, no, dei residui al
+1:16:08
+1 hour, 16 minutes, 8 seconds
+quadrato. E come la vuole scrivere? Beh, la vuole scrivere come l'errore minimo possibile più un quadrato. E questa è
+1:16:17
+1 hour, 16 minutes, 17 seconds
+l'espressione che avevamo trovato anche prima quando abbiamo fatto la decomposizione generalissima. Quindi avete l'errore minimo che è questo che è
+1:16:24
+1 hour, 16 minutes, 24 seconds
+la varianza quella quella distorta varianza di y e poi avete 1 su n lo
+1:16:31
+1 hour, 16 minutes, 31 seconds
+scarto tra la media e o scusate è beta 0 questa non m fatto una copia incolla da altre cose beta 0 tra il parametro di
+1:16:40
+1 hour, 16 minutes, 40 seconds
+media e la media effettivamente osservata al quadrato. Ok? Ora, se volete si tratta solo di rimaneggiare questa espressione di in alto, ma è la
+1:16:48
+1 hour, 16 minutes, 48 seconds
+stessa cosa che uno che abbiamo fatto all'inizio della lezione, cioè sviluppate quel quadrato, aggiungiamo e togliamo il termine giusto e si trova
+1:16:55
+1 hour, 16 minutes, 55 seconds
+questa espressione. Ok? Perché questa espressione ci piace di più? Perché vedete c'è beta0 che è la nostra eh
+1:17:04
+1 hour, 17 minutes, 4 seconds
+parametro che non conosciamo, meno un certo valore al quadrato. Questa è una densità gausiana, è già scritta bene
+1:17:10
+1 hour, 17 minutes, 10 seconds
+come densità gausiana perché c'è beta0 - un valore di media elevato al quadrato e la varianza, attenzione, c'è anche qua,
+1:17:18
+1 hour, 17 minutes, 18 seconds
+eh c'è un n su sigma quadro. E ora vediamo quanto vale la la varianza.
+1:17:25
+1 hour, 17 minutes, 25 seconds
+Eh, dunque, fatemi vedere una cosa.
+1:17:30
+1 hour, 17 minutes, 30 seconds
+Sì, ho fatto copia incolla anche troppo allegramente, perché se scrivete
+1:17:37
+1 hour, 17 minutes, 37 seconds
+Eh, sì, qua non c'è, qua c'è uno. Eh, correggete sta formula. Eh, sì, andrebbero fatti i conti così siamo
+1:17:44
+1 hour, 17 minutes, 44 seconds
+sicuri al 100%. Ecco, se metto un su n c'è non c'è l' n lì. Ok, dunque fatemi vedere.
+1:17:53
+1 hour, 17 minutes, 53 seconds
+Eh, dunque beta 0 No, viene n vol. No, no, scusate, l' sta qui e non c'è l'uno su n qua. Ecco qua. Fatto copia incolla da altre formule. No, non andava bene.
+1:18:02
+1 hour, 18 minutes, 2 seconds
+Ok. Beh, lo vedete perché beta 0 lì sopra, se sviluppate il quadrato avete n volte beta0 qu perché ogni ogni addendo
+1:18:09
+1 hour, 18 minutes, 9 seconds
+vi dà un beta0 qu. Quindi lì sotto avete beta0 quad * n, giusto? Ok? Ora il resto va un attimo calcolato, ma vi assicuro
+1:18:18
+1 hour, 18 minutes, 18 seconds
+che questa è la formula. Ok? Allora, se uno si ricorda cosa succedeva a statistica 1, eh vi ricordate che a un certo punto compariva la densità di
+1:18:26
+1 hour, 18 minutes, 26 seconds
+student? E allora questo è il punto forse più più delicato, però non è complicato perché è un conto che si fa una volta, poi non lo si rifà più.
+1:18:37
+1 hour, 18 minutes, 37 seconds
+Allora, il punto qual è? Che qui abbiamo la densità di tutti e due parametri, no?
+1:18:41
+1 hour, 18 minutes, 41 seconds
+Avete il beta 0 e la sigma. Ora, quando voi avete due variabiliatorie
+1:18:49
+1 hour, 18 minutes, 49 seconds
+e avete la densità di tutte e due, potete recuperare la densità di una integrando via l'altra o sommando sui valori dell'altra. Ok? Quindi questa che
+1:18:58
+1 hour, 18 minutes, 58 seconds
+è un'espressione, vedete che dipende da da sigma e da beta 0, a noi interessa solo l'incertezza su beta0, non su sigma. Quindi cosa si fa? Beh, si
+1:19:07
+1 hour, 19 minutes, 7 seconds
+integra via beta 0. Si integra via, scusate, sì, se ci interessa la densità su sigma integrieramo beta0. Se ci
+1:19:14
+1 hour, 19 minutes, 14 seconds
+interessa quella su beta 0, integriamo via sigma. Ora tendenzialmente vi interessa l'incertezza su beta 0. Sigma,
+1:19:22
+1 hour, 19 minutes, 22 seconds
+diciamo, è un prodotto di dell'ottimizzazione e così via. Quindi integriamo via rispetto a sigma.
+1:19:29
+1 hour, 19 minutes, 29 seconds
+Ok? Quindi se prende l'espressione di prima è un conto da fare. I valori di sigma sono solo i positivi e si integra via eh questa densità che ho riportato.
+1:19:43
+1 hour, 19 minutes, 43 seconds
+Adesso l'ho di nuovo riportata giusta. Mh. C'è un N qui.
+1:19:50
+1 hour, 19 minutes, 50 seconds
+Dunque l' sta qui.
+1:20:04
+1 hour, 20 minutes, 4 seconds
+Dunque, sì, riportate la densità giusta, non quella sbagliata. Sì.
+1:20:11
+1 hour, 20 minutes, 11 seconds
+Ok.
+1:20:14
+1 hour, 20 minutes, 14 seconds
+Eh sì, devo ricontrollare il conto. Ora dei passaggi non li ho ricontrollati al 100%.
+1:20:20
+1 hour, 20 minutes, 20 seconds
+E eh però il punto qual è? Che integrando via, vedete, dobbiamo integrare in sigma. Vabbè, non è che
+1:20:28
+1 hour, 20 minutes, 28 seconds
+questa è per mostrarvi il conto per una volta, perché non credo che neanche statistica uno si facesse. Vedete, qui abbiamo un integrale in sigma e allora
+1:20:36
+1 hour, 20 minutes, 36 seconds
+uno fa un cambio di variabile perché ci interessa soltanto la dipendenza da beta. Quindi chiama, non lo so, chiama tutta questa grossa variabile la chiama z.
+1:20:46
+1 hour, 20 minutes, 46 seconds
+Vedete, c'è sigma, eh, lì c'è sigma quadro, che è quello rispetto alla quale stiamo integrando. Chiamo z, faccio il cambio di variabile, quindi d sigma e
+1:20:55
+1 hour, 20 minutes, 55 seconds
+sarà ci sarà un legame tra sigma e z, no? State scrivendo che z è uguale a una grossa costante a / sigma qu. Quindi a
+1:21:03
+1 hour, 21 minutes, 3 seconds
+quel punto dz è uguale a a / sigma c dma col valore assoluto, diciamo, e con un due anche.
+1:21:15
+1 hour, 21 minutes, 15 seconds
+Va bene? Uno inserisce, fa il cambio di variabile e risultato finale. Andiamo solo sul risultato finale, anche perché i vari passaggi forse li ho li ho copi
+1:21:22
+1 hour, 21 minutes, 22 seconds
+incollati male. Trovo un'espressione che non è più una gaussiana. Vedete? Mentre beta0 inizio sembrava una gausiana per
+1:21:29
+1 hour, 21 minutes, 29 seconds
+c'era esponenziale di - beta0 qu portando via l'incertezza su sigma, quindi integrando via sigma otteniamo
+1:21:37
+1 hour, 21 minutes, 37 seconds
+una densità che non è gaussiana. Che densità è questa? Beh, se uno si ricorda di statistica 1, questa è quella che veniva chiamata una densità student, ok?
+1:21:47
+1 hour, 21 minutes, 47 seconds
+Quindi si trova una densità del tipo 1 più, vedete qui c'è la beta0 - la media y barato al quadrato con dei
+1:21:55
+1 hour, 21 minutes, 55 seconds
+coefficienti a denominatore e elevato a un certo esponente. Ok? Ora vediamo una ricordiamo un attimo qual è la densità student generale. Ora non è che dovete
+1:22:04
+1 hour, 22 minutes, 4 seconds
+impararvela a memoria, eh, cioè però il fatto è questo, che questa è una densità student, era quello che succedeva anche
+1:22:11
+1 hour, 22 minutes, 11 seconds
+a statistica 1. E quello che accade è che uno se fa i conti giusti trova appunto una student con n - 1° di
+1:22:19
+1 hour, 22 minutes, 19 seconds
+libertà dove n sono le osservazioni. La media della student è la media campionaria delle nostre osservazioni
+1:22:27
+1 hour, 22 minutes, 27 seconds
+e poi c'è un parametro ulteriore che è una specie di varianza, attenti che però non è esattamente la varianza, è semplicemente la varianza campionaria della y
+1:22:36
+1 hour, 22 minutes, 36 seconds
+diviso nelle vostre osservazioni diviso n. Ok? Quindi effettivamente l'approccio cosa dice? Perché se inizialmente ho
+1:22:45
+1 hour, 22 minutes, 45 seconds
+completa incertezza su beta0 e su sigma, dopo le mie n osservazioni beta 0
+1:22:52
+1 hour, 22 minutes, 52 seconds
+incerta su un intervallo enorme, ma diventa una densità student. Questo pure ce l'avevate nel caso di statistica uno perché usavate la studenta.
+1:23:02
+1 hour, 23 minutes, 2 seconds
+Allora, quali sono i parametri? avete la media che è la media delle vostre osservazioni. La, diciamo, varianza di questa student
+1:23:10
+1 hour, 23 minutes, 10 seconds
+campionaria sulle n osservazioni, quella quella corretta è quella diviso con 1 su n - 1 diviso n piccolo, quindi diventa
+1:23:17
+1 hour, 23 minutes, 17 seconds
+piccola mano mano che cresce il numero delle osservazioni e poi i gradi di libertà sono n - 1. Ok? Ora questa
+1:23:26
+1 hour, 23 minutes, 26 seconds
+emerge da questo conto qui. Ora magari fatto bene, magari lo correggo prima di ricaricarvi le slide. Quindi, però questa densità è importante. Perché è
+1:23:35
+1 hour, 23 minutes, 35 seconds
+importante? Perché tendenzialmente a voi interessa quantificare l'incertezza quando avete pochi dati, perché se avete tanti dati, uno dice "Va beh allora avrò
+1:23:43
+1 hour, 23 minutes, 43 seconds
+poca incertezza". Se avete pochi dati, allora tanto vale essere precisi e usare la student, ok? Perché uno potrebbe dire "Beh, a prossimo con una gaussiana, ma
+1:23:52
+1 hour, 23 minutes, 52 seconds
+in realtà sta facendo un errore", no? Vi ricordate a statistica uno quando uno ha pochi poche osservazioni, pochi gradi di libertà, faceva differenza. gli
+1:24:00
+1 hour, 24 minutes
+intervalli di confidenza diventano più grandi, appunto. E allora, vediamo un po' cosa succede. Ehm, la densità
+1:24:08
+1 hour, 24 minutes, 8 seconds
+generale di student la richiamo qui, quindi avete un certo parametro che sono i gradi di libertà, un parametro di media e un parametro di scala al quadrato.
+1:24:17
+1 hour, 24 minutes, 17 seconds
+Ah, se non si dice nulla si parla solo di student con gradi di libertà, significa che a media zero e scala al quadrato 1, come le gausiane standard.
+1:24:26
+1 hour, 24 minutes, 26 seconds
+Però in generale uno può dire che la densità, la funzione di densità è 1 + 1 su numero di gradi di libertà. Poi avete
+1:24:34
+1 hour, 24 minutes, 34 seconds
+un'espressione simile a quello che avreste sulle gausiane, cioè avete z - a medio di sigma tutto al quadrato e però non è un esponenziale, ma è un
+1:24:42
+1 hour, 24 minutes, 42 seconds
+polinomio, o meglio un funzione razionale. Avete elevato all'esponente - gradi di libertà + 1/2.
+1:24:51
+1 hour, 24 minutes, 51 seconds
+Ho questa formula un po' complicata, non serve che ve la ricordiate, tra l'altro c'è anche una costante che non ho specificato che è molto complicata.
+1:24:57
+1 hour, 24 minutes, 57 seconds
+Quello che è importante ricordarsi è vabbè c'è una notazione che quindi aumenta rispetto alle gaussiane, avete la media, la scala al quadrato e i gradi
+1:25:06
+1 hour, 25 minutes, 6 seconds
+di libertà e queste densità somigliano un po' alle gaussiane, ma hanno delle code più pesanti, ok? hanno delle code,
+1:25:15
+1 hour, 25 minutes, 15 seconds
+cioè hanno più probabilità sulle code rispetto alle Gausian che invece vanno a zero molto rapidamente. Ok? Quindi rappresentano maggiore incertezza. In
+1:25:23
+1 hour, 25 minutes, 23 seconds
+particolare quando avete un pochi gradi di libertà, poche osservazioni, è importante tenere conto della student, ok? Tendenzialmente quando avete
+1:25:32
+1 hour, 25 minutes, 32 seconds
+infiniti gradi di libertà recuperate la gaussiana e nella pratica, diciamo, per valori ragionevoli, quando avete più di
+1:25:39
+1 hour, 25 minutes, 39 seconds
+30-40 osservazioni, va bene anche usare la gausiana, eh? Ok. Poi dipende da che da che livelli di confidenza volete trovare, ma in pratica insomma su scale
+1:25:48
+1 hour, 25 minutes, 48 seconds
+naturali se fate sempre il 95% 99% bastano anche 30 osservazioni e siete praticamente sulla gaussiala. Va bene?
+1:25:56
+1 hour, 25 minutes, 56 seconds
+Ora, quindi la densità student al variare dei gradi di libertà, questa è la il caso sigma 1 e media uguale 0 e
+1:26:06
+1 hour, 26 minutes, 6 seconds
+sigma = 1. E facendo soltanto aumentare i gradi di libertà si passa appunto da una curva, quella rossa che è 1 grado di
+1:26:14
+1 hour, 26 minutes, 14 seconds
+libertà. Ved detto anche così e molto Vedete vedete le code qui non è non è affatto zero. Qua siete abbastanza
+1:26:21
+1 hour, 26 minutes, 21 seconds
+lontani, però appunto quando crescono i gradi di libertà, quindi si passa a 30, casomai ricordatevela anche su uno
+1:26:29
+1 hour, 26 minutes, 29 seconds
+schermo voi, vedete che si è praticamente gaussiane, questa è la coda, è già scomparsa, insomma. Ok?
+1:26:35
+1 hour, 26 minutes, 35 seconds
+Quindi la student è è eh l'ingrediente chiave se uno vuole dare veramente delle stime precise di incertezza.
+1:26:45
+1 hour, 26 minutes, 45 seconds
+Quindi cosa abbiamo trovato? Che la beta 0, il parametro di media, è una student con sicurezza, cioè veramente la
+1:26:53
+1 hour, 26 minutes, 53 seconds
+student. Se però uno vuole approssimare la student con la gausiana, non è gravissimo. Quindi quello che uno fa dice "vabbè, se ho tante osservazioni
+1:27:00
+1 hour, 27 minutes
+faccio che una student con infiniti gradi di libertà e trovo una gausiana".
+1:27:04
+1 hour, 27 minutes, 4 seconds
+Ok? Quindi se volete avete tante osservazioni, il parametro beta0 dopo aver visto i dati, è una gaussiana di
+1:27:10
+1 hour, 27 minutes, 10 seconds
+media campionaria e varianza la varianza campionaria diviso n. Questo è importantissimo però eh che deve esserci.
+1:27:21
+1 hour, 27 minutes, 21 seconds
+E però se uno vuole essere esatto, esatto. Stima è proprio questa che è una student con questi gradi di libertà n - 1. Ok? Quindi una volta che uno ha
+1:27:29
+1 hour, 27 minutes, 29 seconds
+trovato la densità di beta posteriori trova gli intervalli di fiducia.
+1:27:34
+1 hour, 27 minutes, 34 seconds
+intervalli di credibilità. Quindi cosa fa? Trova eh i quantili della student se vuole usare la distribuzione esatta
+1:27:41
+1 hour, 27 minutes, 41 seconds
+oppure usa i quantili della Gaussiana se vuole usare quella l'ipotesi approssimata. Però gli intervalli che natura hanno. Beh, avete il parametro
+1:27:49
+1 hour, 27 minutes, 49 seconds
+beta 0 che sarà vicino a il parametro il valore di media, quindi la media campionaria, vicino quanto? Beh, meno
+1:27:57
+1 hour, 27 minutes, 57 seconds
+del quantile 1 - alfa/2. Perché 1 - alfa/2? Perché la distribuzione, avete visto prima, è simmetrica. Quindi se volete lasciarne alfa mezzi a destra è
+1:28:06
+1 hour, 28 minutes, 6 seconds
+come lasciarne insomma alfa/2 a sinistra, ok? E questo vi insomma non dovete calcolare che il quantile di
+1:28:15
+1 hour, 28 minutes, 15 seconds
+alfa/2, ecco, vi basta fare questo. E ovviamente dovete mettere la deviazione standard. La deviazione standard risulta
+1:28:22
+1 hour, 28 minutes, 22 seconds
+la radice della varianza campionaria su n. Quindi con questa scelta se uno sceglie il quanti giusto e vi ricordate forse da statistica uno c'erano le
+1:28:30
+1 hour, 28 minutes, 30 seconds
+tavole, no, de degli score delle delle student e della Gaussiana, trovate l'intervallo di credibilità. Va bene?
+1:28:40
+1 hour, 28 minutes, 40 seconds
+Ecco, diciamo per oggi finiamo qui, poi vedremo come mercoledì come questa si riversa poi nelle varie incertezze sulle
+1:28:49
+1 hour, 28 minutes, 49 seconds
+previsioni e poi vediamo anche l'approccio parametrico e ovviamente vediamo che il metodo generale che formule ci dà. D'accordo? Quindi,
+1:28:57
+1 hour, 28 minutes, 57 seconds
+scusate, interrompiamo qui, però oggi comunque ci siamo.
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+80 watching
+5:23
+2026 Fields Medal: Hong Wang
+Simons Foundation
+554k 1 mo ago
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+4:43
+MENDELSSOHN Violin Concerto in D minor, Finale (Arr Baker)·  Black Dyke Band @jamconcert_uk
+JAM
+10k 3 wk ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+223k 13 hr ago
+New
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+13:24
+Ezio Bosso at Sanremo 2016 CAPTIONED
+tubegiro
+94k 10 yr ago
+3:29
+Starship's Fifth Flight Test
+SpaceX
+5.4m 1 yr ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+5:43
+Gigi Proietti - La pioggia nel pineto (Gabriele D'Annunzio)
+Gigi Proietti Fans
+1.3m 9 yr ago
+16:15
+Travaglio Show! Lancia un Affondo Durissimo Contro La Russa e lo Ridicolizza
+Attualità Politica
+169k 2 wk ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+1:13:40
+Le tecniche del comporre - Alessandro Solbiati 09.05.2017
+Fondazione Collegio San Carlo
+30k 9 yr ago
+8:03
+Don't Throw Away Your Old Computer Hard Drive 😱 Billions of People Don't Know This Secret
+Inventor 247
+467k 4 mo ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+14:14
+Tracking Yuja Wang’s Heartbeats During Her Rachmaninoff Marathon | Carnegie Hall
+Carnegie Hall
+866k 2 yr ago
+5:30
+Raimondo Vianello e la valletta ciociara (1968)
+pietromollo
+993k 7 yr ago
+5:57
+The Biggest Pitfall of the Maths Olympiad | Fun of Mathematics | X+11=X|
+Rashel's Classroom
+504k 1 mo ago

@@ -1,0 +1,2099 @@
+
+IT
+750AA 2025 11 24 lezione 19
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+147 views  24 Nov 2025
+Modelli SES, Holt, Holt damped, Holt-Winters. Cenni ai modelli ETS. Stima SSE (minimi quadrati) e stima MLE sotto ipotesi di gaussianità dei residui. Conseguenze: intervalli di predizione parametrici (senza formule) e indicatori AIC/BIC per selezione deli modello. Test di gaussianità (esempi, senza dettagli). Metodo bootstrap sui residui per stimare intervalli di predizione.
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:00
+0 seconds
+Bene, dunque, cosa vediamo oggi?
+0:04
+4 seconds
+Eh, oggi facciamo la seconda lezione sulle serie storiche, poi ci sarà mercoledì un altro laboratorio, diciamo,
+0:12
+12 seconds
+quindi portate il computer. Poi lunedì c'è un'altra lezione sulle serie storiche, un altro laboratorio, poi c'è l'8 dicembre, non si fa lezione e poi
+0:20
+20 seconds
+concludiamo, dicevamo, con una specie di finto pompitino, va bene? Quindi non è una vera prova d'esame, però cercate di
+0:27
+27 seconds
+esserci quindi mercoledì 10, va bene questo? Ehm, almeno in quella data. Ecco, allora,
+0:35
+35 seconds
+invece, vediamo qui cosa cosa ci riserva la lezione oggi. Andiamo a vedere degli dei modelli per le serie storiche un po'
+0:42
+42 seconds
+più sofisticati, quindi andiamo crescendo, insomma, di sofisticazione.
+0:46
+46 seconds
+Questo non vuol dire che i modelli elementari non vadano bene, però, appunto, spesso questi performano un po' meglio. Anzi, quelle che vediamo oggi,
+0:54
+54 seconds
+secondo me, rappresentano un giusto bilanciamento tra complessità del modello e invece, insomma,
+1:01
+1 minute, 1 second
+rendimento. Bene, hanno pochi parametri, quindi sono abbastanza semplici e cominceremo in realtà dai dai più semplici di questi modelli che sono i
+1:09
+1 minute, 9 seconds
+modelli di Holt, poi Holt Winters e poi questa notazione un po' che cerca di organizzare questo tipo di modelli, si chiamano ATS, modelli ETS.
+1:19
+1 minute, 19 seconds
+Poi, appunto, vedremo che in realtà lo facciamo via che introduciamo dei modelli, come si stimano i parametri di questi modelli, perché diversamente
+1:27
+1 minute, 27 seconds
+dagli altri modelli proprio una IV elementari hanno dei parametri che vanno stimati, ma ormai abbiamo visto altre volte in cui come si stimano parametri
+1:35
+1 minute, 35 seconds
+anche nella regressione, no, e nella classificazione e vediamo anche poi che ci sono indicatori tipo questi IKE Bic, no, BIC
+1:45
+1 minute, 45 seconds
+di per selezionare poi degli iper parametri.
+1:49
+1 minute, 49 seconds
+cosa che comunque si può fare anche tramite cross validation, ricordatevi questo si può sempre fare come per K nn
+1:56
+1 minute, 56 seconds
+e e poi vediamo, ma non vediamo le formule, ecco, quindi non non spaventatevi come si fanno a dare degli delle stime sull'incertezza, come
+2:05
+2 minutes, 5 seconds
+abbiamo fatto per la regressione. Anche qui abbiamo una previsione puntuale, ma poi si vuole affiancare a una misura tramite intervalli di confidenza e poi
+2:14
+2 minutes, 14 seconds
+vediamo anche un attimo il Bootstrap, come si può fare almeno per i residui.
+2:19
+2 minutes, 19 seconds
+Va bene? Quindi abbiamo diverse cosette da vedere, però diciamo sono in realtà alcune cose le abbiamo già viste, si tratta solo di capire come declinarle nel contesto delle serie storiche.
+2:30
+2 minutes, 30 seconds
+Quindi, allora, riprendiamo, partiamo da una serie storica, diciamo che abbiamo osservata per dei tempi da 1 fino a t grande. Qual è l'obiettivo? Beh,
+2:38
+2 minutes, 38 seconds
+introduciamo, per dare un modello parametrico, introduciamo una famiglia di funzioni fpenderanno dal tempo, ma
+2:47
+2 minutes, 47 seconds
+anche da dei parametri teta. Chiamiamoli teta in astratto, poi vediamo chi sono. E abbiamo in generale pi parametri, ok?
+2:53
+2 minutes, 53 seconds
+Or l'abbiamo chiamato H per la per la regressione e forse anche per la classificazione, ma non chiamiamolo H perché h è l'orizzonte temporale, quindi
+3:02
+3 minutes, 2 seconds
+pensate una funzione che vi dice come come sarà la previsione al tempo t e se avete i parametri theta stimati. Ok?
+3:10
+3 minutes, 10 seconds
+Quindi punto di partenza è quindi scegliere questo tipo di modello, quale funzione scegliamo, quanti parametri ci mettiamo. Poi stimiamo i parametri dei
+3:18
+3 minutes, 18 seconds
+dati, stimiamo quindi faremo un vedremo adesso, insomma, una specie di minimi quadrati e poi effettuiamo
+3:27
+3 minutes, 27 seconds
+effettivamente delle previsioni. Quindi la previsione sarà che al tempo t + h, quindi in un futuro diciamo orizzonte h,
+3:35
+3 minutes, 35 seconds
+se abbiamo osservato fino al tempo t sarà semplicemente la f t + h. dove però, attenzione, i parametri mettiamo quelli stimati. I parametri sono quelli stimati su tutto il training set, ok?
+3:47
+3 minutes, 47 seconds
+Poi magari avete lasciato un po' di test set a parte e quindi questo non è ancora, diciamo, lo step finale. Poi alla fine però quando uno decide qual è
+3:55
+3 minutes, 55 seconds
+il modello che sceglie, fa il training su tutto il modello e via, fa le previsioni su effettivamente quello che non ha osservato. Ok? E appunto poi
+4:03
+4 minutes, 3 seconds
+quello che vogliamo indicare non è soltanto la previsione puntuale come per la regressione, ma anche un intervallo di predizione di previsione, quindi
+4:11
+4 minutes, 11 seconds
+incertezza e anche incorporare l'incertezza su sugli errori, quello che non riusciamo a a stimare. Allora, quindi cominciamo con un modello
+4:19
+4 minutes, 19 seconds
+semplice semplice, modello di eh allora smoothing esponenziale semplice. In italiano a volte viene tradotto
+4:27
+4 minutes, 27 seconds
+smorzamento esponenziale semplice, va bene? Comunque il modello SES S e S.
+4:32
+4 minutes, 32 seconds
+Allora, modello più elementare, eh, perché perché abbiamo, diciamo, il modello parametrico, quelli quelli dell'altra volta erano proprio senza parametri, erano i modelli troppo
+4:41
+4 minutes, 41 seconds
+elementari, quindi introduciamo almeno un piccolo parametro, alfa. Adesso vediamo questo alfa, intanto è un numero tra 0 e 1. Vediamo cosa va cosa cosa va
+4:50
+4 minutes, 50 seconds
+a fare. Va bene? Allora, c'è c'è il fatto che noi vogliamo definire, diciamo, il la nostra previsione che
+4:57
+4 minutes, 57 seconds
+sarà questa LT, che sarà un livello, lo chiamiamo livello L al tempo t e lo definiamo ricorsivamente, va bene?
+5:07
+5 minutes, 7 seconds
+usando questo parametro alfa, quindi il livello al tempo t è, se volete c'è una media perché c'è alfa volte una media
+5:13
+5 minutes, 13 seconds
+pesata, alfa volte y d t, quindi il valore effettivo della serie storica + 1 - alfa invece il livello precedente l -
+5:23
+5 minutes, 23 seconds
+1 l al t - al tempo t - 1. Ok? Ora questa di per sé è una formula ricorsiva per L perché vedete L al tempo t è
+5:32
+5 minutes, 32 seconds
+definito usando L al tempo t - 1. Poi adesso vediamo qu è una formula effettivamente completa cosa sta facendo questo. Però pensate che c'è questa
+5:39
+5 minutes, 39 seconds
+questo livello che poi useremo anche per la previsione ma per il momento pensatelo come una variabile in più che non è un parametro, è qualcosa che è
+5:47
+5 minutes, 47 seconds
+stimato dai dati e con il parametro alfa, va bene? Ed è questa media. A quel
+5:53
+5 minutes, 53 seconds
+punto, diciamo, quando abbiamo il nostro alfa stimato, va bene? Come faremo le previsioni? Beh, le previsioni, diciamo,
+6:02
+6 minutes, 2 seconds
+se se conosciamo la serie storica fino al tempo t piccolo, quindi 1 t piccolo e andiamo a eh fare la previsione del
+6:10
+6 minutes, 10 seconds
+tempo t piccolo + h. Beh, qui la previsione, se volete, ricorda un po' la previsione naive, quella in cui dite "Beh, è l'ultimo valore che ho
+6:19
+6 minutes, 19 seconds
+osservato". Ora, non usate l'ultimo valore osservato che naiv sarebbe y d, ma usate l'ultimo livello osservato.
+6:26
+6 minutes, 26 seconds
+Quindi calcolate questi LDT fino al tempo t piccolo, avete osservato tutto, quindi potete calcolarli e poi usate l' LDT per fare una previsione. Ok?
+6:36
+6 minutes, 36 seconds
+Va bene? Quindi questi sono i due step importanti. Adesso vediamo però anche come stimare alfa. Quindi adesso vediamo anche di capire, vi do la formula
+6:44
+6 minutes, 44 seconds
+precisa, esplicita per questo LDT, però lo vedete già da qui, no? che dicevo è una media pesata tra le osservazioni
+6:52
+6 minutes, 52 seconds
+eh passate, ok? O quanto meglio c'è, per dire meglio, c'è alfa volte y d, quindi potreste pensare come l'ultima
+7:00
+7 minutes
+osservazione che viene però pesata per alfa volte e poi 1 - alfa lt che in qualche modo tiene conto della memoria di tutte le osservazioni precedenti, ok?
+7:10
+7 minutes, 10 seconds
+Quindi alfa effettivamente mi bilancia, è più importante il presente, quindi se mettiamo alfa uguale 1 avremo soltanto l'ultima osservazione e diventiamo
+7:17
+7 minutes, 17 seconds
+proprio naive, il metodo naive. Eh, se mettete alfa uguale 0 invece, vabbè, ora alfa uguale 0 avete la prima
+7:26
+7 minutes, 26 seconds
+osservazione, va bene? Non è un granché come metodo, insomma, l'importante è cercare una una cosa intermedia. Allora,
+7:34
+7 minutes, 34 seconds
+e qual è una formula esplicita, giusto per curiosità, perché poi vedremo tante formule simili ricorsive, va bene?
+7:40
+7 minutes, 40 seconds
+Quindi questa è la formula che vi conviene ricordarvi, insomma, perché dice l' Ldt come la calcola il computer?
+7:45
+7 minutes, 45 seconds
+Mi fa slungo la serie storica, mi calcola l' l, diciamo, L di 0 andrebbe specificato cos'è. Fate ad esempio partire da mettete L0 uguale 0. Poi ci
+7:54
+7 minutes, 54 seconds
+sono dei parametri, si può giocare anche lì sui primi valori, però diciamo tendenzialmente l'avete calcolato e andate avanti con la vostra ricorsione.
+8:02
+8 minutes, 2 seconds
+Se uno vuole una formula esplicita, cosa osserva? Perché lt è alfa volte y t, quindi l'ultima osservazione. poi alfa *
+8:10
+8 minutes, 10 seconds
+1 - alfa y t - 1 più perché appunto va a sostituire nella definizione di di l - 1
+8:18
+8 minutes, 18 seconds
+va a inserire alfa volte y t - 1, quindi trova questo termine, però trova anche alfa volte 1 - alfa l - 2 e allora va a
+8:28
+8 minutes, 28 seconds
+sostituire l t - 2, usa la formula ricorsiva, insomma, e si trova una somma pesata di tutte le osservazioni passate.
+8:34
+8 minutes, 34 seconds
+Va bene? Ora non è che dovete eh proprio ricordarvi questa formula, ok? Però, appunto, appunto, questo modello usa un
+8:43
+8 minutes, 43 seconds
+un decadimento, una media, diciamo, tra alfa e il presente e 1 - alfa il passato. Attenti, perché è esponenziale?
+8:50
+8 minutes, 50 seconds
+Ecco, forse è importante osservare solo questo fatto. Perché è esponenziale? Vedete, qui c'è un decadimento, vedete?
+8:57
+8 minutes, 57 seconds
+1 - alfa 1 - alfa va a moltiplicare il lag a ritardo di 1 - alfa qu che è un
+9:04
+9 minutes, 4 seconds
+fattore più piccolo perché alfa è tra 0 e 1 va a moltiplicare osservazione al lag 2 ritardata di 2 1 - alfa cubo va a
+9:12
+9 minutes, 12 seconds
+osservare quello ritardate di 3 quindi il passato conta ma viene se volete incorporato con un decadimento esponenziale. Ok? Questo spiega se volete l'esponenziale.
+9:23
+9 minutes, 23 seconds
+Semplice. Ora vediamo perché sono facciamo una costruzione su modelli più complicati di questo e in un certo senso smoothing. Ora
+9:31
+9 minutes, 31 seconds
+smoothing viene anche detto smorzamento in italiano, anche se non è proprio correttissima come traduzione. In effetti sarebbe lisciamento, sarebbe una
+9:39
+9 minutes, 39 seconds
+versione più liscia. In che senso è più liscia? Beh, se volete facendo la media, no, di tutti questi osservazioni passate, pesandoli in questo modo, alla
+9:47
+9 minutes, 47 seconds
+fine uno ha una versione più regolare, ok? Il rumore in qualche modo, se ci sono oscillazioni si dovrebbero cancellare. Adesso vediamo in pratica
+9:55
+9 minutes, 55 seconds
+cosa fa questo modello, che poi non è così sofisticato, però una prima idea di base insomma per rendere, insomma, un
+10:03
+10 minutes, 3 seconds
+modello un po' più complicato del naive, ma non troppo. Ok, allora questa è la serie dell'altra volta, quella notem, quella delle temperature, no? Allora,
+10:11
+10 minutes, 11 seconds
+cosa si si può fare? Vedete, abbiamo tutte le nostre osservazioni, quelle in nero. Ho lasciato un paio di osservazioni in rosso, così abbiamo un
+10:18
+10 minutes, 18 seconds
+test set, un insieme di validazione e invece le previsioni con il modello smoothing esponenziale semplice con alfa
+10:27
+10 minutes, 27 seconds
+= 0,5 ho scelto io alfa 1/2 ci dà questa linea blu qui. Ok? E e vedete è un po'
+10:34
+10 minutes, 34 seconds
+come naive perché in effetti dice "Ok, andiamo avanti con quella previsione, l'ultimo L trovato, l'ultimo livello trovato e si procede su quello. Non è il
+10:42
+10 minutes, 42 seconds
+massimo, vedete? Cioè le oscillazioni non le catturiamo, però diciamo rispetto al naiv, quello naive sarebbe
+10:49
+10 minutes, 49 seconds
+semplicemente prendere l'ultimo valore e portarlo avanti. È un qualcosa di diverso, no? in qualche modo ha capito
+10:57
+10 minutes, 57 seconds
+che la nostra serie storica non è solo l'ultimo valore, ma c'è un'oscillazione e perché sta facendo le medie, no, di tutte le osservazioni precedenti e
+11:05
+11 minutes, 5 seconds
+quindi si si ferma, insomma, su questo valore qui. Va bene?
+11:11
+11 minutes, 11 seconds
+Eh, e però in effetti se mettete alfa = 1, che era quello appunto naive, perché state facendo alfa volte l'ultima osservazione più il passato invece
+11:20
+11 minutes, 20 seconds
+pesato 1 - alfa, quindi 0 passato pesa 0, trovate proprio naif. Ok? E allora
+11:27
+11 minutes, 27 seconds
+andiamo a vedere. Ehm, ma ora non occupiamoci ancora del problema di stimare alfa, va bene? Ora,
+11:34
+11 minutes, 34 seconds
+visto che le equazioni sono facili, perché avete solo questa equazione per la vostra eh il livello e anche per la
+11:43
+11 minutes, 43 seconds
+previsione, quindi abbiamo solo due equazioni, no? Allora, l'idea è rigiriamole, vi introduco già questa decomposizione ETS che poi sarà utile
+11:52
+11 minutes, 52 seconds
+per classificare un po' tutti questi modelli, altrimenti diventa una selva di modelli, va bene? Allora, questa decomposizione ETS, questi modelli
+12:00
+12 minutes
+errore, trend e stagionalità, quindi ETS, cercano di scrivere queste equazioni che uno può anche scrivere,
+12:08
+12 minutes, 8 seconds
+appunto, come abbiamo scritto adesso quella di SS, poi vedremo le altre un po' più complicate, cercano di scriverle in termini in modo che sia esplicito il
+12:17
+12 minutes, 17 seconds
+concetto di residuo, di errore. E vi ricordate, ne abbiamo parlato anche l'altra volta, quando c'è la decomposizione additiva o moltiplicativa
+12:24
+12 minutes, 24 seconds
+e poi c'è il trend, la stagionalità, volendo c'è il ciclo, questa cosa che però incorporiamo in trendo stagionalità e poi il residuo, l'errore. Ora
+12:33
+12 minutes, 33 seconds
+nell'equazione di prima vi ho detto c'è il livello e c'è la previsione, non ho detto cos'è l'errore. Ok? Quindi allora facciamo così, dato un modello
+12:42
+12 minutes, 42 seconds
+predittivo, non necessariamente quello di prima, ma appunto in generale, e chiamiamo residuo o errore, che cosa?
+12:50
+12 minutes, 50 seconds
+Chiamiamolo e di t + h, sapendo, diciamo, la serie fino a t. Che cos'è?
+12:56
+12 minutes, 56 seconds
+Beh, è la differenza è il solito residuo, se volete, qua anche in regressione abbiamo parlato così di residui. Facciamo la differenza tra la y
+13:03
+13 minutes, 3 seconds
+effettivamente osservata, se possibile, di in t + h e invece la previsione la
+13:09
+13 minutes, 9 seconds
+previsione che abbiamo di y a tempo t + h sapendo la serie fino a t. Ora, per semplificare la notazione chiamiamo
+13:17
+13 minutes, 17 seconds
+soltanto d t che poi sarà, diciamo, la cosa più tipica. Facciamo soltanto la differenza tra l'osservazione al tempo t
+13:26
+13 minutes, 26 seconds
+e la previsione, attenti della del valore y al tempo t se conosciamo la serie fino al tempo t - 1.
+13:34
+13 minutes, 34 seconds
+Ok? Quindi una previsione a orizzonte 1 eh, partendo però dal tempo t - 1. Ok?
+13:42
+13 minutes, 42 seconds
+Quindi questo è un punto importante, diciamo. Quindi più in generale avete questo errore perché potete fare previsioni a un mese, a un anno, h
+13:50
+13 minutes, 50 seconds
+quanto grande volete, ma ora vedremo che per le formule, per la stima, tendenzialmente si fa una stima eh in modo da minimizzare i residui soltanto
+13:59
+13 minutes, 59 seconds
+all'istante successivo, ok? Poi si può anche cambiare questa cosa, ma quindi chiamiamo dt sempre questo, ok?
+14:06
+14 minutes, 6 seconds
+Ricordate y d è la differenza tra y dt e la previsione, conoscendo però l'istante immediatamente precedente,
+14:13
+14 minutes, 13 seconds
+tutta la storia fino all'istante precedente. Ok? Allora, osserviamo subito perché poi questo giochetto si può fare per tutti i modelli, anche
+14:22
+14 minutes, 22 seconds
+winters, i più complicati che vedremo, ma non lo facciamo esplicitamente, però almeno per il modello SES, quello di smoothing esponenziale
+14:30
+14 minutes, 30 seconds
+semplice. Allora, ricordiamoci, c'erano due equazioni, no? c'era l'equazione sulla previsione. L'equazione sulla previsione dice usa l'ultimo livello che
+14:38
+14 minutes, 38 seconds
+hai trovato e portalo avanti. Quindi, in particolare, cosa abbiamo? che y cappuccio toscendo la serie fino a t - 1
+14:45
+14 minutes, 45 seconds
+è L t - 1, l'ultimo che livello che avevamo. E allora perfetto, questo ce l'abbiamo e poi c'era l'altra equazione,
+14:53
+14 minutes, 53 seconds
+quella per il livello. Il livello era il livello al tempo t era alfa volte y d + 1 - alfa lt - 1 il livello precedente.
+15:03
+15 minutes, 3 seconds
+Quindi ora vedete abbiamo due equazioni.
+15:06
+15 minutes, 6 seconds
+Eh beh, ora quest'altra, vedete, la cerco di scriverla in modo da far comparire il residuo. Vedete? Perché c'è alfa qui e un alfa qui. Quindi se voi
+15:14
+15 minutes, 14 seconds
+raccogliete alfa avete alfa volte y t - lt - 1
+15:22
+15 minutes, 22 seconds
+e poi più il livello l - 1. Ok? Quindi riscrivo l'equazione perché definisce il livello è solo una cosa algebrica. viene
+15:30
+15 minutes, 30 seconds
+alfa volte y t - lt - 1 più semplicemente l - 1.
+15:41
+15 minutes, 41 seconds
+Quindi dice che il livello vecchio, il vecchio livello viene aggiornato moltiplicandovelo per cosa? Cioè aggiungendogli, scusate, non
+15:48
+15 minutes, 48 seconds
+moltiplicando, aggiungendo cosa? alfa volte questo parametro che ci dice quanto pesa il presente rispetto al al
+15:57
+15 minutes, 57 seconds
+passato è alfa che moltiplica però cos'è questo? y d la vera osservazione - lt -
+16:05
+16 minutes, 5 seconds
+1. Ma questa è la previsione, questa è y cappuccio di toscendo t - 1. Quindi stiamo dicendo
+16:12
+16 minutes, 12 seconds
+che la lt il nuovo livello è alfa volte irresiduo, quindi se volete l'errore nella mia previsione più il vecchio livello. Ok?
+16:23
+16 minutes, 23 seconds
+Quindi, in un altro in un altro senso, il livello si può pensare come una specie di somma perché poi potete
+16:30
+16 minutes, 30 seconds
+portare avanti, no? Avrete alfa volte t + lt - 1, no? Che che svolgete ancora,
+16:38
+16 minutes, 38 seconds
+no? Avete quindi alfa volte t -2 e così via, quindi avete una somma dei residui, ok? L'DT è in qualche modo una somma smorzata di questi errori.
+16:51
+16 minutes, 51 seconds
+Ecco. E e chi è però Y? attenti. Ecco, quindi abbiamo riscritto l'equazione per le nostre L in termini dei residui, che
+16:59
+16 minutes, 59 seconds
+è questa, molto semplice, e chiamiamola si chiama a volte equazione di stato di transizione.
+17:05
+17 minutes, 5 seconds
+Comunque l'equazione che vi dice il livello come cambia, va bene questa questa variabile livello e l'altra invece più importante, attenti però
+17:12
+17 minutes, 12 seconds
+appunto che la previsione invece è questa qui. l'ho semplicemente rigirata, cioè dicendo che la yt
+17:24
+17 minutes, 24 seconds
+è appunto l - 1 più per definizione l'errore. Va bene? Questo è semplicemente ho riscritto l'equazione
+17:31
+17 minutes, 31 seconds
+questa in alto qui, va bene? Perché vedete t è y - y cappuccio, ma y cappuccio è L semplifica e avete questo. Ok?
+17:43
+17 minutes, 43 seconds
+Non ho capito cosa cosa ha chiamato prima come la previsione di tata più -1 quando ha fatto l'uguale sotto questa.
+17:51
+17 minutes, 51 seconds
+Questa qui. Sì, sì, questa. Questa qui.
+17:54
+17 minutes, 54 seconds
+Beh, il modello SES dice quello che vi ho detto fino all'inizio, cioè calcolate questi livelli e poi quando è il momento
+18:00
+18 minutes
+di fare una previsione a un a due o a 100 anni nel futuro, il modello S è molto semplice. Dice tieni l'ultimo
+18:08
+18 minutes, 8 seconds
+livello che hai trovato va bene come previsione. Ok. molto simile al naiv, non fa oscillazioni, non fa nulla. Ok,
+18:15
+18 minutes, 15 seconds
+quindi allora il punto qual è? La logica è questa perché ve la racconto in questo che è il modello più semplice, perché poi tutte queste rimescolamenti
+18:22
+18 minutes, 22 seconds
+algebrici si possono fare anche per i modelli più complicati, però almeno in questo modello vediamolo. Allora, uno parla di, cioè, vuole mettere in
+18:30
+18 minutes, 30 seconds
+evidenza questi errori, questi residui ed è la differenza tra quello che effettivamente è il valore della serie e la previsione. Ok? Ora chiamiamo solo dto. Questo che abbiamo detto, no?
+18:43
+18 minutes, 43 seconds
+Adesso vedete se io qui inserisco, cioè il modello SES non parlava di residui, cioè posso però cercare di riscriverlo in termini di residui, che è solo una
+18:52
+18 minutes, 52 seconds
+riscrittura. Quindi uno dice la previsione è l'ultimo livello.
+18:57
+18 minutes, 57 seconds
+Ok? Quindi se qua ci metto adesso l ottengo che y t - l - 1. Ho ho già un'equazione, un'equazione che mi dice
+19:05
+19 minutes, 5 seconds
+residuo è la differenza tra la y t - 1.
+19:10
+19 minutes, 10 seconds
+Prima equazione che è scritta qui quaggiù, insomma. Ok? E l'altra è l'equazione che dice come si evolve il livello, ma posso scriverlo in termini
+19:17
+19 minutes, 17 seconds
+di residuo. Era quello che dicevamo qui, che il livello è il vecchio livello più alfa volte il residuo. Ok?
+19:24
+19 minutes, 24 seconds
+Va bene? È un modo, se volete più perché ora vedrete anche le successive diventano un po' ad hoc queste equazioni, un po' complicate, però si
+19:32
+19 minutes, 32 seconds
+possono in realtà riscrivere tutte inquadrare in questa idea che ci sono dei termini di errore, dei residui e poi ci saranno dei termini di trend e di
+19:40
+19 minutes, 40 seconds
+stagionalità. Ok? Ora vale la pena, secondo me, di scegliere uno dei due punti di vista e quello più tradizionale
+19:48
+19 minutes, 48 seconds
+è di presentare, adesso vedremo, di evolvere un po' le equazioni S e S di queste SES. diventano via più complicate, però si può fare la stessa
+19:56
+19 minutes, 56 seconds
+cosa dal punto di vista qui dove mettete in evidenza un livello e il poi aggiungiamo il trend, la stagionalità e
+20:03
+20 minutes, 3 seconds
+i residui, va bene? Quindi si sceglie, diciamo, uno dei due punti di vista, lo porto avanti. Potrei farveli in parallelo tutte e due, ma avreste una quantità di equazione poi da, insomma,
+20:12
+20 minutes, 12 seconds
+da complicate. Ok? Allora, quindi diciamo così, il punto di vista qual è?
+20:16
+20 minutes, 16 seconds
+che abbiamo il livello che potreste pensare il vero stato, una uno stato del vostro sistema che però non andate a
+20:24
+20 minutes, 24 seconds
+osservare voi andate a osservare la y, la serie storica. E la serie storica cos'è da questo punto di vista? Cioè, diciamo che il livello è magari quello che idealmente mi piacerebbe avere.
+20:35
+20 minutes, 35 seconds
+Allora, la serie storica è il livello più un rumore, no? Un residuo. Ok? Qui in
+20:45
+20 minutes, 45 seconds
+effetti da questo punto di vista rovesciate un po' la cosa, state dicendo che ci sono questi rumori e voi vorreste veramente modellizzare la L, ma quello
+20:54
+20 minutes, 54 seconds
+che osservate è solo la Y, che è una versione rumorosa. Ok, questo è il punto di vista ETS, va bene?
+21:03
+21 minutes, 3 seconds
+è un po' rovesciando un po' la situazione, quindi e questo spiega un po' per questo livello che natura potrebbe potremmo dargli, potremmo dirgli a una versione un po' ideale di
+21:12
+21 minutes, 12 seconds
+quella che dovrebbe essere la mia serie storica, ma io ne osservo invece una versione rumorosa, ok? Questo che è il livello più residuo. Quindi lo stato
+21:20
+21 minutes, 20 seconds
+effettivamente questo livello è lo stato precedente con il rumore. Ecco, vedete?
+21:26
+21 minutes, 26 seconds
+C'è anche una disparità, non è che sono la stessa equazione. Vedete, il livello si evolve come il livello precedente più alfa volte, quindi smorzato con questo
+21:34
+21 minutes, 34 seconds
+con questo parametro che in generale è smorzato perché alfa è più piccolo di 1 e invece la y è l - 1 + t. Ok?
+21:45
+21 minutes, 45 seconds
+Va bene. Quindi abbiamo, diciamo, questo, se volete, è una versione alternativa del modello SS.
+21:52
+21 minutes, 52 seconds
+sono sempre due equazioni in un parametro alfa e poi abbiamo scelto in questo caso le variabili L ed, va bene?
+22:01
+22 minutes, 1 second
+Invece di dire qual è la previsione e qual è il livello e basta.
+22:06
+22 minutes, 6 seconds
+Allora, però a livello di notazione, giusto per introdurvi, appunto, che secondo me è più comoda anche da capire, è allora questa è un modello. Che cosa
+22:13
+22 minutes, 13 seconds
+fa questo modello? Non sta cogliendo nessun trend, nessuna stagionalità, c'è soltanto, diciamo, un livello, no? un livello, diciamo, di una costante.
+22:23
+22 minutes, 23 seconds
+Allora, e in particolare, vedete, abbiamo solo usato addizioni, se volete, qui stiamo sommando i valori, i residui sono tutti in decomposizione additiva.
+22:31
+22 minutes, 31 seconds
+Allora, l'anotazione è ETS, errore, trend e stagionalità.
+22:36
+22 minutes, 36 seconds
+A per indicare che stiamo usando soltanto un livello che si evolve in senso additivo. Vedete? Avete delle
+22:42
+22 minutes, 42 seconds
+somme e poi non c'è n vuol dire vuoto nal di trend, niente trend e niente
+22:51
+22 minutes, 51 seconds
+stagionalità. Ok, adesso andiamo via a rendere più complicati questi modelli aggiungendoci trend e stagionalità.
+22:59
+22 minutes, 59 seconds
+Ok, va bene. Questo è l'unico caso che in cui trasformiamo un modello alt winters,
+23:05
+23 minutes, 5 seconds
+adesso vediamo Holt o SES in un modello ETS, però questa trasformazione si può fare sempre, diventa un po' noiosa da da
+23:13
+23 minutes, 13 seconds
+scrivere. Ecco, ad esempio, uno dice, "Ok, adesso era una decomposizione additiva, ma ad esempio se sappiamo, no,
+23:21
+23 minutes, 21 seconds
+che si può fare tutte le decomposizioni additive o moltiplicative, quindi se invece la mia serie ha un carattere più moltiplicativo, ok, anche senza
+23:30
+23 minutes, 30 seconds
+introdurre trend e stagionalità, ma diciamo soltanto che vogliamo passare al logaritmo essenzialmente, no? Beh, allora qual è la l'operazione naturale?
+23:37
+23 minutes, 37 seconds
+L'operazione naturale è di dire, cioè ora potete in effetti passare il logaritmo e usare la cosa additiva, nessuno ve lo vieta, però altrimenti
+23:46
+23 minutes, 46 seconds
+potete parlare di errori, invece di parlare di errori in senso additivo, fate gli errori relativi, ok? Quindi fate la differenza.
+23:55
+23 minutes, 55 seconds
+Senti che è diverso e rispetto a fare il logaritmo e poi eh riespondenziale. Fate la differenza, ma dividete per la vostra
+24:03
+24 minutes, 3 seconds
+eh previsione. Adesso qua devo controllare perché in effetti
+24:10
+24 minutes, 10 seconds
+mi mi risulta Sì, va bene, va bene che così dovrebbe andare. Ecco allora come diventano le equazioni? Se uno definisce
+24:17
+24 minutes, 17 seconds
+il residuo in questo modo e fa comunque il il modello S e S, eh allora ottiene quello che chiama modello ETS con lo
+24:27
+24 minutes, 27 seconds
+stato che evolve in senso moltiplicativo. Cosa vuol dire? Vuol dire che lo stato è dato dallo stato precedente, il livello è dato dal
+24:33
+24 minutes, 33 seconds
+livello precedente per questo 1 + alfa y d. Ok? Quindi, invece di avere il livello + alfa volte y ε t lo andate a moltiplicare.
+24:44
+24 minutes, 44 seconds
+Ok? E per l'osservazione avete questa stessa evoluzione in senso moltiplicativo. Ora questo livello un po' strano, dice "Ma perché sto facendo
+24:52
+24 minutes, 52 seconds
+questo?" Perché poi quando uno va a aggiungere il trend o va a aggiungere la stagionalità lì si vede veramente la differenza se stai facendo trend
+24:59
+24 minutes, 59 seconds
+moltiplicativo o additivo, no? Vi ricordate anche le serie che abbiamo visto la volta scorsa?
+25:05
+25 minutes, 5 seconds
+Va bene. Allora, al di là di additivo o moltiplicativo, rimane il problema di come stimiamo alfa, no? C'è un parametro, come facciamo a stimarlo?
+25:14
+25 minutes, 14 seconds
+Beh, allora ci riconduciamo quello che abbiamo visto anche ai tempi della della regressione, no? Quindi e qui la
+25:21
+25 minutes, 21 seconds
+decomposizione, la scrittura di tipo errore, trend e stagionalità è molto comoda perché abbiamo una nozione di errore, di residuo, beh, e a quel punto
+25:29
+25 minutes, 29 seconds
+facciamo i minimi quadrati su quei residui. Ok? Quindi l'ipotesi, qual è l'ipotesi statistica che faceva funzionare i mini quadrati? era che i
+25:37
+25 minutes, 37 seconds
+residui siano variabili aleatorie indipendenti, identicamente distribuite, gaussiane, media zero e una varianza
+25:45
+25 minutes, 45 seconds
+sigma quadro che potendo possiamo anche stimare pure dai dati, no? E quindi cosa significava fare i minimi quadrati?
+25:52
+25 minutes, 52 seconds
+Significava fare eh la somma dei dei residui che ho scritto di nuovo esplicitamente, no? Mettiamente il valore osservato meno la previsione al
+26:01
+26 minutes, 1 second
+quadrato e sommante su tutte le osservazioni, no? da 1 a n.
+26:07
+26 minutes, 7 seconds
+Ecco, allora questo metodo eh perché ci piace? Perché appunto è ehm è un metodo che funzionava per la regressione. Va
+26:15
+26 minutes, 15 seconds
+benissimo. Quale potrebbe essere il problema? Se il modello è un po' troppo complicato, vi ricordate? Il metodo dei mini quadrati di per sé si può fare
+26:23
+26 minutes, 23 seconds
+sempre ed ha sempre l'interpretazione come massima verosimiglianza.
+26:27
+26 minutes, 27 seconds
+Però attenti, vi ricordate? Poi ci siamo concentrati sui modelli lineari perché nei modelli lineari, a parte che avevamo
+26:34
+26 minutes, 34 seconds
+delle formule esplicite di risoluzione, eh nei modelli lineari, appunto, si può garantire che esiste un, insomma, si può
+26:42
+26 minutes, 42 seconds
+trovare facilmente anche numericamente se uno non avesse delle formule i parametri. Ok? Allora, qual è il problema di questi modelli? È che il
+26:51
+26 minutes, 51 seconds
+parametro alfa, vi ricordate quella formula esplicita che vi ho scritto?
+26:54
+26 minutes, 54 seconds
+c'era alfa a volte y + alfa 1 per alfa 1 - alfa e così via. È un'espressione complicata in alfa, non è un modello lineare.
+27:03
+27 minutes, 3 seconds
+Ok? Quindi quando qui andate a inserire, ad esempio, già per il modello più semplice che sess andate a inserire il
+27:10
+27 minutes, 10 seconds
+vostro lt - 1, qui dice perfetto, ma questo è un lt - 1 che dipende da alfa.
+27:18
+27 minutes, 18 seconds
+Qui dovreste inserire tutta quell'espressione complicata e non è più una funzione lineare di alfa e quindi non c'è una formula esplicita, ok? Non
+27:26
+27 minutes, 26 seconds
+c'è una formula esplicita, non è, insomma, deve essere soltanto calcolato numericamente, va bene? Quindi si
+27:34
+27 minutes, 34 seconds
+ricorre a metodi numerici. Quando andremo mercoledì magari a implementare direttamente i modelli, uno dà il modello e comando e lasciamo stimare il parametro dai dati al funzione numerica.
+27:46
+27 minutes, 46 seconds
+Va bene? Quindi non aspettatevi. Ecco, domandina, c'è una formula numerica esplicita per i parametri ottimali per le serie storiche? Tendenzialmente no.
+27:56
+27 minutes, 56 seconds
+Ok. Se sono questi modelli qui non c'è.
+28:00
+28 minutes
+Ok? Poi magari per altri modelli che sono lineari si può pure trovare qualche formula, ma tendenzialmente uno non insomma non si concentra tanto su quello
+28:09
+28 minutes, 9 seconds
+come come invece nella regressione abbiamo fatto. Allora, dai, vediamo in pratica. Quindi stimiamo questo Alfa, lasciamolo stimare ad R, diciamo,
+28:17
+28 minutes, 17 seconds
+software. Allora, questo ho preso la solita serie storica, quella dove prima io avevo messo 0,5 come scelta di
+28:24
+28 minutes, 24 seconds
+parametro che mi piaceva, invece lasciandolo stimare al l'output del, vabbè, vedremo la
+28:32
+28 minutes, 32 seconds
+funzione, insomma, ETS, abbiamo che l'alfa stimato risulta 1. Ora alfa stimato significa che l'alfa che
+28:40
+28 minutes, 40 seconds
+minimizza la somma dei residui al quadrato per le nostre osservazioni è 1. E alfa = 1 era un modello naive, no?
+28:49
+28 minutes, 49 seconds
+perché era quello che pesava solo l'ultima osservazione e il passato era pesato con 1- alfa, quindi ce lo dimentichiamo. Qui vedete, alla fine,
+28:57
+28 minutes, 57 seconds
+nonostante abbiamo cercato di rendere più flessibile il modello, la scelta dei minimi quadrati ci ha riportato, no, il metodo AIV in realtà era pure meglio,
+29:06
+29 minutes, 6 seconds
+cioè era diciamo tanto tanto meglio quanto Ora, non è sempre così, eh ad esempio, qua ho preso Stock quella di E
+29:14
+29 minutes, 14 seconds
+Stock Markets, ho preso una finestra di un anno e comunque mi stima alfa uguale 1, però non è sempre così. Ad esempio,
+29:22
+29 minutes, 22 seconds
+potete prendere, vabbè, ora in questo caso è sempre così, abbiamo alfa uguale 1 anche qui, però ad esempio in questo caso per la Air Passengers, ecco, sì, ho
+29:31
+29 minutes, 31 seconds
+fatto una cosa un po' più complicata perché tenete presente sono è un modello molto semplice questo di sesso, insomma, quindi alla fine si finisce nel naive,
+29:40
+29 minutes, 40 seconds
+insomma. Però, ad esempio, qui ho preso eh ETS additivo, però ho applicato al logaritmo, quindi ho cercato di fare una
+29:48
+29 minutes, 48 seconds
+cosa un po' moltiplicativa e mi ho trovato alfa uguale 0. Altri casi, vabbè, no, c'erano altri esempi in cui veniva 0,2 0,6, ma li vediamo mercoledì.
+29:57
+29 minutes, 57 seconds
+Comunque è un modello molto molto semplice, ok? Se volete davvero dare una previsione che sia costante nel futuro, potete appoggiarvi a modello sess.
+30:07
+30 minutes, 7 seconds
+Ecco, andiamo a rendere un po' più complicato perché ha il difetto questo modello che non coglie né il trend né la stagionalità.
+30:14
+30 minutes, 14 seconds
+Quindi vediamo un po' come si fa ad aggiungere un po' di complessità questo modello senza esagerare.
+30:19
+30 minutes, 19 seconds
+Allora, l'idea è molto semplice, un'idea di Holt, siamo parliamo degli anni 50, del 900, quindi non è un'idea
+30:27
+30 minutes, 27 seconds
+recentissima, però sono modelli che alla fine performano bene. Allora, l'idea è aggiungiamo, oltre al livello
+30:34
+30 minutes, 34 seconds
+aggiungiamo una pendenza. Facciamo tutto in versione additiva per il momento. Ok?
+30:39
+30 minutes, 39 seconds
+Quindi l'idea qual è? La previsione y t + h conoscendo soltanto t sarà appunto
+30:47
+30 minutes, 47 seconds
+il nostro livello che sarebbe la previsione di eh del modello sess più però andiamo a vedere il trend, no? Ho questa pendenza.
+30:57
+30 minutes, 57 seconds
+Quindi faremo h vol bt, quindi vado a dire che invece di se qui è la mia serie storica, invece di prevedere una
+31:05
+31 minutes, 5 seconds
+costante, magari me la prevede pure nel senso naive, ma va a cogliere un po' di trend, quindi va a fare una una funzione lineare. Ok?
+31:16
+31 minutes, 16 seconds
+Ecco, allora quali parametri avremo adesso? Avremo un parametro per lo smoothing, lo lo insomma smorzamento di
+31:25
+31 minutes, 25 seconds
+del livello alfa. come prima perché andiamo a complicare un po' il modello di SES e andiamo però a fare un'operazione simile anche per il trend,
+31:34
+31 minutes, 34 seconds
+ok? Quindi anche il trend avrà un suo parametro beta, quindi il livello LDT si si insomma sarà associato, se volete, al parametro alfa
+31:42
+31 minutes, 42 seconds
+e il il b al beta. Ok? Però vediamo come le equazioni sono un attimo da
+31:49
+31 minutes, 49 seconds
+discutere. Allora, la prima è quella che vi ho appena descritto anche sopra, no?
+31:53
+31 minutes, 53 seconds
+Quindi la previsione partendo dal tempo t a un orizzonte t + h al tempo t + h, quindi dopo h, sarà il livello lt che
+32:02
+32 minutes, 2 seconds
+sarebbe solo il sess più però h volt che è la nostra retta di trend, no? Partiamo
+32:10
+32 minutes, 10 seconds
+con il trend BDT, quindi attenti, questo è diverso. Poi abbiamo l'equazione per il livello e il livello uno dice "Beh, prendiamo la stessa equazione di modello
+32:19
+32 minutes, 19 seconds
+smoothing esponenziale semplice". Beh, allora è quasi uguale perché vedete avete alfa volte l'osservazione più
+32:26
+32 minutes, 26 seconds
+recente + 1 - alfa. Adesso qui bisogna stare attenti perché non voglio usare il livello precedente, voglio usare quello
+32:34
+32 minutes, 34 seconds
+che insomma se io fossi al tempo precedente avevo previsto di essere il valore della serie al tempo t. Quindi vado a prendere il livello precedente,
+32:43
+32 minutes, 43 seconds
+come facevo in SES, ma vado a dire "Beh, ma c'era il trend, c'era il trend" e quindi avendo fatto un passo di 1 da t - 1 a t, vado a aggiungere b t - 1. Ok?
+32:55
+32 minutes, 55 seconds
+Quindi ho incorporato anche questa equazione, vedete, non è proprio esattamente l'equazione s è conto del trend,
+33:04
+33 minutes, 4 seconds
+ok? Voglio dire che non era, ver, cioè la y di t la confronto con quella che era la mia previsione al tempo t - 1.
+33:11
+33 minutes, 11 seconds
+Infatti capite che si può rigirare poi tutte le equazioni in termini di residui eccetera. Però allora questo lo teniamo qui. E il trend? Per il trend cosa
+33:20
+33 minutes, 20 seconds
+faccio? Beh, allora il trend faccio una cosa simile, eh beh, posso fare beh ora scritte così, in effetti e un po'
+33:27
+33 minutes, 27 seconds
+rovesciata la situazione. Avete 1 - beta il trend passato, no? No, è corretto,
+33:34
+33 minutes, 34 seconds
+diciamo. 1 - beta è il trend passato. E invece qual è il trend attuale? Uno
+33:40
+33 minutes, 40 seconds
+direbbe y dt - y t - 1. Ecco, in realtà nel modello di alt se uno usasse y d - y
+33:48
+33 minutes, 48 seconds
+t - 1 verrebbe una cosa un po' troppo rumorosa e allora si usa invece la differenza dei livelli. Quindi pensate a questo come circa y d t - y t - 1. Ok?
+34:00
+34 minutes
+Questa è la è la l'idea di Holt essenzialmente. Va bene.
+34:08
+34 minutes, 8 seconds
+Sì, faccio tutto per stimare magari in questo caso PDT rispetto a PD -1, ma prima comunque era il livello rispetto
+34:15
+34 minutes, 15 seconds
+al livello precedente, a un certo punto io comunque devo partire.
+34:18
+34 minutes, 18 seconds
+Sì, li metti a zero all'inizio oppure metti delle medie. No, vanno inizializzate queste equazioni. Sì, sì.
+34:23
+34 minutes, 23 seconds
+Ora non preoccupatevi, sono effettivamente equazioni ricorsive. Qui dice vado indietro, vado indietro nel tempo. A un certo punto mi mancano le osservazioni. Allora bisogna specificare
+34:32
+34 minutes, 32 seconds
+come vengono inizializzate. Sì, qui si può fare a mano, si lascia fare in automatico, insomma, alle funzioni di R.
+34:39
+34 minutes, 39 seconds
+Va bene? Sì, è vero. Cioè, tutte le ricorsioni per essere risolte c'è da dire quali sono. L'idea qui è sempre che uno ha abbastanza osservazioni per cui
+34:48
+34 minutes, 48 seconds
+effettivamente come le inizializzi non è poi così grave. Insomma, se un inizializza ha un valor medio, un trend medio, no? Abbiamo anche stimato l'altra
+34:55
+34 minutes, 55 seconds
+volta il il metodo drift che era un modo di stimare il trend dicendo prendo il massimo, cioè l'ultimo valore della serie e meno il primo e diviso la lunghezza e così avevamo un drift.
+35:07
+35 minutes, 7 seconds
+Va bene? E vabbè. Allora, quindi queste equazioni, quindi vedete sono eh queste tre equazioni che si possono in realtà
+35:15
+35 minutes, 15 seconds
+non lo faremo, eh, non preoccupatevi, si possono rigirare in termini di errori trend, questa volta compare anche il
+35:22
+35 minutes, 22 seconds
+trend oltre a livello. Beh, allora eh vanno a insomma, quindi non è veramente queste equazioni, ma quelle rigirate in termini di errori, trend e stagionalità
+35:30
+35 minutes, 30 seconds
+che ancora non abbiamo visto. Sono il modello ETS additivo e additivo. Ok?
+35:36
+35 minutes, 36 seconds
+Cioè, in realtà, quindi attenti, non sono proprio queste, andrebbero riscritte in termini dei residui epsilon. I parametri però sono sempre
+35:43
+35 minutes, 43 seconds
+quelli. Eh, attenti, additivo. Additivo, sì, perché è possibile fare la versione moltiplicativa del trend. Va bene? In
+35:52
+35 minutes, 52 seconds
+realtà poi i parametri, appunto, sono stimati da anche questo da minimi quadrati, no?
+35:59
+35 minutes, 59 seconds
+Allora, vediamo un po' in pratica cosa succede e se si possono già aggiustare un pochino queste equazioni, cioè se funzionano già un po' meglio del metodo
+36:08
+36 minutes, 8 seconds
+sesso. Allora, andiamo a vedere. Questa è una serie che l'altra volta non abbiamo visto. È una serie un po' rumorosa, però non tanto quanto quelle
+36:16
+36 minutes, 16 seconds
+dei mercati finanziari, è una serie economica, ok? Sono quelle già caricate in R, sono dati di vendita di
+36:23
+36 minutes, 23 seconds
+un'azienda. Ok? Allora, come al solito, diviso in training e test.
+36:29
+36 minutes, 29 seconds
+Allora, qui vorremmo capire se il modello, vedete, se uno usa un modello, non l'ho fatto effettivamente, il modello SES e basta, ma usiamo anche il
+36:37
+36 minutes, 37 seconds
+metodo naive, ci fermiamo qui. Vogliamo capire se in qualche modo invece il modello di Alt, questa qui riesce a cogliere un po' di trend. Vedete, c'è
+36:45
+36 minutes, 45 seconds
+stato tutto questo trend crescente perché dovrebbe arrestarsi. Vediamo cosa cosa prevede OLT. Allora, il modello di
+36:53
+36 minutes, 53 seconds
+Holt prevede alfa = 1, quindi se volete ancora naive.
+36:58
+36 minutes, 58 seconds
+però prevede un beta e tra l'altro il beta non è eh né 0 né 1, è un valore 0,25, ok? Quindi sta mediando un po' tra
+37:06
+37 minutes, 6 seconds
+i trend passati e l'ultimo trend, pensatela così. Ed effettivamente la previsione è questa blu,
+37:14
+37 minutes, 14 seconds
+ok? Però uno potrebbe dire eh ho fatto un po' di di cherry picking, no? Perché uno dice vi ho mostrato questo esempio e la previsione sembra abbastanza buona.
+37:25
+37 minutes, 25 seconds
+Cosa succede se invece ci posizioniamo qui? No, vedo, avete questo andamento fantastico che sta crescendo, invece tutto sta andando benissimo. Usiamo il
+37:34
+37 minutes, 34 seconds
+modello di OT. Secondo voi cosa cosa prevederà Olt? Prevederà che si continua, vedete, dopo abbastanza osservazioni che sono tutte crescenti,
+37:42
+37 minutes, 42 seconds
+dirà "Eh, va benissimo, andiamo avanti e continuiamo a crescere". Ok?
+37:48
+37 minutes, 48 seconds
+E allora questo infatti è un è una cosa che il modello di Olt tende a fare, ok?
+37:52
+37 minutes, 52 seconds
+tende un po' a sovrastimare, un po' a prendere l'ultima traiettoria e e partire per quella, ok? L'ultimo incremento dice fantastico, è un po' eh
+38:01
+38 minutes, 1 second
+insomma troppo così eccitabile da questo punto di vista. Lui parte e se ne va.
+38:06
+38 minutes, 6 seconds
+Allora, vediamo un po' come si fa a correggere questa questo problema.
+38:11
+38 minutes, 11 seconds
+Quindi spesso il modello di Ol tende a sovrastimare o comunque se uno va a orizzonti temporali abbastanza lontani le previsioni di OT non sono un granché
+38:19
+38 minutes, 19 seconds
+perché pensa a questo trend lineare e ci rimane. Ok? Allora, quindi l'idea qual è? Per orizzonti lontani magari è meglio
+38:27
+38 minutes, 27 seconds
+usare SES, cioè quello in cui c'è soltanto una costante, ok? ci vogliamo adaggiare un po' fare una media tra una
+38:34
+38 minutes, 34 seconds
+previsione localmente dove c'è il trend e nel futuro essere un po' più conservativi, mettere una costante. Ok?
+38:41
+38 minutes, 41 seconds
+Eh, allora per mettere insieme un po' questi due aspetti c'è questo modello di OT con il trend smorzato dove smorzato è
+38:49
+38 minutes, 49 seconds
+veramente ucciso, ok? Mentre quell'altro smoothing a volte viene tradotto pure lui con smorzamento, non è la stessa
+38:56
+38 minutes, 56 seconds
+cosa. Allora, infatti in itali in inglese sarebbe dampt, ok? Quindi avete il trend smorzato
+39:04
+39 minutes, 4 seconds
+e cosa si fa? Beh, si aggiunge un piccolo parametro al trend, un parametro, se volete che a lungo andare lo va a uccidere, lo va a distruggere il
+39:12
+39 minutes, 12 seconds
+trend. Quindi le variabili sono sempre le stesse, il livello e la pendenza e il trend. Ci sia un parametro in più,
+39:19
+39 minutes, 19 seconds
+dicevo, ce ne sono uno per il livello e due per il trend, perché uno è il solito beta di prima che fa una specie di
+39:27
+39 minutes, 27 seconds
+smoothing esponenziale sul trend e uno invece che lo smorza. Adesso vediamo in che modo entra questo secondo parametro
+39:33
+39 minutes, 33 seconds
+F. Allora, vedete le equazioni, le ultime due, quelle del livello dello
+39:39
+39 minutes, 39 seconds
+stato e il trend sono le stesse. Quindi queste non dovete Beh, no, aspettate
+39:47
+39 minutes, 47 seconds
+a modulo un piccolo aspetto. Ora vediamo. Però la la cosa più importante è quella della previsione. Vedete, la previsione dice che al tempo t + h è il
+39:57
+39 minutes, 57 seconds
+livello, ma poi non è che partiamo e facciamo h volt. Ok, che è il nostro stima del trend. Facciamo questo,
+40:04
+40 minutes, 4 seconds
+facciamo il parametro f + f^ e qua ho sbagliato, è f³ + f ^ 4 fin^ h. Qual è il fatto che f
+40:14
+40 minutes, 14 seconds
+questo questo parametro è un numero più piccolo di 1. Immaginate 1/2, fate 1/2 + 1/4 + 1/8 + un 16, andate a sommare via
+40:22
+40 minutes, 22 seconds
+numeri più piccoli e alla fine questa è una serie geometrica, non vi fa esplodere, ok? Arrivate a una costante, ok? Quindi la previsione, diciamo, se
+40:31
+40 minutes, 31 seconds
+volete, è smorzata più se andate avanti nel futuro, molto avanti nel futuro, avete uno smorzamento che alla fine vi ferma, ok? non andate non partite per la tangente, appunto.
+40:42
+40 minutes, 42 seconds
+Ecco, attenti, quindi, con la convenzione che appunto a un passo uno avete già F volte BDT, quindi il trend,
+40:51
+40 minutes, 51 seconds
+se volete BDT non è proprio il trend a un passo uno, ma è f volte BDT, quindi dovete correggere anche le altre due
+40:57
+40 minutes, 57 seconds
+equazioni dove prima compariva bt - 1 e compariva perché stavate dicendo y vado a stimarlo con lt - 1 più il trend, dovete fare f bdt - 1 e qu vol bt -1.
+41:09
+41 minutes, 9 seconds
+Ok? Però la vera novità, se volete, è questa. La vera novità è questo pezzo qui, ok? che vi dice non andate a sommare in modo così
+41:18
+41 minutes, 18 seconds
+esagerato il trend, ma andate a smorzare.
+41:23
+41 minutes, 23 seconds
+Allora, questo modello che viene usato abbastanza in pratica, anche lui si può riscrivere in termini di errore, trend e stagionalità introducendo i residui e
+41:29
+41 minutes, 29 seconds
+così via e merita una notazione diversa e la notazione è questa dove c'è Ora questa è tutta versione additiva, quindi
+41:37
+41 minutes, 37 seconds
+abbiamo additivo il livello, additivo il trend, ma c'è il damping, cioè lo smorzamento e quindi lo mettiamo AD, ok?
+41:46
+41 minutes, 46 seconds
+Tip stapper damping. Qui abbiamo questo modello di trend smorzato.
+41:52
+41 minutes, 52 seconds
+Cosa succede? Beh, allora, se prendete se non mettete lo smorzamento, ora se f è 1, quindi state facendo 1 + 1² fa 1, no?
+42:02
+42 minutes, 2 seconds
+Quindi 1 + 1 fa 2, poi più un altro 1 e così via, alla fine avete h, no? Questo qui nel caso in cui f sia 1 è uguale ad
+42:10
+42 minutes, 10 seconds
+h se f è uguale a 1. Quindi in quel caso recuperare alt semplice. Quindi in generale però aspettatevi un f più
+42:18
+42 minutes, 18 seconds
+piccolo di 1 e questo ha l'effetto di di smorzare di uccidere questo questo trend.
+42:24
+42 minutes, 24 seconds
+In effetti si può mostrare che siccome sommando f^ + f³ f^ h alla fine si converge a un numero, questa è una serie
+42:32
+42 minutes, 32 seconds
+geometrica, si converge a un valore limite. Effettivamente la previsione all'inizio parte con il trend ma poi si assesta, si si ferma.
+42:41
+42 minutes, 41 seconds
+Vediamolo in pratica. Ok? Allora, questo è l'esempio di prima.
+42:45
+42 minutes, 45 seconds
+Ho proprio spezzato la serie come avevamo fatto prima per Holt semplice e vedete che il modello di Holt con damping vi stima alfa = 1 beta = 0,28.
+42:58
+42 minutes, 58 seconds
+Questi sono sempre stimati con minimi quadrati. Eh, anche il fi lo stimate allo stesso modo. Introducete i residui e trovate il fi che minimizza insieme agli altri parametri i minimi quadrati.
+43:09
+43 minutes, 9 seconds
+Vedete, la stima è molto più conservativa, cioè c riconosce un po' di trend all'inizio, ma poi si va subito a fermare, insomma, si va a sestare.
+43:19
+43 minutes, 19 seconds
+Ok? Eh, questo magari non lo vogliamo in questa regione, però guardate un attimino cosa succede se faccio quella finestra di prima, dove dicevo invece
+43:27
+43 minutes, 27 seconds
+arriviamo da un momento di euforia e tutto tutto sta crescendo, ci sono tantissime vendite, poi però la cosa un po' eh si arresta, no? Si ferma un po'.
+43:37
+43 minutes, 37 seconds
+Allora, cosa succede? Se fate alt eh alt quello verde è l'olt semplice,
+43:44
+43 minutes, 44 seconds
+senza damping? Vedete che effettivamente parte con una bella retta e prevede vendite eccezionali, cosa insomma non
+43:53
+43 minutes, 53 seconds
+molto, cioè, insomma, potrebbe essere anche rischioso affidarsi a un modello del genere, no? A quel punto prevede fantastico un andamento di mercato che che ci farà crescere per tanti anni.
+44:03
+44 minutes, 3 seconds
+Beh, in realtà, appunto, l'OT con il damping è quello blu, si avvicina un po' di più a quello che succede veramente.
+44:10
+44 minutes, 10 seconds
+Ok? Non ancora, effettivamente non coglie la situazione dove c'è il trend che si arresta, però se volete abbiamo scelto proprio noi una regione un po' cattiva per testare questo modello. Ok?
+44:21
+44 minutes, 21 seconds
+Quindi l'OLT con il damping, se dovete fare solo trend e pensate che ci sia un rischio, insomma, nel di sovrastimare il trend, allora metteteci il damping, ok?
+44:30
+44 minutes, 30 seconds
+In questo modo cogliete all'inizio un po' di trend e ma poi siete un po' più conservativi, ok? Al tempo grande, insomma, non vi allontanate troppo, va bene?
+44:41
+44 minutes, 41 seconds
+Ecco, ovviamente il trend si può fare anche in versione moltiplicativa. Ora questo esempio lo mostra un po' perché vi ricordate c'era questa serie dei
+44:50
+44 minutes, 50 seconds
+passeggeri, ho estrapolato un po' di più, non soltanto sono andato oltre il periodo in cui abbiamo la serie, però ho
+44:56
+44 minutes, 56 seconds
+fatto modello di altodo moltiplicativo. Cosa vuol dire? che il trend viene aggiornato con i prodotti,
+45:04
+45 minutes, 4 seconds
+un po' come quell'equazione, insomma, che abbiamo visto prima per il SES moltiplicativo. Ora anche il Bene aggiornato in modo moltiplicativo. E
+45:12
+45 minutes, 12 seconds
+vedete qual è l'effetto? Beh, l'effetto è che il trend non è soltanto di crescita lineare, ma essendo moltiplicativo, se volete siete passati
+45:19
+45 minutes, 19 seconds
+a un esponenziale, quindi avete l'esponenziale, una crescita esponenziale e anche qui rischioso, eh, se non mettete un damping rischioso che alla fine avete una crescita enorme, ok?
+45:31
+45 minutes, 31 seconds
+Quindi attenti soprattutto se usate oltre in senso moltiplicativo, a quel punto la stima del trend potrebbe portarvi molto fuori,
+45:39
+45 minutes, 39 seconds
+ok? Però, appunto, diciamo, questo esempio mostra che si può cogliere un po' la crescita moltiplicativa. Se uno fa il modello di alt moltiplicativo, poi
+45:48
+45 minutes, 48 seconds
+alla fine sono tutte gestite in automatico queste equazioni, quindi ora non voglio che impariate tutte le possibili equazioni. Ehm, però cosa
+45:56
+45 minutes, 56 seconds
+manca in questo modello? Manca la stagionalità. Ok? Se il nostro obiettivo è cogliere trend e stagionalità, alt, bisogna renderlo un po' più complicato.
+46:07
+46 minutes, 7 seconds
+E così passiamo al modello di Holt Winters, va bene? Che è quello più complicato dei modelli che vedremo oggi.
+46:15
+46 minutes, 15 seconds
+Ok? Questo cerca di incorporare trend e stagionalità.
+46:21
+46 minutes, 21 seconds
+Ok? Poi in effetti si può fare varianti in cui si dice no, non voglio il trend, voglio solo la stagionalità e altre cose, però diciamo questo cerca di incorporare tutto ed è unevoluzione del
+46:30
+46 minutes, 30 seconds
+modello di OT. Allora, vediamo un attimino la forma additiva in cui la moltiplicativa forse neanche ve l'ho scritta nelle slide, quindi insomma
+46:39
+46 minutes, 39 seconds
+abbiamo visto solo le equazioni in senso additivo. Allora, le variabili quali sono? Come prima mettiamo un livello, poi come prima mettiamo un trend, una
+46:47
+46 minutes, 47 seconds
+pendenza. però aggiungiamo una nuova variabile, una stagionalità che era quella che cercavamo anche una decomposizione all'inizio per per
+46:55
+46 minutes, 55 seconds
+rappresentare le serie storiche. Quindi, qual è l'idea? Vi scrivo subito la previsione che si capisce un po'. Cioè,
+47:02
+47 minutes, 2 seconds
+se devo andare a prevedere y t + h avendo osservato al tempo t, cosa avrò?
+47:09
+47 minutes, 9 seconds
+avrò il livello che sarebbe eh sesse.
+47:13
+47 minutes, 13 seconds
+Poi facciamo senza damping, si può fare anche col damping. Mettiamoci h volt,
+47:19
+47 minutes, 19 seconds
+quindi modello di altitivo, vado a fare S di T + H. Beh, t + h però
+47:29
+47 minutes, 29 seconds
+come faccio a definirlo? Beh, torno indietro di multipli del periodo, quindi faccio - k vol m.
+47:37
+47 minutes, 37 seconds
+M sarà il mio periodo 12 24 7 poi quello che vi ha insomma se
+47:45
+47 minutes, 45 seconds
+che vi sembra opportuno avete stimato magari prima il periodo della stagionalità e ora per quante volte?
+47:52
+47 minutes, 52 seconds
+Beh, farò un K fintanto che t + h non diventa tra i valori che ho osservato. Va bene?
+48:00
+48 minutes
+Ok. Quindi dovrò prendere K.
+48:03
+48 minutes, 3 seconds
+Precisamente deve essere la parte interna di H / M. Ok? Se vi allontanate un multiplo del periodo, due multipli
+48:11
+48 minutes, 11 seconds
+del periodo, poi toglieteli indietro finché non tornate tra i valori che avete osservato. Ok? Precisamente dovete fare la parte intera, eh, sarebbe il il
+48:20
+48 minutes, 20 seconds
+più il più piccolo intero più grande di H su M. Va bene? così siete sicuri che ritornate dentro i valori osservati ed è il più recente. Ecco perché attenti
+48:29
+48 minutes, 29 seconds
+questo SDT, mentre quando abbiamo fatto la decomposizione elementare con decompose STL, l'abbiamo vista anche mercoledì, avevamo questa funzione
+48:37
+48 minutes, 37 seconds
+periodica che era che era costante, va bene? Invece in un certo senso, Old Winters cerca di aggiornare anche un po'
+48:44
+48 minutes, 44 seconds
+la stagionalità, va bene? anche sempre col meccanismo della nuova stagionalità e la vecchia stagionalità, sempre fare
+48:52
+48 minutes, 52 seconds
+questo aggiornamento tipo di smoothing esponenziale.
+48:55
+48 minutes, 55 seconds
+Allora, questa volta le equazioni saranno una per il livello, una per la pendenza e una per la stagionalità e poi quella della previsione e i parametri
+49:04
+49 minutes, 4 seconds
+saranno come prima, uno per il livello, uno per il trend e aggiungiamo un nuovo parametro per la stagionalità. Ok?
+49:12
+49 minutes, 12 seconds
+attenti che volendo potete fare anche il damping nel trend e metterci un altro parametro in più per il trend. Allora,
+49:19
+49 minutes, 19 seconds
+queste sono le equazioni di HT Winters e guardiamole bene, dai, visto che,
+49:26
+49 minutes, 26 seconds
+insomma, sono Allora, come dicevo, la quella di previsione dice che al tempo t + h, avendo osservato fino a t è il
+49:34
+49 minutes, 34 seconds
+livello + h a volte il nostro trend, il parametro di trend.
+49:41
+49 minutes, 41 seconds
+coefficiente di trend, scusate. E poi a questo discorso di fare la stagionalità in T + H, che sarebbe il suo tempo, però
+49:47
+49 minutes, 47 seconds
+togliamo un numero intero di periodi per tornare indietro e usare il primo valore
+49:55
+49 minutes, 55 seconds
+ehm utile, diciamo, questo questa scelta di K permette di tornare indietro, ve lo
+50:03
+50 minutes, 3 seconds
+disegno pure, no? Diciamo che avete questo vostro tempo, no?
+50:07
+50 minutes, 7 seconds
+e avete osservato fino a tete fare t + h. Ok? Allora, voi sapete che questa è periodica di periodo m, quindi fate t +
+50:16
+50 minutes, 16 seconds
+h - m -2m -3m e poi fate abbastanza salti all'indietro sempre di ampiezza m
+50:25
+50 minutes, 25 seconds
+finché non rientrate tra i valori osservati, ok? Perché tra i valori osservati che avete definito queste L, B
+50:32
+50 minutes, 32 seconds
+ed S. Ok? Quindi questo è il è la vostra previsione, ok? Precisamente dovete fare questo
+50:41
+50 minutes, 41 seconds
+numero di salti se volete. In questo caso in questo disegno sono quattro, ma in generale sono la parte intera di h /
+50:48
+50 minutes, 48 seconds
+m, la parte intera superiore, ok? Di h / m. Va bene? Allora, vediamo un po' però chi sono invece il livello e il B e la
+50:57
+50 minutes, 57 seconds
+stagionalità. Allora, abbiamo eh Allora, quella del livello, ecco, quella del livello già un po' va cambiata. Perché nel livello vorremmo
+51:06
+51 minutes, 6 seconds
+togliere la stagionalità. Quindi andiamo a fare y d t.
+51:13
+51 minutes, 13 seconds
+Quindi avete alfa volte l'ultima osservazione, ma togliete la stagionalità, ok? La y di t - m, l'ultima stima che avevate, se volete, della vostra stagionalità.
+51:24
+51 minutes, 24 seconds
+Oppure, diciamo, se venite dal dal precedente, no? Cioè dovete usare questa sarebbe l'ultima osservazione alfa volta è l'ultima osservazione invece fate
+51:33
+51 minutes, 33 seconds
+l'ultima osservazione tolta la stagionalità perché dovete stimare solo il livello. Il livello non è la stagionalità, quindi lo togliamo. E invece se avete l'osservazione
+51:42
+51 minutes, 42 seconds
+precedente, no, il vostro passato, se volete avete il livello passato più il trend e qui non c'è da aggiungere
+51:50
+51 minutes, 50 seconds
+stagionalità. stagionalità sarebbe qualcosa che cioè volendo potreste dire aggiungo la stagionalità ma poi la tolgo perché vogliamo stimare solo il livello.
+51:57
+51 minutes, 57 seconds
+Quindi avete lt - 1 + bt - 1 come in alt e basta. Ok? Quindi qui abbiamo cambiato solo questo termine qui perché vogliamo
+52:05
+52 minutes, 5 seconds
+osservare il livello senza la stagionalità.
+52:09
+52 minutes, 9 seconds
+Ok? Per il trend eh qui il fi dovete toglierlo. Scusate, ho fatto copia incolla sbagliando perché non c'è il
+52:17
+52 minutes, 17 seconds
+damping. Ok? Quindi per il trend fate la stessa cosa di prima, fate il livello beta volte lt - lt - 1 + 1 - beta bt -
+52:26
+52 minutes, 26 seconds
+1. Quindi è una specie di smorzamento esponenziale soltanto sul trend. E l'ultima cosa è questa, vabbè, ha fatto veramente copia incolla male, scusate.
+52:36
+52 minutes, 36 seconds
+Questa è la stagionalità.
+52:40
+52 minutes, 40 seconds
+L'ultima equazione, quella nuova, dice come vado a stimare il mio termine di stagionalità SDT. Beh, allora vedete, SD
+52:48
+52 minutes, 48 seconds
+è di nuovo gamma, un qualcosa che adesso andiamo a vedere + 1 - gamma, quindi una media con SD T precedente, ma attenzione, non è T - 1, è T - m, no?
+52:58
+52 minutes, 58 seconds
+Perché stagionalità vorrebbe dire che è periodica di periodo m, quindi la stagionalità al tempo precedente intende
+53:06
+53 minutes, 6 seconds
+dire quella di un anno precedente, diciamo, se era di un anno, no? o di una settimana precedente se m era 7, così non quella del tempo t - 1. E invece il
+53:15
+53 minutes, 15 seconds
+primo termine cos'è? Beh, il primo termine sarebbe eh vedete io faccio y d la mia osservazione,
+53:22
+53 minutes, 22 seconds
+però di questa voglio ricavare solo la stagionalità. Allora, cosa va a fare?
+53:26
+53 minutes, 26 seconds
+Andiamo a togliere il livello e il trend, va bene? Quindi faccio y t - lt - 1 - bt - 1. Ok? Questa mi dà una stima,
+53:36
+53 minutes, 36 seconds
+se volete, della stagionalità stagionalità recente
+53:44
+53 minutes, 44 seconds
+e questa è la stagionalità passata.
+53:52
+53 minutes, 52 seconds
+Quindi tutte queste equazioni, tutte e tre, hanno a che fare, insomma, con l'idea di mediare tra il presente, quello più recente e passato. Ok? il
+54:01
+54 minutes, 1 second
+passato andate a mediare solo quello immediatamente precedente perché poi a cascata vi fa tutta una media su tutti i passati passati veramente ok quindi
+54:09
+54 minutes, 9 seconds
+avete sia per il livello che per il trend che per la stagionalità attenti che via fanno più complicate queste tre equazioni.
+54:17
+54 minutes, 17 seconds
+Va bene? Però di nuovo sono tre equazioni e in realtà con un po' di fatica, non lo facciamo, si può eh
+54:25
+54 minutes, 25 seconds
+riscrivere tutto in notazione di errore, trend e stagionalità. Quindi si può introdurre i residui, i residui diventano un termine delle vostre
+54:32
+54 minutes, 32 seconds
+equazioni, una una variabile e poi che poi quella che andiamo a stimare eh permette di stimare i coefficienti.
+54:40
+54 minutes, 40 seconds
+Allora, con la notazione ETS e queste sono le equazioni ETS additive nel livello, additive nel trend e additive nella stagionalità.
+54:50
+54 minutes, 50 seconds
+Ok? Poi si possono fare tante combinazioni, eh non tutte sono permesse, a dire il vero, ma appunto il ad esempio uno può
+54:59
+54 minutes, 59 seconds
+fare anche equazioni soltanto di livello e stagionalità oppure mettere un damping e poi ovviamente non vi ho detto ci sono
+55:06
+55 minutes, 6 seconds
+le versioni moltiplicative, ma poi anche il trend pure in questo caso si può smorzare perché lo stesso difetto che aveva Holt ce l'avrà pure, cioè abbiamo
+55:15
+55 minutes, 15 seconds
+aggiunto solo una stagionalità, ma se lo lasciate fare vi stima un trend nel futuro. duro molto insomma essenzialmente un trend costante.
+55:27
+55 minutes, 27 seconds
+Allora, vediamo in pratica e quindi cosa facciamo. Questo è l'esempio della serie Notem. Ho zoommato, ma ho fatto la stima
+55:34
+55 minutes, 34 seconds
+dei coefficienti su tutta la serie, eccetto questi ultimi 2 anni. E vedete in rosso, non l'ho scritto, dovrebbe essere rosso, la serie vera.
+55:46
+55 minutes, 46 seconds
+Rosso eh è il test.
+55:51
+55 minutes, 51 seconds
+test set e in blu è il blu è la blu è alt winters, ok?
+56:00
+56 minutes
+Additivo.
+56:03
+56 minutes, 3 seconds
+Vedete che Old Winters additivo coglie giustamente la stagionalità, ma anche, beh, ora in questo caso non c'è trend e quindi ci siamo. Insomma,
+56:11
+56 minutes, 11 seconds
+coglie bene la stagionalità. Ok, poco da dire.
+56:15
+56 minutes, 15 seconds
+Vediamo come si comporta HT Winters additivo con una serie dove c'è il trend. Quindi a quel punto mi stima. Ora qui non li ho scritti, ma si può avere
+56:24
+56 minutes, 24 seconds
+la stima di alfa, beta e gamma. Ok, quindi vediamo. Qui c'è il trend. Ho fatto di nuovo tutta la serie Air Passengers, quella lì dei passeggeri, ma
+56:33
+56 minutes, 33 seconds
+soltanto per ragioni grafiche vi mostro solo gli ultimi du 5 anni. Quindi il di nuovo il rosso è la vera serie e il blu
+56:41
+56 minutes, 41 seconds
+è quella stimata da Old Winters. Allora, cosa ha fatto Old Winters? Sta cogliendo un pochino il trend perché vedete i picchi qui si stanno un po' crescendo.
+56:52
+56 minutes, 52 seconds
+Ha accolto un po' la stagionalità, ma qual è il difetto grosso? uno se ne accorge che eh non ha colto la
+56:59
+56 minutes, 59 seconds
+stagionalità moltiplicativa. Beh, comunque il modello non l'abbiamo scelto moltiplicativo. Qui ho scelto il modello
+57:06
+57 minutes, 6 seconds
+to winters additivo. Ok? Quindi lui ha osservato questi dati, ma se abbiamo forzato quelle equazioni dove ci sono
+57:13
+57 minutes, 13 seconds
+addizioni, non ci sono prodotti, questo può uscire, ok? Non può uscire un modello moltiplicativo, bisogna scegliere il modello e spiegando che di usare le equazioni moltiplicative.
+57:24
+57 minutes, 24 seconds
+Eccolo qua. Quindi, se mettete le equazioni moltiplicative, eh, alt winters coglie bene l'ampiezza delle delle stagionalità. Ora, in
+57:32
+57 minutes, 32 seconds
+effetti, sul trend a Ah, qui ho messo solo la stagionalità moltiplicativa, scusate, eh, ho fatto stagionalità moltiplicativa,
+57:41
+57 minutes, 41 seconds
+quindi questo è ETS, eh, ho fatto additivo, additivo e moltiplicativo. Ok?
+57:49
+57 minutes, 49 seconds
+Quindi qui sta dicendo che il trend è additivo, quindi pensate che cresce come una retta e invece la stagionalità
+57:58
+57 minutes, 58 seconds
+è va a moltiplicare, quindi più grande è il valore e comunque vedete che che coglie il fatto che le oscillazioni abbiano questa ampiezza. Mentre se fate
+58:07
+58 minutes, 7 seconds
+oscillazioni additive va a fare in un certo senso una media dell'ampiezza delle oscillazioni che avete visto fin dall'inizio dove erano molto piccole,
+58:14
+58 minutes, 14 seconds
+quindi è chiaro che stimava dei valori piccoli, però ancora vedete il trend non è colto esattamente perché la vera serie sta qui in alto, invece il mio trend è un po', diciamo, sottostimato, no?
+58:26
+58 minutes, 26 seconds
+Perché? Perché anche il trend qui è moltiplicativo. Quindi andiamo a vedere l'ultima variante. Questo è ETS o
+58:34
+58 minutes, 34 seconds
+Winters, tutto moltiplicativo, moltiplicativo, moltiplicativo. Ok?
+58:38
+58 minutes, 38 seconds
+Quindi cosa succede? Succede che livello e trend in senso moltiplicativo e quindi vedete che alla fine coglie
+58:46
+58 minutes, 46 seconds
+molto bene anche il trend. Ok? Quindi allora capire bene, guardare, soprattutto insomma visualizzare sì la
+58:53
+58 minutes, 53 seconds
+serie, ma adesso vedremo anche gli indicatori numerici, eh capire se se uno sta sbagliando modello, ecco, cioè se uno sceglie modello additivo o
+59:01
+59 minutes, 1 second
+moltiplicativo fa fa abbastanza differenza.
+59:06
+59 minutes, 6 seconds
+Ecco, vabbè, questi sono modelli abbastanza classici, eh, ci sono per le serie storiche, ci sono modelli, vedremo poi modelli gaussiani, eh, questi Arima
+59:14
+59 minutes, 14 seconds
+la settimana prossima, ma in realtà continuano a performare bene. Eh, Old Winters non è da buttare via, cioè attualmente lo stato dell'arte è che
+59:21
+59 minutes, 21 seconds
+anche se uno usa serie storiche e usa per le serie storiche usa reti neurali, cose molto sofisticate,
+59:30
+59 minutes, 30 seconds
+non sempre ottiene grandi miglioramenti, eh. Quindi va a finire che alt Winters un po' insomma è più guarda più strizza
+59:38
+59 minutes, 38 seconds
+l'occhio e modelli naive perché ha due tre parametri, ma alla fine si comporta bene, quindi non serve andare a fare cose troppo sofisticate.
+59:46
+59 minutes, 46 seconds
+Eh, allora, come vi dicevo, i modelli ETS generalizzano o quantomeno, insomma, mettono un po' di ordine in questa situazione di alt winters, additivo,
+59:54
+59 minutes, 54 seconds
+moltiplicativo, così via. Ora, noi non vediamo effettivamente le equazioni, abbiamo visto solo quelle del modello dove c'è soltanto eh il livello, però in
+1:00:03
+1 hour, 3 seconds
+generale usano una componente di errore, una componente di livello, una componente di trend e una componente di
+1:00:10
+1 hour, 10 seconds
+stagionalità. Ok? Quindi cerca di modellizzare questo. Allora, ogni componente, quindi l'errore può essere
+1:00:18
+1 hour, 18 seconds
+additivo o moltiplicativo, il trend può essere additivo o moltiplicativo o il la stagionalità pure o oppure può essere
+1:00:25
+1 hour, 25 seconds
+assente. N sta per assente, no? Abbiamo visto quello più semplice era A n additivo, niente trend, niente stagionalità.
+1:00:33
+1 hour, 33 seconds
+Ovviamente ora, appunto, avete tre, volendo, in realtà, ci può essere anche lo smorzamento, eh, quindi AD,
+1:00:41
+1 hour, 41 seconds
+se volete anche un damping, però, appunto, con questa notazione e potete cogliere tantissimi modelli. Ad
+1:00:50
+1 hour, 50 seconds
+esempio, allora, additivo, niente trend e niente stagionalità è il modello SES, il primo additivo. Additivo era alt additivo, diciamo.
+1:01:01
+1 hour, 1 minute, 1 second
+Se fate però additivo additivo con damping e niente, allora avete il trend smorzato
+1:01:07
+1 hour, 1 minute, 7 seconds
+e oppure Old Winters additivo è aa e infine vabbè no, altri esempi c'era ETS
+1:01:15
+1 hour, 1 minute, 15 seconds
+mm potete fare tutto moltiplicativo moltiplicativo moltiplicativo.
+1:01:25
+1 hour, 1 minute, 25 seconds
+Quindi uno capisce che insomma volendo essendo un po' ora non tutte le combinazioni vanno bene, però diciamo aggiungendoci anche il damping, vabbè
+1:01:33
+1 hour, 1 minute, 33 seconds
+dai, avevo 91 modelli, insomma, no, anzi no, di più, no, tre perché potete mettere o non mettere, quindi avete tre,
+1:01:40
+1 hour, 1 minute, 40 seconds
+insomma, avete una ventina di modelli, ok? Questo eh fa subito sorgere il problema se volete, di eh
+1:01:49
+1 hour, 1 minute, 49 seconds
+scegliere il modello, no? Come prima avevamo anche KNN e KNN volendo ne avete infiniti di modelli perché potete
+1:01:56
+1 hour, 1 minute, 56 seconds
+scegliere tutte le combinazioni di cap e di lag. Beh, allora abbiamo creato tantissimi modelli. Quindi come si fa a scegliere qual è il modello più
+1:02:04
+1 hour, 2 minutes, 4 seconds
+opportuno? si fa sempre sicuramente visualizzazione grafica è molto utile, si capisce quali sono magari i problemi, se potete farlo, però se avete poi anche
+1:02:13
+1 hour, 2 minutes, 13 seconds
+serie moltivariate, avete tante situazioni, è bene avere anche degli indicatori numerici. Allora, come li
+1:02:20
+1 hour, 2 minutes, 20 seconds
+troviamo gli indicatori? Beh, o si fa una cross validation, come abbiamo fatto per KNN, quindi potete farlo anche qui.
+1:02:27
+1 hour, 2 minutes, 27 seconds
+Eh, fate l'errore di cross validazione per fate una famiglia di possibili modelli ETS e vedete qual è quello che
+1:02:35
+1 hour, 2 minutes, 35 seconds
+performa meglio. Un'altra possibilità è usare quegli indicatori di informazione che che erano gli a AI eh C e B, no?
+1:02:46
+1 hour, 2 minutes, 46 seconds
+Allora, vediamo un po' come nascevano quegli indicatori. Beh, bisognava riconoscere che uno aveva una stima di massima verosimiglianza
+1:02:54
+1 hour, 2 minutes, 54 seconds
+e e questo ce l'abbiamo facilmente perché stavo dicendo che i modelli si stimano imponendo che i residui siano delle gaussiane indipendenti a media
+1:03:03
+1 hour, 3 minutes, 3 seconds
+zero a varianza costante. E allora, come dicevamo, il residuo, l'abbiamo detto prima, no,
+1:03:12
+1 hour, 3 minutes, 12 seconds
+abbiamo fatto l'esempio SES, era la differenza tra la previsione e il valore osservato e la stima dei minimi quadrati è, ma
+1:03:21
+1 hour, 3 minutes, 21 seconds
+questo è lo stesso conto che abbiamo fatto per la per la regressione. La minimi quadrati è una stima di massima
+1:03:28
+1 hour, 3 minutes, 28 seconds
+verosimiglianza quando si impone che i residui siano gaussiani e indipendenti. Ok?
+1:03:35
+1 hour, 3 minutes, 35 seconds
+Quindi perché ci piace avere una massima verosimiglianza? Perché nel momento in cui avete riconosciuto qualcosa di noto come la verosimiglianza, potete dire
+1:03:43
+1 hour, 3 minutes, 43 seconds
+"Beh, allora magari posso fare gli intervalli di previsione baesiani, non baesiani, parametrici." Allora, nel testo che vi ho consigliato qui ci sono
+1:03:52
+1 hour, 3 minutes, 52 seconds
+anche le formule degli intervalli parametrici, poi vediamo soltanto come si applicano in pratica su su R. Altra cosa interessante è che potete usare gli
+1:04:01
+1 hour, 4 minutes, 1 second
+indicatori, ad esempio questi IC e A I C e Bic, no? Per che vi davano funzionavano se avevate un modello
+1:04:09
+1 hour, 4 minutes, 9 seconds
+basato sulla verosimiglianza, perché avevate un termine, se volete, legato alla verosimiglianza, avevate meno
+1:04:16
+1 hour, 4 minutes, 16 seconds
+logaritmo della verosimiglianza e poi una penalizzazione sul numero di parametri. Se avete troppi parametri l'indicatore cresceva.
+1:04:24
+1 hour, 4 minutes, 24 seconds
+Altre cose che si può si può fare è metodi baesiani.
+1:04:30
+1 hour, 4 minutes, 30 seconds
+Ok? Se avete delle informazioni a priori sulla vostra serie potete incorporarle eh magari con una stima baesiana, ok?
+1:04:40
+1 hour, 4 minutes, 40 seconds
+Questo non quindi riconoscere che comunque stiamo facendo una stima di massima verosimiglianza è utile sotto vari
+1:04:47
+1 hour, 4 minutes, 47 seconds
+aspetti. Allora, vediamo innanzitutto soltanto graficamente perché non voglio darvi le formule perché sennò diventano
+1:04:55
+1 hour, 4 minutes, 55 seconds
+un disastro. Le abbiamo già viste per la regressione e in quel caso vi prego di approfondire bene anche il ruolo dei
+1:05:02
+1 hour, 5 minutes, 2 seconds
+vari termini, però anche in questo caso i modelli sono abbastanza semplici e permettono un'analisi per cui uno ha
+1:05:09
+1 hour, 5 minutes, 9 seconds
+delle formule esplicite. Ok? Quindi ci sono possibilità di avere intervalli di previsione, pensateli in senso
+1:05:17
+1 hour, 5 minutes, 17 seconds
+frequentista. sarebbero questo il senso opportuno, eh, però diciamo se preferite il senso baesiano, vanno pure bene.
+1:05:25
+1 hour, 5 minutes, 25 seconds
+Quindi, diciamo il un intervallo di previsione al livello 95% e vi accompagna la previsione puntuale,
+1:05:33
+1 hour, 5 minutes, 33 seconds
+no? Questa era col damping, no? Ve lo ricordate? E quindi avete questo trend che sta diminuendo, ma quella era la previsione
+1:05:41
+1 hour, 5 minutes, 41 seconds
+puntuale. Poi cosa sappiamo dire? Beh, visti i dati che abbiamo, possiamo dire con confidenza, livello di confidenza
+1:05:49
+1 hour, 5 minutes, 49 seconds
+95% che il la serie effettivamente sarà dentro questa finestra. Poi ho interrotto il tempo qui, eh, non è che
+1:05:56
+1 hour, 5 minutes, 56 seconds
+poi finisce. Ok, forse devo estendere un po' di più l'orizzonte di previsione.
+1:06:02
+1 hour, 6 minutes, 2 seconds
+Quindi con se volete interpretarlo in modo paesiano, sarebbe che con probabilità 95% per ogni tempo che
+1:06:09
+1 hour, 6 minutes, 9 seconds
+fissiamo qui la serie storica cadrà qui dentro.
+1:06:13
+1 hour, 6 minutes, 13 seconds
+Non è proprio questo, cioè questi sono intervalli frequentisti, ma appunto secondo me per le serie storiche è un è un po' diversa la cosa perché dal punto
+1:06:21
+1 hour, 6 minutes, 21 seconds
+di vista frequentista doveste dire se io campiono tante volte questa serie storica, però non potete farlo perché ne avete una
+1:06:29
+1 hour, 6 minutes, 29 seconds
+sola di solito di serie storica, 95% delle volte cadrà lì dentro. Ok?
+1:06:36
+1 hour, 6 minutes, 36 seconds
+Va bene. Quindi questo è il punto di vista frequentista.
+1:06:40
+1 hour, 6 minutes, 40 seconds
+Comunque vedete, avete questi intervalli che vi accompagnano e vi dicono con quale sicurezza eh il potete prevedere
+1:06:47
+1 hour, 6 minutes, 47 seconds
+che la serie sarà non diciamo quella lì esattamente con lavorale che poi magari non interessa molto, ma sarà dentro quell'intervallo.
+1:06:56
+1 hour, 6 minutes, 56 seconds
+Andiamo a vedere altri intervalli di previsione e in questo caso è quella Air Passengers. Vedete l'intervallo di previsione è una banda. Ora abbiamo ho
+1:07:04
+1 hour, 7 minutes, 4 seconds
+specificato io 95% in automatico R vi dà due intervalli 80 e 95. Insomma poi il livello lo decidete voi, dipende da
+1:07:12
+1 hour, 7 minutes, 12 seconds
+dall'utilizzo o da quanto grande volete questa banda essenzialmente. E però vedete che la serie vera rientra bene dentro il
+1:07:21
+1 hour, 7 minutes, 21 seconds
+la non tanto la previsione ma l'intervallo di confidenza, ok? L'intervallo di previsione. Scusate.
+1:07:28
+1 hour, 7 minutes, 28 seconds
+Cosa succede se scelgo se scelgo un modello eh sbagliato? Vabbè, lo vediamo mercoledì. perché non volevo mettere troppi grafici. Quindi intervalli di
+1:07:35
+1 hour, 7 minutes, 35 seconds
+previsione, poi ci giochiamo anche mercoledì, magari mettiamo modelli sbagliati, vediamo se se effettivamente l'intervallo diventa molto grande e così
+1:07:42
+1 hour, 7 minutes, 42 seconds
+via. Ecco, invece l'altra strada interessante che ci fornisce la verosimiglianza è quella di questi indicatori, no? Vi
+1:07:51
+1 hour, 7 minutes, 51 seconds
+ricordate l'indicatore era un numero che si calcolava in modo molto semplice. Era eh K, se fate il big
+1:07:59
+1 hour, 7 minutes, 59 seconds
+fate k volte, anzi no, dove k era il avete numero di parametri p per il logaritmo del numero di osservazioni che
+1:08:08
+1 hour, 8 minutes, 8 seconds
+è a questo punto il tempo per cui osservate la serie storica, meno il logaritmo della verosimiglianza. Ok? E
+1:08:15
+1 hour, 8 minutes, 15 seconds
+allora a quel punto avete questi indicatori che non serve fare cross validation, cioè semplicemente sui dati che avete vi possono dare un'indicazione
+1:08:24
+1 hour, 8 minutes, 24 seconds
+di quale modello è il migliore, quello che ha meno parametri, penalizzano un po' il numero di parametri e così via.
+1:08:30
+1 hour, 8 minutes, 30 seconds
+In generale appunto attenzione appunto che è fatto sul training set, eh sono non non è cross validazione, non è cross validation.
+1:08:42
+1 hour, 8 minutes, 42 seconds
+Quindi, attenti, questi sono tutti indicatori calcolati su sulla serie che avete visto e senza fare finta di non aver visto un
+1:08:49
+1 hour, 8 minutes, 49 seconds
+pezzo di serie e così via, che sarebbe la cross validazione, però si calcola in modo molto più semplice. Se avete 100.000, beh, ora non ne avete 100.000, Quindi,
+1:08:57
+1 hour, 8 minutes, 57 seconds
+avete già una ventina di cose da testare e ogni modello vi costa molto, sia di fare il training che di ehm e pensate la
+1:09:06
+1 hour, 9 minutes, 6 seconds
+cross validation potrebbe essere molto più costosa. A quel punto vi vi cioè vi bastano questi indicatori. Allora, vediamo ad esempio in questa serie
+1:09:13
+1 hour, 9 minutes, 13 seconds
+storica di Notem, vedete, ho preso eh i rossi dovrebbero essere il vero modello
+1:09:22
+1 hour, 9 minutes, 22 seconds
+e eh tre e quattro mi sa che sono praticamente sovrapposti. sono quelle che hanno una stagionalità, quindi sono alto.
+1:09:32
+1 hour, 9 minutes, 32 seconds
+Invece c'è una c'è una retta qui che cioè c'è una curva che va giù, non è neanche una retta. Questo sarebbe il modello di Alt. Il modello di Alt,
+1:09:40
+1 hour, 9 minutes, 40 seconds
+vedete, si viene da un periodo di grande discesa, di trend decrescente. Il modello di OLT vede solo il trend e quindi dice "Sì, allora andiamo andremo
+1:09:48
+1 hour, 9 minutes, 48 seconds
+ancora più giù". Ed è un trend smorzato, è il modello 2. Ok? Il modello uno effettivamente forse non l'ho neanche
+1:09:56
+1 hour, 9 minutes, 56 seconds
+plottato a questo punto che sarebbe quello di alting.
+1:10:03
+1 hour, 10 minutes, 3 seconds
+Ok, forse ho dimenticato di metterlo nel grafico, però fa una cosa simile, ok?
+1:10:07
+1 hour, 10 minutes, 7 seconds
+Vede questo trend, il modello di OT, vede solo il trend, non capisce la stagionalità e dice "Beh, si continua così".
+1:10:14
+1 hour, 10 minutes, 14 seconds
+Allora, quale dovrebbe avere l'indicatore eh migliore? Andiamo a vederli. E vedete
+1:10:20
+1 hour, 10 minutes, 20 seconds
+l'indicatore IC e BIC sono molto simili perché comunque abbiamo, insomma, il
+1:10:28
+1 hour, 10 minutes, 28 seconds
+numero di osservazioni non è così grande, però vedete passiamo da 1800 e scendiamo a 1549
+1:10:35
+1 hour, 10 minutes, 35 seconds
+1570. Ok? Quindi a livello di indicatore dobbiamo scegliere una decomposizione additiva. Più piccolo è, meglio è, ok? E
+1:10:44
+1 hour, 10 minutes, 44 seconds
+quindi avete il la scelta vi ricade sul modello di Old Winters. A a Aa sarebbe tutto additivo,
+1:10:53
+1 hour, 10 minutes, 53 seconds
+quello che abbiamo visto prima, le equazioni che abbiamo visto prima.
+1:10:57
+1 hour, 10 minutes, 57 seconds
+Ok? È molto meno costosa e di fare una cross validation.
+1:11:03
+1 hour, 11 minutes, 3 seconds
+Va bene? E vediamo invece un'altra cosa che forse non abbiamo mai affrontato ed è il discorso della gaussianità dei residui. Abbiamo detto che questi queste
+1:11:12
+1 hour, 11 minutes, 12 seconds
+stime si basano sul fatto che i residui gli errori siano delle gausiane indipendenti, tutte con la stessa media, zero, e la
+1:11:20
+1 hour, 11 minutes, 20 seconds
+stessa varianza. Questa ipotesi della varianza è quella che si chiama omoschedasticità, va bene? Vuol dire che la varianza è
+1:11:27
+1 hour, 11 minutes, 27 seconds
+sempre costante. Ecco, allora il problema qual è? Eh, si può supportare, si può dare, insomma, dell'informazione
+1:11:36
+1 hour, 11 minutes, 36 seconds
+a supporto di questa ipotesi. Questa non potrete mai dimostrare che sono veramente delle gaussiane, cioè quando avete dei dati reali non è che potete dire è veramente una gausiana, però
+1:11:44
+1 hour, 11 minutes, 44 seconds
+potete dire sì, potrebbe essere una gausiana perché vediamo perché. Allora, abbiamo già visto metodi qualitativi, no? una una gausiana può fare il cuc
+1:11:54
+1 hour, 11 minutes, 54 seconds
+plot, va a confrontare il guantile eh empirico, quindi il quantile osservato dei dati e il quantile teorico di una
+1:12:02
+1 hour, 12 minutes, 2 seconds
+gausiana e se effettivamente fosse una gausiana dovrebbe stare su una retta.
+1:12:06
+1 hour, 12 minutes, 6 seconds
+Ok? E similmente l'istogramma anche un po' più semplice, uno usa, se volete la legge di grandi numeri e dice "Guardate, se facciamo un istogramma, l'istogramma
+1:12:15
+1 hour, 12 minutes, 15 seconds
+dovrebbe avere un andamento simile alla densità della gausiana, quindi una curva campana". Questi sono metodi qualitativi che vi permettono di dire "Sì, forse i
+1:12:23
+1 hour, 12 minutes, 23 seconds
+miei dati sono i miei residui. Eh, tendenzialmente i residui vi interessa se sono gaussiani." Ci sono anche metodi quantitativi che sono questi test di gausianità.
+1:12:34
+1 hour, 12 minutes, 34 seconds
+Allora, ehm, i test di gausianità come funzionano? Noi entriamo nei dettagli perché ce ne sono tantissimi, però qual
+1:12:41
+1 hour, 12 minutes, 41 seconds
+è l'ipotesi nulla e in un test? È quella che uno tendenzialmente vuole rifiutare, no? E uno dice, "Beh, i residui sono
+1:12:49
+1 hour, 12 minutes, 49 seconds
+gausiani, quindi metto alla prova l'affermazione i residui sono gausiani e l'alternativa v sarà che i residui non
+1:12:56
+1 hour, 12 minutes, 56 seconds
+sono gausiani." Poi la cosa interessante è che poi il livello del testio si calcolano comunque sotto l'ipotesi
+1:13:03
+1 hour, 13 minutes, 3 seconds
+nulla, ok? Quindi se i residui sono gaussiani potete calcolare certe quantità e a quel punto fate la probabilità di quello che avete
+1:13:11
+1 hour, 13 minutes, 11 seconds
+effettivamente osservato e alla fine vi indica un paliue. Allora, cosa vorrà dire? che p value basso, poi basso, dipende da quanto lo decidete voi, vi
+1:13:21
+1 hour, 13 minutes, 21 seconds
+permette di rifiutare l'ipotesi nulla, quindi scartate eh la gausianità dei residui. Attenti che P value alto vi
+1:13:29
+1 hour, 13 minutes, 29 seconds
+dice che le prove non sono sufficienti a scartare la gausianalità dei residui e quindi dite "Vabbè, accetto, sono gausiani". Ok? Allora, ci sono tanti
+1:13:38
+1 hour, 13 minutes, 38 seconds
+test di gausianità basati su idee più o meno diverse e adesso vi do degli indicatori di due, cioè non vi do
+1:13:46
+1 hour, 13 minutes, 46 seconds
+dettagli, ma usiamo a scatola chiusa un po' se volete questi test di Shapiro, Wilk e Yark Bea, va bene? Uno è basato
+1:13:54
+1 hour, 13 minutes, 54 seconds
+sui momenti, l'altro sulle funzioni di di ripartizione.
+1:13:58
+1 hour, 13 minutes, 58 seconds
+Allora, quindi se volete dare un dire "Ok, io adesso voglio usare questi intervalli parametrici", adesso vi appunto perché vogliamo usare,
+1:14:06
+1 hour, 14 minutes, 6 seconds
+ma anche in generale quando parlavamo di regressione uno dice "Ok, i resilui sono effettivamente gaussiani". Beh, non soltanto mostrate un istogramma, non soltanto potete mostrare un cuclot.
+1:14:18
+1 hour, 14 minutes, 18 seconds
+Questi sono i residui di BJ Sales quando avete il modello di alted, ma avete anche dei p value, quindi
+1:14:27
+1 hour, 14 minutes, 27 seconds
+potete dare anche dei numeri, non soltanto dei grafici. Quindi indicate, ad esempio, può essere utile come affermazione che il test di Shapiro Wilk
+1:14:36
+1 hour, 14 minutes, 36 seconds
+vi dà un pivglio 0.6, 6, quindi molto alto, non ha senso scartare l'ipotesi nulla che siano gausiani. Quindi accettiamo che siano gausiani. Ok?
+1:14:46
+1 hour, 14 minutes, 46 seconds
+Stessa cosa per l'altro test. Poi sono molto simili, alla fine difficile trovare situazioni in cui uno vi dà una cosa e l'altro no. Magari indicandone
+1:14:55
+1 hour, 14 minutes, 55 seconds
+due, uno è più tranquillo, dice questo è un altro caso, vedete? Eh, no, questo seme Ah, no, sì, questo è air
+1:15:02
+1 hour, 15 minutes, 2 seconds
+passengers, quello di prima. Belles. Va bene, vedete? Insomma, la curva, il cuc plot è
+1:15:10
+1 hour, 15 minutes, 10 seconds
+abbastanza vicino e ha una retta e vedete gli indicatori sono molto grandi pivo, non potete scartare la gosità.
+1:15:17
+1 hour, 15 minutes, 17 seconds
+Ecco, questo però è un caso in cui secondo me il test insomma dice qualcosa di interessante.
+1:15:23
+1 hour, 15 minutes, 23 seconds
+Vedete sulla curva, cioè a guardarlo dice beh, potrebbe essere una gaussiana anche questo, una curva campana, un istogramma, vabbè, c'è un piccolì. Cos'è
+1:15:32
+1 hour, 15 minutes, 32 seconds
+che non gli piace? Beh, non piace il fatto che sia leggermente asimmetrica la situazione. Vedete il lo zero, cioè uno
+1:15:39
+1 hour, 15 minutes, 39 seconds
+direbbe qui dovrebbe essere la media della mia gausiana sul picco. Invece quello che succede è che l'origine zero, la media dovrebbe essere qui, ok? Quindi
+1:15:47
+1 hour, 15 minutes, 47 seconds
+sembrerebbe quasi che ci sia una coda sbilanciata, no? La coda negativa è più pesante della coda a destra, quella dei
+1:15:55
+1 hour, 15 minutes, 55 seconds
+positivi. E lo vedete anche qui nel cucupot. Vedete il cucupot? stanno sulla retta, sul lato destro va tutto bene, ma qui sul lato sinistro prendono un'altra
+1:16:03
+1 hour, 16 minutes, 3 seconds
+direzione. Ok? Or questo non piace, le caussiane non fanno questa cosa e in effetti il test vi mostra che c'è un
+1:16:11
+1 hour, 16 minutes, 11 seconds
+pilio piccolo 0.0 eh quindi un 2,5%.
+1:16:18
+1 hour, 16 minutes, 18 seconds
+Per il il test di Shapiro Vilk Yark Berra vi dà 0.06, 06, quindi più più velo piccolo, è il momento forse di
+1:16:25
+1 hour, 16 minutes, 25 seconds
+scartare l'ipotesi che i residui siano caussiani. Attenate questa ipotesi cosa succede? Eh, siete un po' in difficoltà
+1:16:34
+1 hour, 16 minutes, 34 seconds
+per gli intervalli parametrici, cioè non è che questa ipotesi ci piaccia e basta, ok? Il punto è che gli intervalli parametrici, quegli intervalli di
+1:16:42
+1 hour, 16 minutes, 42 seconds
+confidenza, sono calcolati supponendo che i residui siano gausiani. La stessa cosa che abbiamo visto per la regressione, no? Vi ricordate? dicevano tutte quelle formule si basavano sul
+1:16:50
+1 hour, 16 minutes, 50 seconds
+fatto che i residui fossero gaussiali e quindi cosa possiamo fare? Diciamo che siamo in una situazione, beh, qui è
+1:16:57
+1 hour, 16 minutes, 57 seconds
+anche peggio questo ETS, questo è Air Passengers con trend e insomma sono venuti dei residui
+1:17:07
+1 hour, 17 minutes, 7 seconds
+bruttissimi. Vedete questo? Questo sia di qua che di qua si allontanano un po' e i test ci danno un pivissimo. Quindi
+1:17:14
+1 hour, 17 minutes, 14 seconds
+in questa situazione, quella di prima, magari ancora ancora uno dice "Ma qui si scarta". Ok, qui scartiamo l'ipotesi che
+1:17:21
+1 hour, 17 minutes, 21 seconds
+siamo gausiani. Come facciamo? Possiamo dare comunque degli intervalli di fiducia. Questo è un punto chiave. Ok?
+1:17:29
+1 hour, 17 minutes, 29 seconds
+Non è che ci piacciono le gausiane solo perché vogliamo essere gausiani. Eh, il punto è che se i residui non sono gaussiani
+1:17:38
+1 hour, 17 minutes, 38 seconds
+e quindi potrebbe essere una situazione di prima, il test vi ha evidenziato che in realtà potrebbe essere anche peggio
+1:17:45
+1 hour, 17 minutes, 45 seconds
+che magari sono gausiani ma non sono eterosched, cioè sono non sono omoschedastici, quindi avete delle varianze che dipendono da dal tempo, ma
+1:17:53
+1 hour, 17 minutes, 53 seconds
+comunque facciamo finta che non siano gausiane. A quel punto cosa potete fare?
+1:17:57
+1 hour, 17 minutes, 57 seconds
+Beh, un'idea, vi ricordate anche per la regressione abbiamo detto ci sono le formule quelle parametriche, ma possiamo usare anche il Bootstrap. Allora, usiamo
+1:18:07
+1 hour, 18 minutes, 7 seconds
+il Bootstrap, però attenti, non su tutta la serie storica, perché se uno prende comincia a prendere campioni a caso, vi
+1:18:14
+1 hour, 18 minutes, 14 seconds
+ricordate l'idea di Bootstrap? era di dire ho i miei dati, ne prendo un po' a caso, calcolo eh delle stime e poi queste alla fine mi daranno dei valori
+1:18:23
+1 hour, 18 minutes, 23 seconds
+con naturalmente una certa oscillazione perché dipende dal modo in cui campionate i dati. Beh, attenti, non potete farlo per una serie storica in questo modo immediato, perché se
+1:18:32
+1 hour, 18 minutes, 32 seconds
+prendete tempi a caso non rispettate, che so la struttura di di trend, di stagionalità, non non va bene. Allora,
+1:18:39
+1 hour, 18 minutes, 39 seconds
+si può fare effettivamente un Bootstrap sulla serie, ma sicuramente l'idea che sarebbe che i residui non hanno più tanta struttura, quindi facciamo
+1:18:47
+1 hour, 18 minutes, 47 seconds
+soltanto il Bootstrap sui residui, va bene? Quindi l'idea è ho fatto il mio
+1:18:54
+1 hour, 18 minutes, 54 seconds
+ehm la mia previsione, ok? Ho il mio il mio fit del mio modello e voglio soltanto associare alla previsione puntuale degli intervalli di fiducia.
+1:19:05
+1 hour, 19 minutes, 5 seconds
+Eh, allora cosa faccio? Beh, ho degli errori osservati. che sono gli d, no?
+1:19:11
+1 hour, 19 minutes, 11 seconds
+Come abbiamo definito sempre fino a prima, cioè fate l'y di t conoscendo t -
+1:19:18
+1 hour, 19 minutes, 18 seconds
+1. Questo dipenderà dal vostro modello, eh se è alt winters, se è solo alt e così via, o anche un altro modello. Eh
+1:19:26
+1 hour, 19 minutes, 26 seconds
+non è che funzioni questa idea solo per Oldt Winters, meno effettivamente la la mia serie storica. Questi residui non dovrebbero avere strutture di
+1:19:34
+1 hour, 19 minutes, 34 seconds
+stagionalità, non dovrebbero avere strutture di di trend e così via, sono effettivamente residui e quindi diciamo
+1:19:41
+1 hour, 19 minutes, 41 seconds
+posso campionare da questi, cioè mi danno un'idea di quale dovrebbe essere la distribuzione dei miei residui.
+1:19:47
+1 hour, 19 minutes, 47 seconds
+Quindi cosa faccio? Facciamo un esempio concreto sulla previsione più semplice di tutte, naive, ok? Che potrebbe essere
+1:19:56
+1 hour, 19 minutes, 56 seconds
+un s, un sesso e con alfa uguale 1. Va bene?
+1:20:00
+1 hour, 20 minutes
+Allora, cosa fate? Eh, prima abbiamo la nostra previsione naive, che dire prendi l'ultimo valore osservato e hai y dt.
+1:20:08
+1 hour, 20 minutes, 8 seconds
+Adesso però hai i residui osservati.
+1:20:11
+1 hour, 20 minutes, 11 seconds
+Cosa sono i residui per naive? Per naive dt in questo caso è y d - 1 - y dt. Ok?
+1:20:20
+1 hour, 20 minutes, 20 seconds
+Quindi per tutta la serie storica che ho osservato riesco a costruire questi residui. Ok? Forse per Naiv avranno ancora molta struttura, però diciamo
+1:20:28
+1 hour, 20 minutes, 28 seconds
+usiamolo proprio come esempio così per fare delle formule semplici. A quel punto avete i residui
+1:20:34
+1 hour, 20 minutes, 34 seconds
+eh per ogni tempo t e usate, fate finta, no? Li mettete in una bella urna e cominciate a campionare questi numeri di
+1:20:42
+1 hour, 20 minutes, 42 seconds
+questi residui, no? Fate il bootstrap, quindi prendiamo, diciamo, ci interessa fare una previsione al tempo h. Beh,
+1:20:49
+1 hour, 20 minutes, 49 seconds
+allora campioniamo h di questi residui, chiamiamoli asterisco t + 1, asterisco t + 2,
+1:20:58
+1 hour, 20 minutes, 58 seconds
+t +2 fino a t + h. Ora, questi dipendono da come ho campionato, eh, infatti è importante in boostrap avere la possibilità di campionarne molti, quindi
+1:21:07
+1 hour, 21 minutes, 7 seconds
+campioniamo, campioniamo B volte, diciamo un certo numero di volte, ok? E quindi a quel
+1:21:14
+1 hour, 21 minutes, 14 seconds
+punto cosa fate? ogni volta che fate la previsione e usando in questo caso il metodo naive, quindi non è che fate molto, cioè state
+1:21:22
+1 hour, 21 minutes, 22 seconds
+dicendo prendo la il valore precedente e aggiungo però il residuo. Ogni volta ci aggiungo un residuo che è questo errore.
+1:21:29
+1 hour, 21 minutes, 29 seconds
+Ok? Quindi alla fine la mia previsione cosa fa? Parte dall'ultimo valore che ho osservato veramente e poi siccome fa
+1:21:36
+1 hour, 21 minutes, 36 seconds
+hpassi, questo è un modello naive molto semplice, aggiunge semplicemente questi questi H residui campionati. Però capite, aggiungendo questi queste
+1:21:45
+1 hour, 21 minutes, 45 seconds
+oscillazioni dopo h tempi avrete una, insomma, avrete un valore che oscilla, ok? Avrete un'oscillazione e questo vi
+1:21:53
+1 hour, 21 minutes, 53 seconds
+permette poi di calcolare degli intervalli come facevamo per la per la regressione, degli intervalli a qualsiasi livello, 95% 80%, quel che
+1:22:02
+1 hour, 22 minutes, 2 seconds
+volete, basandovi su queste osservazioni che avete costruito voi. Ok?
+1:22:08
+1 hour, 22 minutes, 8 seconds
+Ora, qual è la cosa interessante? è che il i quantili, diciamo, usate i quantili empirici, la cosa interessante è che, diciamo, questo metodo, almeno a livello di residui, non è molto costoso, ok?
+1:22:18
+1 hour, 22 minutes, 18 seconds
+Perché Bootstrap su tutto, vi ricordate?
+1:22:21
+1 hour, 22 minutes, 21 seconds
+A livello di regressione dovevate fare il training del modello su i dati che avete campionato, no? Sul sui dati della vostra bag.
+1:22:32
+1 hour, 22 minutes, 32 seconds
+Quello è molto costoso. Questa è un po' una via di mezzo. Uno dice, faccio il modello effettivamente quello, faccio il training su tutto, uso quei residui per
+1:22:40
+1 hour, 22 minutes, 40 seconds
+fare bootstrap sui residui. Se non sono gausiani faccio questo. Ok? Cosa? Come si comporta in pratica? Beh, in pratica
+1:22:47
+1 hour, 22 minutes, 47 seconds
+si comporta abbastanza bene. Ok? Questo ad esempio le sono gli intervalli al 95%
+1:22:54
+1 hour, 22 minutes, 54 seconds
+di sulla serie Notem, quelli costruiti con Bootstrap. Ok? Ora, vedete, effettivamente eh posso confrontarli con
+1:23:03
+1 hour, 23 minutes, 3 seconds
+quelli ehm parametrici? Beh, con quelli parametrici si possono confrontare, magari se avete le slide dopo
+1:23:11
+1 hour, 23 minutes, 11 seconds
+guardatevele, sono molto molto simili. E questo era un caso in cui uno dice vabbè sono simili perché sono gaussiani, no?
+1:23:19
+1 hour, 23 minutes, 19 seconds
+Questo qui era un caso in cui i test dicevano almeno mi sembra era forse un caso in cui i test dicevano di scartare le
+1:23:27
+1 hour, 23 minutes, 27 seconds
+ipotesi di gausianità. Vedete, comunque sono risultati leggermente diversi, un po' più eh un po' più slittati verso il
+1:23:35
+1 hour, 23 minutes, 35 seconds
+basso, ma comunque molto molto simili e non è costoso, eh, non è molto costoso.
+1:23:40
+1 hour, 23 minutes, 40 seconds
+Anche qui vedete gli intervalli si somigliano abbastanza. Ora quelli parametrici addirittura qui sovra stimano, quelli Bootstrap vanno a
+1:23:49
+1 hour, 23 minutes, 49 seconds
+sottostimare, però effettivamente vedete quelli parametrici quasi coprono la vera serie storica che è quella rossa. Ok?
+1:23:57
+1 hour, 23 minutes, 57 seconds
+Quindi la previsione è quella blu, quella puntuale. Se vogliete aggiungere un intervallo di confidenza, se c'è l'ipotesi di gausianità, usiamo quelli
+1:24:05
+1 hour, 24 minutes, 5 seconds
+parametrici che basta semplicemente una piccola opzione se usate R e altrimenti si può fare appunto gli intervalli
+1:24:11
+1 hour, 24 minutes, 11 seconds
+Bootstrap che performano abbastanza bene, non insomma diciamo un po' meno garantito il successo perché comunque
+1:24:20
+1 hour, 24 minutes, 20 seconds
+siete fuori dalle ipotesi di gausanità, ma ma ci si può anche accontentare.
+1:24:25
+1 hour, 24 minutes, 25 seconds
+Va bene. Allora, queste cose adesso le vedremo mercoledì in pratica.
+1:24:30
+1 hour, 24 minutes, 30 seconds
+Quindi, se il vostro obiettivo è fare un un progettino sulle serie storiche, non
+1:24:37
+1 hour, 24 minutes, 37 seconds
+soltanto scegliete la serie. Ora avete dei modelli in più, oltre KNN, oltre a quelli naive, potete usare Old Winters.
+1:24:45
+1 hour, 24 minutes, 45 seconds
+Mercoledì vediamo i comandi, ma anche sarà importante evidenziare questa cosa dell'intervallo di previsione, va bene?
+1:24:51
+1 hour, 24 minutes, 51 seconds
+Perché è importante non accontentarsi di una singola previsione puntuale, ma di avere anche un certo range di confidenza.
+1:25:00
+1 hour, 25 minutes
+Va bene, dai. Allora, fermiamoci qui e ci vediamo mercoledì.
+1:25:19
+1 hour, 25 minutes, 19 seconds
+الله
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+81 watching
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+4:43
+MENDELSSOHN Violin Concerto in D minor, Finale (Arr Baker)·  Black Dyke Band @jamconcert_uk
+JAM
+10k 3 wk ago
+5:01
+Inventing Spanish - SNL
+Saturday Night Live
+8.3m 11 mo ago
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+225k 13 hr ago
+New
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+8:58
+Martha Argerich, il pianoforte raccontato dal violino - Via dei Matti n.0 del 15/01/2026
+Rai
+21k 8 mo ago
+3:01
+Uno dei momenti più imbarazzanti della televisione italiana: Luca Giurato e il mago
+Gialappa's Band
+967k 3 yr ago
+16:03
+Questo server consuma meno di una LAMPADINA (e costa solo 95€!)
+Fabio Porta
+133k 8 days ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+8 songs
+Hindemith: Cello Concerto & The Four Temperaments
+Yan Pascal Tortelier, BBC Philharmonic Orchestra, Howard Shelley, Raphael Wallfisch • 25 Sept 2025
+View full playlist
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+7 songs
+Rachmaninoff & Prokofiev: Cello Sonatas
+Yo-Yo Ma, Emanuel Ax • 22 Jul 2026
+View full playlist
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+5:43
+Gigi Proietti - La pioggia nel pineto (Gabriele D'Annunzio)
+Gigi Proietti Fans
+1.3m 9 yr ago
+5:57
+The Biggest Pitfall of the Maths Olympiad | Fun of Mathematics | X+11=X|
+Rashel's Classroom
+504k 1 mo ago
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+3:05
+Mai dire 99 - La grande sfida: Giurato Vs  Sbardella
+Gialappa's Band
+259k 2 yr ago
+20:19
+[Hidden Camera] What if a local piano competition contestant was a top Korean pianist? Lol
+또모TOWMOO
+5.4m 2 wk ago
+5:24
+1986: How to Spot the Upper Class | That's Life! | BBC Archive
+BBC Archive
+2.7m 5 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago

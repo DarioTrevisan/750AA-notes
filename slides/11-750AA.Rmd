@@ -1,0 +1,828 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "1/12/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 11'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+library(caret)
+library(glmnet)
+library(car)
+library(tidyr)
+library(patchwork)
+library(forecast)
+library(tsfeatures)
+library(feasts)
+```
+
+
+# Serie storiche III
+
+
+## Obiettivi della lezione
+
+* Introdurre i *processo stocastici* come modelli probabilistici per le serie storiche.
+
+* Discutere la *stazionarietà* di un processo stocastico.
+
+* Introdurre il concetto di media mobile (*moving average*) e applicarla alla decomposizione
+
+* Introdurre modelli (S)ARIMA e studiarne le proprietà
+
+## Processo stocastico
+
+Finora abbiamo considerato le serie storiche $(y_t)_{t=1, \ldots, T}$ come dati osservati *senza supporre un modello probabilistico sottostante*. 
+
+- **Esempio**: gli errori di previsione $\varepsilon_t$ sono i.i.d.\ $\mathcal{N}(0, \sigma^2)$ (stima SSE come MLE), ma quale distribuzione supponiamo per le $y_t$?
+
+- Confronto con regressione: i dati $(y_i, x_i)$ sono i.i.d.\ estratti da una distribuzione congiunta ignota $P(X,Y)$.
+
+- Un **processo stocastico** $(Y_t)_{t=1, \ldots, T}$ è una collezione di variabili aleatorie (reali) indicizzate da un insieme di tempi. 
+
+- Un processo stocastico è detto **gaussiano** se le variabili $(Y_t)_{t=1, \ldots, T}$ sono gausssiane.
+
+## Funzioni di autocovarianza/correlazione 
+
+Dato un **processo stocastico** $(Y_t)_{t=1, \ldots, T}$:
+
+- la funzione di media (teorica) è definita
+$$ t \mapsto m(t) = \E{Y_t} $$
+
+- La **funzione di autocovarianza** (teorica) è
+$$ (s,t) \mapsto  C(s,t) = \text{Cov}(Y_s, Y_{t})$$
+- La **funzione di autocorrelazione** è
+$$ (s,t) \mapsto  \rho(s,t) = \frac{C(s,t)}{\sqrt{C(s,s) C(t,t)}} $$
+
+- La distribuzione di un processo gaussiano è completamente descritta dalla sua funzione di media e dalla sua funzione di autocovarianza.
+
+
+
+## Processi stazionari
+
+Un processo stocastico $(Y_t)_{t=1, \ldots, T}$ è **stazionario** se:
+
+  - La funzione di media è costante: $m(t) = \mu$ per ogni $t$.
+  
+  - La funzione di autocovarianza dipende solo dalla differenza temporale: $C(s,t) = C(t-s)$.
+
+- In questo caso, definiamo la funzione di autocovarianza stazionaria (teorica):
+$$ h \mapsto \gamma(h) = C(h) = \text{Cov}(Y_t, Y_{t+h}) $$
+
+- **Intuitivamente:** le proprietà statistiche di un processo stazionario non cambiano nel tempo:
+  - trend o stagionalità non sono permessi
+  - ciclo o rumore sono ammessi
+  
+
+## Legame tra acf() e funzione di autocovarianza
+
+- Date una serie storica  $(y_t)_{t=1, \ldots, T}$ di osservazioni di un processo stazionario $(Y_t)_{t=1, \ldots, T}$, la funzione di autocovarianza è stimata da
+$$ \hat\gamma(h) = \frac{1}{T-h} \sum_{t=h+1}^{T} (y_t - \bar{y})(y_{t-h}-\bar{y}) $$
+- È uno stimatore non distorto (e spesso consistente per $T \to \infty$) della funzione di autocovarianza teorica $\gamma(h)$.
+
+- È (approssimativamente) la covarianza campionaria tra la serie storica e la sua ritardata $L^hy$.
+
+- La funzione di autocorrelazione stimata $\hat\rho(h)$ è la funzione di autocovarianza stimata normalizzata:
+$$ \hat\rho(h) = \frac{\hat\gamma(h)}{\hat\gamma(0)} $$
+
+- È la funzione calcolata dal comando `acf()` in R.
+
+
+
+
+
+
+## Differenziazione e stazionarietà
+
+
+Spesso le serie storiche reali **non sono stazionarie** (trend, stagionalità, varianza non costante).
+
+- Un modo semplice per rendere una serie storica stazionaria è la **differenziazione**:
+$$ \operatorname{diff}( y) = y - Ly $$
+
+- Se la serie originale è stazionaria $\rightarrow$  la serie differenziata lo è.
+
+- La serie differenziata è più vicina alla stazionarietà (rimuove trend lineari).
+
+- In caso di trend non lineari, si differenzia più volte.
+
+- Se la serie ha stagionalità: **differenziazione stagionale**  $\operatorname{diff}_s( y) = y - L^s y$.
+
+## Esempi
+
+```{r}
+
+library(forecast)
+
+# Serie non stazionaria con trend
+AP <- AirPassengers
+
+d_AP <- diff(AirPassengers)
+
+d2_AP <- diff(d_AP)
+
+ds_AP <- diff(AirPassengers, lag=12)
+
+
+p_1 <- autoplot(AirPassengers, main="Serie originale (AirPassengers)", ylab="numero passeggeri")
+p_1
+```
+
+----
+
+```{r}
+p_2 <- autoplot(d_AP, main ="Serie differenziata (AirPassengers)", ylab="numero passeggeri")
+
+p_2
+```
+
+
+----
+
+```{r}
+p_3 <- autoplot(d2_AP, main ="Serie differenziata due volte (AirPassengers)", ylab="numero passeggeri")
+p_3
+```
+
+----
+
+```{r}
+
+p_4 <- autoplot(ds_AP, main ="Serie differenziata stagionale (AirPassengers)", ylab="numero passeggeri")
+p_4
+
+```
+
+
+----
+
+
+```{r}
+
+ds2_AP <- diff(ds_AP)
+
+p_5 <- autoplot(ds2_AP, main ="Serie differenziata/differenziata stagionale (AirPassengers)", ylab="numero passeggeri")
+p_5
+
+```
+
+-----
+
+
+
+
+```{r}
+
+ds_mul <- diff(log(AirPassengers))
+autoplot(ds_mul,  main ="differenziata log(AirPassengers)", ylab="log(numero passeggeri)")
+```
+  
+## Test di stazionarietà
+
+
+Come capire se una serie storica proviene da un processo stazionario?
+
+- Ispezione grafica (trend, varianza crescente)
+
+- Test statistici:
+  1. Test KPSS (Kwiatkowski-Phillips-Schmidt-Shin):  $p$-value basso nel test KPSS $\rightarrow$ rifiuto dell'*ipotesi nulla di stazionarietà* $\rightarrow$ serie non stazionaria.
+  2.  Test  PP (Phillips–Perron)/ADF (Augmented Dickey-Fuller): $p$-value basso nel test ADF/PP $\rightarrow$ rifiuto dell'*ipotesi nulla di non stazionarietà* $\rightarrow$ serie stazionaria
+  
+- Se la serie non è stazionaria, applicare una o più differenziazioni.
+
+
+## Esempi: serie AirPassengers
+
+
+
+```{r}
+# confronta i p-value del test per la serie originale e le differenziate definite sopra
+
+
+
+# prepara data frame per visualizzare p-values e decisioni
+p_values <- data.frame(
+  Serie = c("Originale", "Diff", "Diff 2 volte", "Diff stagionale", "Diff e diff stagionale", "diff(log())"),
+  KPSS_p = c(unitroot_kpss(AP)[2],
+                   unitroot_kpss(d_AP)[2],
+                   unitroot_kpss(d2_AP)[2],
+                   unitroot_kpss(ds_AP)[2],
+                   unitroot_kpss(ds2_AP)[2],
+                  unitroot_kpss(ds_mul)[2])
+)
+  
+p_values$KPSS_Dec <- ifelse(p_values$KPSS_p < 0.05, "Non staz.", "Stazionaria")
+
+p_values$PP_p = c(unitroot_pp(AP)[2],
+                   unitroot_pp(d_AP)[2],
+                   unitroot_pp(d2_AP)[2],
+                   unitroot_pp(ds_AP)[2],
+                   unitroot_pp(ds2_AP)[2],
+                                      unitroot_pp(ds_mul)[2]
+                   )
+  
+
+p_values$PP_Dec <- ifelse(p_values$PP_p > 0.05, "Non staz.", "Stazionaria")
+
+
+# visualizza come tabbell knitr
+library(knitr)
+kable(p_values, digits=4)
+
+
+
+```
+
+
+
+
+
+## Richiami sulla decomposizione di serie storiche
+
+
+Abbiamo visto che molte serie storiche reali mostrano **trend** e **stagionalità**. 
+
+Si estraggono mediante decomposizione additiva:
+$$ y_t = T_t + S_t + R_t $$
+
+- Dopo aver estratto il trend si media sulla sottoserie stagionale:
+$$ S_t = \frac{1}{N} \sum_{i=0}^{N-1} (y_{t - i \cdot s} - T_{t - i \cdot s}) $$
+- Come estrarre il trend? vediamo il *metodo delle medie mobili*.
+
+
+## Media mobile
+
+
+Una **media mobile** (semplice e centrata) di lunghezza $2q+1$ è definita come:
+
+$$ MA_t = \frac{1}{2q+1} \sum_{j=-q}^{q} y_{t-j} $$
+
+- Si tratta di un **filtro passa-basso**: attenua le componenti ad alta frequenza (rumore), mantenendo le componenti a bassa frequenza (trend).
+
+- Si può usare per stimare il trend di una serie storica: $T_t \approx MA_t$.
+
+- Nel comando `decompose()` si usa una media mobile di lunghezza $q$ pari alla periodicità (es. $q=12$ per dati mensili).
+
+
+## Esempi
+
+```{r}
+ts_data <- AirPassengers
+dec <- decompose(ts_data, type="additive")
+
+ autoplot(AirPassengers, main= "Serie AirPassengers e trend stimato con media mobile", ylab="numero passeggeri")+
+   autolayer(dec$trend, linewidth=2)+
+   # rimuovi legenda
+   theme(legend.position="none")
+ 
+
+``` 
+
+
+----
+
+
+```{r}
+ts_data <- nottem
+dec <- decompose(ts_data, type="additive")
+
+ autoplot(nottem, main= "Serie nottem e trend stimato con media mobile", ylab="numero passeggeri")+
+   autolayer(dec$trend, linewidth=2)+
+   # rimuovi legenda
+   theme(legend.position="none")
+
+``` 
+
+
+----
+
+
+```{r}
+
+ts_data <- EuStockMarkets[,1]
+dec <- decompose(ts_data, type="additive")
+
+ autoplot(EuStockMarkets[,1], main= "Serie EuStockMarkets (DAX) e trend stimato con media mobile", ylab="numero passeggeri")+
+   autolayer(dec$trend,  linewidth=2)+
+   # rimuovi legenda
+   theme(legend.position="none")
+ 
+
+``` 
+
+## Medie mobili generali
+
+La media mobile di `decompose()` è detta
+
+  - semplice (tutti i pesi sono uguali)
+  
+  - centrata (si media ugualmente nel passato che nel futuro).
+  
+- Medie mobili generali hanno la forma:
+$$ MA_t = \sum_{j=-q}^{q} w_j y_{t-j} $$
+
+- dove i pesi $(w_j)_{j=-q, \ldots, q}$ soddisfano:
+  - $w_j \ge 0$ per ogni $j$
+  - $\sum_{j=-q}^{q} w_j = 1$
+
+- **Esempio**: media mobile sinistra (solo passato) $w_j = \frac{1}{q+1}$ per $j=0, \ldots, q$ e $w_j=0$ altrimenti.
+
+
+## Esempio
+
+```{r}
+
+#confronta media mobile simmetrica e sinistra
+ts_data <- AirPassengers
+ma_sym <- stats::filter(ts_data, rep(1/13, 13), sides=2)
+ma_left <- stats::filter(ts_data, rep(1/13, 13), sides=1)
+autoplot(ts_data, main= "Serie AirPassengers e medie mobili", ylab="numero passeggeri")+
+  autolayer(ma_sym, series="Simmetrica", linewidth=2)+
+  autolayer(ma_left, series="Sinistra", linewidth=2)+
+  scale_color_manual(values=c("Simmetrica"="blue", "Sinistra"="red"))+
+  theme(legend.position="bottom")
+```
+
+
+## Modelli ARIMA
+
+I modelli ARIMA (*AutoRegressive Integrated Moving Average*) sono una classe di processi stocastici per serie storiche stazionarie (o rese stazionarie tramite differenziazione).
+
+Due punti di vista:
+
+1. Basato su **innovazioni**: ogni osservazione è una combinazione lineare delle osservazioni e/o residui passati.
+
+2. Basato su **autocorrelazione**: sono processi gaussiani con determinate strutture della funzione di autocovarianza.
+
+
+## Punto di vista basato su innovazioni
+
+Similmente ai modelli ETS, i modelli ARIMA sono basati sull'idea di **innovazioni** (errori di previsione imprevedibili).
+
+- Ogni osservazione $Y_t$ è una combinazione lineare di:
+  - valori passati della serie $(Y_{t-1}, Y_{t-2}, \ldots)$
+  - errori di previsione passati $(\varepsilon_{t-1}, \varepsilon_{t-2}, \ldots)$
+  - errore di previsione attuale $\varepsilon_t$
+  
+- Gli errori di previsione $(\varepsilon_t)$ sono i.i.d.\ $\mathcal{N}(0, \sigma^2)$ (rumore bianco).
+
+
+## Modelli (solo) AutoRegressivi (AR)
+
+**Definizione**: Un modello AR(p) di ordine $p \in \mathbb{N}$ è tale che
+$$
+Y_t = \alpha_1 Y_{t-1} + \dots + \alpha_p Y_{t-p} + \varepsilon_t
+$$
+dove $(\alpha_i)_{i=1, \ldots, p} \in \R^p$ sono i parametri del modello e $(\varepsilon_t)$ è rumore bianco i.i.d.\ $\mathcal{N}(0, \sigma^2)$.
+
+
+- **Notazione compatta**: posto $\mathbf{p}(L) := 1-\alpha_1 L-\alpha_2 L^2 - \ldots \alpha_p L^p$,
+$$\mathbf{p}(L)Y = \varepsilon$$
+
+- Condizione di stazionarietà: $\mathbf{p}(z)=0 \rightarrow \abs{z} > 1$
+
+- Legame con SES/ETS: AR(1) è equivalente a SES/ETS(A, N, N).
+
+## Esempio (generato)
+
+```{r} 
+set.seed(123) 
+ar_data <- arima.sim(model=list(ar=c(-0.7)), n=200)
+autoplot(ar_data, main="Esempio di serie AR(1) simulata", ylab="Valore") 
+``` 
+
+
+----
+
+
+```{r} 
+set.seed(123) 
+ar_data <- arima.sim(model=list(ar=c(0.7, -0.3)), n=200) 
+autoplot(ar_data, main="Esempio di serie AR(2) simulata", ylab="Valore") 
+``` 
+
+
+
+## Modelli (solo) a Media Mobile (MA)
+
+
+**Definizione**: Un modello MA(q) di ordine $q \in \mathbb{N}$ è tale che
+$$
+Y_t = \varepsilon_t + \beta_1 \varepsilon_{t-1} + \dots + \beta_q \varepsilon_{t-q} 
+$$
+dove $(\beta_i)_{i=1, \ldots, q} \in \R^q$ sono i parametri del modello e $(\varepsilon_t)$ è rumore bianco i.i.d.\ $\mathcal{N}(0, \sigma^2)$.
+
+
+- **Notazione compatta**: posto  $\mathbf{q}(L) := 1+ \beta_1 L+ \beta_2 L^2 + \ldots + \beta_q L^q$, 
+$$Y= \mathbf{q}(L)\varepsilon.$$
+
+- È **sempre stazionario**.
+
+## Esempio:
+
+```{r} 
+set.seed(123) 
+ma_data <- arima.sim(model=list(ma=c(0.5, 0.3, 1)), n=200) 
+autoplot(ma_data, main="Esempio di serie MA(3) simulata", ylab="Valore") 
+```   
+
+----
+
+
+```{r} 
+set.seed(123) 
+ma5_data <- arima.sim(model=list(ma=c(0.5, 0.3, 0.5, 0.5, 0.1)), n=200) 
+autoplot(ma5_data, main="Esempio di serie MA(5) simulata", ylab="Valore") 
+```   
+
+## Modelli ARIMA generali
+
+
+**Definizione**: Un modello ARIMA(p,d,q) di ordini $p,d,q \in \mathbb{N}$ è tale che dopo $d$ differenziazioni discrete $X =(I-L)^dY$ soddisfa
+$$
+ X_t = \sum_{i=1}^p \alpha_i X _{t-i}  + \varepsilon_t + \sum_{q=1}^q \beta_j \varepsilon_{t-j}
+$$
+dove $(\alpha_i)_{i=1, \ldots, p}, (\beta_j)_{j=1, \ldots, q}$ sono i parametri del modello e $(\varepsilon_t)$ è rumore bianco i.i.d.\ $\mathcal{N}(0, \sigma^2)$.
+
+
+- **Notazione compatta**: 
+$$ \mathbf{p}(L) (1-L)^d Y = \mathbf{q}(L) \varepsilon.$$
+
+- Il modello ARIMA(p,d,q) è stazionario se $d=0$ e la condizione di stazionarietà per AR(p) è soddisfatta.
+
+- Se $d>0$, la serie originale $(Y_t)$ non è stazionaria, ma la serie differenziata $(X_t)$ lo è.
+
+
+## Esempi
+
+```{r}
+
+# Random walk come ARIMA(0,1,0)
+
+set.seed(123)
+rw_data <- arima.sim(model=list(order=c(0,1,0)), n=200)
+autoplot(rw_data, main="Esempio di serie Random Walk (ARIMA(0,1,0)) simulata", ylab="Valore")
+```
+
+
+----
+
+
+```{r}
+
+# Simulazione di un ARIMA(2,2,2)
+
+set.seed(123)
+rw_data <- arima.sim(model=list(order=c(2,1,2), ar=c(0.5, -0.3), ma=c(0.4, 0.2)), n=200)
+autoplot(rw_data, main="Esempio di ARIMA(2,1,2) simulato", ylab="Valore")
+```
+
+
+
+## Modelli ARIMA stagionali (SARIMA)
+
+Si può ulteriormente estendere i modelli ARIMA tenendo conto della stagionalità di periodo $s$.
+
+- **Idea**: 
+  - aggiungere polinomi $\mathbf{P}(L^s)$, $\mathbf{Q}(L^s)$
+  - applicare differenziazioni stagionali $(1-L^s)^D$.
+  
+- Equazioni ricorsive (notazione compatta):
+$$  \mathbf{P}(L^s) \mathbf{p}(L) (1-L)^d (1-L^s)^D Y = \mathbf{Q}(L^s) \mathbf{q}(L) \varepsilon.$$
+
+- Notazione: $ARIMA(p,d,q)(P,D,Q)_s$
+
+
+
+## Esempio
+
+```{r}
+
+# Impostare il seed per replicare la simulazone
+set.seed(123)
+# impostiamo i parametri e la taglia
+
+
+n    <- 300
+
+
+
+# usiamo li comando sarima.sim dalla libreria astsa
+library(astsa)
+arima_sim <- sarima.sim(d=1,  D=1, S=12, n=n)  
+
+autoplot(arima_sim) +
+  ggtitle(paste0("Simulazione SARIMA(0,1,0)(0,1,0)_12"))
+```                        
+
+## Funzione di autocorrelazione dei modelli ARIMA
+
+- La funzione di autocorrelazione dei modelli ARIMA(p,d,q) dipende dai parametri $(\alpha_i)$, $(\beta_j)$ e dal numero di differenziazioni $d$.
+
+- Equazioni ricorsive di Yule-Walker:
+$$ C(k) = \sum_{i=1}^p \alpha_i C(k-i) \quad \text{per $k-p >q$.} $$
+
+- In particolare si trova che per  un ARIMA(p,0,q) (stazionario):
+
+  - La ACF si annulla per lag $h > q$ se $p=0$ (modello solo MA)
+  
+  - La ACF decresce esponenzialmente se $q=0$ (modello solo AR)
+
+
+- Più in generale la ACF combina decadimento (AR) e troncatura parziale (MA).
+
+  
+## Esempi
+
+
+
+```{r} 
+ar_data <- arima.sim(model=list(ar=c(0.8)), n=200)
+p1 <- autoplot(ar_data, main="Esempio di serie AR(1) simulata", ylab="Valore") 
+
+p2 <- ggAcf(ar_data, main="Funzione di autocorrelazione")
+
+p1/p2
+``` 
+
+
+----
+
+
+
+```{r} 
+set.seed(123) 
+ar_data <- arima.sim(model=list(order=c(3,0,0), ar=c(0.6, 0.2, 0.1)), n=200)
+p1 <- autoplot(ar_data, main="Esempio di serie AR(3) simulata", ylab="Valore") 
+
+p2 <- ggAcf(ar_data, main="Funzione di autocorrelazione")
+
+p1/p2
+``` 
+
+
+----
+
+```{r} 
+set.seed(123) 
+ar_data <- arima.sim(model=list(order=c(0,0,1), ma=c(0.6)), n=200)
+p1 <- autoplot(ar_data, main="Esempio di serie MA(1) simulata", ylab="Valore") 
+
+p2 <- ggAcf(ar_data, main="Funzione di autocorrelazione")
+
+p1/p2
+``` 
+
+-----
+
+```{r} 
+set.seed(123) 
+ar_data <- arima.sim(model=list(order=c(0,0,4), ma=c(0.6, 0.3, 0.8, 0.8)), n=200)
+p1 <- autoplot(ar_data, main="Esempio di serie MA(4) simulata", ylab="Valore") 
+
+p2 <- ggAcf(ar_data, main="Funzione di autocorrelazione")
+
+p1/p2
+``` 
+
+
+----
+
+
+```{r} 
+set.seed(123) 
+ar_data <- arima.sim(model=list(order=c(2,0,4), ar=c(0.7, 0.1), ma=c(0.6, 0.3, 0.8, 0.8)), n=200)
+p1 <- autoplot(ar_data, main="Esempio di serie ARIMA(2, 0, 4) simulata", ylab="Valore") 
+
+p2 <- ggAcf(ar_data, main="Funzione di autocorrelazione")
+
+p1/p2
+``` 
+
+
+----
+
+```{r} 
+# genera un seasonal arima 
+
+# Simulazione di un SARIMA(1,0,1)(0,1,0)_12 
+set.seed(123) 
+sarima_data <- arima.sim(model=list(order=c(12,0,1), ar=c(0.4, rep(0, 10), 0.5), ma=c(0.5)), n=200)
+p1 <- autoplot(sarima_data, main="Esempio di SARIMA(1,0,1)(0,1,0)_12 simulato", ylab="Valore")
+
+p2 <- ggAcf(sarima_data, main="Funzione di autocorrelazione")
+
+p1/p2
+``` 
+
+
+## Stima dei parametri
+
+
+**Problema**: fissato l'ordine (p,d,q) del modello ARIMA (eventualmente pure con stagionalità) **stimare i parametri** 
+$$ (\hat \alpha_i)_{i=1,\ldots, p}, (\hat \beta_j)_{j=1, \ldots, q}$$
+
+
+- Due approcci:
+
+  1. Approccio basato su SSE/MLE:
+  $$ \alpha_{SSE}, \beta_{SSE} \in \arg \min_{\alpha, \beta} \sum_{t} \varepsilon_t^2$$
+      - comando R `arima()`
+  
+  2. Approccio basato sulla funzione di autocovarianza (Yule-Walker)
+      $$ \hat{C}(k) \approx \sum_{i=1}^p \alpha_i \hat{C}(k-i) $$
+      - comando R `ar.yw()`
+      
+## Esempio serie log(AirPassengers)
+
+Consideriamo un modello ARIMA(1,1,0) (ossia AR(1)).
+
+```{r}
+
+
+ts_data <- diff(log(AirPassengers))
+
+
+# fit con ar(1) comando arima
+
+
+
+fit_ar_arima <- arima(ts_data, order=c(1,0,0))
+
+print(paste("(alpha) stimato tramite SSE/MLE:", round(fit_ar_arima$coef[1], 5)))
+
+
+fit_ar_yw <-ar.yw(ts_data, order.max=1)
+
+print(paste("(alpha) stimato tramite Yule-Walker:", round(fit_ar_yw$ar, 5)))
+
+``` 
+
+## Previsioni
+
+Una volta stimati i parametri del modello, usiamo la ricorsione per fare previsioni future:
+$$ \hat{y}_{T+h} = \sum_{i=1}^p \hat{\alpha}_i \hat{y}_{T+h-i} + \sum_{j=1}^q \hat{\beta}_j \hat{\varepsilon}_{T+h-j} $$
+
+- Per la previsione puntuale si pongono a zero i residui futuri $\hat{\varepsilon}_{T+h-j} = 0$.
+
+- Le previsioni dipendono dai valori osservati fino a $T$ e dai residui stimati fino a $T$.
+
+- Intervalli di predizione si ottengono propagando l'incertezza del modello stimato (in modo parametrico o mediante bootstrap)
+
+
+## Esempio
+
+```{r}
+# Previsioni con modello AR(1) stimato con arima()
+forecast_ar_arima <- forecast(fit_ar_arima, h=12)
+autoplot(forecast_ar_arima, main="Previsioni AR(1) su serie differenziata log(AirPassengers), intervalli parametrici", ylab="Valore differenziato")
+```
+
+
+---- 
+
+```{r}
+# Previsioni con modello AR(1) stimato con arima()
+forecast_ar_arima <- forecast(fit_ar_arima, bootstrap=TRUE, h=12)
+autoplot(forecast_ar_arima, main="Previsioni AR(1) su serie differenziata log(AirPassengers), intervalli bootstrap", ylab="Valore differenziato")
+```
+
+## Selezione del modello
+
+Supponiamo di voler usare un modello (S)ARIMA ma non conoscere l'ordine $(p,d,q)(P,D,Q)$. **Come selezionarlo?**
+
+- È il solito problema di selezione del modello: bilanciare bontà di adattamento (varianza) e complessità (bias) per ridurre l'errore di generalizazione.
+
+- Due approcci:
+  1. Indicatori informativi (AIC, BIC, AICc)
+  2. Validazione crociata  per serie storiche (cross-validation rolling origin)
+
+
+- In R, procedure automatiche di selezione del modello (`auto.arima()`):
+  * ricerca esaustiva o stepwise su modelli candidati
+  * selezione tramite AICc
+  * test di stazionarietà e differenziazione automatica
+
+
+## Esempio auto.arima() su serie log(AirPassengers)
+
+```{r}
+
+ts_data <- log(AirPassengers)
+fit_auto_arima <- auto.arima(ts_data)
+summary(fit_auto_arima)
+```
+
+-----
+
+```{r}
+# plot previsione
+
+forecast_auto_arima <- forecast(fit_auto_arima, h=24)
+autoplot(forecast_auto_arima, main="Previsioni con auto.arima() su serie log(AirPassengers)", ylab="log(numero passeggeri)")
+``` 
+
+
+
+## Esempio performance log(AirPassengers)
+
+
+```{r}
+fit_snaive <- snaive(log(AirPassengers))
+fit_ets <- ets(log(AirPassengers), model="MAM")
+fit_arima <- Arima(log(AirPassengers), order=c(0,1,1), seasonal=c(0,1,1))
+# errore di CV rolling origin
+ts_data <- log(AirPassengers)
+
+# costruisci le funzioni di predizione
+forecast_ets <- function (y, h) {
+  fit <- ets(y, model="MAM")
+  forecast(fit, h=h)
+}
+
+forecast_snaive <- function (y, h) {
+  fit <- snaive(y)
+  forecast(fit, h=h)
+}
+
+forecast_Arima <- function (y, h) {
+  fit <- Arima(y, order=c(0,1,1), seasonal=c(0,1,1))
+  forecast(fit, h=h)
+}
+
+
+e_ets <- tsCV(ts_data, forecastfunction=forecast_ets, h=24)
+e_arima <- tsCV(ts_data, forecastfunction=forecast_Arima, h=24)
+e_snaive <- tsCV(ts_data, forecastfunction=forecast_snaive, h=24)
+
+
+## data frame con vari metodi ed errori sul training set e di CV
+methods <- c("snaive", "ETS(MAM)", "ARIMA(0,1,1)(0,1,1)[12]")
+train_rmse <- c(sqrt(mean(fit_snaive$residuals^2, na.rm=TRUE)), sqrt(mean(fit_ets$residuals^2)), sqrt(mean(fit_arima$residuals^2)))
+cv_rmse <- c(sqrt(mean(e_snaive^2, na.rm=TRUE)), sqrt(mean(e_ets^2, na.rm=TRUE)), sqrt(mean(e_arima^2, na.rm=TRUE)))
+results <- data.frame(
+  Metodo = methods,
+  RMSE_Train = train_rmse,
+  RMSE_CV = cv_rmse
+)
+
+# visualizza tabella con knitr
+library(knitr)
+kable(results, digits=3)
+
+```
+
+----
+
+
+```{r}
+
+# plot degli errori di CV al variare del modello e al variare dell'orizzonte h
+
+rmse_snaive <- sqrt(colMeans(e_snaive^2, na.rm=TRUE))
+rmse_ets <- sqrt(colMeans(e_ets^2, na.rm=TRUE))
+rmse_arima <- sqrt(colMeans(e_arima^2, na.rm=TRUE))
+
+horizons <- 1:24
+
+#usa ggplot
+ plot(horizons, rmse_snaive, type="o", col="blue", ylim=range(c(rmse_snaive, rmse_ets, rmse_arima)),
+     xlab="Orizzonte di previsione", ylab="RMSE", main="Confronto RMSE di CV, serie log(AirPassengers)")
+lines(horizons, rmse_ets, type="o", col="red")
+lines(horizons, rmse_arima, type="o", col="green")
+legend("bottomright", legend=c("Snaive", "ETS", "ARIMA"), col=c("blue", "red", "green"), lty=1, pch=1)
+``` 
+
+
+## Riassunto ETS/ARIMA
+
+| Aspetto           | ETS                     | ARIMA                            |
+| ----------------- | ----------------------- | -------------------------------- |
+| Trend             | Esplicito (A/M)         | Solo dopo differenziazione       |
+| Stagionalità      | Esplicita               | Dopo diff. stagionale |
+| Interpretabilità  | Molto alta              | Moderata                         |
+| Serie moltiplicative | Usare    M               | Limitata  (passare al logaritmo)  |

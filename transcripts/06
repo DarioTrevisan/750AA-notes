@@ -1,0 +1,2207 @@
+
+IT
+750AA 2025 10 27 lezione 11
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+186 views  28 Oct 2025
+Regressione: descrizione generale del problema, indicatori di performance (MSE, RMSE, MAE, R^2 - coefficiente di determinazione). Errore di test, train, cross-validation, errore di generalizzazione. K-NN per la regressione: descrizione e grafici delle curve di errore (test/cv). Decomposizione generale dell'errore in bias^2+varianza+rumore (cenno di dimostrazione). Conseguenze pratiche del dilemma bias/varianza. Introduzone ai modelli parametrici per la regressione. Metodo dei minimi quadrati (OLS) e intepretazione come stima MLE per rumore additivo gaussiano.
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:10
+10 seconds
+Allora, se iniziamo
+0:28
+28 seconds
+allora ho ricevuto un po' di domande.
+0:29
+29 seconds
+sui progetti e ho visto anche che qualcuno li ha già caricati, non li ho ancora guardati, però quelli che avete caricato, però quanto prima vi do dei feedback.
+0:41
+41 seconds
+La cosa che qualcuno mi ha chiesto, lo dico anche per tutti, è se clustering di per sé è un argomento e va bene, cioè è
+0:49
+49 seconds
+nell'area della classificazione. Allora, vi do questo consiglio, visto che comunque ho postato classificazione,
+0:55
+55 seconds
+regressione e serie storiche. Se se volete fare soprattutto clustering, che è più una tecnica esplorativa, appunto,
+1:04
+1 minute, 4 seconds
+non supervisionata, eh fate così, riservatevi un po' di punti di eh di osservazioni, insomma, se
+1:12
+1 minute, 12 seconds
+non avete cinque osservazioni, senò un po' eh pochino, cioè ehm riservatevi un po' di punti, li tenete fuori dal dal
+1:20
+1 minute, 20 seconds
+dataset su cui fate il clustering e poi a quel punto usate un metodo di classificazione
+1:27
+1 minute, 27 seconds
+per imputare, per classificare quei punti che avete lasciato fuori e associarli a un cluster. Vedete, fate una specie di di test, vi vi insomma vi
+1:36
+1 minute, 36 seconds
+inventate un po' un problema di classificazione dopo aver fatto i clustering, quindi una specie di validazione, potete dire, dei vostri
+1:43
+1 minute, 43 seconds
+cluster. Vedete se è ragionevole quello che che fa.
+1:49
+1 minute, 49 seconds
+Prendete anche KNN, prendete anche l'algoritmo più semplice, così che salvate insomma tutto quanto e anche se avete fatto perlop più clustering, poi
+1:56
+1 minute, 56 seconds
+dite comunque ho fatto una cosa di classificazione, ce la caviamo così, va bene?
+2:01
+2 minutes, 1 second
+Poi non mi chiedete troppi dettagli su quali dataset vadano bene, quali non vadano bene. Generalmente, insomma, se avete un minimo numero di osservazioni,
+2:09
+2 minutes, 9 seconds
+un minimo numero di caratteristiche, insomma, ora proprio c'è chi mi ha detto addirittura sette, siamo proprio al limite, insomma, però magari ha tante
+2:18
+2 minutes, 18 seconds
+feature, quindi è interessante fare una riduzione di dimensionalità, insomma, cercate dataset come quelli che studiavamo, insomma, anche quelli tipo sul
+2:26
+2 minutes, 26 seconds
+centinaio, ve la cavate bene, insomma, comunque non è che c'è una regola e che si può fare statistica solo con tantissimi dati, eh, quindi se
+2:34
+2 minutes, 34 seconds
+semplicemente ci si accorge magari che le conseguenze non sono insomma le le che non sono le conclusioni non sono con così nette, no, quando avete pochi dati.
+2:45
+2 minutes, 45 seconds
+Allora, vediamo un po' di proseguire con l'argomento nuovo che è quello della regressione.
+2:52
+2 minutes, 52 seconds
+E oggi spieghiamo un po' il concetto di regressione. Vediamo, già che ci siamo, vediamo KNN per la
+2:59
+2 minutes, 59 seconds
+regressione, così ripassate anche KNN per la classificazione e poi passeremo
+3:06
+3 minutes, 6 seconds
+ai modelli lineari. Va bene? Allora, qual è il problema generale della regressione? è molto simile a quello
+3:13
+3 minutes, 13 seconds
+della classificazione, anzi uno potrebbe dire che la classificazione è un caso speciale di regressione e la regressione
+3:21
+3 minutes, 21 seconds
+è la classificazione con infinite classi perché abbiamo un dataset, un insieme di osservazioni xi, yi e cosa chiediamo?
+3:31
+3 minutes, 31 seconds
+Avete il solito paradigma, diciamo, supervisionato in cui avete già un insieme di esempi e come nella classificazione diciamo che
+3:40
+3 minutes, 40 seconds
+le x con i sono variabili di input che potrebbero essere delle caratteristiche, no, di ingresso che chiamiamole fattori
+3:48
+3 minutes, 48 seconds
+di ingresso, ora hanno tantissimi nomi, eh, quindi scegliete quello che preferite, però siate consapevoli che a seconda dell'ambito il problema della
+3:56
+3 minutes, 56 seconds
+regressione è fondamentale, tantissimi ambiti hanno poi sviluppato anche la loro nomenclatura, diciamo. Quindi cercherò di chiamarle caratteristiche di
+4:04
+4 minutes, 4 seconds
+ingresso, fattori di ingresso. Eh, potreste anche chiamarle variabili indipendenti, ma non è il massimo perché improbabilità. Si chiama anche predittori, variabili esplicative, no?
+4:14
+4 minutes, 14 seconds
+Un po' simile al exploratory factor analysis, no? E e allora andiamo a vedere un po' cosa sono invece le Y, che
+4:22
+4 minutes, 22 seconds
+è la differenza rispetto alla classificazione, mentre le Y erano classi, cioè variabili discrete. Eh, ora
+4:31
+4 minutes, 31 seconds
+nel caso della regressione sono delle generali variabili di output, dette anche fattori di uscita o risposte, ok? Quindi io chiamerei ad
+4:40
+4 minutes, 40 seconds
+esempio fattori di ingresso, fattori d'uscita che mi sembra abbastanza neutro, perché ad esempio chiamarle variabili indipendenti e variabili
+4:48
+4 minutes, 48 seconds
+dipendenti presuppone già un qualche significato tipo causa effetto, magari che non è molto ehm non è molto vero in
+4:57
+4 minutes, 57 seconds
+generale per la regressione. Dunque, qual è l'obiettivo? L'obiettivo è molto simile alla classificazione, è
+5:04
+5 minutes, 4 seconds
+determinare, costruire una funzione h, chiamiamola ipotesi o modello di regressione.
+5:11
+5 minutes, 11 seconds
+E per cui dall'insieme delle feature arriviamo nell'insieme delle variabili di output, quelle che erano le classi per la classificazione e qual è la
+5:20
+5 minutes, 20 seconds
+richiesta? vogliamo che hx sia circa y, cioè ora vediamo in che senso dovremmo definire una funzione di loss, un rischio e così via, però l'obiettivo è
+5:29
+5 minutes, 29 seconds
+quindi imparare una funzione partendo da esempi, ok? E le applicazioni sono molteplici, ma non serve neanche andare
+5:38
+5 minutes, 38 seconds
+troppo lontano, no? Se diciamo subito che l'insieme di output, i fattori di uscita e insomma le variabili dipendenti
+5:47
+5 minutes, 47 seconds
+sono soltanto valori binari -1 1. Beh, stiamo dicendo che ora bisogna dire cos'è precisamente questa relazione che
+5:55
+5 minutes, 55 seconds
+hx sia circa y, però potremmo dire che più o meno abbiamo esteso la classificazione.
+6:01
+6 minutes, 1 second
+Ok? Partendo da un problema con due sole classi, siamo andati a un insieme continuo di classi.
+6:07
+6 minutes, 7 seconds
+Eh, infatti dico continuo perché tendenzialmente, ora magari non lo dirò sempre, non è poi così necessario, ma l'insieme delle feature di ingresso, dei
+6:16
+6 minutes, 16 seconds
+fattori di ingresso, lo pensiamo come un insieme continuo, diciamo, in RD e anche i fattori diuscita, le variabili
+6:24
+6 minutes, 24 seconds
+dipendenti, le pensiamo in un un insieme a valori in un RK e faremo il caso di k
+6:31
+6 minutes, 31 seconds
+= 1. Ok? Poi si può fare appunto anche il caso in cui le Y, le output sono vettoriali a loro volta. Ok? Quindi
+6:39
+6 minutes, 39 seconds
+diciamo se non dico niente pensate che l'ingresso sia un vettore di dimensionale e l'uscita sia un vettore k
+6:46
+6 minutes, 46 seconds
+dimensionale, ma prendiamo anche k = 1, ok? Facciamo un caso reale, va bene?
+6:51
+6 minutes, 51 seconds
+Tante di queste cose poi si estendono nel caso vettoriale.
+6:55
+6 minutes, 55 seconds
+Allora, uno dice, "Ma io so già come fare in modo che una funzione sia circa, no? eh passi bene sui miei punti, no?
+7:04
+7 minutes, 4 seconds
+L'esempio, forse avete già parlato, avete mai incontrato il problema dell'interpolazione che è quella proprio di disegnare, di trovare una funzione
+7:12
+7 minutes, 12 seconds
+che passi esattamente per i punti di esempio, no? Eh, allora il problema dell'interpolazione è che è
+7:19
+7 minutes, 19 seconds
+un po' troppo, cioè richiede un po' troppo, ok? Ad esempio, qui abbiamo questa nuvola di punti, no? Uno dice queste sono le mie x, i miei fattori di
+7:27
+7 minutes, 27 seconds
+ingresso è unidimensionale. Fattore d'uscita è la sola y. Ok? Ora voglio imparare, voglio scoprire una funzione
+7:35
+7 minutes, 35 seconds
+hx che sia circa y, ma se non dico in che senso deve essere circa e e non chiarisco bene qual è l'obiettivo, ce ne sono tantissime che
+7:43
+7 minutes, 43 seconds
+possono fare questo lavoro e in particolare potrei cercare una funzione che so lineare a tratti che passi esattamente per i punti. Ecco, questo
+7:51
+7 minutes, 51 seconds
+qui non è andato bene. Vabbè, devo fare prima una deviazione, no? Che passi esattamente per i miei punti. Difficile da fare a mano, però insomma se date una
+8:00
+8 minutes
+linea di di comando R potete fare subito un'interpolazione lineare e ce l'avete. E qui dice vabbè è finito il problema della regressione.
+8:11
+8 minutes, 11 seconds
+No, questo è un problema. Eh beh, in questo caso potrebbe anche andare bene come funzione. Dice non è poi male, nel senso che se il mio obiettivo è dire
+8:19
+8 minutes, 19 seconds
+prendo una nuova x che non ho osservato e dico quanto varrà hx, quanto varrà la y corrispondente, sarò più o meno qui mi
+8:28
+8 minutes, 28 seconds
+sembra ragionevole. C'è però un problema che cosa succede se, ad esempio, ho delle osservazioni molto rumorose, ma
+8:36
+8 minutes, 36 seconds
+mettiamo anche pochi punti che sono fuori, insomma, sono outliers, sono proprio fuori dalla nostro, insomma,
+8:43
+8 minutes, 43 seconds
+sono estremamente diversi da quelli che ho osservato. Eh, allora, a quel punto, se vado a fare interpolazione sto mettendo troppo peso, no, su questi
+8:52
+8 minutes, 52 seconds
+outliers, vedete, li ho aggiunti qui in alto, un punto qui, un punto qui, qualche punto qui. Se ora faccio come prima un'interpolazione, cioè sto
+8:59
+8 minutes, 59 seconds
+proprio andando a inseguire i miei punti, eh pago un prezzo, no? Perché questo questo outlier mi mi mi insomma
+9:08
+9 minutes, 8 seconds
+mi manda completamente fuori dalla curva che insomma si vede anche a occhio che dovrebbe essere invece più più liscia, più vicina a questo, no? Eh, allora è il
+9:17
+9 minutes, 17 seconds
+solito problema è il solito problema di bias e varianza. In un certo senso il modello che fa l'interpolazione
+9:25
+9 minutes, 25 seconds
+ha varianza troppo alta, ok? Insegue troppo i miei punti. Il bias potrebbe essere basso. Adesso ritorneremo su
+9:33
+9 minutes, 33 seconds
+questi concetti che abbiamo visto per la classificazione. Il bias sarà molto basso perché appunto un modello molto flessibile, insegue tutti i punti, ma la
+9:40
+9 minutes, 40 seconds
+varianza è troppo alta, insegue troppo i punti, non riesce a generalizzare bene.
+9:45
+9 minutes, 45 seconds
+Ecco, allora vediamo un po'. Ora l'interpolazione così lineare a tratti non è proprio un modello che si usa di solito per la regressione.
+9:53
+9 minutes, 53 seconds
+Qual è il modello più semplice giusto per fissare un modello come abbiamo fatto per la classificazione, no? Che poi una può anche impiegare in pratica e non non è neanche male come performance.
+10:05
+10 minutes, 5 seconds
+E si fa la stessa idea che abbiamo fatto per la classificazione ai K primi vicini. Ok? è un primo esempio di
+10:11
+10 minutes, 11 seconds
+modello per la regressione e non ha un nome proprio, cioè insomma è KNN per la regressione. Poca fantasia. Beh, cosa
+10:20
+10 minutes, 20 seconds
+facciamo? Prendiamo, come vi ricordate in KNN, che non è K means eh, allora, e
+10:27
+10 minutes, 27 seconds
+i primi k punti vicini di un punto di test, no? E dobbiamo dire com'è HD.
+10:34
+10 minutes, 34 seconds
+Allora, diciamo che abbiamo un punto di test X con certi fattori di ingresso, queste caratteristiche X che saranno X1, X2, X con D, un vettore di di
+10:42
+10 minutes, 42 seconds
+caratteristiche come N per la classificazione. Andiamo a vedere i k primi punti vicini, insomma i punti più
+10:50
+10 minutes, 50 seconds
+vicini. Ad esempio, potremmo andare a pretendere K = 1, andiamo a vedere il più vicino, ma facciamo già in generale, no? Ne prendiamo K, KC. Devo quindi
+11:00
+11 minutes
+passarmi tutto il mio training set, il mio set di esempi. Vado a vedere i punti che effettivamente hanno le caratteristiche più vicine. E adesso,
+11:08
+11 minutes, 8 seconds
+mentre per la classificazione si faceva un voto, no, si diceva vediamo chi qual è la classe che è la maggioranza, queste y le i fattori d'uscita sono delle
+11:17
+11 minutes, 17 seconds
+variabili reali o anche vettoriali se lo fossero e e posso fare una media, quindi vado a fare la media, ok? prendo la
+11:24
+11 minutes, 24 seconds
+caratteristica relativa al primo più vicino più la caratteristica y più vicina del secondo più vicino fino al
+11:30
+11 minutes, 30 seconds
+kesimo e divido per K. Ok? modello molto semplice, avrà gli stessi difetti e di KNN per la
+11:39
+11 minutes, 39 seconds
+classificazione. In particolare, se lo usate in pratica, attenti che questa idea di cercare i punti più vicini usa
+11:47
+11 minutes, 47 seconds
+la distanza euclidea, quindi potete o giocarvi altre distanze, ma soprattutto riscalate i punti, eh fate una standardizzazione perché magari ci sono
+11:55
+11 minutes, 55 seconds
+delle feature su scale molto grandi che appunto vi vi schiacciano tutto e vincono rispetto ad altri. Comunque
+12:03
+12 minutes, 3 seconds
+andiamo a vedere un po' come funziona in pratica nel nostro esempio e se k = 1 in particolare la il punto del vostro
+12:12
+12 minutes, 12 seconds
+training set più vicino, per cui la x è più vicina a la x di quel punto di esempio e andate a stabilire appunto che
+12:19
+12 minutes, 19 seconds
+la y è uguale e eh i vantaggi, dicevo, gli svantaggi sono molto simili, non è che c'è molto di più da dire. Ecco,
+12:28
+12 minutes, 28 seconds
+vediamo ad esempio cosa succede se facciamo k = 5, no? Questo è lo stesso dataset di prima, però vedete, mentre la
+12:37
+12 minutes, 37 seconds
+interpolazione lineare esattamente andava a coprire, cioè andava a riprodurre tutti i punti, già andando a fare una media sui cinque vicini, eh
+12:47
+12 minutes, 47 seconds
+vedete, abbiamo un po' mitigato l'effetto degli outliers, perché ce n'è uno solo qui e lui da solo Sì, un
+12:54
+12 minutes, 54 seconds
+pochino sposta, vedete, no? la funzione fa un po' salto verso il basso perché percepisce la presenza di quel punto, ma ma dopo è anche un po' verso l'alto
+13:03
+13 minutes, 3 seconds
+perché percepisce, ma la maggioranza degli altri punti sono così abbastanza vicini a questa curva e quindi insomma
+13:09
+13 minutes, 9 seconds
+con K ug sicuramente abbiamo mitigato questo questo effetto.
+13:15
+13 minutes, 15 seconds
+Ecco, non è molto complicato. Ovviamente però non possiamo guardare a occhio i grafici, no, se la dimensione non è uno,
+13:23
+13 minutes, 23 seconds
+non è due, insomma, poi insomma è difficile andare a visualizzare tutto e introduciamo degli indicatori di
+13:31
+13 minutes, 31 seconds
+performance, come abbiamo fatto per la classificazione, però vi ricordate per la classificazione c'era un indicatore naturale, anche se
+13:40
+13 minutes, 40 seconds
+poi uno può, insomma, discutere, introdurne tanti altri, ma l'indicatore naturale era l'accuratezza, no?
+13:46
+13 minutes, 46 seconds
+L'accuratezza. di un classificatore era il numero di di casi esatti, a dire il
+13:54
+13 minutes, 54 seconds
+vero, sarebbe sul totale, no? Curatezza su su n, no? Andiamo a vedere la la frazione di successi nella classificazione.
+14:02
+14 minutes, 2 seconds
+Eh, ora questa si può calcolare chiaramente sul training set, ma è più interessante sul test validation, no? sui punti che non
+14:10
+14 minutes, 10 seconds
+abbiamo osservato. Però prima di andare a distinguere training e test e validation in generale, c'è un problema
+14:17
+14 minutes, 17 seconds
+che per la regressione sarà difficile, no? Tornate all'esempio di prima. Anche questo che può sembrare un buon
+14:25
+14 minutes, 25 seconds
+un buon un buon modello, diciamo, Kale5, non è che sta veramente esattamente già già sul training set, vedete? Non è che,
+14:32
+14 minutes, 32 seconds
+anzi, probabilmente ne becca pochissimi di punti neri, no, che sono quelli del training set. Quindi, se andiamo a misurare l'accuratezza del del modello di regressione, andando
+14:41
+14 minutes, 41 seconds
+a contare uno se andiamo a colpire esattamente il punto e zero se non lo colpiamo o se volete fare un errore mettete uno
+14:50
+14 minutes, 50 seconds
+quando non lo colpite e zero quando siete esattamente su quel punto. È troppo, insomma, è troppo grossolana, no? Vogliamo avere una funzione che sia
+14:58
+14 minutes, 58 seconds
+un po' più liscia. E allora come facciamo? Come abbiamo fatto anche all'inizio del corso, no? Ricordatevi, questa è una possibile funzione di loss.
+15:07
+15 minutes, 7 seconds
+Questa sarebbe la 01 loss.
+15:10
+15 minutes, 10 seconds
+Ok, pesate. Beh, ora questa è il contrario della 0 one loss. Vabbè, la 0 one insomma sarebbe 1 meno la 0 one
+15:19
+15 minutes, 19 seconds
+loss, ok? Perché per l'accuratezza contate uno quando fate giusto. Eh, allora facciamo la stessa cosa,
+15:26
+15 minutes, 26 seconds
+scegliamo una funzione di loss che ci piace, una funzione di perdita e andiamo a fare la
+15:33
+15 minutes, 33 seconds
+media su tutto il training set o su tutto il test insiemi di validazione di di cosa? Della loss tra il modello valutato in x e l'Y. Ok?
+15:46
+15 minutes, 46 seconds
+Ovviamente abbiamo bisogno di sapere anche qual è l'Y per fare poi queste queste stime di errore. Allora, quale
+15:52
+15 minutes, 52 seconds
+loss ci piace? c'è scritta sulla lavagna la funzione di loss di costo quadratico.
+16:00
+16 minutes
+Eh, ovviamente, quindi, con questa scelta andiamo a introdurre un indicatore che se è importante, ricordatevi, errore quadrato, errore
+16:09
+16 minutes, 9 seconds
+quadratico medio o eh in italiano, vabbè, non è EQM, scusate.
+16:19
+16 minutes, 19 seconds
+Vabbè, m sì, ok. Min square error in inglese, cioè c'è anche l'abbreviazione in italiano, se ne sono sicuro, ma non mi
+16:27
+16 minutes, 27 seconds
+viene al momento. Allora, Me square error è l'errore quadratico medio del nostro modello di regressione. Cioè, cosa andiamo a fare? la media 1 su n su
+16:37
+16 minutes, 37 seconds
+tutti i punti d'esempio dell h di xi, quindi quello che proporrebbe il modello di regressione - la y i che è quella che
+16:44
+16 minutes, 44 seconds
+effettivamente è il valore della della funzione che vogliamo stimare e poi questo scarto, questo residuo lo eleviamo al quadrato.
+16:52
+16 minutes, 52 seconds
+Ora, se vi ricordate un po' assomiglia un po' a una varianza e agli stessi difetti, no? Interpretare questo, siccome stiamo facendo i quadrati non è
+17:00
+17 minutes
+il massimo perché ci porta magari su quantità che non hanno un significato, no? rispetto magari la y è in metri e
+17:08
+17 minutes, 8 seconds
+questo errore quadratico medio in metri quadri, quindi quello che si definisce è il root min square error, ok? Quindi la radice quadrata del min square error.
+17:16
+17 minutes, 16 seconds
+Quindi se vedete RMSI è l'errore quadratico medio sotto radice. Ok?
+17:23
+17 minutes, 23 seconds
+Ma non è l'unico possibile funzione di loss che possiamo prendere.
+17:27
+17 minutes, 27 seconds
+Tra l'altro sapete, no, che quando scegliete di elevare il quadrato, eh gli outlier, come nell'esempio di prima, verrebbero molto amplificati, no? Quindi
+17:36
+17 minutes, 36 seconds
+si paga molto. Invece se uno fa direttamente la somma dei valori assoluti, gli outlier vengono un po' mitigati, insomma contano un po' meno nell'errore.
+17:47
+17 minutes, 47 seconds
+Ok? Questo già si vedeva tra media e mediana, no? Qua una variante un po' più sofisticata. E allora se metto il valore
+17:54
+17 minutes, 54 seconds
+assoluto ottengo l'errore assoluto medio. Ok? Me absolute error. Ok? Quindi attenti, sono indicatori che vedrete poi
+18:01
+18 minutes, 1 second
+vedremo anche nel codice mercoledì e insomma si può usare uno o l'altro. Qui non c'è bisogno di prendere radici quadrate ovviamente.
+18:11
+18 minutes, 11 seconds
+Ecco, ma al di là del della funzione di loss che scegliete, potete sceglierne altre, eh, non sono le uniche.
+18:18
+18 minutes, 18 seconds
+Ovviamente se avete un problema particolare, avete un esperto di qualche ambito che vi dice "No, ma questa è la mia loss che voglio diminuire", allora inserite quella.
+18:27
+18 minutes, 27 seconds
+Ma al di là di questo, fissata la loss, eh tutte le altre osservazioni che abbiamo fatto per la classificazione,
+18:35
+18 minutes, 35 seconds
+dove c'era la loss 01, valgono anche in questo caso. Quindi attenzione, l'obiettivo finale della regressione,
+18:43
+18 minutes, 43 seconds
+come per la classificazione, non è di minimizzare la loss sull'insieme di training sugli esempi che avete, ma è
+18:50
+18 minutes, 50 seconds
+quello di generalizzare bene, cioè sui punti che non vedrete, cioè che non vedrete durante il training. Quelli sono i punti interessanti e lì la loss
+18:59
+18 minutes, 59 seconds
+dovrebbe essere bassa, il vostro errore dovrebbe essere basso. Beh, e quindi qui come facciamo? Come abbiamo fatto per la
+19:07
+19 minutes, 7 seconds
+classificazione, ci inventiamo un po' un'ipotesi e che è quella la stessa della classificazione, cioè che i punti
+19:13
+19 minutes, 13 seconds
+che abbiamo osservato sono un campione di taglia n di variabili indipendenti tutte con la stessa legge e questo varrà
+19:21
+19 minutes, 21 seconds
+sia per il training che per il test o per i punti che andremo a osservare.
+19:27
+19 minutes, 27 seconds
+E a quel punto, quindi, se uno ha la legge, ha delle variabili aleatorie, può dire che l'errore che interessa non è
+19:35
+19 minutes, 35 seconds
+quello sul train, ma quello di generalizzazione, il rischio, il l'errore atteso. Allora, per la
+19:43
+19 minutes, 43 seconds
+classificazione era semplicemente la probabilità che h x fosse diverso da y.
+19:50
+19 minutes, 50 seconds
+Questo era facile perché h pensate classificatore binario, no? eh veniva o ci azzeccava o sbagliava, no? Quindi
+19:58
+19 minutes, 58 seconds
+ecco, nel caso della regressione dipende un po' dalla loss che scegliete, ok?
+20:04
+20 minutes, 4 seconds
+Quindi qual è un modo compatto per scriverlo in ogni per ogni possibile loss? Si prende la funzione di costo di
+20:10
+20 minutes, 10 seconds
+di perdita l'OS, e la valutate nei due eh nei due termini che avete hx, quindi
+20:20
+20 minutes, 20 seconds
+sarebbe la il modello valutato nel nuovo punto X confrontato con la Y corrispondente. Ok? Facciamo un esempio.
+20:29
+20 minutes, 29 seconds
+Nel caso della loss quadratica, los diy = h - y². Allora, questa comincia a
+20:38
+20 minutes, 38 seconds
+somigliare un po' a una varianza. Ora vediamo un po'. Verrà il valore atteso di hx - y al qu
+20:47
+20 minutes, 47 seconds
+insomma se però più in generale potete scegliere altre loss e l'espressione è questa, cioè il punto fate la media sui
+20:55
+20 minutes, 55 seconds
+sui possibili punti di test che vi arriveranno e fate la media dell'errore che che vedrete. Ok? E il punto qual è?
+21:03
+21 minutes, 3 seconds
+che non abbiamo ehm insomma al momento è un po' teorica sta cosa come lo era per la classificazione
+21:10
+21 minutes, 10 seconds
+perché non conosciamo la legge, non la conosciamo.
+21:17
+21 minutes, 17 seconds
+Ok? Questa è un po' un problema. Non conosciamo questa, quindi possiamo dire il nostro obiettivo è minimizzare quello, ma non lo conosciamo. Eh. E
+21:24
+21 minutes, 24 seconds
+allora come si risolve il problema? e si fa la solita, se volete, la prima divisione, quella un po' più semplice, è
+21:31
+21 minutes, 31 seconds
+dire prendo il mio insieme e divido in training point, training set e test a
+21:39
+21 minutes, 39 seconds
+quel punto quindi uso il test set per stimare questa questo errore di generalizzazione. Quindi magari ho preso
+21:46
+21 minutes, 46 seconds
+M punti che sono che so un/4to un po' meno di quelli che avevo effettivamente inizialmente li sacrifico, diciamo, per stimare il l'errore di test.
+21:58
+21 minutes, 58 seconds
+Poi ovviamente uno potrebbe, cioè sempre il solito problema nel momento in cui però ho fatto la prima divisione, poi magari ci sono altri parametri che
+22:05
+22 minutes, 5 seconds
+voglio stimare e magari voglio selezionarmi quei parametri ma senza andare a fare la stima finale per capire qual è il possibile errore su i punti
+22:14
+22 minutes, 14 seconds
+che non ho visto e quindi dovrò fare ulteriori divisioni all'interno e si fanno quindi tutte quelle operazioni di
+22:20
+22 minutes, 20 seconds
+validazione incrociata, no? Quindi, vi ricordate, lo schema è lo stesso. Ad esempio, per la validazione live one out
+22:30
+22 minutes, 30 seconds
+cosa si fa? Si prende il nostro trading set, si dice "Ok, tolgo un punto e uso
+22:36
+22 minutes, 36 seconds
+tutti gli altri punti per eh fare KNN, no? E valutare invece la previsione su
+22:43
+22 minutes, 43 seconds
+quel punto che ho tolto e confronto l'etichetta di quel non l'etichetta la la risposta, no? La y di quel punto con quella prevista. calcolo la loss e poi
+22:51
+22 minutes, 51 seconds
+faccio la somma su tutti i possibili eh punti che vado a togliere. Questo sarebbe l' one out, potete toglierne due K o poi vi ricordo c'era anche
+22:59
+22 minutes, 59 seconds
+quest'altra Kefold Cross Validation in cui effettivamente si divideva invece in K sottoinsieme.
+23:08
+23 minutes, 8 seconds
+Ok? Quindi questo è lo stesso schema.
+23:10
+23 minutes, 10 seconds
+Ora non so se darvi proprio tutte le definizioni perché alla fine si tratta di, anzi forse è un esercizio migliore,
+23:17
+23 minutes, 17 seconds
+tornate indietro al all'esempio della classificazione e provate a rivedere cosa dovrebbe diventare nel caso della
+23:26
+23 minutes, 26 seconds
+regressione. Ok? Il punto è che a seconda della loss che scegliete avrete dei valori diversi. Eh, attenti che loss
+23:33
+23 minutes, 33 seconds
+diverse potrebbero favorire alcune cose rispetto ad altre. Allora, cosa succede in pratica? In pratica la situazione è
+23:40
+23 minutes, 40 seconds
+simile a quella di della classificazione. Ad esempio con KNN possiamo dire usiamo la validazione, la cross validation per stimare K, no?
+23:52
+23 minutes, 52 seconds
+Noi sappiamo che al crescere di KL il modello di regressione diventa via più semplice e però potrebbe esserci una
+24:00
+24 minutes
+situazione intermedia in cui se appunto K non è né troppo grande né troppo piccolo, le cose vanno bene. Tipo K = 5
+24:07
+24 minutes, 7 seconds
+l'avevo scelto io, magari K = 6 7 non serve più che sia sia pari, non avete più problemi se volete di di questo
+24:15
+24 minutes, 15 seconds
+natura per la regressione. E quindi ho cominciato a esplorare un po' K. Questo è K.
+24:21
+24 minutes, 21 seconds
+Eh, allora uno cosa si accorge? Si accorge giusto quel root min square error, va bene, di one out sull'esempio di prima, eh, quello di che ho generato.
+24:30
+24 minutes, 30 seconds
+Beh, in effetti se uno vede con k = 1 ha un errore abbastanza grande, poi comincia a scendere, scende, scende, perfetto. Uno dice allora ne vado
+24:38
+24 minutes, 38 seconds
+avanti, prendo K molto, molto grande, andrà sempre meglio. Cosa succede? Però se vi ricordate cosa succede per la classificazione,
+24:47
+24 minutes, 47 seconds
+qualcos'altro succederà dopo, no? quando K è troppo grande.
+24:51
+24 minutes, 51 seconds
+Ehm, d'accordo. Ecco, prima di però passare a vedere cosa succede per K,
+24:59
+24 minutes, 59 seconds
+fatemi introdurre un altro paio di indicatori che sono comodi perché il root means square error, appunto, è sì
+25:07
+25 minutes, 7 seconds
+la radice quadrata di quel costo quadratico, però eh però ancora è su una scala che dipende un po' dall'unità di misura, no?
+25:16
+25 minutes, 16 seconds
+Se io prendo la mia y è in metri, avrò un certo rootmin square error. Se qualcuno ha deciso di misurarla in centimetri, avrà un rootmin square error quanto? Che sarà 100 volte tanto, no?
+25:28
+25 minutes, 28 seconds
+Perché avete tutto sto fattore di dilatazione. Quindi c'è qualche indicatore invece assoluto che non ha un'unità di misura, un po' se volete
+25:35
+25 minutes, 35 seconds
+come la correlazione, no? Il coefficiente di correlazione non ha più l'unità di misura. Eh, allora ce ne sono un paio e semplicemente si ottengono
+25:44
+25 minutes, 44 seconds
+passando dal con una loss, se volete, eh relativa, una, scusate, assoluta a una loss relativa. Ok? Quindi cosa facciamo?
+25:55
+25 minutes, 55 seconds
+Prendiamo ad esempio l'errore assoluto e lo dividiamo per la la grandezza della y, ok? In questo modo non ha più un'unità di misura, ok?
+26:05
+26 minutes, 5 seconds
+E in realtà la cosa più che si usa per la maggiore, appunto, è il coefficiente R qu che è un po' simile a questa idea, però ora ve la spiego ehm nel dettaglio.
+26:17
+26 minutes, 17 seconds
+Quindi cosa facciamo? Prendiamo, guardate, questo termine qua, è un coozi a numeratore avete questo che a parte il fattore 1 su
+26:26
+26 minutes, 26 seconds
+n che mancherebbe, se volete potete metterlo, ma non cambia niente perché lo mettete sia sotto che sopra. Ecco qui.
+26:34
+26 minutes, 34 seconds
+Allora, a numeratore avete il Min Square Error. Ok? Questo che appunto è un indicatore già di performance, va bene,
+26:42
+26 minutes, 42 seconds
+però andiamo a fare un cooziente. Con cosa lo confrontiamo? Beh, lo confrontiamo. Vedete, qui sotto c'è la
+26:48
+26 minutes, 48 seconds
+somma su tutto il nostro training set, in questo caso, ma si fa anche sul test e così via. Y i-o la media delle y al quadrato per 1 su n. Questa che cos'è?
+27:02
+27 minutes, 2 seconds
+Beh, questa è la varianza circa, la varianza, la varianza se lo dividete per nienza campionaria, ma insomma pensate n
+27:10
+27 minutes, 10 seconds
+grande. Quindi questo cosa sta confrontando? Sta confrontando l'errore ehm
+27:17
+27 minutes, 17 seconds
+l'errore medio, appunto, l'errore medio quadratico del nostro modello di regressione. Contro cosa? Contro l'errore di che modello? Beh, del
+27:25
+27 minutes, 25 seconds
+modello che è costante. Potreste pensare che y barrato è un modello banale, chiamiamo chiamiamolo h barrato di x, un
+27:33
+27 minutes, 33 seconds
+modello banale che restituisce sempre la media. Ok? Quindi stiamo dicendo, beh, vediamo un po' se questo rapporto,
+27:41
+27 minutes, 41 seconds
+appunto, se l'errore ci aspetteremo che l'errore numeratore sia un po' più piccolo dell'errore di quello banale, insomma, sennò stiamo prendendo un h,
+27:49
+27 minutes, 49 seconds
+cioè bastava prendere la media su tutti, era banale. Quindi ci aspetteremmo che questo quantità sia minore di 1, ok?
+27:55
+27 minutes, 55 seconds
+Questo rapporto, che il numeratore sia più piccolo del dell'errore banale e quindi quando fate 1 meno questa quantità ottenete sì qualcosa che sia compreso tra 0 e 1. Vi aspettereste. Ok.
+28:08
+28 minutes, 8 seconds
+Beh, ora in pratica in effetti ci sono anche casi, non è garantito, eh, cioè ci sono anche casi in cui effettivamente il vostro modello funziona peggio
+28:17
+28 minutes, 17 seconds
+addirittura di ehm di prendere il modello costante uguale alla media, ok?
+28:23
+28 minutes, 23 seconds
+In quel caso l'R quad è addirittura negativo. Comunque diciamo tendenzialmente vedrete sempre dei dei coefficienti r qu che sono positivi e
+28:32
+28 minutes, 32 seconds
+compresi tra 0 e 1. Notate che non hanno più un'unità di misura perché state facendo appunto questo quoziente. E cosa
+28:40
+28 minutes, 40 seconds
+ci interessa? Ci interessa, cioè quando la performance è migliore, attenzione, questo non è un errore, vogliamo che sia più grande possibile. Più grande è il
+28:48
+28 minutes, 48 seconds
+coefficiente di determinazione, migliore sarà la performance. Ora, in che senso?
+28:53
+28 minutes, 53 seconds
+Beh, stiamo confrontando la performance rispetto allo stimatore, al modello costante. Ok? Può anche capitare che sia
+29:02
+29 minutes, 2 seconds
+negativo. Eh, io sinceramente non l'ho mai visto, cioè in teoria viene ma poi in pratica non l'ho mai visto un un cioè bisogna prendere proprio un modello che
+29:09
+29 minutes, 9 seconds
+faccia veramente male. Potreste pensare a un classificatore che sbaglia appunto sistematicamente, quindi tanto vale che piuttosto non predica nulla. Ok?
+29:18
+29 minutes, 18 seconds
+Allora, pure attenzione all'R però che non è l'unico indicatore, infatti ve l'ho messo qui, ma ce ne sono tanti altri. E anche attenzione all'R che poi
+29:28
+29 minutes, 28 seconds
+vedremo sul coi comandi R, vi viene fornito automaticamente l'R quad però valutato sul training set. Quindi
+29:37
+29 minutes, 37 seconds
+attenzione, un R4 molto grande sul training set sta dicendo che cosa? sta dicendo che il vostro modello di
+29:45
+29 minutes, 45 seconds
+regressione sta cogliendo molto bene il training set, ok? Quindi attenti che non
+29:52
+29 minutes, 52 seconds
+potrebbe non essere il caso eh quando lo andate poi ad applicare sul test, ok?
+29:58
+29 minutes, 58 seconds
+Quindi di nuovo l'R4 da solo non è la salvezza di di nessuno, ok? È un indicatore come gli altri.
+30:06
+30 minutes, 6 seconds
+Va bene? Ecco, allora torniamo un po' al discorso di K, no? Abbiamo visto prima quel grafico, no? con KNN per la
+30:14
+30 minutes, 14 seconds
+regressione e abbiamo visto cosa succedeva almeno per K che cresceva.
+30:19
+30 minutes, 19 seconds
+Vediamo che il rootmin square error decresce. Qua non ho fatto il la cosa simile per l' R². Vedreste che l' R²
+30:27
+30 minutes, 27 seconds
+cresce. Ok. Ecco. Ma cosa? Ehm, aspettate, r² cresce. No, scusate, l' R²
+30:36
+30 minutes, 36 seconds
+pure decresce, no? Perché all'inizio siete a uno e poi invece diminuisce. No, no, pure l' R qu decrescerebbe sul training set almeno. E allora andiamo a
+30:45
+30 minutes, 45 seconds
+vedere un po' cosa succede però per l'errore per torniamo al al min
+30:52
+30 minutes, 52 seconds
+square error, va bene? E vediamo un po' di capire cosa succede per valori estremi, ok? Allora, cosa succede se
+30:59
+30 minutes, 59 seconds
+prendo k = 1? k = 1 è questo esempio qui, questo rosso. Se vedete ora qui ho
+31:07
+31 minutes, 7 seconds
+fatto una cosa un po' così per fare un grafico facile. Ho preso semplicemente i le previsioni del modello nei punti di
+31:16
+31 minutes, 16 seconds
+eh di training e sappiamo che se prendo k = 1 e lo valuto su un punto di training il più vicino è lui e quindi mi
+31:24
+31 minutes, 24 seconds
+restituisce lui. Ok? Qui in effetti con k = 1 qui sembrerebbe che kn stia interpolando. Attenti che non è
+31:31
+31 minutes, 31 seconds
+esattamente così, eh, perché kn sui punti se uno fa un punto di test se è vicino a questo darà questo valore, se è
+31:39
+31 minutes, 39 seconds
+vicino a quest'altro darà questo valore e così via. Quindi sarebbe piuttosto un grafico una curva costante a tratti. Ok,
+31:46
+31 minutes, 46 seconds
+va bene, però insomma per il fine nostro insomma facciamo finta che stia proprio esattamente interpolando. Ok? E l'altro
+31:53
+31 minutes, 53 seconds
+estremo ho preso K = 50. Qui non mi ricordo quanti punti sono, ma insomma con K = 50 cosa succede? K = 50, vediamo
+32:02
+32 minutes, 2 seconds
+qua, ad esempio, ci sono delle regioni completamente piatte. Come mai? Cosa dite?
+32:09
+32 minutes, 9 seconds
+Perché ci sono queste regioni completamente piatte con questo K così grande? Si avvicina la media.
+32:18
+32 minutes, 18 seconds
+Si avvicina alla media. Esatto. E anche qui, vedete, c'è sta facendo un po' la curva, no? Come dovrebbe fare, però è un
+32:24
+32 minutes, 24 seconds
+po' sotto, no? Perché perché se sono in questo punto, no, sto prendendo la media dei 50 punti più vicini e vado a vedere che ho tutti questi punti negativi, no?
+32:35
+32 minutes, 35 seconds
+tutti questi qui, ma anche questi positivi e quindi va a finire che sto mediando e quindi mi trovo un po' in una
+32:42
+32 minutes, 42 seconds
+situazione banale. Ok, ora vabbè, non mi fiderei al 100% di questa questa cosa che l'ho l'ho girata in un secondo, ma
+32:49
+32 minutes, 49 seconds
+comunque la situazione è questa. Ok, più K cresce, andiamo nel caso finale. Nel caso in cui prendo K che è dato da tutti i punti, prendo proprio la media di
+32:58
+32 minutes, 58 seconds
+tutti, ok? E quindi sarò vedrò una curva piatta, ok?
+33:02
+33 minutes, 2 seconds
+piccolo piiattisce lo stesso. Cioè perché eh sì, perché allora qui ho fatto una cosa che forse andrebbe un attimo corretta, cioè ho preso soltanto le
+33:10
+33 minutes, 10 seconds
+previsioni nei punti di training ok interpola linearmente, ok? Quindi in
+33:17
+33 minutes, 17 seconds
+realtà quello che avrei dovuto fare era prendere un'altra griglia di punti e gli dire ok prendi tutti quei punti nella griglia, calcolami KN e e vedevi a quel
+33:27
+33 minutes, 27 seconds
+punto delle regioni costanti, no? Ora immagina se i punti fossero stati pochi, no? Diciamo che pochi punti, facciamo un
+33:34
+33 minutes, 34 seconds
+esempio così, no? E fai 1 N. Allora, cosa significa? Che qui, finché il punto più vicino è lui, vedi questa curva.
+33:40
+33 minutes, 40 seconds
+Adesso che il punto più vicino è lui, vedi questo valore. Cioè questo vedi grafici di questo tipo perché n con n uguale 1. Ok?
+33:49
+33 minutes, 49 seconds
+Però, appunto, era solo una cosa qualitativa per mostrarvi cosa sta succedendo, no? con K mediamo su troppi punti e facciamo un
+33:57
+33 minutes, 57 seconds
+errore. Facciamo un errore addirittura sul training set. Con K piccolo non facciamo errore sul training set, ce l'abbiamo esattamente, però ci
+34:05
+34 minutes, 5 seconds
+aspettiamo che ci sia un errore sul test set. E allora andiamo a vedere un po' se la curva di ad esempio di di dell'errore di cross validation ci mostra qualcosa.
+34:17
+34 minutes, 17 seconds
+Allora, vediamo una curva di questo tipo. Ok, qui questa quella che vi ho mostrato prima era tipo i primi 10, no?
+34:24
+34 minutes, 24 seconds
+Prima avevo mostrato una curva e sembrava andare tutto bene. Quando cresce K, K cresce, l'errore diminuisce, perfetto. Ce lo
+34:33
+34 minutes, 33 seconds
+prendo più grande possibile. Beh, quello che succede allora per KNN e per tanti altri modelli, però attenti
+34:40
+34 minutes, 40 seconds
+che non è una legge della natura, eh, succede che appunto al crescere di K di
+34:47
+34 minutes, 47 seconds
+questi parametri uno osserva un comportamento tipo adu, ok? Qui avete una prima discesa e poi però si risale e poi tendenzialmente si stabilizza.
+34:56
+34 minutes, 56 seconds
+Questo succede in molti modelli. Ci sono modelli più complessi dove addirittura avete diverse curve, diverse discese, salite, va bene? Però diciamo per i
+35:05
+35 minutes, 5 seconds
+modelli più semplici la la statistica classica dice: "Ok, fermatevi alla prima volta che vedete risalire l'errore, vi fermate lì e selezionate in questo caso
+35:13
+35 minutes, 13 seconds
+il K ottimale." Va bene? Questo era quello che abbiamo detto anche per la classificazione, era un po' meno evidente, forse. In questo caso eh direi che proprio si vede bene, no?
+35:23
+35 minutes, 23 seconds
+L'andamento della della curva.
+35:26
+35 minutes, 26 seconds
+E questo è l'errore di cross validation, ok? Quindi è praticamente una stima dell'errore di di generalizzazione.
+35:36
+35 minutes, 36 seconds
+E se invece lo confronto con l'errore di sul training set, questo l'abbiamo visto anche per la classificazione, sappiamo
+35:43
+35 minutes, 43 seconds
+che per k piccolo, per k piccolo l'errore è 0. Per k = 1 sappiamo esattamente cogliere tutto il training
+35:51
+35 minutes, 51 seconds
+set e quindi l'errore è zero sul training set. E quindi vedete avete questi due andamenti, no? Inizialmente con K molto piccolo avete un errore sul
+36:00
+36 minutes
+training set nullo che poi comincia a crescere mano mano che fate crescere K e va poi a inseguire arriva molto vicino a
+36:08
+36 minutes, 8 seconds
+quello invece della cross validation che sarebbe il test error se volete, ok? Che invece parte da da molto in alto e poi fa questo andamento a u. Ok?
+36:18
+36 minutes, 18 seconds
+Beh, allora questo fenomeno è abbastanza indicativo e succede per molti molti modelli al variare di molti parametri.
+36:27
+36 minutes, 27 seconds
+In questo caso il parametro K è quello che si chiama un iper parametro, no?
+36:30
+36 minutes, 30 seconds
+L'abbiamo chiamato così anche in altre occasioni e e rappresenta, se volete, quello che si chiama il dilemma
+36:39
+36 minutes, 39 seconds
+della bias controvarianza. Ok? Quindi, qual è la situazione? cerchiamo di cogliere perché se non lo capite neanche su questo esempio è un po' un problema.
+36:48
+36 minutes, 48 seconds
+Ok? Quindi diciamo per K piccolo avete una situazione con un modello, in questo caso di KNN eh perché il parametro poi
+36:56
+36 minutes, 56 seconds
+può cambiare, ma questo dilemma si propone spesso. Quando un parametro, in questo caso K, è piccolo, eh avete un modello molto flessibile e riesce a
+37:04
+37 minutes, 4 seconds
+catturare esattamente i vostri punti di trading. Però il prezzo qual è? Appunto, questo succede spesso è che in realtà
+37:12
+37 minutes, 12 seconds
+sul test performa malissimo. Ok? Invece per K grande avete un modello molto poco
+37:19
+37 minutes, 19 seconds
+flessibile, praticamente una costante, no? E a quel punto cosa fa? Beh, il vostro modello non è capace neanche di
+37:25
+37 minutes, 25 seconds
+cogliere bene i vostri punti di training e menche meno quelli di test. Ok?
+37:31
+37 minutes, 31 seconds
+Tendenzialmente si si appiattiscono queste due curve di training test. E quindi qual è la prescrizione? di cercare un K ottimale in qui per vostra
+37:40
+37 minutes, 40 seconds
+curva di Beh, questo già già peggio, questo qua va pure meglio. K star che minimizza il training, scusate, il cross
+37:50
+37 minutes, 50 seconds
+validation o test error. Ok? Quindi un bilanciamento tra questi due estremi e come chiamiamo le situazioni? E beh, in
+37:57
+37 minutes, 57 seconds
+questo caso l'estremo in cui il modello è poco espressivo, diciamo, è una situazione in cui c'è molto bias, biaso.
+38:05
+38 minutes, 5 seconds
+E in questo caso invece in cui l'errore sul training è basso, ma l'errore sul test è alto, è un caso in cui c'è la
+38:12
+38 minutes, 12 seconds
+varianza eh alta.
+38:16
+38 minutes, 16 seconds
+Ok? Qui abbiamo questo dilemma, però attenti, ora vedremo la decomposizione dell'errore. Ci sono effettivamente
+38:23
+38 minutes, 23 seconds
+questi termini, però attenti che non è, cioè non è non c'è nessun teorema che dice che effettivamente in tutti i modelli statistici deve accadere questa
+38:31
+38 minutes, 31 seconds
+cosa. Ok? È una cosa che si riproduce spesso e quasi sempre. Ci sono dei modelli, tipo le reti neurali, le random
+38:39
+38 minutes, 39 seconds
+forest che hanno tantissimi parametri, ma non esibiscono esattamente questo dilemma byzia. Però se uno parte con modelli molto semplici, tipo KNN
+38:48
+38 minutes, 48 seconds
+eccetera, si cioè capita in questa situazione. Ok? Quindi cosa diciamo?
+38:54
+38 minutes, 54 seconds
+Quando k = 1, quindi abbiamo un errore di training molto basso, quindi quella curva rossa, no? Quindi interpolo esattamente i miei punti, c'è molto
+39:02
+39 minutes, 2 seconds
+vicino, ma l'errore di test è alto o l'errore di cross validation è alto.
+39:07
+39 minutes, 7 seconds
+Diciamo che appunto c'è tanta varianza e il modello esibisce overfitting.
+39:13
+39 minutes, 13 seconds
+Scusate, io questo l'avevo disabilitato, ma si è riabilitato.
+39:18
+39 minutes, 18 seconds
+Ok, va bene. e altrimenti nella situazione opposta il modello è troppo povero, non riesce a insomma è molto simile a una
+39:27
+39 minutes, 27 seconds
+costante, non riesce neanche a a rendere basso l'errore sui punti, sugli esempi che gli abbiamo dato. E in questo caso
+39:34
+39 minutes, 34 seconds
+l'errore di training è elevato e anche l'errore di test di conseguenza se non ce la fa neanche sui punti che gli abbiamo dato, pensate quelli che non
+39:42
+39 minutes, 42 seconds
+aveva visto. E in questo caso siamo nella situazioni di underfitting, ok?
+39:46
+39 minutes, 46 seconds
+overfit, underfit sono queste due situazioni estreme e vabbè, allora cerchiamo appunto la prescrizione solita di trovare una situazione intermedia per
+39:55
+39 minutes, 55 seconds
+questi parametri e appunto la ricerca è quella che abbiamo fatto anche già per la classificazione, insomma il fenomeno
+40:01
+40 minutes, 1 second
+c'era. Va bene. Eh, adesso la cosa che però più interessante che si potrebbe fare anche per la classificazione, però
+40:09
+40 minutes, 9 seconds
+è più scomoda da da scrivere, è invece una decomposizione molto pulita. Questo è forse uno dei pochi risultati teorici
+40:17
+40 minutes, 17 seconds
+che vediamo è la decomposizione dell'errore. Ok? Quindi prendiamo la loss quadratica,
+40:25
+40 minutes, 25 seconds
+ok? Ma questo è un fatto che verrebbe più in generale per altre loss. Anche la loss 01 esibisce una simile decomposizione. Beh, allora si può
+40:33
+40 minutes, 33 seconds
+decomporre l'errore di generalizzazione eh eh come tre termini. Sono tre contributi, diciamo, si può veramente
+40:41
+40 minutes, 41 seconds
+evidenziare questi tre contributi. Il primo è il termine di bias bias al quadrato, che è quello che appunto rappresenta,
+40:50
+40 minutes, 50 seconds
+appunto, se un termine grande, rappresenta il fatto che il modello è troppo semplice, ok? E non riesce appunto a come nel caso di Kande,
+40:58
+40 minutes, 58 seconds
+abbiamo questo caso che i modelli sono troppo piatti, non è non ce la fa. E poi c'è un secondo termine che chiameremo
+41:05
+41 minutes, 5 seconds
+errore di varianza, ok? che è l'errore dovuto al fatto che invece il modello è troppo complesso, no? E quindi riesce ad aderire molto bene i dati e potrebbe
+41:13
+41 minutes, 13 seconds
+dipendere troppo da quegli specifici dati che gli abbiamo dato, che abbiamo presentato. E poi c'è un terzo errore che è praticamente quello che rimane ed
+41:22
+41 minutes, 22 seconds
+è in un certo senso un termine che chiamiamo di rumore che è, diciamo, quello che proprio nessun modello riuscirebbe a cogliere. Se se quello è grande è perché i dati che abbiamo fanno
+41:30
+41 minutes, 30 seconds
+fanno schifo. Ok, va bene. Ora vediamo come sono veramente questi tre termini. Ma la cosa importante
+41:38
+41 minutes, 38 seconds
+è, insomma, capire che c'è una distinzione tra queste tre cose, in particolare tra bias e varianza. Poi il rumore è essenzialmente quello che rimane dopo, ok?
+41:49
+41 minutes, 49 seconds
+E in effetti se uno si accorge che pur lavorando su bias e varianza, quindi facendo aumentare complessità del modello, diminuire, rimane grande l'errore, a un certo punto uno si
+41:58
+41 minutes, 58 seconds
+arrende e dice "Ma forse ho bisogno di raccogliere più dati, mi servono dati più puliti, ci sono ci sono appunto degli outlier che rovinano tutto". e così via.
+42:08
+42 minutes, 8 seconds
+Va bene? Allora, vediamo un po'. Non vi ho ancora detto esplicitamente chi sono questi tre termini, adesso li scopriamo
+42:14
+42 minutes, 14 seconds
+insieme. Bene, però, appunto, sono tre punti interessanti ed è forse il risultato più
+42:21
+42 minutes, 21 seconds
+teorico, ma ma simpatico, perché dà diverse indicazioni. Allora, facciamo delle ipotesi che sono le stesse che abbiamo fatto per la classificazione
+42:29
+42 minutes, 29 seconds
+all'inizio. Vedete il modello di regressione che indichiamo di solito come hx.
+42:35
+42 minutes, 35 seconds
+attenti, di solito è un modello che usa i dati che gli ho dato, no? Quindi se abbiamo i nostri punti di training xi,
+42:42
+42 minutes, 42 seconds
+yi diremmo che è una funzione non soltanto della X, che è il punto di test, ma anche dei punti di training.
+42:53
+42 minutes, 53 seconds
+Ad esempio, KeNN, che KNN effettivamente è una funzione molto esplicita di tutti i punti di training, ok? ci sono modelli, vedremo
+43:01
+43 minutes, 1 second
+dopo, che usano dei parametri che a loro volta dipendono dai punti di training.
+43:04
+43 minutes, 4 seconds
+Comunque alla fine dipende tutto dai punti di training che gli abbiamo dato, ok? E la stessa ipotesi che abbiamo
+43:13
+43 minutes, 13 seconds
+fatto prima, la ripeto qui, cioè i dati, le coppie X y sia nel training che nel test. Questa ipotesi sembra innocente,
+43:21
+43 minutes, 21 seconds
+ma in realtà se uno non la fa è un po' fregato, no? Cioè, chiediamo che tutti i dati siano variabili aleatorie. Vabbè,
+43:29
+43 minutes, 29 seconds
+ora indipendenti si potrà magari un po' rilassare, ma la cosa importante è che siano identicamente distribuite, cioè che abbiano tutte la stessa legge.
+43:36
+43 minutes, 36 seconds
+Perché se faccio il mio training su un insieme di dati che è di una certa natura, no, che so rappresentano i dati, la classificazione, no, immagini di cani
+43:45
+43 minutes, 45 seconds
+e gatti e poi lo prendo il mio modello e lo vado a testare sui dati che sono tutt'altro e non posso aspettarmi che
+43:52
+43 minutes, 52 seconds
+funzioni qualcosa, cioè siamo out of out of distribution, ok? Certo, qualcosina sarebbe interessante capire come
+44:00
+44 minutes
+funziona, ma nella casa nel caso più semplice, supponiamo che comunque i dati che gli darò sono simili a quelli che ha già osservato. Ok? Va bene. E allora diamo un nome a questa legge, è pxy.
+44:11
+44 minutes, 11 seconds
+Pensate la continua, una densità continua, una densità discreta, come volete. Ok? Va bene. Allora, che
+44:19
+44 minutes, 19 seconds
+risultati ci sono due risultati tecnici che forse avete già visto. La statistica uno io l'avevo evidenziato all'epoca, ma
+44:27
+44 minutes, 27 seconds
+non so se si faceva ogni volta. Allora, c'è quello che si chiama il teorema di Pitagora per le variabiliatorie. Cosa dice? Se voi prendete due variabili
+44:35
+44 minutes, 35 seconds
+aleatorie, chiamiamole, le chiamo U e V, ma varbori reali, ma sapete che una di
+44:43
+44 minutes, 43 seconds
+queste è costante, ok? rispetto all'informazione che avete, diciamo che sapete che è una di queste costanti.
+44:50
+44 minutes, 50 seconds
+Beh, allora cosa potete fare? Guardate, avete V - U²,
+44:57
+44 minutes, 57 seconds
+questo è un quadrato costruito su un lato, adesso lo disegniamo anche. È uguale a che cosa? Una somma di due quadrati. Avete questo quadrato più
+45:04
+45 minutes, 4 seconds
+questo quadrato. Allora, disegniamole anche con un bel disegnetto. Quindi, avete qui ho detto che eh
+45:12
+45 minutes, 12 seconds
+U è costante, no? Quindi avete U che è costante. Qui metto il valore atteso di V
+45:19
+45 minutes, 19 seconds
+e qua metto V. Ok? Teremale di Pitagora cosa vi dice? Che il quadrato costruito sull'ipotenusa, no? È la somma dei
+45:26
+45 minutes, 26 seconds
+quadrati costruiti sui cateti. Ok? Ora è un è un Pitagora per variabiliatorie.
+45:32
+45 minutes, 32 seconds
+Ok? Cosa dice? dice che se faccio la differenza tra V e U edevo al quadrato, che sarebbe appunto il quadrato
+45:39
+45 minutes, 39 seconds
+costruito su sull'ipotenusa, è la somma di due quadrati che mi sto inventando, quali sono questi cateti,
+45:45
+45 minutes, 45 seconds
+no? Allora, uno è questo è la differenza. Un cateto ha questa lunghezza.
+45:51
+45 minutes, 51 seconds
+Differenza tra il valore atteso di V e U, che è una costante, eh rispetto all'informazione che avete è una costante.
+46:00
+46 minutes
+E l'altro è quest'altro lato qui. Ok?
+46:02
+46 minutes, 2 seconds
+Quindi questo chiamiamolo B, questo lo chiamo A e quindi avete A è qui e B è qui. Ok?
+46:11
+46 minutes, 11 seconds
+Allora, a statistica uno si parlava appunto insomma e già forse avevo detto che uno lo chiamava bias perché ci sono
+46:18
+46 minutes, 18 seconds
+gli stimatori distorti che hanno un bias quelli che non ce l'hanno li chiamiamo corretti. Ok? Quindi forse l'avevate
+46:26
+46 minutes, 26 seconds
+visto in questa forma. Valore atteso di V - una costante U
+46:34
+46 minutes, 34 seconds
+è uguale al valore atteso di V-o il suo valore atteso al quadrato, che sarebbe il primo lato più l'altro che è quello
+46:43
+46 minutes, 43 seconds
+che chiamiamo bias valore atteso di V - U².
+46:50
+46 minutes, 50 seconds
+Questo l'abbiamo applicato agli stimatori dicendo che ci sono gli stimatori non distorti sono quelli per cui non c'è questo che chiamiamo termine
+46:57
+46 minutes, 57 seconds
+di bias. Beh, allora la stessa cosa vale più in generale. Se avete dell'informazione I che vi dice che una
+47:05
+47 minutes, 5 seconds
+variabilatoria è una costante, se se conoscete quell'informazione, quindi quell'informazione vi determina esattamente la variabile u, potete fare
+47:12
+47 minutes, 12 seconds
+la stessa decomposizione, ok? Si tratta solo di di fare i conti, non con le probabilità, ma con le probabilità
+47:19
+47 minutes, 19 seconds
+condizionate a I. Ok? E questo è importante perché quel quel risultato vi dice che ci sono tre contributi di
+47:27
+47 minutes, 27 seconds
+errore e adesso lo andiamo a applicare due volte e spezzeremo prima un primo contributo e poi lo spezziamo un'altra volta che non è troppo complicato. Però
+47:36
+47 minutes, 36 seconds
+c'è un altro contributo che insomma di un altro teorema importante che è una versione della legge della probabilità
+47:43
+47 minutes, 43 seconds
+totale. Vi ricordate la probabilità totale cosa diceva? diceva che se dovete calcolare la probabilità di A
+47:50
+47 minutes, 50 seconds
+o di B eh rispetto una qualche informazione, anche rispetto all'informazione originaria e avevate un sistema di
+47:59
+47 minutes, 59 seconds
+alternative, facevamo la probabilità di B sapendo A con I per la probabilità di A con I e sommavate sul sistema di
+48:07
+48 minutes, 7 seconds
+alternative, non lo so, m alternative, dove gli A con i sono un sistema di alternative.
+48:13
+48 minutes, 13 seconds
+Questo vi diceva che una probabilità si può calcolare come combinazione di probabilità condizionate.
+48:21
+48 minutes, 21 seconds
+Allora, non lo dimostriamo qui, ma anche il valore il valore medio. Il valor medio che è una media di, insomma, è una
+48:29
+48 minutes, 29 seconds
+media pesata con le probabilità e ha la stessa proprietà, cioè uno può calcolare il valor medio condizionato se conosce
+48:36
+48 minutes, 36 seconds
+dell'informazione. Ora vediamo che informazione è questa. e poi può fare la media su tutte le possibili informazioni che che poteva raccogliere. Ok? Questa,
+48:46
+48 minutes, 46 seconds
+se volete il sistema d' alternative è un po' nascosto qui è questa questa i se volete il gioca ruolo del sistema di alternative. Adesso vediamo che tipo di
+48:54
+48 minutes, 54 seconds
+informazione usiamo. L'informazione sono i dati che mi arriveranno. Va bene?
+49:00
+49 minutes
+Va bene. Allora, questi due adesso ve li metto un po', insomma, li usiamo a scatola chiusa perché non è che voglio mostrare tutto quanto, ma è un risultato che secondo me vale la pena di vedere.
+49:09
+49 minutes, 9 seconds
+Allora, cominciamo con la loss. Allora, la loss, dicevamo, è la loss quadratica, quindi hx - y qu?
+49:21
+49 minutes, 21 seconds
+Allora, chi era il nostro il nostro rischio o errore di generalizzazione?
+49:26
+49 minutes, 26 seconds
+era il valor medio della loss, quindi scriviamola come hx
+49:34
+49 minutes, 34 seconds
+- y^ su un nuovo punto, un nuovo punto di eh di test. Però attenti qui in questa scrittura, anche quella che vi ho
+49:42
+49 minutes, 42 seconds
+dato all'inizio, non si evidenzia bene dove sono i punti di training, quindi scriviamoli esplicitamente.
+49:50
+49 minutes, 50 seconds
+Ricordiamoci che H è in realtà un H che dipende dai punti di training D e D
+49:58
+49 minutes, 58 seconds
+con i Y per da 1 a N. Ok? Ci sono i punti tren, quindi li scrivo esplicitamente così si
+50:06
+50 minutes, 6 seconds
+capisce. hx e metto un punto e virgola così e ho i punti di traing.
+50:15
+50 minutes, 15 seconds
+Ok? Bene. Quindi cosa sto facendo? Sto facendo la media su i punti eh di test perché ho questo X.
+50:25
+50 minutes, 25 seconds
+Ma attenti, è un po' implicito, eh, questa quando uno dà la definizione, non è forse andava detto in modo un po' più esplicito, ma ho anche la media sui
+50:33
+50 minutes, 33 seconds
+possibili punti di training ok? Quindi sto pensando in una situazione ideale, riceverò dei punti di training che sono
+50:41
+50 minutes, 41 seconds
+certe realizzazioni di variabia o avrò anche un certo un punto di test, faccio la media su della loss su tutte queste
+50:48
+50 minutes, 48 seconds
+possibili situazioni. Ok? Qual è appunto il mio errore medio di generalizzazione? Ok, allora voglio estrarre il rumore.
+50:57
+50 minutes, 57 seconds
+Facciamo un po' seete un po' al contrario perché so già dove voglio arrivare. Quindi la prima cosa che estraggo è quella che vi dicevo è il
+51:04
+51 minutes, 4 seconds
+termine che non che non che alla fine uno dice questo è rumore. Ok. Allora, come facciamo?
+51:12
+51 minutes, 12 seconds
+Faccio così, aggiungo e e tolgo.
+51:21
+51 minutes, 21 seconds
+Aspettate, vediamo un attimo se lo posso fare bene.
+51:27
+51 minutes, 27 seconds
+Beh, facciamo così. Prima di tutto introduco dell'informazione, va bene?
+51:33
+51 minutes, 33 seconds
+Faccio hx di - y.
+51:38
+51 minutes, 38 seconds
+Allora, che informazione posso introdurre qui? Beh, devo immaginare se io conoscessi i punti di test o se io
+51:46
+51 minutes, 46 seconds
+conoscessi i punti di training, queste sono informazioni che potrei avere. Ora, in generale, sto dicendo, sto mediando su tutte le situazioni e non ce le ho, però posso fare finta di di aggiungerla.
+51:56
+51 minutes, 56 seconds
+Quindi dico aggiungo e suppongo di sapere il punto X che vado a testare, ma anche i nostri punti di training. Ok?
+52:06
+52 minutes, 6 seconds
+Questa, se volete l'informazione I che vado ad aggiungere. Ok?
+52:11
+52 minutes, 11 seconds
+Questo usando questa regola di prima che dicevamo la legge della probabilità totale, io sto mediando su tutti i possibili dataset di training e anche su
+52:19
+52 minutes, 19 seconds
+tutti i possibili punti di test e internamente dico beh, facciamo finta prima di conoscerli. Ok? Perché mi piace
+52:26
+52 minutes, 26 seconds
+questa informazione? Vedete? Ora, se io conosco i punti, il punto di test e conosco i
+52:34
+52 minutes, 34 seconds
+punti di training conosco questa variabile qua, perché h dipende solo da il punto dove sta andando a fare il test
+52:42
+52 minutes, 42 seconds
+e i punti di traing. Quindi questa qui è costante se conosco I. Se conosco I.
+52:53
+52 minutes, 53 seconds
+Ok, quindi siamo nella prima situazione.
+52:55
+52 minutes, 55 seconds
+Vi ricordate c'erano u e V. Allora, questa è la U, se usate le notazioni di prima, questa è la U e questa è la V.
+53:04
+53 minutes, 4 seconds
+Ok? Usiamo per una volta il teorema di Pitagora, ok? Teorema di Pitagora vi dice, "Beh, se conoscevi i tuoi training
+53:12
+53 minutes, 12 seconds
+set, conosci il tuo punto di test, il tuo stimatore valutato in x è una funzione, è deterministico, lo conosci,
+53:19
+53 minutes, 19 seconds
+quindi quello è come se fosse una costante. Usiamo il teorema di Pitagora. Quindi cosa dice il teorema di Pitagora?
+53:26
+53 minutes, 26 seconds
+Vi ricordate? Allora, questo era l'ipotenusa, no? Quindi abbiamo capito? Capito perché è costante? Perché
+53:34
+53 minutes, 34 seconds
+nel momento in cui uno dice condiziono a conoscere x e conoscere il mio training set, conosco tutto. Ok? Diciamo h è una
+53:43
+53 minutes, 43 seconds
+funzione di queste due cose. Allora, cosa si fa? Facciamo hxd -
+53:50
+53 minutes, 50 seconds
+quindi lei è quella costante e devo togliere invece il valor medio della y
+53:56
+53 minutes, 56 seconds
+se conoscessi x e d. Quindi questo è il primo cateto.
+54:03
+54 minutes, 3 seconds
+Ok? E poi ho l'altro l'altro cateto che è y meno il valore medio di y condizionato a XD.
+54:16
+54 minutes, 16 seconds
+al quadrato. Ok, ho fatto la prima applicazione, ho separato due termini.
+54:20
+54 minutes, 20 seconds
+Adesso cerchiamo di capire perché uno è rumore e l'altro no. Ok? Vedete questo
+54:27
+54 minutes, 27 seconds
+termine qui, questo termine qua che appunto tornati indietro la formula diceva proprio
+54:36
+54 minutes, 36 seconds
+dovete il termine che dovete mettere c'è il valore atteso. Atteso però attenzione se conoscete tutto quanto x e d. Vabbè,
+54:43
+54 minutes, 43 seconds
+ora questo termine qua io dico che è rumore perché perché y è il la variabile che devo predire, no? E cosa le sto
+54:53
+54 minutes, 53 seconds
+togliendo? Le sto togliendo il valor medio. Conoscendo la x e conoscendo il mio training set, vedete, non c'è h, cioè questo non dipenderà mai da h.
+55:01
+55 minutes, 1 second
+Questo è indipendente da h. Non dipende da hio sia in gamba. Non dipende da H.
+55:11
+55 minutes, 11 seconds
+Per quanto io scelga un un modello di regressione sofisticatissimo, fantastico, eccetera, questa quantità sotto non dipenderà mai da h. L'h è
+55:20
+55 minutes, 20 seconds
+rimasta separata lì sopra, ok? E quindi questo termine, per quanto io sia in gamba col mio e lo chiamerò rumore, cioè
+55:27
+55 minutes, 27 seconds
+dipende dai miei dati, dipende da come dipende la y dalla x. Sarà una cosa interessante, ma non è necessaria che questa D si può togliere perché i dati
+55:36
+55 minutes, 36 seconds
+sono indipendenti, ma di per sé possiamo chiamare questo termine di rumore, quindi per quanto saremo in gamba e così via questo termine non si può toccare,
+55:45
+55 minutes, 45 seconds
+ok? E anzi il miglior modello che uno potrebbe sperare di avere è proprio questo valore medio di y condizionato a
+55:52
+55 minutes, 52 seconds
+XD, ok? la migliore cosa che potete fare perché appunto se uno riuscisse a fare hxd dato da quello, almeno il termine
+56:00
+56 minutes
+sopra si cancella e rimane solo quello sotto. Però nella pratica non è così.
+56:04
+56 minutes, 4 seconds
+Quindi adesso andiamo a vedere se da questo che dipende da h riusciamo a estrarre quello che ci interessa, cioè bias e varianza.
+56:13
+56 minutes, 13 seconds
+Va bene? Allora, lo copio e lo incolliamo sotto.
+56:18
+56 minutes, 18 seconds
+Vediamo se riesco a fare una cosa non distruttiva. Allora, quindi il primo termine l'abbiamo eliminato e andiamo a
+56:27
+56 minutes, 27 seconds
+vedere il secondo. Cioè, eliminato rimane lì, non è che purtroppo c'è molto da fare. Allora, qui adesso dico,
+56:34
+56 minutes, 34 seconds
+vedete, ho il valore medio di y condizionato a sapere x e d. Allora,
+56:40
+56 minutes, 40 seconds
+come vi dicevo prima, X, cioè D, è indipendente, il nostro
+56:49
+56 minutes, 49 seconds
+training set è indipendente da XY, dal nuovo test. Quindi il training set e test set sono tutte variabili
+56:57
+56 minutes, 57 seconds
+indipendenti. Quindi questo vi dice, ecco, forse questo è un terzo punto che dovevo aggiungere che quando voi conoscete
+57:06
+57 minutes, 6 seconds
+il training set e conoscete anche la X e quando fate il valor medio, questa è una proprietà del valor medio, è una cosa generale, per
+57:14
+57 minutes, 14 seconds
+indipendenza, vi ricordate quando uno condiziona per qualcosa di indipendente è come non metterlo.
+57:20
+57 minutes, 20 seconds
+Quindi questo y è è come il valor medio non dipenderà dal training set, dipende solo dalla x. Ovviamente è tutto teorico, eh, tutto teorico.
+57:33
+57 minutes, 33 seconds
+Non conosco non conosco la densità P di XY.
+57:37
+57 minutes, 37 seconds
+Qualunque essa sia, varrà questa cosa, ma il problema è che non la conosco, eh, cioè, quindi uno direbbe allora che lo stimatore non dipende dai dati di
+57:44
+57 minutes, 44 seconds
+training? Beh, in teoria non dipende, purtroppo non non possiamo saperlo perché non abbiamo px y. Quindi, allora,
+57:52
+57 minutes, 52 seconds
+il primo passaggio è di dire: "Ok, grazie a questa proprietà, quel valore medio di y in realtà dipende
+58:01
+58 minutes, 1 second
+solo dalla x, non dipende da tutto il training set." Ok?
+58:08
+58 minutes, 8 seconds
+Quindi questo primo passaggio, ecco. E adesso facciamo la stessa cosa che abbiamo fatto prima,
+58:16
+58 minutes, 16 seconds
+cioè introduciamo dell'informazione, ma questa volta introduco solo l'informazione su eh il mio X,
+58:27
+58 minutes, 27 seconds
+perché vedete questo dipende solo da X
+58:34
+58 minutes, 34 seconds
+e questo dipende da X e D. Ok, quindi cosa faccio? Faccio di nuovo il
+58:42
+58 minutes, 42 seconds
+il quella regola della probabilità totale, cioè faccio l'errore, quello che sta rimanendo dell'errore,
+58:50
+58 minutes, 50 seconds
+condizionando a conoscere X. Attenti, prima ho condizionato con X e D, adesso dico, ok, il training set
+59:00
+59 minutes
+non lo conosco, però faccio finta di conoscere il punto di test.
+59:04
+59 minutes, 4 seconds
+Allora, se conosco il punto di test, vedete, questo è un valore medio che ho detto dipende solo da x, quindi è come
+59:11
+59 minutes, 11 seconds
+se fosse costante costante se conosco x.
+59:19
+59 minutes, 19 seconds
+Attenti che è tutta una cosa teorica, cioè dovreste conoscere x, ma anche la densità congiunta. Eh, questo in pratica non è così. Però se conosco
+59:27
+59 minutes, 27 seconds
+le x e conosco la densità congiunta, questo è un valore medio, è una cosa che dovrei poter calcolare. E questo invece no, questo no. Quindi questa è quella
+59:36
+59 minutes, 36 seconds
+che abbiamo chiamato U e questa è quella che chiamiamo V nel teorema di Pitagora generalizzato.
+59:42
+59 minutes, 42 seconds
+E quindi cosa abbiamo? Spezziamo questo come un quadrato, no? avete V che la riporto qui meno il suo valor medio.
+59:55
+59 minutes, 55 seconds
+Comunque, aspettate un secondo che non so se comunque eh, aspettate oh.
+1:00:15
+1 hour, 15 seconds
+Dunque, un attimo. Eh, dunque, sì. Ok, ci siamo. Allora, siamo qui, no?
+1:00:26
+1 hour, 26 seconds
+Si vede. Aspettate che controllo che non si sia persa la registrazione. Perfetto.
+1:00:31
+1 hour, 31 seconds
+Sì. Allora, abbiamo eh V meno il suo valor medio, quindi abbiamo il valor medio di X
+1:00:38
+1 hour, 38 seconds
+di condizionato, scusate, sono un attimo.
+1:00:44
+1 hour, 44 seconds
+Eh, Dunque, Sì.
+1:00:58
+1 hour, 58 seconds
+Accidenti, sono era meglio se mi assegnavo qualche nota. Ora mi sta venendo al contrario di
+1:01:07
+1 hour, 1 minute, 7 seconds
+com'era. Ok, questo. Quindi questo è il primo eh termine
+1:01:16
+1 hour, 1 minute, 16 seconds
+e poi abbiamo un altro termine, ok? Più l'altro termine, facciamogli un po' di spazio. M ok. Più l'altro termine cosa viene?
+1:01:26
+1 hour, 1 minute, 26 seconds
+L'altro termine è eh il valor medio
+1:01:32
+1 hour, 1 minute, 32 seconds
+di y condizionato a x - m perché mi viene al contrario di i valore medio di
+1:01:40
+1 hour, 1 minute, 40 seconds
+x condizionato a conoscere x. Ah, ecco qua. Sì, sì, perfetto, scusate. Eh, ci siamo, l'abbiamo applicato correttamente, non preoccupatevi, no?
+1:01:49
+1 hour, 1 minute, 49 seconds
+Eh, ok, benissimo, ci siamo. Abbiamo di nuovo applicato,
+1:01:55
+1 hour, 1 minute, 55 seconds
+insomma, eh dobbiamo fare venire fuori tre termini, l'abbiamo applicato due volte sto teorema di Pitagora. Allora, vediamo un po' di capire cosa stanno
+1:02:03
+1 hour, 2 minutes, 3 seconds
+dando questi termini. Ok? Allora, quello che voglio dire è che questo termine qui, ok? è quello che potremmo individuare e chiamare termine di varianza.
+1:02:17
+1 hour, 2 minutes, 17 seconds
+Ok? E invece questo termine qui, questo sotto, forse diamogli un altro colore,
+1:02:24
+1 hour, 2 minutes, 24 seconds
+facciamolo il rosso. Eccolo qua, è quello che possiamo chiamare termine di bias quadrato, ok? BAS Quadro perché
+1:02:32
+1 hour, 2 minutes, 32 seconds
+un po' Bias di solito la differenza tra la variabile e il suo valore atteso, invece a questo punto è già è valutato quadrato. Ora vediamo se c'è un'altra
+1:02:40
+1 hour, 2 minutes, 40 seconds
+slide, un po' di spazio, eh mettiamoci una pagina in più. Allora, vediamo un po' perché, che natura hanno questi due
+1:02:48
+1 hour, 2 minutes, 48 seconds
+termini e così li avete anche visti esplicitamente. Allora, questo primo termine che è quello di varianza,
+1:02:57
+1 hour, 2 minutes, 57 seconds
+eccolo qua. Allora, questo è un termine di varianza.
+1:03:04
+1 hour, 3 minutes, 4 seconds
+Allora, cosa state prendendo? Beh, eh no, scusate, questo non è quello di prima. Ho fatto copia ancora sbagliato.
+1:03:11
+1 hour, 3 minutes, 11 seconds
+Beh, lo riscrivo, dai. Allora, h questo meno valore atteso di hx
+1:03:20
+1 hour, 3 minutes, 20 seconds
+di condizionato a x, eccolo qua, al quadrato. Ok? Allora, cosa sta facendo
+1:03:28
+1 hour, 3 minutes, 28 seconds
+questo valore atteso? Vedete, da un lato ho il mio stimatore, no? Che eh
+1:03:35
+1 hour, 3 minutes, 35 seconds
+vedete, questo è il mio modello e dipende sia dai dati dai dati e da x.
+1:03:45
+1 hour, 3 minutes, 45 seconds
+Questo invece ho condizionato a conoscere x. Ma cosa significa che conosco X? Significa che ora i dati non
+1:03:53
+1 hour, 3 minutes, 53 seconds
+li conosco più. Ok? Qui sto dicendo che X la conosco. Ora il mio modello di regressione dipende dai dati di training
+1:04:02
+1 hour, 4 minutes, 2 seconds
+e dall' x di test. Qui cosa ho detto? Ho detto che conosco X, quindi vuol dire che sto mediando sui dati, ok? Quindi
+1:04:11
+1 hour, 4 minutes, 11 seconds
+conosco solo X medio sui dati.
+1:04:16
+1 hour, 4 minutes, 16 seconds
+In che senso sui dati? Su tutte le possibili realizzazioni di dati di training set che potrebbero arrivare. Ok?
+1:04:23
+1 hour, 4 minutes, 23 seconds
+E quindi sto vedendo è una specie di varianza di di variabilità di quanto il mio effettivo modello H quando lo valuto su dei dati specifici differeni.
+1:04:37
+1 hour, 4 minutes, 37 seconds
+Ok? Qui sta vedendo quanto quindi la varianza quanto il modello
+1:04:45
+1 hour, 4 minutes, 45 seconds
+il modello dipende dai dati, è sensibile ai dati. Ok? ai dati
+1:04:53
+1 hour, 4 minutes, 53 seconds
+specifici di che vedrò. Ora, di nuovo è un discorso generale perché sto comunque mediando anche fuori, quindi sto dicendo in media quanto in media sui possibili
+1:05:02
+1 hour, 5 minutes, 2 seconds
+dati che otterrò, quanto dipenderà il mio modello, quanto differirà il mio modello H rispetto a quello mediato su tutti i dati che potrei ottenere. Ok?
+1:05:10
+1 hour, 5 minutes, 10 seconds
+Quindi questo è il termine di varianza.
+1:05:12
+1 hour, 5 minutes, 12 seconds
+L'altro termine invece era più facile che è quello di bias che prende la media di x condizionare a x, quindi mediando
+1:05:22
+1 hour, 5 minutes, 22 seconds
+sui dati d. Infatti a volte si scrive il valore teso di d così per dire che stiamo mediando sui dati, però a me non piace tantissimo.
+1:05:30
+1 hour, 5 minutes, 30 seconds
+E poi togliete invece il modello, quello ottimale che era il meglio che si poteva fare se conosciamo la densità di x e y però. Ok? ed era questo.
+1:05:42
+1 hour, 5 minutes, 42 seconds
+Ok? Quindi sta dicendo in media, se faccio la media su tutti i dati che posso ottenere perché avrò questi rumori
+1:05:50
+1 hour, 5 minutes, 50 seconds
+dovuti ai dati che andrò a visualizzare, ma se mediassi sono tutti i possibili dati che osserverò e faccio la media del mio del Mh del mio modello di
+1:05:58
+1 hour, 5 minutes, 58 seconds
+regressione. Quanto sono lontano da questo che è il modello migliore, ok?
+1:06:02
+1 hour, 6 minutes, 2 seconds
+Questo a volte si chiama anche il modello baesiano HBX, ok? Quindi la media sui dati, quanto è
+1:06:11
+1 hour, 6 minutes, 11 seconds
+distante dal meglio che potevo fare tenendo conto che c'è del rumore. Beh, allora questo è un termine che chiamiamo di bias, ok?
+1:06:19
+1 hour, 6 minutes, 19 seconds
+Perché? Perché vuol dire che anche se teniamo conto della variabilità dei dati, potrebbe essere che il mio modello è troppo semplice, è è sbagliato, è
+1:06:27
+1 hour, 6 minutes, 27 seconds
+calibrato male e quindi in media mi va a vedere un modello diverso da quello che che molto lontano da quello che vorrei trovare ottimamente. Ok? E quindi questo
+1:06:37
+1 hour, 6 minutes, 37 seconds
+è il termine di bias. Va bene? Quindi sono tre i termini. Da un lato c'è il primo termine di rumore e quello è non
+1:06:44
+1 hour, 6 minutes, 44 seconds
+si può fare molto. Poi c'è questo termine di varianza e infine questo termine di bias. Insomma, l'ordine esce dietro voi come presentarlo. Allora,
+1:06:53
+1 hour, 6 minutes, 53 seconds
+vediamo un po'. Vorrei dire queste formule spero non vi abbiano spaventato.
+1:06:58
+1 hour, 6 minutes, 58 seconds
+Torniamo al discorso, insomma, pratico concettuale, cioè cosa vuol dire che un modello ha questo questa cosa c'è ovunque nei testi non avete mai vista.
+1:07:09
+1 hour, 7 minutes, 9 seconds
+Un modello presenta bias alto e varianza alta. Ok, cominciamo da qui in alto.
+1:07:14
+1 hour, 7 minutes, 14 seconds
+Cioè il nostro obiettivo del modello di regressione è centrare esattamente l'obiettivo che sarebbe il centro, no, di questi bersagli che è la nostra Y.
+1:07:23
+1 hour, 7 minutes, 23 seconds
+Ok? Cosa vuol dire? Che un modello H presenta varianza alta e bias alto? Vuol
+1:07:31
+1 hour, 7 minutes, 31 seconds
+dire che sbaglia tutto, no? Cioè, allora, non soltanto varianza alta vuol dire che dipende molto dai dati effettivi che gli sto dando, ma by a
+1:07:40
+1 hour, 7 minutes, 40 seconds
+salto vuol dire anche che sta in media sbagliando, ok? anche se medio sui dati, su un'ipotetica famiglia di tutti i dati che potrò vedere, sto sbagliando, quindi
+1:07:48
+1 hour, 7 minutes, 48 seconds
+avrò una situazione in cui sto lanciando le freccette, ma sono proprio fuori e faccio anche una grossa variabilità al variare di possibili dati.
+1:07:58
+1 hour, 7 minutes, 58 seconds
+Beh, tutto l'opposto. Cosa vuol dire bias basso e varianza basso? Bas basso, varianze basse vuol dire che il modello cambia poco a seconda dei dati che gli ho dato e in media ci azzecca. Ok?
+1:08:11
+1 hour, 8 minutes, 11 seconds
+E andiamo a vedere invece situazioni intermedie, appunto. Supponiamo che il bias sia alto, ma la varianza sia bassa.
+1:08:18
+1 hour, 8 minutes, 18 seconds
+Cosa vuol dire? Vuol dire che la varianza è bassa, vuol dire che non dipende troppo dai dati effettivi che
+1:08:24
+1 hour, 8 minutes, 24 seconds
+sta osservando, è vicino ai ai alla situazione media, quindi avrò delle piccole dispersioni, però il bias è
+1:08:32
+1 hour, 8 minutes, 32 seconds
+alto, vuol dire che non sta catturando il punto giusto, è calib è calibrato male, uno direbbe. Ok, quindi siamo in situazione così.
+1:08:41
+1 hour, 8 minutes, 41 seconds
+E invece l'altra situazione è varianza alta ma bias basso. Ok? Quindi bias basso varianza alto è come Kenen con K
+1:08:49
+1 hour, 8 minutes, 49 seconds
+piccolo, no? Varianza alto molto grande, ma in media su tutte le possibili osservazioni eh ci c la faceva. Ok? Va bene.
+1:09:01
+1 hour, 9 minutes, 1 second
+Situazione del genere. Se mediate su tutti i possibili D ci siete. Ok?
+1:09:06
+1 hour, 9 minutes, 6 seconds
+Quindi, al di là di quella formula decomposizione Pitagora, non non spaventatevi troppo, in effetti quando la racconto è facile perdersi, cioè i
+1:09:15
+1 hour, 9 minutes, 15 seconds
+punti sono questi. Il dilemma apparentemente c'è, però fate attenzione che non tutti i modelli presentano questo dilemma. Eh, quindi allora che
+1:09:24
+1 hour, 9 minutes, 24 seconds
+indicazioni pratiche possiamo trarne da queste curve d'errore, no? Uno disegna la curva d'errore, confronta errori di training con errore di validation o di
+1:09:32
+1 hour, 9 minutes, 32 seconds
+test. Allora, se l'errore di training è basso e l'errore di test è basso, beh, siamo a posto. Insomma, qua non ci sono
+1:09:40
+1 hour, 9 minutes, 40 seconds
+non c'è niente da dire. Abbiamo trovato un ottimo modello che aderisce bene ai dati osservati e generalizza bene.
+1:09:47
+1 hour, 9 minutes, 47 seconds
+Perfetto. Ma questo non lo troverete.
+1:09:50
+1 hour, 9 minutes, 50 seconds
+Allora, invece cosa succede? Quali sono le situazioni che non ci piacciono? e si può fare qualcosa, cioè se l'errore di training è molto basso, quindi siete
+1:09:59
+1 hour, 9 minutes, 59 seconds
+tipo KNN con K1, avete training zero, ma l'errore di test è molto alto, allora vuol dire che siete in situazione di overfitting, cioè il modello è troppo
+1:10:08
+1 hour, 10 minutes, 8 seconds
+complesso, dovete introdurre del bias se proprio il cioè se c'è veramente questo dilemma, no, cosa significa? prendiamo
+1:10:17
+1 hour, 10 minutes, 17 seconds
+un modello più semplice, cioè dovete, insomma, potenzialmente vorremmo non introdurre il bias, però alla fine l'effetto è quello che di solito si
+1:10:25
+1 hour, 10 minutes, 25 seconds
+introduce. rendete il modello più semplice, aumentate i parametri di regolarizzazione, tipo questo capn
+1:10:32
+1 hour, 10 minutes, 32 seconds
+e ci sono poi tecniche un po' più sistematiche che non dipendono proprio dal modello. Ci sono queste tecniche di
+1:10:38
+1 hour, 10 minutes, 38 seconds
+begging o cosiddetto dropout se fate eh se fate discesa gradiente, ci sono queste queste tecniche. Comunque al di
+1:10:47
+1 hour, 10 minutes, 47 seconds
+là di questo, il punto che avrete spesso dei parametri che vi indicano quanto il vostro modello è complesso e se vedete che siete situazione tipo KNN che è
+1:10:56
+1 hour, 10 minutes, 56 seconds
+questo gap training e testerlo più semplice il vostro modello. E l'altra situazione in cui si può dire
+1:11:04
+1 hour, 11 minutes, 4 seconds
+qualcosa è quando l'errore di training è alto e anche l'errore di test è alto e allora qui magari probabilmente siete in
+1:11:11
+1 hour, 11 minutes, 11 seconds
+una situazione in cui il modello è troppo semplice. C'è sempre situazione in cui potrebbe esserci un rumore, cioè un noise estremamente alto e grande,
+1:11:20
+1 hour, 11 minutes, 20 seconds
+quindi avete trovato dei dati tremendi, però diciamo la speranza qui è di essere una situazione di underfitting. Il modello è troppo semplice, quindi magari
+1:11:29
+1 hour, 11 minutes, 29 seconds
+riusciamo a a scoprire almeno i i punti di training e sperando poi che riusciamo a cogliere qualcosa anche sul test. Ok?
+1:11:38
+1 hour, 11 minutes, 38 seconds
+E allora in questa situazione è l'opposto, no? Quindi K molto grande, riducete K oppure aumentate, rendete il modello più complicato,
+1:11:46
+1 hour, 11 minutes, 46 seconds
+quindi riducete il valore della regolarizzazione. Ci sono tecniche anche qui sistematiche, si chiamano metodi di
+1:11:54
+1 hour, 11 minutes, 54 seconds
+boosting, in cui partendo da modelli molto semplici si può in realtà aumentare l'espressività di modelli.
+1:12:01
+1 hour, 12 minutes, 1 second
+Allora, questa slide però prendetela con, insomma, un po' di accuratezza, cioè non dite che è una cosa generale che funziona sempre, perché ci sono
+1:12:10
+1 hour, 12 minutes, 10 seconds
+anche modelli appunto che non presentano questo dilemma bias e varianze. Ok? Poi nella pratica però sono molto complicati
+1:12:18
+1 hour, 12 minutes, 18 seconds
+da Beh, almeno diciamo Random Forest è un po' più semplice, funziona bene come modello di classificazione
+1:12:25
+1 hour, 12 minutes, 25 seconds
+e reti neurali sembrano che non soffrano di questa situazione di bias varianza.
+1:12:31
+1 hour, 12 minutes, 31 seconds
+di dilemma, diciamo, però anche loro hanno delle complicazioni quando fate il training, quindi non è così evidente.
+1:12:39
+1 hour, 12 minutes, 39 seconds
+Allora, questa questa dicotomia, questo dilemma tenetelo presente e lo vedremo anche, insomma, quando fate le quando vi
+1:12:47
+1 hour, 12 minutes, 47 seconds
+avvicinate dei dataset reali. c'è sempre questi parametri da impostare e questa è una buona guida. Insomma, cercate sempre
+1:12:54
+1 hour, 12 minutes, 54 seconds
+un un punto intermedio dove le cose funzionino bene.
+1:13:00
+1 hour, 13 minutes
+Beh, allora abbiamo qualche minuto. Sì, finiamo poi alle 4:00 in punto.
+1:13:07
+1 hour, 13 minutes, 7 seconds
+Allora, KNN per la regressione è un buon modello, potete impostarlo e usarlo a
+1:13:14
+1 hour, 13 minutes, 14 seconds
+piacere, però soffre gli stessi problemi della classificazione e il problema forse principale era che è un modello
+1:13:21
+1 hour, 13 minutes, 21 seconds
+non parametrico, cioè se voi dovete calcolare in un nuovo punto X, vi ricordate come funzionava la funzione
+1:13:27
+1 hour, 13 minutes, 27 seconds
+KNN? dovete dargli tutto il training set, digli questo invece è il nuovo punto di test, trovami il valore perché
+1:13:36
+1 hour, 13 minutes, 36 seconds
+perché lui deve passare in teoria tutto training set, vedere quali sono i k punti più vicini e poi mi restituisce la
+1:13:43
+1 hour, 13 minutes, 43 seconds
+previsione. Beh, e quindi possiamo cercare una situazione più semplice, cioè questo fatto di dovergli dare tutto il training set ha dei ha dei costi, no?
+1:13:54
+1 hour, 13 minutes, 54 seconds
+Chiaramente, cioè quando è molto grande il training set deve passarsi tutto il training set che potrebbe essere gigantesco. E poi ci sono altri
+1:14:02
+1 hour, 14 minutes, 2 seconds
+problemi, vi ricordo di KNN, il fatto che usa la distanza euclidea che in dimensione elevata è un problema.
+1:14:09
+1 hour, 14 minutes, 9 seconds
+Poi ultima problema che forse ci interessa un po' di più è questo che se il modello la ricetta è semplicemente vai a vedere i k punti più vicini e fai
+1:14:17
+1 hour, 14 minutes, 17 seconds
+la media di quelli, non è che ho imparato molto, no? Cioè, non è, se volete, una bella teoria che mi dice ecco perché le cose funzionano in questo
+1:14:25
+1 hour, 14 minutes, 25 seconds
+modo. Sta semplicemente dicendo beh, sulla base delle della storia precedente questo questo posso dire che la Y sarà
+1:14:33
+1 hour, 14 minutes, 33 seconds
+questa. Quindi è un po' difficile interpretare perché il modello ci sta dando questo esito, capite?
+1:14:39
+1 hour, 14 minutes, 39 seconds
+L'interpretabilità è importante, eh, ci sono anche i modelli moderni, tipo le reti neurali, soffrono di questo problema, ma anche KenenNen in effetti
+1:14:46
+1 hour, 14 minutes, 46 seconds
+non è che ci dica moltissimo su perché succedono certe cose. Allora, qual è il passaggio? Il passaggio è di passare ai
+1:14:53
+1 hour, 14 minutes, 53 seconds
+modelli parametrici, come avevamo fatto per la classificazione, avevamo introdotto dei modelli generativi, no,
+1:15:01
+1 hour, 15 minutes, 1 second
+discriminativi, ma comunque alla fine avevamo parametrizzato delle densità di probabilità e avevamo con quei parametri poi stimato i parametri e fatto delle
+1:15:09
+1 hour, 15 minutes, 9 seconds
+previsioni. Allora, qui si fa la stessa cosa e diciamo sono piuttosto modelli discriminativi tendenzialmente se uno
+1:15:16
+1 hour, 15 minutes, 16 seconds
+volesse classificarli, no? come facevamo per per gli altri. Ma il punto chiave qual è? Che noi il nostro eh modello di
+1:15:25
+1 hour, 15 minutes, 25 seconds
+regressione lo facciamo dipendere non soltanto dal dal test dal punto di test
+1:15:33
+1 hour, 15 minutes, 33 seconds
+e ma non da tutto il training set D, come facevamo prima in astratto, ma se volete la dipendenza un po' mediata. ci sono questi parametri, diciamo,
+1:15:42
+1 hour, 15 minutes, 42 seconds
+tendenzialmente sono parametri reali, un insieme finito di parametri tipo p parametri reali, quindi un singolo
+1:15:49
+1 hour, 15 minutes, 49 seconds
+vettore in r^ p che ci permette di dire eh appunto quale poi dovremmo stimare quale di questi parametri andrà bene,
+1:15:58
+1 hour, 15 minutes, 58 seconds
+facciamo il training e poi una volta scelto quei parametri possiamo usare il modello per fare test. Quindi, allora, ripeto, il il passaggio fondamentale è
+1:16:07
+1 hour, 16 minutes, 7 seconds
+che vogliamo ridurre la dipendenza da tutto il training set a un insieme finito piccolo di parametri.
+1:16:13
+1 hour, 16 minutes, 13 seconds
+Tendenzialmente P è molto più piccolo di di n. Tendenzialmente, ok? Tipicamente, tipicamente
+1:16:21
+1 hour, 16 minutes, 21 seconds
+P è molto più piccolo di N, però attenti che tipicamente che che appunto che ci sono modelli che fanno sono proprio nel
+1:16:30
+1 hour, 16 minutes, 30 seconds
+regime opposto. Comunque allora al di là della dimensione il punto è che faremo due fasi, no? Prima una fase di stima di
+1:16:37
+1 hour, 16 minutes, 37 seconds
+questi parametri che chiamiamo training del modello e poi una fase di previsione, ok? Il test, ok? Quindi separiamo le due parti, mentre KNN in
+1:16:46
+1 hour, 16 minutes, 46 seconds
+effetti funziona tutto insieme, non è molto chiaro cos'è trading e cos'è test. In questo caso separiamo.
+1:16:53
+1 hour, 16 minutes, 53 seconds
+Ecco, allora mercoledì vediamo poi concretamente dei modelli specifici, però vi racconto già e così chiudiamo
+1:17:01
+1 hour, 17 minutes, 1 second
+questa parte più teorica. Eh, qual è il metodo con cui stimiamo i parametri? Ok?
+1:17:07
+1 hour, 17 minutes, 7 seconds
+Allora, il metodo è sempre un metodo variazionale. Fissiamo una funzione di loss e scegliamo un teta in modo da
+1:17:15
+1 hour, 17 minutes, 15 seconds
+minimizzare la nostra loss. Dove la valutiamo però questo rischio? Beh, allora, tendenzialmente si valuta la
+1:17:22
+1 hour, 17 minutes, 22 seconds
+loss sul training set, ok? Quindi, cosa facciamo? Fissiamo il modello parametrico hxa,
+1:17:30
+1 hour, 17 minutes, 30 seconds
+ok? Quindi al variare di teta avrete questi parametri che dovete giocare.
+1:17:34
+1 hour, 17 minutes, 34 seconds
+Beh, allora cosa andiamo a fare? Andiamo a prendere ad esempio il metodo dei minimi quadrati. Vi dice di prendere il
+1:17:42
+1 hour, 17 minutes, 42 seconds
+la ehm il min square error, l'errore del quadrato comedio di h di
+1:17:49
+1 hour, 17 minutes, 49 seconds
+teta sul sul training set. Ok? E al vari teta
+1:17:57
+1 hour, 17 minutes, 57 seconds
+andate a scegliere i parametri che lo minimizzano. Ok? Ora potrebbe esserci anche più di una soluzione, eh, non in questa generalità non è che ce n'è una
+1:18:05
+1 hour, 18 minutes, 5 seconds
+sola, però nel momento in cui ne trovate una siamo a posto, siamo felici. Ora come la troviamo è un altro paio di maniche, però nel momento in cui trovate
+1:18:13
+1 hour, 18 minutes, 13 seconds
+un teta che rende basso più piccolo possibile errore il minquare error sul training set, a quel punto usate quello
+1:18:20
+1 hour, 18 minutes, 20 seconds
+per fare una previsione, no, su un nuovo dato. Quindi avete dato un X nuovo, avete la previsione con questo modello di regressione. Ok?
+1:18:31
+1 hour, 18 minutes, 31 seconds
+Allora, in effetti questa prescrizione risale addirittura ai tempi di di Gaus, va bene? Molto antica questa idea del metodo dei minimi quadrati e eh ad
+1:18:40
+1 hour, 18 minutes, 40 seconds
+esempio la plus faceva i minimo valori assoluti, cioè non faceva i quadrati ma faceva il valore assoluto. Comunque al di là di questo, eh può essere usato per
+1:18:49
+1 hour, 18 minutes, 49 seconds
+qualsiasi modello parametrico, ok? Che sia un modello, vedremo modelli lineari, polinomiali, ma ci sono anche modelli non lineari come le reti neurali, ok?
+1:19:00
+1 hour, 19 minutes
+Visto che parliamo un po' di teoria, però questo metodo un po' calato dall'alto non si sposa bene con quello che vi ho detto prima, cioè abbiamo
+1:19:07
+1 hour, 19 minutes, 7 seconds
+visto per la classificazione i modelli basati sulla formula di Beyes. Allora, c'è un legame, c'è un legame, sì. E il
+1:19:15
+1 hour, 19 minutes, 15 seconds
+metodo dei minimi quadrati si può pensare come un metodo di massima verossimiglianza. Va bene? Questo non è soltanto un legame così che che andiamo
+1:19:23
+1 hour, 19 minutes, 23 seconds
+a inventarci. Il punto è che grazie, cioè chiarendo un pochino qual è l'ipotesi che fa funzionare il metodo dei minimi quadrati, poi potremo trarre
+1:19:31
+1 hour, 19 minutes, 31 seconds
+ulteriori conseguenze più tardi settimana prossima. Quindi però cominciamo soltanto con l'interpretazione di questo metodo. Poi
+1:19:39
+1 hour, 19 minutes, 39 seconds
+in pratica vedrete che si implementa con una riga di codice, però il punto qual è? Che l'ipotesi che facciamo è che y è
+1:19:49
+1 hour, 19 minutes, 49 seconds
+circa x hx. Vi ricordate che vogliamo scrivere questo? significa in pratica
+1:19:55
+1 hour, 19 minutes, 55 seconds
+che c'è un errore, chiamiamolo residuo, che è una gausiana indipendente, ok?
+1:20:04
+1 hour, 20 minutes, 4 seconds
+Indipendente da cosa? Praticamente indipendente da tutto. Ok? Vogliamo dire che questo che è rumore, diciamo che è un errore che sta lì, ok? Un residuo indipendente.
+1:20:16
+1 hour, 20 minutes, 16 seconds
+Ok?
+1:20:17
+1 hour, 20 minutes, 17 seconds
+Quindi questo è il metodo, se volete, il modello vero che fa funzionare il metodo dei mini quadrati dal punto di vista probabilistico è di chiedere che c'è il
+1:20:25
+1 hour, 20 minutes, 25 seconds
+modello di regressione h dix teta e però c'è un rumore additivo, cioè un errore + epsil che chiamiamo residuo e questo
+1:20:33
+1 hour, 20 minutes, 33 seconds
+residuo, se vogliamo proprio il metodo dei minimo quadrati è gaussiano. Ok?
+1:20:37
+1 hour, 20 minutes, 37 seconds
+Quindi l'ipotesi di gaussianità del residuo è fondamentale per per almeno per interpretare bene questo metodo dei
+1:20:45
+1 hour, 20 minutes, 45 seconds
+minimi quadrati. Eh perché vediamo un attimo. Se partiamo quindi da questo modello, ok? Incornicio questo così è un po' più chiaro.
+1:20:55
+1 hour, 20 minutes, 55 seconds
+Eh, posso scrivere, posso stimare i parametri?
+1:21:00
+1 hour, 21 minutes
+Sì. E l'idea è che li stimo con la stima di massima verosimiglianza.
+1:21:05
+1 hour, 21 minutes, 5 seconds
+Ricordate cos'è la verosimiglianza? La verosimiglianza L, ve l'ho scritta qua sotto di un parametro relativo a delle
+1:21:15
+1 hour, 21 minutes, 15 seconds
+osservazioni era la probabilità di fare quelle osservazioni se conosco il parametro. Ok? Sì, era si invertiva, no,
+1:21:24
+1 hour, 21 minutes, 24 seconds
+il l'ordine delle cose. Quindi, allora, supponiamo di avere i miei dati di training set e vado a scrivere la
+1:21:31
+1 hour, 21 minutes, 31 seconds
+verosimiglianza. Cosa significa la verosimiglianza? Beh, vuol dire la probabilità di osservare proprio questi dati se conosco il parametro teta.
+1:21:39
+1 hour, 21 minutes, 39 seconds
+Però, allora, se conosco il parametro teta, intanto i miei dati sono delle x e delle y, intanto poi ho chiesto anche che siamo tutti indipendenti, quindi
+1:21:48
+1 hour, 21 minutes, 48 seconds
+intanto il vantaggio è che essendo indipendenti ogni dato avrà la sua densità di probabilità e e le spezzo
+1:21:55
+1 hour, 21 minutes, 55 seconds
+come prodotto di n, no? Quello per indipendenza, ok? per indipendenza si spezza come
+1:22:04
+1 hour, 22 minutes, 4 seconds
+prodotto dei singoli delle singole osservazioni. Poi però concentriamoci su uno di questi, no? Cioè, allora qui ho la probabilità di osservare la x e la y
+1:22:14
+1 hour, 22 minutes, 14 seconds
+sapendo il parametro teta. Allora, se io so il parametro teta e ancora non so veramente tutto perché
+1:22:21
+1 hour, 22 minutes, 21 seconds
+io vorrei ho ad esempio l'EPil che mi resta un po' eh così da determinare.
+1:22:27
+1 hour, 22 minutes, 27 seconds
+Beh, allora cosa faccio? Innanzitutto scrivo la y come hx
+1:22:33
+1 hour, 22 minutes, 33 seconds
++ hxa +, no? Quindi uso che y = hx teta +
+1:22:41
+1 hour, 22 minutes, 41 seconds
+introduco quindi la epil qui e d'altra parte vedete qui questa c'è una densità congiunta. Adesso spesso a
+1:22:49
+1 hour, 22 minutes, 49 seconds
+volte neanche si scrive questa cosa, però la verosimiglianza effettivamente riguarderebbe la probabilità di osservare la x e la y perché il mio
+1:22:57
+1 hour, 22 minutes, 57 seconds
+training set è xy. Ora però cosa si può fare quando avete una probabilità di A e B? Eh che si chiama regola del prodotto,
+1:23:06
+1 hour, 23 minutes, 6 seconds
+avete la probabilità di eh ad esempio di osservare la X per la probabilità della Y sapendo anche la X.
+1:23:16
+1 hour, 23 minutes, 16 seconds
+Ok? Questa è una regola generale. Quando avete probabilità di A e B, forse avevamo anche ripassate, no? Era la
+1:23:23
+1 hour, 23 minutes, 23 seconds
+probabilità di B in questo caso per la probabilità di A condizionata B. Quindi in questo caso questo è A. Eh sì.
+1:23:31
+1 hour, 23 minutes, 31 seconds
+E questo è B.
+1:23:33
+1 hour, 23 minutes, 33 seconds
+Ok? Allora, adesso bisogna un po' essere chiari con le ipotesi perché altrimenti Allora, se conosco teta, qual è la probabilità di osservare una certa x?
+1:23:42
+1 hour, 23 minutes, 42 seconds
+Allora, theta per noi è un parametro che andiamo a introdurre per modellizzare la relazione tra x e y,
+1:23:50
+1 hour, 23 minutes, 50 seconds
+quindi non ci dovrebbe dire niente sul fatto che andiamo a osservare una certa x. Quindi qui se volete ci mettiamo un'ipotesi di indipendenza. Questo lo
+1:23:58
+1 hour, 23 minutes, 58 seconds
+togliamo. Questa è un'ipotesi che mettiamo noi, eh, non è ci dice è ragionevole perché la teta serve per
+1:24:05
+1 hour, 24 minutes, 5 seconds
+stimare la relazione tra la x e la y, non effettivamente quale x andremo a vedere.
+1:24:11
+1 hour, 24 minutes, 11 seconds
+Ecco. E adesso però ci siamo veramente arrivati al metodo dei minimi quadrati perché teta lo conosciamo, x la
+1:24:18
+1 hour, 24 minutes, 18 seconds
+conosciamo e la y dicevamo, era hx teta più rumore.
+1:24:24
+1 hour, 24 minutes, 24 seconds
+Quindi qui la x la conosco, la teta la conosco, questo è un numero, è un numero.
+1:24:30
+1 hour, 24 minutes, 30 seconds
+Quindi la probabilità di osservare rumore più questo numero uguale y è la probabilità di osservare il rumore
+1:24:37
+1 hour, 24 minutes, 37 seconds
+uguale a y - l'h di xi teta. Ma il rumore ho detto che è gaussiano e qual è
+1:24:44
+1 hour, 24 minutes, 44 seconds
+la probabilità di osservare una densità di probabilità di osservare una certa gausiana? Beh, è la la densità gausiana.
+1:24:51
+1 hour, 24 minutes, 51 seconds
+Quindi ci metto esplicitamente la densità gausiana. Questa è la densità del nostro rumore valutata in quale
+1:24:57
+1 hour, 24 minutes, 57 seconds
+punto? y - hxi teta. Vedete, la valuto qui. Quindi è sto usando proprio il fatto che il rumore è gaussiano.
+1:25:08
+1 hour, 25 minutes, 8 seconds
+Eh, oggi vi ho un po' dato un paio di di dimostrazioni un po' pesanti, però eh vediamo un attimino, cioè modulo quindi
+1:25:17
+1 hour, 25 minutes, 17 seconds
+questo fatto che la questa è la è un'espressione della verosimiglianza.
+1:25:21
+1 hour, 25 minutes, 21 seconds
+Vediamo effettivamente che i teta che massimizzano, che rendono più grande possibile questa sono quelli che minimizzano la loss quadratica sul
+1:25:30
+1 hour, 25 minutes, 30 seconds
+training set, quindi quelli che stabiliscono il metodo dei minimi quadrati. Eh eh! Ops, mi manca un po' di spazio.
+1:25:37
+1 hour, 25 minutes, 37 seconds
+Allora, facciamo l'asterisco, prendiamo qui.
+1:25:45
+1 hour, 25 minutes, 45 seconds
+Questo qua forse si è si è perso qualcosa. Allora, quindi questa è l'espressione, no? Abbiamo introdotto
+1:25:52
+1 hour, 25 minutes, 52 seconds
+su tutti i nostri dati. L'esponenziale - 1/2 avete eh h xi teta - yi qu/ sigma qu che è la varianza del nostro rumore.
+1:26:07
+1 hour, 26 minutes, 7 seconds
+1 √2 piσ che è la densità gausiana richiede questo e poi avete anche la densità di questo, ma non dipende più da teta.
+1:26:16
+1 hour, 26 minutes, 16 seconds
+Allora, cos'è che dipende da teta?
+1:26:18
+1 hour, 26 minutes, 18 seconds
+Questo soltanto dipende da teta. Questo dipende da teta. Questo non dipende da teta.
+1:26:29
+1 hour, 26 minutes, 29 seconds
+Noi dobbiamo trovare il teta il parametro che rende più grande la verosimiglianza, quindi dovremmo rendere più grande quella lì, quello di sinistra. Ora però quel prodotto di
+1:26:37
+1 hour, 26 minutes, 37 seconds
+esponenziali eh non è nient'altro che cosa che l'esponenziale di - 1/2 anche il sigma quadro sta qui.
+1:26:45
+1 hour, 26 minutes, 45 seconds
+E poi siccome ho fatto il prodotto di esponenziale ho l'esponenziale della somma.
+1:26:51
+1 hour, 26 minutes, 51 seconds
+o e adesso lo vedete anche voi, - i quadrato.
+1:27:00
+1 hour, 27 minutes
+Eh, questo pezzo è l'unico pezzo che dipende da theta e ho un esponenziale di meno una grossa somma che dipende da teta.
+1:27:08
+1 hour, 27 minutes, 8 seconds
+Quindi, se devo rendere più grande possibile questa esponenziale di meno qualcosa, beh, quel qualcosa dovrà essere più piccolo possibile, ok? Perché
+1:27:17
+1 hour, 27 minutes, 17 seconds
+l'esponenziale coisonente negativo è decrescente. E quindi cosa abbiamo scoperto? Che se voglio massimizzare la verosimiglianza devo minimizzare
+1:27:26
+1 hour, 27 minutes, 26 seconds
+questo questa somma dei residui, quindi minimizzare
+1:27:32
+1 hour, 27 minutes, 32 seconds
+in teta se solo se massimizzo la verosimiglianza.
+1:27:42
+1 hour, 27 minutes, 42 seconds
+Ok? Quindi, effettivamente il metodo dei minimi quadrati è proprio la versione, se volete variazionale in cui fate
+1:27:50
+1 hour, 27 minutes, 50 seconds
+soltanto dite questo residuo questa e ma di cosa? Di cosa? del modello in cui dico i residui, cioè i termini di
+1:27:58
+1 hour, 27 minutes, 58 seconds
+differenza tra le y e le hx sono delle gaussiane indipendenti. Questo sarà importante perché poi quando andiamo a fare l'analisi eh degli intervalli di
+1:28:08
+1 hour, 28 minutes, 8 seconds
+confidenza, delle previsioni eccetera, questo fatto che i residui siano causani indipendenti ritorna. Ok? Perché se uno
+1:28:15
+1 hour, 28 minutes, 15 seconds
+vuole soltanto una stima puntuale di teta può inventarsi minimi quadrati, ma si può inventare qualsiasi altro metodo.
+1:28:21
+1 hour, 28 minutes, 21 seconds
+Ma poi eh appunto il metodo di minimi quadrati è ha un vantaggio perché poi tante altre espressioni verranno
+1:28:28
+1 hour, 28 minutes, 28 seconds
+esplicite e abbastanza eh maneggevoli, insomma, si può fare dei conti, mentre con altri metodi un po' meno. Ok,
+1:28:37
+1 hour, 28 minutes, 37 seconds
+d'accordo. Quindi ora il metodo di per sé ha un po' di problemi e semplicemente ora finiamo elencandoli e poi vedremo la
+1:28:46
+1 hour, 28 minutes, 46 seconds
+soluzione. Allora, la minimizzazione in generale, questa minimizzazione, sia che le vediate dal punto di vista di massima
+1:28:53
+1 hour, 28 minutes, 53 seconds
+verosimiglianza o minimi quadrati, è un problema complicato perché avete tanti parametri, potenzialmente uno spazio
+1:29:01
+1 hour, 29 minutes, 1 second
+molto grande da esplorare e queste funzioni che minimizzate non è che basta fare la derivata e imporre che si si annulli, insomma, potrebbero esserci
+1:29:08
+1 hour, 29 minutes, 8 seconds
+minimi locali, massimi locali, punti appunto che non sono né massimi né minimi e così via. E altro problema è se
+1:29:17
+1 hour, 29 minutes, 17 seconds
+il mio modello è troppo grande posso fare overfitting, mentre per KNN c'è un parametro naturale di di complessità e
+1:29:25
+1 hour, 29 minutes, 25 seconds
+per un modello così astratto non è molto chiaro come rendere più regolari questi modelli. Pure questo lo vedremo per
+1:29:33
+1 hour, 29 minutes, 33 seconds
+ultimo però e questo punto qui non lo vedremo perché è una questione numerica, cioè di come trovo effettivamente i minimi e come minimizzo le funzioni.
+1:29:43
+1 hour, 29 minutes, 43 seconds
+E invece la prossima volta vedremo, quindi ci lasciamo questi due problemi, il due e il tre, il due per ultimo, invece vedremo la prossima volta, lunedì
+1:29:52
+1 hour, 29 minutes, 52 seconds
+prossimo, come valutare l'incertezza, cioè nel momento in cui ho trovato un punto di minimo, posso far girare il
+1:29:59
+1 hour, 29 minutes, 59 seconds
+modello anche sul computer, trovo un punto di minimo, ma come faccio a valutare quanto sono sicuro che questo
+1:30:07
+1 hour, 30 minutes, 7 seconds
+sia un buon punto? Ok. Quanto posso dare delle informazioni circa all'incertezza della mia stima?
+1:30:13
+1 hour, 30 minutes, 13 seconds
+E allora vedremo che un modello che insomma un po' risolve tutti questi tre sono i modelli cosiddetti di regressione lineare, però li vediamo in pratica
+1:30:21
+1 hour, 30 minutes, 21 seconds
+mercoledì e poi discutiamo un po' la teoria. Ehm, quindi terminiamo qui oggi,
+1:30:27
+1 hour, 30 minutes, 27 seconds
+va bene? Quindi fermiamoci qua alla 27, va bene?
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+80 watching
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+223k 13 hr ago
+New
+39:47
+Beethoven - Triple Concerto in C Major, op. 56 | Morgenstern Trio, Casco Phil, Benjamin Haemhouts
+CASCO Phil
+15k 2 mo ago
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+8:13
+Chi se ne frega di Jev?
+Salvatore Sanfilippo
+6.3k 3 hr ago
+New
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+Mix
+My Mix
+Relja Lukic, Ezio Bosso, Kristen Bell and more
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+16:15
+Travaglio Show! Lancia un Affondo Durissimo Contro La Russa e lo Ridicolizza
+Attualità Politica
+169k 2 wk ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+5:57
+The Biggest Pitfall of the Maths Olympiad | Fun of Mathematics | X+11=X|
+Rashel's Classroom
+504k 1 mo ago
+8:03
+Don't Throw Away Your Old Computer Hard Drive 😱 Billions of People Don't Know This Secret
+Inventor 247
+467k 4 mo ago
+5:30
+Raimondo Vianello e la valletta ciociara (1968)
+pietromollo
+993k 7 yr ago
+7 songs
+Rachmaninoff & Prokofiev: Cello Sonatas
+Yo-Yo Ma, Emanuel Ax • 22 Jul 2026
+View full playlist
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+1:13:40
+Le tecniche del comporre - Alessandro Solbiati 09.05.2017
+Fondazione Collegio San Carlo
+30k 9 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+14:14
+Tracking Yuja Wang’s Heartbeats During Her Rachmaninoff Marathon | Carnegie Hall
+Carnegie Hall
+866k 2 yr ago
+4:13
+Pizzicar Galante - Giovanni Battista Gervasio - Sonata // Per Mandolino solo e Basso (Allegro)
+ahproductions
+54k 3 yr ago

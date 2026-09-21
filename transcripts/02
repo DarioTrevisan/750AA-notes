@@ -1,0 +1,2256 @@
+
+IT
+750AA 2025 09 29 lezione 3 (teoria 2)
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+280 views  29 Sept 2025
+Media e medoide, definizione e significato. Introduzione al clustering: obiettivi, metodi non gerarchici (k-means, algoritmo di Lloyd; PAM), metodi gerarchici (agnes, diana). Indicatori di qualità del clustering: metodo elbow (pro e contro), indice di Dunn, silhouette, definizione e interpretazione.
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:01
+1 second
+Perfetto. Dunque, c'è una cosa che eh non abbiamo trattato la volta scorsa che può essere utile perché queste demo che
+0:09
+9 seconds
+ora vi mostrerò anche oggi ce ne sono un paio forse se arriviamo fino alla fine, eh potete girarle su R in locale.
+0:17
+17 seconds
+Allora, anche qui vi chiederà comunque un sacco di pacchetti perché ci vogliono tutte le, insomma, le funzioni di questo
+0:25
+25 seconds
+shiny che permette di creare queste piccole demo interattive. Però se voi vi scaricate il codice che ripeto un po'
+0:33
+33 seconds
+scritto in fretta e non è proprio il massimo che vi allego qui come file zip, voi ve lo scaricate, tipo questa era
+0:40
+40 seconds
+quella del semplicemente della prima che abbiamo visto, l'unica e ve lo caricate in una cartella locale, quindi il file è
+0:49
+49 seconds
+compresso, avete tanti piccoli file. Nel momento in cui andate ad aprire il file
+0:56
+56 seconds
+global sono tutti file. R, quindi sono file con codice.
+1:01
+1 minute, 1 second
+Se avete installato tutte le varie librerie, perché vede chiede della libreria shiny, la libreria gigglot,
+1:08
+1 minute, 8 seconds
+nel momento in cui fate run app potete giocare, giocare, insomma, esplorare in locale o sul browser il come se appunto
+1:17
+1 minute, 17 seconds
+fosse online, però potete giocarci localmente, potete anche modificare il codice come volete, insomma. Ok? Quindi
+1:24
+1 minute, 24 seconds
+perché non ho eh non ho un account per cui posso, cioè non ho un server dove far girare a tempo pieno queste cose e e
+1:33
+1 minute, 33 seconds
+anzi secondo me è più istruttivo, se ve lo scaricate vedete un pochino com'è fatto. Ok? Quindi questo vale per questa demo, ma per tutte le altre demo. Quindi
+1:41
+1 minute, 41 seconds
+se vedete che a un certo punto che succederà, si esaurisce il il tempo a disposizione sui server lì de di Shiny
+1:50
+1 minute, 50 seconds
+Deposit, sono sempre quelli di R Studio che mettono a disposizione questo questi spazi, non potremmo più girarle, però si girano pure in locale, ok? Quindi
+1:59
+1 minute, 59 seconds
+provateci, se avete difficoltà dovre, cioè dovrebbe filare tutto liscio nel momento in cui installate queste librerie, va bene? Shiny e gig Blot.
+2:08
+2 minutes, 8 seconds
+E poi quando aprite il file fateci un progetto separato, caricate i progetti delle demo lì e uno alla volta o un
+2:15
+2 minutes, 15 seconds
+progetto per ogni demo sarebbe meglio, ma insomma anche un progetto singolo.
+2:19
+2 minutes, 19 seconds
+Nel momento in cui aprite il file global ci sono tutte le indicazioni per far girare questa questa app e poi ve le
+2:26
+2 minutes, 26 seconds
+mostra come un HTML interattivo. Va bene? Quindi questo eh era per dirvi
+2:34
+2 minutes, 34 seconds
+questo, perché altrimenti non magari tra un po' non funzionerà più. Invece muoviamoci ora sulla parte di teoria
+2:41
+2 minutes, 41 seconds
+e oggi veniamo di affrontare il problema del clustering,
+2:49
+2 minutes, 49 seconds
+ma prima di questo c'è un'ultima demo da mostrare perché si collega poi con gli argomenti che vediamo ora per il clustering. Va bene?
+3:00
+3 minutes
+Quindi richiamiamo alcune cose che abbiamo visto. La prima è importantissima ed è fondamentale in statistica nella statistica
+3:07
+3 minutes, 7 seconds
+contemporanea, di usare criteri di minimo rischio per ottenere degli indicatori, poi vedremo per ottenere dei
+3:15
+3 minutes, 15 seconds
+parametri per certi modelli e così via, ma il punto chiave è questa interpretazione variazionale, cioè si dice c'è una funzione di loss, di
+3:23
+3 minutes, 23 seconds
+perdita, si cerca di minimizzare e abbiamo visto che gli indicatori di centralità, ma anche i quantili nascono in questo modo. Poi abbiamo detto che se
+3:32
+3 minutes, 32 seconds
+abbiamo una statistica multivariata, abbiamo più osservazioni di caratteristiche diverse per singoli individui e poi bisogna stare un po'
+3:39
+3 minutes, 39 seconds
+attenti a insomma abbiamo diverse possibilità, ad esempio, anche soltanto per fare una distanza tra le osservazioni. Abbiamo distanze nel
+3:47
+3 minutes, 47 seconds
+piano, distanze del, insomma, la distanza euclidea, la distanza di Manattano, Taxicab, poi la distanza del
+3:54
+3 minutes, 54 seconds
+massimo e così via. Adesso c'è un'altra cosa interessante che vale la pena di discutere in dimensione maggiore di 1, ma varrebbe
+4:02
+4 minutes, 2 seconds
+anche in dimensione 1. Ed è questo fatto quando voi usate l'indicatore, ad esempio la ma anche anche la mediana, ma
+4:09
+4 minutes, 9 seconds
+in particolare la media, la media di una famiglia di osservazioni non è necessariamente una di queste osservazioni, quindi a volte potrebbe
+4:18
+4 minutes, 18 seconds
+non avere senso. Immaginate, no? La media deve, cioè ho un certo numero di palline rosse. Ho fatto un po' di osservazioni, tutti voi avete lanciato
+4:27
+4 minutes, 27 seconds
+estratto delle palline, poi faccio la media e trovo che il numero medio di palline rosse è 4,5. Dico, ma 4,5 non è
+4:35
+4 minutes, 35 seconds
+un numero possibile delle palline rosse, non è un intero? Anche soltanto per questo motivo uno dice: "Allora usiamo la mediana perché magari la mediana è
+4:43
+4 minutes, 43 seconds
+uno dei valori osservati". Allora, più in generale si può fare una distinzione tra appunto tra centroide tra tra media
+4:50
+4 minutes, 50 seconds
+e medoide che è un po' più simile alla mediana che sarà uno dei valori osservati. Allora, vediamo un po' di fare questa distinzione in generale, quindi supponiamo di avere delle
+4:59
+4 minutes, 59 seconds
+osservazioni x1 xn, osservazioni non necessariamente unidimensionali,
+5:06
+5 minutes, 6 seconds
+ok? anche quindi in RD, quindi Dimensionali per ciascuno, quindi immaginate di avere questa tabella di
+5:14
+5 minutes, 14 seconds
+numeri. Eh, allora come possiamo definire un centroide o meglio un beh, la media, diciamo,
+5:23
+5 minutes, 23 seconds
+la media o centroide è definita semplicemente componente per componente
+5:32
+5 minutes, 32 seconds
+e 1 su n la somma delle x con n.
+5:37
+5 minutes, 37 seconds
+E questa sappiamo che minimizza la l'OS, la funzione di di rischio con costo quadratico sulla distanza euclidea.
+5:46
+5 minutes, 46 seconds
+Bisogna stare molto attenti qui. Quindi minimizza effettivamente come dimensione 1 loss quadratica, un min square error si può dire nel con il costo euclideo.
+5:56
+5 minutes, 56 seconds
+però appunto ha questo difetto che non necessariamente pensati di dimensione D potrebbe essere ancora più amplificato perché magari le compon alcune devono
+6:04
+6 minutes, 4 seconds
+essere componenti discrete, numeri, altre invece sono continue. Allora, quindi ha senso definire quello che chiamiamo il medoide,
+6:12
+6 minutes, 12 seconds
+che è una specie di metà via tra una media e una mediana. Allora, cosa facciamo? Prendiamo un x che sarà tra
+6:21
+6 minutes, 21 seconds
+quelli osservati, tra le osservazioni, quindi lo metto appartiene all'insieme delle x con i
+6:29
+6 minutes, 29 seconds
+che minimizza, quindi è un x che minimizza che cosa?
+6:37
+6 minutes, 37 seconds
+Beh, che minimizza la somma. Prendiamo sempre la distanza euclidea per il momento. X - x i quad sommato da 1. Ok?
+6:46
+6 minutes, 46 seconds
+Questo sarebbe l'errore quadratico medio. Allora, come dicievamo, se uno minimizza su tutte i possibili x nel in
+6:54
+6 minutes, 54 seconds
+RD, trova effettivamente la media, ma se forzo, che debba essere una delle mie osservazioni, trovo quello che chiamo il
+7:01
+7 minutes, 1 second
+medoide. Ok? Quindi attenzione, x è o è arg min, come scrivevamo l'altra volta,
+7:08
+7 minutes, 8 seconds
+sulle osservazioni, scriviamole sulle x con i o x con con j, non lo so,
+7:16
+7 minutes, 16 seconds
+chiamatele come volete, della somma o chiamiamola h in x cont chi h l'altra
+7:23
+7 minutes, 23 seconds
+volta, h - x. Quindi, capite, ci limitiamo a guardare tra le possibili osservazioni, ok? Così siamo sicuri che
+7:32
+7 minutes, 32 seconds
+sarà un valore di quelli che abbiamo osservato e non ci stiamo inventando nulla, nulla di strano, non stiamo mediando
+7:40
+7 minutes, 40 seconds
+punti punti appunto che non possiamo osservare. osservazione più in generale
+7:47
+7 minutes, 47 seconds
+in generale si può può definire il medoide
+7:56
+7 minutes, 56 seconds
+rispetto a una funzione a una distanza diversa, a una funzione di loss,
+8:04
+8 minutes, 4 seconds
+ok? Di perdita di costo. Quindi avete una loss di X e H.
+8:10
+8 minutes, 10 seconds
+E allora, come abbiamo fatto l'altra volta, si fa il rischio eh empirico, no? E però si cerca di
+8:19
+8 minutes, 19 seconds
+minimizzare arg min soltanto sulle h però che sono x tra le nostre osservazioni e fate la somma della loss
+8:28
+8 minutes, 28 seconds
+di x con i e h. Ok? Quindi allora, formalmente è molto simile. Vedete che questo approccio
+8:37
+8 minutes, 37 seconds
+è utile perché mi dice "Ma perché devo minimizzare su tutti? Minimizzo solo su sulle osservazioni." Qual è la difficoltà volendo che non c'è una
+8:45
+8 minutes, 45 seconds
+formula chiusa, ma questo non c'è neanche per la mediana, non c'è neanche per per tanti altri indicatori, quindi
+8:52
+8 minutes, 52 seconds
+non dovrebbe spaventarci. Ok? Però attenti questa distinzione. Se per qualche motivo non vi piace che la media
+9:00
+9 minutes
+non sia uno dei valori che effettivamente potreste avere osservato, di quelli che avete osservato, allora passate al
+9:08
+9 minutes, 8 seconds
+medoide, va bene? Alment centroide sarebbe quello che si ottiene anche generalizzando il il rischio con altre
+9:16
+9 minutes, 16 seconds
+distanze e così via. Ok? Quindi attente questa piccola distinzione, a volte è un po' sfumata, però vedremo il metodo pam.
+9:24
+9 minutes, 24 seconds
+che permette di partizionare adesso intorno ai medio ai medoidi e non alle medie. Va bene? Questa sarà la distinzione.
+9:33
+9 minutes, 33 seconds
+E a proposito di medoidi, appunto, era questa cosa che sono mai due tre volte che provo a dirvelo, cioè una piccola demo molto semplice, vediamo di farla al
+9:40
+9 minutes, 40 seconds
+volo e potete anche farla girare online, dovrebbe essere ancora disponibile.
+9:47
+9 minutes, 47 seconds
+Vediamola al volo. Questa cosa del Medovid è molto semplice, quindi la apriamola qui.
+9:55
+9 minutes, 55 seconds
+Sì, l'indirizzo, se volete andare, è questo qui, è medoids, semplicemente. Allora, come funziona questa demo?
+10:01
+10 minutes, 1 second
+Giusto per renderci conto che è molto simile al concetto di eh quindi vado su global qui, come vi ho
+10:08
+10 minutes, 8 seconds
+detto prima, e la facciamo girare, va bene? Questa la sto girando in locale.
+10:15
+10 minutes, 15 seconds
+Allora, leggetevi pure tutto quanto, potete giocarci da solo. Comunque, il punto qual è? Se io disegno dei punti, no, facciamo che questi quadratini sono i punti.
+10:25
+10 minutes, 25 seconds
+e voglio individuare un un medoide.
+10:29
+10 minutes, 29 seconds
+Il medoide potrebbe essercene anche più di uno, effettivamente. E come faccio?
+10:34
+10 minutes, 34 seconds
+Devo trovare un punto che stia nel mezzo. Ok? Ecco. Allora, però che limitazione ho? Deve essere uno di questi punti che ho disegnato.
+10:44
+10 minutes, 44 seconds
+Quindi chi potrebbe essere? Cioè, se fosse la media, vedete, ho quattro punti qui sotto, quattro punti qui in alto, mi aspetto che la media sia più o meno qui,
+10:51
+10 minutes, 51 seconds
+no? a metà, ma il medoide ho richiesto che sia una delle mie osservazioni e quindi cosa sarà? Sarà questo oppure
+11:01
+11 minutes, 1 second
+questo. Adesso non appunto il gioco è simpatico perché vederlo a occhio non è non è proprio così facile, no? Quindi facciamo così, chi vota per quello in alto?
+11:11
+11 minutes, 11 seconds
+Chi sia quello in alto? Vedete, non posso mettere un punto in mezzo perché non l'ho non ce l'ho, non è tra le mie osservazioni, no? Ora col pallino bianco
+11:19
+11 minutes, 19 seconds
+selezioniamo quello che dovrebbe essere il medoide. Ok? Quindi sicuramente uno dice non sarà questi punti lontani perché deve comunque essere un punto che
+11:28
+11 minutes, 28 seconds
+sta più o meno a metà, ma non so bene quale sia. Allora, vediamo chi vota quello in basso.
+11:34
+11 minutes, 34 seconds
+Mh, quello in basso pochi. Chi vota questo in alto? Eh, potrebbe essere anche uno di questi. Eh, magari stiamo sbagliando, non è necessariamente.
+11:44
+11 minutes, 44 seconds
+Quindi premiamo Show Medoid. Ah, è quello in alto. Ok. Chi aveva votato in alto ha vinto, può andare al prossimo
+11:51
+11 minutes, 51 seconds
+livello. Vabbè, allora la cosa è molto semplice, divertitevi un pochino, vi fate un po' di fate vedere. Secondo me è più interessante qui la demo, nel senso
+11:58
+11 minutes, 58 seconds
+che potete disegnare situazioni strane, no? In cui uno dice il medoide come può essere
+12:06
+12 minutes, 6 seconds
+fatto, no? Ad esempio, vediamo qui cosa succederà se metto i punti in questo modo. Vediamo chi potrebbe essere un medoide.
+12:15
+12 minutes, 15 seconds
+Uno potrebbe dire, "Magari è questo". Boh, vediamo. E no, invece questo giù, va bene?
+12:22
+12 minutes, 22 seconds
+Insomma, poi dipende anche da quanti uno ne disegna e così via, perché capite, se ci fosse il punto effettivamente in mezzo, vediamo, disegniamo un punto in
+12:29
+12 minutes, 29 seconds
+mezzo. Se ci fosse un punto in mezzo, allora il medoide, ma stranamente è rimasto lui. Mh,
+12:37
+12 minutes, 37 seconds
+ecco, vedete, se lo disegno in mezzo sceglie certamente quelli più più in mezzo, quello che sarebbe la media, il centro, centroide, però se non c'è quel
+12:45
+12 minutes, 45 seconds
+punto lì, allora è forzato a trovarsi altrove. Ok, questa è la piccola difficoltà se volete con i medoidi.
+12:51
+12 minutes, 51 seconds
+Allora, se volete giocare un po' il gioco, vabbè, semplicemente questa demo vi genera dei punti casuali e selezionate il medoid e e andate di
+13:00
+13 minutes
+livello in livello. Ok, ma divertitevi un pochino, esplorate un po' questo concetto del medoid perché adesso vedremo che c'è questo algoritmo di di
+13:07
+13 minutes, 7 seconds
+partizione intorno ai medoidi. che sembrasse una cosa tanto strana.
+13:11
+13 minutes, 11 seconds
+Semplicemente abbiamo questa possibilità di restringerci ai punti che effettivamente abbiamo osservato. Va
+13:19
+13 minutes, 19 seconds
+bene? Allora, andiamo avanti con la teoria.
+13:25
+13 minutes, 25 seconds
+Ehm, sì, siamo qui, no? Allora, andiamo.
+13:34
+13 minutes, 34 seconds
+Sì, quindi scaricatevelo oppure giocate online per quanto ci sia da giocare, insomma. Eh, ovviamente questo sono
+13:42
+13 minutes, 42 seconds
+tutti riferiti alle distanze euclidea, ma si potrebbe cambiare appunto le distanze dopo. Questo complica un po' la vita.
+13:48
+13 minutes, 48 seconds
+Allora, vediamo un po' invece il punto cruciale che è la nuovo argomento che vogliamo trattare che è il clustering.
+13:56
+13 minutes, 56 seconds
+Allora, che cosa si intende per clustering?
+13:59
+13 minutes, 59 seconds
+e che algoritmi, che metodi possiamo usare e come possiamo un po' descrivere tutta la situazione. Allora, qual è
+14:07
+14 minutes, 7 seconds
+intanto l'obiettivo del clustering? Il clustering è una tecnica cosiddetta non supervisionata.
+14:13
+14 minutes, 13 seconds
+Non supervisionata.
+14:17
+14 minutes, 17 seconds
+Poi cercheremo di capire qual è la la distinzione, però al momento se volete questo vi dice che non c'è effettivamente
+14:24
+14 minutes, 24 seconds
+una risposta chiara al problema. E il problema qual è? è di raggruppare dei dati x con le nostre osservazioni
+14:32
+14 minutes, 32 seconds
+in gruppi simili, ok? Che chiameremo i cluster. Capite? Non c'è una risposta giusta perché i dati è una tecnica, se
+14:39
+14 minutes, 39 seconds
+volete, esplorativa, ecco, diciamo pure esplorativa, ok? Cioè, voi avete questi dati dice "Ma
+14:47
+14 minutes, 47 seconds
+se volessi intanto separarli in gruppi simili questi individui, come potrei fare?" Beh, allora l'obiettivo è fissare
+14:55
+14 minutes, 55 seconds
+un K. Anche qui quanti saranno questi gruppi? Saranno K gruppi. Poi cerchiamo di capire come si può capire qual è il K migliore. Ecco, chiamiamoli cluster.
+15:05
+15 minutes, 5 seconds
+Sono tutti gruppi disgiunti, quindi partizioniamo i nostri i nostri puntini come prima, no, che c'erano quei quattro punti in alto, quattro punti in basso.
+15:14
+15 minutes, 14 seconds
+Dice, vabbè, li separo così. Se K = 2, ma se K = 3, magari farò tre qui e così, magari quattro giù e tre
+15:24
+15 minutes, 24 seconds
+in alto, un altro. Ok? Quindi la cosa importante è avere gruppi distinti e disgiunti in modo da partizionare tutte le nostre osservazioni, i nostri dati. E quale sarà il criterio?
+15:36
+15 minutes, 36 seconds
+Di nuovo, estendiamo questa idea della minimizzazione di un rischio, cioè fisseremo un obiettivo, magari non sarà poi così esplicito negli argomenti negli
+15:45
+15 minutes, 45 seconds
+algoritmi, però adesso cominciamo da quelli semplici. E l'idea è che dobbiamo fare in modo che i singoli gruppi nei
+15:52
+15 minutes, 52 seconds
+singoli gruppi ci sia poca variabilità, ok? Immaginate la cosa più semplice, un biologo deve trovare delle specie di
+15:59
+15 minutes, 59 seconds
+animali, ha raccolto tante informazioni di questi animali e vuole quindi capire quali effettivamente potrebbero essere delle specie. Poi c'è una definizione
+16:07
+16 minutes, 7 seconds
+precisa di specie biologica in biologia, no? Però l'idea è che almeno dovrebbero essere abbastanza simili questi. Oppure
+16:16
+16 minutes, 16 seconds
+siete, non lo so, siete alla ricerca di eh siete nel marketing, dovete trovare di delle classi, no, di dei cluster di
+16:24
+16 minutes, 24 seconds
+possibili clienti e potete distinguere in base alle diverse esigenze. Allora userete una strategia diversa in base ai
+16:31
+16 minutes, 31 seconds
+clienti che avete. Infatti il clustering è abbastanza legato al problema della classificazione che vedremo subito dopo.
+16:39
+16 minutes, 39 seconds
+appunto che la classificazione di per sé è presentata come problema supervisionato in cui già vi è stato detto che alcuni individui appartengono
+16:47
+16 minutes, 47 seconds
+a certe classi e volete determinare qual è la classe di un nuovo individuo che non che di cui non avete l'informazione
+16:54
+16 minutes, 54 seconds
+sulla classe. Al momento siamo a livello ancora antecedente, cioè dobbiamo determinare quali potrebbero essere le classi, ok? E quindi le applicazioni
+17:03
+17 minutes, 3 seconds
+sono molteplici e in particolare ci porterà poi alla classificazione che sarebbe un po' imputazione. Imputation si chiama, quando partite, costruite i
+17:11
+17 minutes, 11 seconds
+cluster, poi avete un nuovo individuo e a quel punto ci chiederemo "Ma questo nuovo individuo a quale cluster lo attribuiamo?" Ok? Quello sarà appunto il
+17:20
+17 minutes, 20 seconds
+problema successivo. Per il momento l'obiettivo è distinguere un po' un certo numero di classi di cluster.
+17:26
+17 minutes, 26 seconds
+Allora, quali sono i problemi principali?
+17:30
+17 minutes, 30 seconds
+Di nuovo, vogliamo minimizzare la dissimilarità, vogliamo che dentro i singoli cluster siano molto simili le caratteristiche di di queste
+17:38
+17 minutes, 38 seconds
+osservazioni, però non abbiamo detto come sono simili, in quale senso saranno simili, capite? Come per la mediana, la
+17:46
+17 minutes, 46 seconds
+media, dipenderà dal tipo di costo che imputiamo al fatto di essere dissimili, di essere diversi. Ok? Poi l'altra
+17:55
+17 minutes, 55 seconds
+domanda che appunto non è non è chiara è vabbè vogliamo spezzare un certo numero di cluster? Facciamo la cosa più semplice. Abbiamo n osservazioni, n
+18:02
+18 minutes, 2 seconds
+cluster è finita, ognuno sta nella sua isoletta felice, no? Ovviamente dobbiamo capire se c'è una qualche criterio per
+18:10
+18 minutes, 10 seconds
+scegliere o quantomeno per individuare dei parametri cap ragionevoli. Ok?
+18:15
+18 minutes, 15 seconds
+Allora, questi è la prima volta che vediamo un parametro in più, nel senso che da un lato dobbiamo determinare
+18:22
+18 minutes, 22 seconds
+i i vari centri, i vari cluster che dovremmo trovare minimizzando un certo rischio. Poi una volta che abbiamo fatto
+18:29
+18 minutes, 29 seconds
+questa minimizzazione ci sarà questo ulteriore parametro che però non è chiaro come insomma come determinare.
+18:36
+18 minutes, 36 seconds
+Volendo potremmo trovare un nuovo criterio per la scelta di questo parametro K. Quindi questi a volte si chiamano iperparametri, ok? in un
+18:43
+18 minutes, 43 seconds
+modello statistico uno spesso distingue tra modelli parametri che minimizza, tipo quelle h che mettevamo prima anche
+18:51
+18 minutes, 51 seconds
+nella scelta dei medoidi, quelli sarebbe un parametro. Invece l'iperparametro è qualcosa in più che facciamo magari in uno step successivo e non è neppure
+18:59
+18 minutes, 59 seconds
+chiaro quale sia il criterio per determinarlo. A volte ci sono possibili scelte diverse e vedremo che proprio
+19:06
+19 minutes, 6 seconds
+questo accade per i cluster. E infine l'ultima domanda è importante per chi vuole effettivamente calcolare i cluster, ma come adesso ho anche fissato
+19:14
+19 minutes, 14 seconds
+un rischio sensato, ho scelto CAP, come posso effettivamente calcolare i cluster? Quindi è tutta una questione di
+19:20
+19 minutes, 20 seconds
+algoritmi. Ok? quali algoritmi possiamo usare per determinare i cluster. Questo è un po' meno legato alla statistica. Se
+19:27
+19 minutes, 27 seconds
+volete è più legato all'ottimizzazione, cioè so che i cluster devono essere ottimali, minimizzare un qualche
+19:34
+19 minutes, 34 seconds
+rischio. Come li trovo? Anche lì la mediana come la trovo se devo effettivamente diminuire il il rischio.
+19:42
+19 minutes, 42 seconds
+Ok?
+19:44
+19 minutes, 44 seconds
+Comunque adesso, in base, se volete a a queste distinzioni, ci possiamo classificare i metodi di clustering in
+19:52
+19 minutes, 52 seconds
+due classi. Allora, ci sono i metodi cosiddetti non gerarchici dove K è fissato, la distinzione è
+20:01
+20 minutes, 1 second
+essenzialmente questa. K è fissato, prima si fissa K e poi si calcola il cluster. Ok? E qui vedremo
+20:09
+20 minutes, 9 seconds
+essenzialmente due metodi, Kings e Pam, che userà questi medoidi. Dopo vediamo un po' meglio cosa vogliono dire
+20:16
+20 minutes, 16 seconds
+questi questi abbreviazioni. Ok? E l'altra classe di metodi è invece quella dei metodi gerarchici, cioè K non è
+20:25
+20 minutes, 25 seconds
+fissato, K non fissato a priori e si crea quindi una gerarchia,
+20:32
+20 minutes, 32 seconds
+una appunto una gerarchia e dopo la rappresentiamo gerarchia.
+20:38
+20 minutes, 38 seconds
+di possibili cluster, no? Di possibili.
+20:45
+20 minutes, 45 seconds
+E quindi qui sono un po' più flessibili, se volete si gira una volta l'algoritmo e a quel punto si può scegliere il K ottimale. Ok? Sono un po' più flessibili sulla scelta del K.
+20:57
+20 minutes, 57 seconds
+Beh, vediamo però. Però se uno ha già chiaro bene quale sia il K e ha chiaro quale sia il rischio, basta che fare ins'è, insomma, la risposta. Vedremo che
+21:04
+21 minutes, 4 seconds
+il primo a volte basta per poi all'interno il modo in cui uno crea questa gerarchia distingue ulteriormente. Allora, ci sono metodi
+21:13
+21 minutes, 13 seconds
+agglomerativi e vedremo Agnes, ok? E metodi divisivi. Dopo cerchiamo di capire. Dipende un po' dal modo in cui
+21:21
+21 minutes, 21 seconds
+viene creata questa gerarchia. Se partendo dal basso, quindi dai singoli individui, mettendoli insieme via, creando dei cluster via più grandi,
+21:29
+21 minutes, 29 seconds
+questi sono agglomerativi, oppure i divisivi, immaginate, si parte con una bella torta, si taglia a metà e si dice "Ok, questi andranno da una parte,
+21:37
+21 minutes, 37 seconds
+questi andranno in un altro cluster poi si taglia ulteriormente e così via".
+21:40
+21 minutes, 40 seconds
+Ora, non è proprio una divisione in questo senso, insomma, brutale di tagliare, però vedremo poi un attimo Diana, questo metodo come funziona.
+21:50
+21 minutes, 50 seconds
+Allora, cominciamo da quello più semplice.
+21:53
+21 minutes, 53 seconds
+Eh, oggi li presentiamo un po' così, senza fare gli esempi su R, poi mercoledì vediamo su R, vediamo dei dataset reali, cerchiamo di capire.
+22:02
+22 minutes, 2 seconds
+Quindi pensatela come una lezione un po' più teorica e vediamo un pochino come come funzionano, insomma, in astrato.
+22:10
+22 minutes, 10 seconds
+Allora, il primo che dicevo era quello che means è proprio il più semplice dei metodi e si basa sull'idea della minia,
+22:19
+22 minutes, 19 seconds
+no? Su sull l'idea di centroide e dove però cosa facciamo? Invece di cercare un singolo centro, una singola media, fissiamo K.
+22:31
+22 minutes, 31 seconds
+Quindi fissiamo K, il numero di cluster è fissato e e cosa diciamo? Beh, invece di cercare
+22:40
+22 minutes, 40 seconds
+una singolo centro, un singolo centroide sarebbe da dire, cerchiamo K punti, quindi se i nostri dati sono, no,
+22:48
+22 minutes, 48 seconds
+distribuiti in qualche modo ne cerchiamo K fissati, potrebbe essere K = 2, no? Facciamolo con un colore
+22:56
+22 minutes, 56 seconds
+diverso, tipo rosso. Cerchiamo di posizionare uno e due punti, ad esempio K = 2. Chiamiamo le C1 e C2
+23:05
+23 minutes, 5 seconds
+che non sono necessariamente tra quelle delle osservazioni. Le medie, appunto, non sono necessariamente punti di quelli che abbiamo osservato. E cosa facciamo
+23:13
+23 minutes, 13 seconds
+poi? Eh, fissati questi punti C1 e C2, ora nella pratica, cosa andiamo a fare?
+23:21
+23 minutes, 21 seconds
+Andiamo ad attribuire i punti delle nostre osservazioni. Andiamo a vedere qual è il C1 o C2 più vicino, il centro di questo di questo cluster più vicino e
+23:29
+23 minutes, 29 seconds
+li attribuiamo. Quindi diciamo questi punti sono più vicini a C1 finiranno nel cluster di C1. Questi punti invece sono tutti più vicini a C2 li attribuiremo al
+23:38
+23 minutes, 38 seconds
+cluster di C2. Ok? Adesso vediamo come si crea effettivamente un algoritmo per trovare questi C1 e C2. Ok? Però l'ipotesi di base o insomma le
+23:47
+23 minutes, 47 seconds
+caratteristiche di base quali sono? K è fissato e la vicinanza, questa è pure
+23:53
+23 minutes, 53 seconds
+importante, la vicinanza, la similarità è misurata è misurata con la distanza euclidea.
+24:08
+24 minutes, 8 seconds
+Ok? Punti vicini saranno punti che effettivamente sono vicini. Qua l'amo fatto nel piano, ma appunto capite?
+24:14
+24 minutes, 14 seconds
+Stiamo usando implicitamente la distanza euclidea quando usiamo il questa idea di di centroide. Ok? Allora, un po' più
+24:22
+24 minutes, 22 seconds
+rigoroso, vogliamo dire abbiamo questi cluster C1, C2, li indico con la lettera grande, va bene? CK.
+24:30
+24 minutes, 30 seconds
+Benissimo, ce li abbiamo. Allora, data una scelta di possibili cluster, ok?
+24:36
+24 minutes, 36 seconds
+Quindi una partizione dei nostri dati, definiamo un rischio. Questo si presenta bene dal punto di vista variazionale.
+24:43
+24 minutes, 43 seconds
+Dice, "Ok, qual è il rischio? Qual è il costo? Il rischio empirico, se volete, associato a una scelta di C1, C2, CK di
+24:51
+24 minutes, 51 seconds
+questi miei cluster? È quella che si chiama il within clusters sum of squares, ok? Vcss, a volte si abbrevi anche in altri modi, si chiama anche
+24:59
+24 minutes, 59 seconds
+inerzia a volte. Allora, cosa si fa? si somma su tutti i cluster, quindi su i Kuster.
+25:08
+25 minutes, 8 seconds
+Cosa si va a vedere? Dentro ciascun cluster si somma sui punti Xi che stanno nel cluster CJ. E cosa si va a fare? Si
+25:15
+25 minutes, 15 seconds
+va a fare il il la loss quadratica, cioè si va a fare x con i meno il centro il
+25:22
+25 minutes, 22 seconds
+centroide di quel cluster, si fa la distanza euclidea al quadrato. Così somiglia un po'. In particolare, se ci fosse un solo cluster che contiene tutti
+25:31
+25 minutes, 31 seconds
+i punti, effettivamente il il centroide è la media. Però il nostro problema non è tanto adesso definire il centroide o la media, ma trovare questi K cluster.
+25:43
+25 minutes, 43 seconds
+Ok? Quindi CJ con la piccola C in questa formula è il centroide della media del
+25:51
+25 minutes, 51 seconds
+cluster Cr. Come definita la media? Beh, il cluster conterrà un po' di punti x con i, si fa uno sul numero perché
+26:00
+26 minutes
+attenzione, l' n la i cluster non devono avere tutti la stessa taglia, eh, quindi se volete il numero di elementi
+26:09
+26 minutes, 9 seconds
+nei cluster CJ e qui eh appunto stiamo facendo la media delle osservazioni, attenti che se
+26:18
+26 minutes, 18 seconds
+sono vettori stiamo facendo componente precomponente le medie, ok? E la media nel senso di appunto
+26:27
+26 minutes, 27 seconds
+sarebbe il centro di massa se lo pensiamo come dei punti che hanno tutti un peso e si fa il centro di massa.
+26:35
+26 minutes, 35 seconds
+Va bene? È chiara questa formula? Quindi diciamo c'è questo costo e uno dice "Ok, è un costo ragionevole perché perché
+26:44
+26 minutes, 44 seconds
+quando vogliamo usare la distanza euclidea vogliamo fissare K e cercheremo questi questi cluster, questi sottoinsiemi e ciascun lo attribuiamo
+26:52
+26 minutes, 52 seconds
+poi alla sua media del cluster, insomma sembra un costo ragionevole. Il costo quadratico è il primo costo a cui uno viene, insomma, che dovrebbe venire in
+27:00
+27 minutes
+mente, visto che per il problema della media ci dava proprio la media e eravamo felici." Ok? Quindi questo K means,
+27:07
+27 minutes, 7 seconds
+queste K medie sono medie dei singoli cluster, però non è ancora detto qui come trovarli. Quindi l'algoritmo qual è? Quindi spero che sia chiaro un po'.
+27:16
+27 minutes, 16 seconds
+L'obiettivo è questo. L'algoritmo qual è? Eh, l'algoritmo viene fuori che è molto è molto difficile trovare esattamente
+27:24
+27 minutes, 24 seconds
+eh quali sono, dati i punti qualsiasi, insomma, in situazioni generali, trovare i punti qualsi esattamente
+27:33
+27 minutes, 33 seconds
+i centri e i cluster che ottimizzano, che minimizzano quel rischio è un problema difficile, ok? È una classe
+27:40
+27 minutes, 40 seconds
+cosiddetta NP hard, va bene? Sono problemi molto difficili da risolvere. E quindi cosa succede? Succede che ci
+27:47
+27 minutes, 47 seconds
+adesso usiamo degli algoritmi che sono un po' delle euristiche, ok? Non necessariamente ci porteranno al minimo vero e proprio, ma poi comunque insomma
+27:56
+27 minutes, 56 seconds
+alla fine nelle applicazioni vogliamo trovare dei cluster ragionevoli.
+28:00
+28 minutes
+Eh, e vedremo ce ne sono anche altri algoritmi, anche PAM funziona così.
+28:05
+28 minutes, 5 seconds
+Allora, c'è un'osservazione comunque importante che che è valida, cioè i classier ottimali, qualunque essi siano, saranno tali per cui ogni osservazione,
+28:14
+28 minutes, 14 seconds
+ma qua scritto due volte, cancellate una di queste osservazioni, ogni osservazione x con i viene assegnata al centroide più vicino. Ok? Quindi la
+28:22
+28 minutes, 22 seconds
+situazione sarà che se abbiamo i nostri centroidi C1, C2, C3, ok? Questi
+28:29
+28 minutes, 29 seconds
+partizionano un po' lo spazio in regioni e saranno le regioni che sono le cosiddette celle di Vorono si chiamano, ma non è importante come si chiamano.
+28:39
+28 minutes, 39 seconds
+Cioè ci sono le regioni dei punti che preferiscono andare da C2. Sono quelli più vicini a C2 rispetto a C1 e C3 e poi ci saranno i punti che vanno invece a
+28:47
+28 minutes, 47 seconds
+C3, quelli che sono più vicini a C3 rispetto agli altri due, agli altri due centri. Ok? Quindi l'idea è che abbiamo
+28:55
+28 minutes, 55 seconds
+soltanto da decidere dove vanno messi i centri. Ok? Nel momento in cui decidiamo dove sono i centri, poi i cluster sono
+29:03
+29 minutes, 3 seconds
+effettivamente i punti, ad esempio, per C1 saranno i punti che sono più vicini a C1, al centro C1 rispetto a tutti gli altri. Ok? Quindi l'algoritmo cosa fa?
+29:11
+29 minutes, 11 seconds
+Cerca di ottimizzare un po' la scelta le posizioni di questi centri. Ok? Si parte con una scelta casuale
+29:20
+29 minutes, 20 seconds
+e poi si cerca di aggiustare il tiro passo dopo passo. Ok? Quindi l'algoritmo è un algoritmo iterativo, si va di passo
+29:28
+29 minutes, 28 seconds
+in passo cercando di migliorare un po' la la scelta. Questo a volte viene chiamato algoritmo K means anche se forse vabbè alla storia chissà chi l'ha
+29:37
+29 minutes, 37 seconds
+trovato per primo, comunque viene attribuito a Lloyd. Ok? Quindi questo suggerisce questo algoritmo di Lloyd.
+29:44
+29 minutes, 44 seconds
+Allora, iniziamo a caso. Scegliamo K candidati centroidi a caso. Ora qui ci
+29:51
+29 minutes, 51 seconds
+sono anche delle strategie per sceglierli non troppo a caso. Ecco. Ok.
+29:56
+29 minutes, 56 seconds
+Adesso questi centroidi sono scelti a caso. Abbiamo dei centroidi. Cosa facciamo? Facciamo quel diagramma di prima, cioè assegniamo ogni punto di
+30:03
+30 minutes, 3 seconds
+quelli delle osservazioni, assegniamolo al centroide più vicino. Ok? Quindi ogni punto dei
+30:10
+30 minutes, 10 seconds
+dati che osserv che osserviamo dei dati viene attribuito, viene assegnato al cluster con il centroide più vicino, ok?
+30:20
+30 minutes, 20 seconds
+Quindi c'è questa partizione dello spazio in cluster semplicemente con il criterio del più vicino. Vado a vedere il centroide più vicino. Ok? A questo
+30:30
+30 minutes, 30 seconds
+punto però cosa è accaduto? No, il mio inizialmente avevo C1, C2 e C3. Facciamo che sono tre.
+30:38
+30 minutes, 38 seconds
+Adesso ho assegnato i miei vari punti, no? I veri punti veri e osservati sono qui.
+30:44
+30 minutes, 44 seconds
+Cosa faccio? Beh, il centro, vedete, i punti nel assegnati a cluster C1, magari questo è il centro, lo segno con una X.
+30:53
+30 minutes, 53 seconds
+Le altre sono le osservazioni. Beh, se io faccio il centroide di quelle osservazioni, non vado nel punto C1,
+31:00
+31 minutes
+quindi cosa faccio? aggiorno il C1 e lo vado a mettere con il suo centroide che magari lo sposterà più qua, ok? Lo
+31:07
+31 minutes, 7 seconds
+stesso per C2 si sposterà più vicino qui e lo stesso per C3, ok? Quindi c'è l'aggiornamento dei centroidi
+31:15
+31 minutes, 15 seconds
+viene spostato, quindi cosa faccio? I centroidi vengono ricalcolati come la media dei punti assegnati nei singoli cluster.
+31:24
+31 minutes, 24 seconds
+Ok? Questo dice vabbè ha finito, no?
+31:26
+31 minutes, 26 seconds
+Perché adesso ho dei nuovi centroidi, sempre K sono, ma sono nuovi, sono K punti nuovi. E ripeto il punto uno, vado
+31:35
+31 minutes, 35 seconds
+a vedere il nuovo criterio che chi sono i nuovi cluster sono quelli. Magari alcuni punti sono risultati più vicini al nuovo al nuovo centroide rispetto a
+31:44
+31 minutes, 44 seconds
+quelli vecchi e così si ripete il discorso. Quindi passo dopo passo si spostano un pochino questi questi centroidi
+31:53
+31 minutes, 53 seconds
+fino alla convergenza, finché non non si ferma. Insomma, poi in realtà magari uno interrompe dopo un po' di passi questo algoritmo, ok? E quindi si trova questi eh centroidi e questo cluster. Va bene?
+32:06
+32 minutes, 6 seconds
+È chiaro un po' l'algoritmo? Cioè poi nella pratica non è un corso questo di algoritmi, però è bene sapere che c'è almeno una qualche procedura. E ora
+32:14
+32 minutes, 14 seconds
+vediamo che vedremo poi la prossima volta che soffre abbastanza questa procedura, ad esempio, di come inizializziamo. Ok? In effetti magari
+32:23
+32 minutes, 23 seconds
+vedremo che ognuno troverà, se lo gira senza, insomma, senza stabilire il modo in cui vengono inizializzati i punti, troverà dei cluster diversi la prossima
+32:31
+32 minutes, 31 seconds
+lezione. Ok? Quindi attenti, insomma, è un algoritmo iterativo, risolve un problema difficile, ma non lo risolve in
+32:39
+32 minutes, 39 seconds
+modo esatto e un certo senso in modo unico, non lo risolve perché sta approssimando la vera soluzione.
+32:46
+32 minutes, 46 seconds
+Allora, vediamo un po' quali sono i vantaggi, ve l'ho descritto facilmente, insomma, ci sono algoritmi più complicati, quindi questo è risulta abbastanza semplice da
+32:55
+32 minutes, 55 seconds
+implementare. Si tratta ogni volta di trovare questi cluster e aggiornare i centroidi e ha il vantaggio che è molto
+33:04
+33 minutes, 4 seconds
+veloce, che i means è la prima cosa che dovreste provare. Ok? È veloce, funziona anche in dataset di grandi dimensioni, insomma non è E altra cosa interessante,
+33:12
+33 minutes, 12 seconds
+se arrivano nuove osservazioni è iterativo l'algoritmo, quindi non è che magari dovete cominciare dai vecchi, arrivano nuove osservazioni, ci sono eh
+33:21
+33 minutes, 21 seconds
+mi ero dimenticato di questi nuovi 100 punti da inserire nel dataset. Bene, aggiorniamo i cluster, ma partiamo dalle dall'ultima iterazione, ok? Siccome è
+33:29
+33 minutes, 29 seconds
+iterativo, ha questo vantaggio, non serve ricominciare da capo, ma si può aggiornare facilmente. Ok? R iterativi
+33:37
+33 minutes, 37 seconds
+hanno questo vantaggio. Eh, gli svantaggio, volendo ne elencare un po', allora c'è questo
+33:44
+33 minutes, 44 seconds
+che appunto dobbiamo specificare K, cioè se nessuno ci dice qual è il K, dobbiamo provarli, se volete uno alla volta, poi vedremo.
+33:52
+33 minutes, 52 seconds
+E altra cosa importante, questo magari non è chiarissimo, qui magari facciamo un esempio mercoledì, cioè il punto è
+33:59
+33 minutes, 59 seconds
+che se stiamo usando il costo quadratico ha la ha gli stessi svantaggi se volete che aveva la media, no? La media
+34:07
+34 minutes, 7 seconds
+rispetto alla mediana è molto sensibile agli outlier. Se ci sono dei valori molto grandi, molto in là, questi vanno a influenzare molto la media, ok? Mentre
+34:15
+34 minutes, 15 seconds
+la mediana è più è più robusta, quindi ci direbbe magari c'è un K medians, ok?
+34:21
+34 minutes, 21 seconds
+potremmo usare la mediana invece della media, però tanto vale usare PAM a quel punto. E come ho detto poi il risultato dipende dall'inizializzazione,
+34:30
+34 minutes, 30 seconds
+però questo insomma si può testare su diverse inizializzazione e poi si cerca un insomma si cerca un clustering ragionevole tra quelle ottenute, ok?
+34:40
+34 minutes, 40 seconds
+Usando questi criteri che saranno gli stessi poi che usiamo per specializzare per specificare K.
+34:46
+34 minutes, 46 seconds
+C'è un ultimo svantaggio, vediamo se l'ho elencato. Eccolo qua, il course of dimensionality. Allora, questo è uno svantaggio comune a questo, al
+34:55
+34 minutes, 55 seconds
+successivo algoritmo metodo che vedremo e non è tanto uno svantaggio di soltanto specifico di K means è lo svantaggio, se
+35:03
+35 minutes, 3 seconds
+volete legato all'usare una distanza tipo quella euclidea. Qual è il problema? Se il nostro dataset,
+35:12
+35 minutes, 12 seconds
+se D è molto grande, diciamo molto più grande di N, avete molte caratteristiche,
+35:20
+35 minutes, 20 seconds
+no, per ciascun individuo, X1, X2, X3 e magari le caratteristiche, vedete, avete
+35:28
+35 minutes, 28 seconds
+una prima caratteristica, quindi se dimensione molto grande e magari c'è del rumore in ogni singola osservazione,
+35:36
+35 minutes, 36 seconds
+quello che succede faremo degli esperimenti.
+35:39
+35 minutes, 39 seconds
+Non è difficile vederlo, è che le distanze non sono più indicative, ok?
+35:43
+35 minutes, 43 seconds
+Perché quando avete tante componenti rumorose e andate a fare la distanza euclidea, state sommando rumore. Quindi avete molto rumore che vi cancella il
+35:51
+35 minutes, 51 seconds
+segnale che è quello che vorreste usare per fare i clustering e quello che succede è che la distanza non è indicativa, ok? non è indicativa, ma
+35:59
+35 minutes, 59 seconds
+tutti i metodi, diciamo, che si basano su scelte così della distanza euclidea o anche L1, ma tutte, nel momento in cui andate avere tante tante
+36:07
+36 minutes, 7 seconds
+caratteristiche, se non riduciamo la dimensionalità tendenzialmente si si soffre questo, cioè questa problema,
+36:14
+36 minutes, 14 seconds
+questa maledizione della dimensionalità, va bene? del Curse of Dimensionality, quindi elenchiamolo come svantaggio qui, ma è uno svantaggio più generale quando
+36:22
+36 minutes, 22 seconds
+avete metodi basati sulle distanze, attenzione che c'è questo effetto. Ok,
+36:29
+36 minutes, 29 seconds
+va bene. Allora, dai, facciamo un po' è un po' unelenco della spesa, però ora che abbiamo capito
+36:36
+36 minutes, 36 seconds
+quali sono i problemi di Kins, e abbiamo capito che è molto semplice perché usa solo le medie e poi deve fare questo
+36:44
+36 minutes, 44 seconds
+passo di aggiornamento e abbiamo una implementazione. Uno diceva allora risolvo qualcosina se uso invece delle medie uso ad esempio i medoidi, no?
+36:57
+36 minutes, 57 seconds
+Dicevamo che e quindi come si chiama? K medoids o detto anche pam. Ok, forse pam
+37:05
+37 minutes, 5 seconds
+è più è più facile da ricordare ed è partitioning around medoids, ok? Quindi si usano le medo i medoidi.
+37:15
+37 minutes, 15 seconds
+In realtà si può, cioè questa cosa non è proprio necessaria. L'altro vantaggio di PAM è che si usa, insomma, tipicamente già implementato
+37:24
+37 minutes, 24 seconds
+con funzioni di costo che non sono necessariamente la distanza. Quindi cosa facciamo? Cambiamo il nostro criterio
+37:32
+37 minutes, 32 seconds
+che era prima, no, la VCSS, la within cluster sum of squares e facciamo un rischio un po' più generale. L'ho chiamato VCR, ma non è necessario
+37:41
+37 minutes, 41 seconds
+chiamarlo così. Insomma, è molto simile a prima, cioè si fa la somma su tutti i cluster, dentro ciascun cluster si fa la somma
+37:49
+37 minutes, 49 seconds
+sui punti che abbiamo nel cluster. E che funzione di loss si sceglie? Beh, quella scegliamo noi, ma la cosa importante è
+37:58
+37 minutes, 58 seconds
+che andiamo a confrontare il punto osservato con CJ. Che cosa sarà CJ? Sarà il centro il scusate il medoide. Prima
+38:06
+38 minutes, 6 seconds
+era il centro, adesso diventa il medoide del nostro cluster. Quindi abbiamo fatto due sostituzioni, se volete. Da un lato
+38:13
+38 minutes, 13 seconds
+possiamo usare una funzione di costo più generale, ok? E dall'altra possiamo usare il medoide,
+38:20
+38 minutes, 20 seconds
+ok? Allora, questa scelta ci dà un ci dà più flessibilità da un lato perché possiamo scegliere funzioni di costo più
+38:27
+38 minutes, 27 seconds
+generali, però dall'altro ci dà un algoritmo un po' meno chiaro, no? Cosa possiamo fare adesso? eh dobbiamo
+38:35
+38 minutes, 35 seconds
+trovare addirittura il medoide a ogni step, mentre prima trovavamo il centroide, la media era facilissimo da trovare, stavolta dobbiamo trovare il
+38:42
+38 minutes, 42 seconds
+medoide, quindi in generale l'algoritmo che ne che otteniamo è un po' più complicato da implementare e l'algoritmo si chiama PAM, appunto.
+38:54
+38 minutes, 54 seconds
+Poi vedremo, sarà una riga di comando in R, non è, cioè non è che dovete implementarlo voi. Allora, questa scelta, diciamo, di Pam rispetto a K means che vantaggi porterà?
+39:07
+39 minutes, 7 seconds
+No, come dicevamo prima, perché è lo stesso vantaggio per cui uno vorrebbe usare il medoide, no? Se il la media non ha molto senso,
+39:16
+39 minutes, 16 seconds
+allora posso usare il medoide, così sto forzando i punti a essere una delle osservazioni.
+39:21
+39 minutes, 21 seconds
+Ok? Quindi la media, se la media non ha significato o se per qualche motivo preferisco avere uno dei valori che effettivamente ho osservato, allora usiamo pam.
+39:32
+39 minutes, 32 seconds
+Altri vantaggi? Beh, qui è un vantaggio più legato alla funzione di costo, appunto. Se uso come costo, invece della
+39:39
+39 minutes, 39 seconds
+distanza al quadrato, uso la distanza, euclidea oppure cambio il tipo di distanza. Beh, posso avere qualcosa di più robusto come avevamo la mediana, no?
+39:49
+39 minutes, 49 seconds
+mediana effettivamente era più robusta se uno ha un miliardario o comunque la mediana della ricchezza rimaneva abbastanza in mezzo, invece la media si sposta.
+39:59
+39 minutes, 59 seconds
+Sembrerebbe che tutti siamo più ricchi grazie al fatto che c'è un miliardario, no?
+40:05
+40 minutes, 5 seconds
+E poi, appunto, come dicevamo, si nulla vieta di usare distanze e costi più generali. Anzi, vedremo che il codice in
+40:12
+40 minutes, 12 seconds
+R ammette già di inserire distanze come vogliamo, insomma. Quindi a quel punto uno può usare anche dati categorici, ok?
+40:19
+40 minutes, 19 seconds
+Può usare distanze, magari il vettore è in RD, alcune componenti sono effettivamente numeriche, altre sono invece
+40:27
+40 minutes, 27 seconds
+categoriche, sono dei factor. A quel punto può fare un misto tra la moda e la mediana, ok? oppure tra mod e la media,
+40:35
+40 minutes, 35 seconds
+cioè proprio che che i modes uno potrebbe fare, ma può fare che cose miste. Quindi questa flessibilità è è
+40:42
+40 minutes, 42 seconds
+implementata, ma a svantaggio lo svantaggio c'è in generale, mentre K means è abbastanza rapido da eseguire,
+40:50
+40 minutes, 50 seconds
+ke eh che insomma pam risulta un po' più lento. Ok? Poi dipende da che dataset
+40:57
+40 minutes, 57 seconds
+avete, insomma, di solito queste cose le fate su, insomma, come indagini esplorative,
+41:05
+41 minutes, 5 seconds
+magari, ecco, se avete un dataset molto grandi e volete fare delle esplorazioni, selezionate a caso, fate un subsampling
+41:13
+41 minutes, 13 seconds
+del vostro dataset e girate l'algorit, cioè non girate subito tutti gli algoritmi su tutto il dataset se sono milioni di osservazioni, ok? fatelo su
+41:21
+41 minutes, 21 seconds
+sottoinsiemi di dataset se fate una indagine esplorativa.
+41:25
+41 minutes, 25 seconds
+E di nuovo eh lo svantaggio, ma c'è legato sempre allo scelta di una distanza. Se usiamo una distanza, sia che usiamo il medoide che usiamo la
+41:34
+41 minutes, 34 seconds
+media, c'è questo effetto della dimensionalità. Di nuovo, se avete dati in dimensione molto grande, se c'è del rumore, come succede spesso nei dati
+41:42
+41 minutes, 42 seconds
+reali, questi rumori vanno a sommarsi e vi dicono che le distanze si concentrano molto, non vi danno niente di indicativo. Ok? Se volete, in un certo
+41:50
+41 minutes, 50 seconds
+senso, per superare la Curse of Dimensionality uno deve trovare delle distanze giuste, eh, però se uno non le sa a priori, insomma, deve in qualche modo impararle dai dati. Va bene?
+42:01
+42 minutes, 1 second
+Quindi, allora questi sono due e li vedremo. Ci sono anche altre possibilità eh di clustering è un argomento
+42:10
+42 minutes, 10 seconds
+importantissimo, ma quindi segnatevi questi due sicuramente Kans e poi pam.
+42:16
+42 minutes, 16 seconds
+Insomma, se uno vuole un po' di flessibilità in più può passare a Palma.
+42:23
+42 minutes, 23 seconds
+Sì, dai, tempo ne abbiamo, poi ci giochiamo un pochino anche con la demo, va bene. Allora, invece quali sono i metodi gerarchici?
+42:33
+42 minutes, 33 seconds
+Eh, gerarchici in inglese hierarchical cluster analysis, hierarchical, quindi avete HCA, a volte si chiamano anche
+42:41
+42 minutes, 41 seconds
+così questi metodi. E allora l'idea qual è? di costruire una gerarchia di cluster, cioè di dire, ad esempio, la
+42:49
+42 minutes, 49 seconds
+cosa più semplice, è forse partendo dal basso, uno dice "Beh, questi due punti sono vicini, li metto insieme e ho creato un piccolo mini cluster". Poi
+42:56
+42 minutes, 56 seconds
+magari vado a vedere un altro punto vicino, ma lo metto insieme o non lo metto insieme, lo lo unisco e unisco un nuovo cluster. Quindi, passo dopo passo,
+43:04
+43 minutes, 4 seconds
+se volete, l'algoritmo vi permette di costruire non soltanto un cluster con un K fissato, ma una famiglia di cluster uno dentro l'altro,
+43:12
+43 minutes, 12 seconds
+ok? Lo stesso potete fare dall'alto con un approccio divisivo. Ok? Allora, come si rappresentano poi questi? Quindi gli approcci sono due, come dicevo, no?
+43:21
+43 minutes, 21 seconds
+Agglomerativi cui si parte dal basso, ad esempio, i punti sono segnati così, no? E allora si comincia mettendo insieme.
+43:28
+43 minutes, 28 seconds
+Ah, questi due li metto insieme. Bene.
+43:30
+43 minutes, 30 seconds
+Poi passo successivo, beh, questi tre li metto insieme senza distruggere i cluster precedenti, no? Adesso metto
+43:37
+43 minutes, 37 seconds
+insieme questi due. Adesso beh, questo qui starebbe bene insieme a lui. Adesso uniamo ancora questi due sono i più
+43:44
+43 minutes, 44 seconds
+vicini e poi infine uniamo questi due, no? Così avete creato una gerarchia di cluster passo dopo passo unendo cluster
+43:52
+43 minutes, 52 seconds
+già già definiti. Questo è l'approccio bottom up, ok? andate dal basso, cioè dalle proprietà fini dei singoli
+43:59
+43 minutes, 59 seconds
+individui e li unite via fino a ottenere un un visione dall'alto, se volete, dove c'è un singolo cluster. E poi divisivi
+44:07
+44 minutes, 7 seconds
+invece è l'approccio opposto, no? In cui dite "Ok, devo creare un cluster qui, beh, farò così, spezzo, se penso proprio
+44:15
+44 minutes, 15 seconds
+a tagliare, no? Taglio via e dico: "Ok, questi finiranno di qua e questi dall'altro lato". E quindi dico, ho costruito due cluster. Adesso vado a
+44:24
+44 minutes, 24 seconds
+vedere i singoli sottocluster che ho definito. Questo qui lo taglio ulteriormente e quindi costruirò questi due, ops,
+44:33
+44 minutes, 33 seconds
+e questi due. Poi non sono ancora contento. Di qua taglio così e vengo costruiti questi due e un singolo cluster con un singolo elemento. Non ho
+44:41
+44 minutes, 41 seconds
+ancora finito, posso tagliare ancora, taglio ancora, taglio ancora. Ok? Quindi se volete un approccio opposto,
+44:49
+44 minutes, 49 seconds
+va bene? Poi ovviamente non sto tagliando a caso, no? Cioè avrò un criterio con cui faccio questi tagli o cui ho un criterio con cui metto insieme i punti. Ok? Chiaro questo discorso.
+45:00
+45 minutes
+Qual è può essere il vantaggio di un metodo del genere rispetto prima a K means? Sicuramente il numero dei cluster
+45:07
+45 minutes, 7 seconds
+non è da specificare in anticipo, quindi ad esempio, se mi interessano eh pochi cluster, potrei fare un
+45:14
+45 minutes, 14 seconds
+approccio divisivo, no? e magari lo interrompo anche invece di arrivare a fare n tipo 1 milione di cluster n 1
+45:21
+45 minutes, 21 seconds
+milione mi fermo quando voglio. Oppure se faccio un approccio agglomerativo e lì magari se mi interessano solo due cluster dovrò arrivare fino in cima. Ok?
+45:30
+45 minutes, 30 seconds
+Però appunto la cosa interessante è che con questi approcci il K è libero e poi lo possiamo fissare tagliando a una certa altezza. Ora capiremo in che senso
+45:39
+45 minutes, 39 seconds
+l'altezza di cose. Ok? Quindi pensate a metà strada, poi ci si interrompe, si dice "Ok, questo cluster, questo numero
+45:46
+45 minutes, 46 seconds
+di cluster che voglio". Quindi questo è il vantaggio sicuramente e però lo svantaggio ovviamente c'è sempre uno svantaggio, non può esserci
+45:54
+45 minutes, 54 seconds
+solo un vantaggio, altrimenti non vi starei a raccontare gli altri metodi, cioè lo svantaggio è che di solito sono più lenti, ok? Perché dovete creare
+46:01
+46 minutes, 1 second
+proprio questa gerarchia e arrivare fino in cima, diciamo. Se volete due cluster dovete partire dal fondo e arrivare fino in alto. Poi ci sono metodi euristiche per velocizzare tutto, ma insomma.
+46:12
+46 minutes, 12 seconds
+Ok.
+46:14
+46 minutes, 14 seconds
+Eh, allora vediamo un po'. Stiamo parlando di alto e basso, però nel momento in cui vi ho fatto questo discorso dei tagli o di mettere insieme, non è chiara qual è la dimensione
+46:22
+46 minutes, 22 seconds
+dell'altezza. Ok? Allora, il punto qual è? che rappresentiamo le gerarchie tramite quello che si chiama nella
+46:28
+46 minutes, 28 seconds
+teoria dei grafi un grafo ad albero o appunto nella teoria di cluster si chiama un dendrogramogramma. Va bene?
+46:36
+46 minutes, 36 seconds
+Allora, cosa cos'è un grafo d'albero?
+46:38
+46 minutes, 38 seconds
+Beh, si rappresentano, diciamo, scritto di solito si mettono le foglie in basso, giusto per complicare la cosa.
+46:46
+46 minutes, 46 seconds
+Sembrano più delle radici, invece uno vorrebbe le foglie in alto. Allora, diciamo le foglie sono corrispondono agli individui del nostro alle singole
+46:55
+46 minutes, 55 seconds
+osservazioni, no? Abbiamo n foglie, ok? Foglia
+47:02
+47 minutes, 2 seconds
+e e poi cosa si fa? Beh, se ad esempio in questa facciamo l'approccio dal basso verso l'alto, no? Ad esempio questi sono i miei individui. Nell'approccio di
+47:10
+47 minutes, 10 seconds
+prima, ad esempio l'individuo, diamo dei nomi 1 2 3 4 5 6. Ad esempio, nell'approccio di prima, bottom up, e il
+47:19
+47 minutes, 19 seconds
+primo step era riconoscere, beh, l'individuo uno e due, sono molto simili, li unisco, li unisco nel singolo, creo un mini cluster di due.
+47:26
+47 minutes, 26 seconds
+Ok? Allora, si fa semplicemente un arco che collega 1 2. Se volete qui in alto metteteci un pallino che rappresenta il
+47:34
+47 minutes, 34 seconds
+cluster 1 2. Ok? Quindi, se volete abbiamo trasformato quelle due foglie, se pensate, le avete unite, avete una nuova foglia che rappresenta il cluster
+47:42
+47 minutes, 42 seconds
+1 2. Poi l'approccio diceva beh, ora anche l'individuo tre, mi sembra che avessimo detto questo, si trova bene, è
+47:49
+47 minutes, 49 seconds
+poco lontano, è molto simile agli individui due, quindi mettiamoli insieme e allora andiamo a fare questo, no? e li
+47:56
+47 minutes, 56 seconds
+uniamo. Poi c'erano i 4 e c forse erano di più i punti, erano sette, vabbè, che si erano uniti lo stesso, magari magari
+48:04
+48 minutes, 4 seconds
+dopo nell'algoritmo venivano uniti dopo perché erano lontani. Quindi lo rappresento con l'altezza.
+48:10
+48 minutes, 10 seconds
+L'altezza sarà in un certo senso la misura della della distanza tra i cluster e poi magari siano uniti 6 e 7.
+48:19
+48 minutes, 19 seconds
+Poi dopo questi due cluster si erano a loro volta uniti e infine avevamo unito. Vedete in che situazione siamo adesso?
+48:27
+48 minutes, 27 seconds
+Siamo nella situazione k = 2 perché abbiamo un grosso cluster qui e un altro grosso cluster qui e infine possiamo
+48:34
+48 minutes, 34 seconds
+unirli e completare se volete il nostro albero là con quella che si chiamerebbe tecnicamente una radice. Va bene? ci sarebbe una radice qui in alto, ok?
+48:44
+48 minutes, 44 seconds
+Quando c'è un singolo cluster. Ora, perché un albero giratevi, insomma, guardatelo, insomma, immaginate che lì ci sia la radice e queste sono le
+48:52
+48 minutes, 52 seconds
+foglie, ok? Di solito si rappresentano così, eh, e non viceversa. Va bene?
+48:59
+48 minutes, 59 seconds
+Quindi, allora, la lunghezza del ramo o più che altro non tanto la lunghezza del ramo, ma l'altezza, ok? questa questa dimensione qui. Quindi sulla x mettiamo
+49:07
+49 minutes, 7 seconds
+il numero di foglie con le loro etichette, sull'altezza, sulle y mettiamo semplicemente la distanza, la dissimilarità.
+49:18
+49 minutes, 18 seconds
+Ok? Quindi più alto avviene l'unione, maggiori sono dissimili i cluster.
+49:25
+49 minutes, 25 seconds
+Ok? Adesso qualcuno dovrebbe chiedermi in che senso due cluster sono dissimili, perché abbiamo detto che gli individui, vado magari usare una funzione di loss,
+49:34
+49 minutes, 34 seconds
+vado a usare una funzione di costo, la distanza tra gli tra le caratteristiche degli individui.
+49:40
+49 minutes, 40 seconds
+Cosa vuol dire che invece due cluster siano distanti. Eh, qui dobbiamo decidere, non è non è dato. Ok? Quindi,
+49:48
+49 minutes, 48 seconds
+comunque, l'idea è che più alta interviene l'unione, il collegamento c'è, maggiore è la distanza. Ok? Quindi quando vedete dei dendrogrammi e sono
+49:57
+49 minutes, 57 seconds
+molto piatti, ad esempio 1 2 3 era molto molto più basso, vuol dire che quelli sono molto vicini, sono molto simili e gli altri magari si sono uniti più
+50:04
+50 minutes, 4 seconds
+avanti. Anche nell'algoritmo di solito si uniscono più o più tardi se facciamo l'approccio bottom up. Ok? Dal basso verso l'alto.
+50:14
+50 minutes, 14 seconds
+D'accordo? Allora, vediamo un po' di capire meglio il concetto di dissimilarità. Sì, qua riassunto appunti punti di fusione, no?
+50:23
+50 minutes, 23 seconds
+mostrano quale distanza i cluster vengono uniti. E certo, sì, ecco, ultima cosa, forse è meglio che ve la mostro di più. Nel momento in cui abbiamo
+50:32
+50 minutes, 32 seconds
+costruito il dendrogramma, ok, vi ho detto, no, con queste tecniche gerarchiche dovremmo avere a disposizione tutti i possibili K.
+50:43
+50 minutes, 43 seconds
+Allora, come si ottiene un uno specifico K? Beh, si fa un taglio dell'albero
+50:52
+50 minutes, 52 seconds
+e effettivamente, ad esempio, ci interessa K = 2, no? Basterà tagliare a questa altezza qui, se volete tagliamo a
+50:59
+50 minutes, 59 seconds
+questa altezza qui o per visualizziamola un po' meglio. Tagliamo qui. Allora, se taglio questa altezza avrò il cluster 4
+51:07
+51 minutes, 7 seconds
+5 6 7 a destra. Vedete che si è separato. Immaginate proprio tagliate quei due rami e avete il cluster 1 2 3.
+51:15
+51 minutes, 15 seconds
+Se mi interessa tagliare un'altra altezza, diciamo, voglio avere tre cluster, allora vado scendo con la mia
+51:21
+51 minutes, 21 seconds
+cesoia, no? Taglio e taglio qui tagliando a questa altezza che sarebbe un proprio quella lì, no? Volendo,
+51:28
+51 minutes, 28 seconds
+allora ho 4 5 che si separa da 6 7, quindi ho due cluster lì e 1 2 3 che sono rimasti insieme. Quindi mano mano
+51:36
+51 minutes, 36 seconds
+che scende, ad esempio questo taglio qui, adesso ho 1 2 3 un cluster, 4 5 un altro cluster, 6 7 si sono separati, quindi abbiamo k = 4.
+51:48
+51 minutes, 48 seconds
+Ok? K = 3, k = 2.
+51:54
+51 minutes, 54 seconds
+Quindi, capite? Decidendo l'altezza a cui tagliare, abbiamo K diversi. Poi vedremo che in realtà il comando è molto
+52:01
+52 minutes, 1 second
+semplice e basterà dare il comando cutree, taglia l'albero e specificare il cap, non specificare l'altezza. Cioè si
+52:09
+52 minutes, 9 seconds
+può anche tagliare una certa altezza, magari ha pure senso in in certe situazioni, ma se a noi interessa capire K, diremo taglia a quell'altezza in modo
+52:17
+52 minutes, 17 seconds
+da avere K, ok? un certo K e non non devo specificarti io qual è l'altezza, però quindi capite a seconda dell'altezza della dissimilarità avremo
+52:27
+52 minutes, 27 seconds
+i vari K. D'accordo? È chiaro questo? Ci sono dubbi su questo? Sembra abbastanza naturale.
+52:36
+52 minutes, 36 seconds
+Ecco, allora e quindi questo vale sia per l'approccio, cioè nel momento in cui avete costruito questa gerarchia e
+52:44
+52 minutes, 44 seconds
+dipende solo dal modo in cui la costruite, no? dall'alto verso il basso in questo disegno o dal basso verso l'alto. Attenti che se pensate agli alberi con le foglie, di solito le
+52:52
+52 minutes, 52 seconds
+foglie sono in alto, quindi si rovescia tutto questo bottom up ehm e
+52:59
+52 minutes, 59 seconds
+e top down, ok? Però non preoccupatevi su questo. Adesso l'importante è avere chiaro, poi i metodi più o meno sono
+53:07
+53 minutes, 7 seconds
+equivalenti, insomma, questo a questo livello. Ehm, dunque, vediamo un attimo il dendrogramma, quindi l'abbiamo detto.
+53:19
+53 minutes, 19 seconds
+Sì. Allora, parliamo un attimo quindi di questi due metodi. Vi presento solo un metodo agglomerativo e uno divisivo. Ok?
+53:28
+53 minutes, 28 seconds
+Poi ce ne sono tantissimi sottometi, complicati, ma insomma cerchiamo di rimanere nella semplicità, così poi
+53:35
+53 minutes, 35 seconds
+semmai ci fosse necessità almeno sapete un po' orientarvi su su quali sono i metodi. Comunque sono i principali, diciamo, questi che vi presento. Allora,
+53:43
+53 minutes, 43 seconds
+metodo agglomerativo, dicevamo, partiamo dai singoli individui e li fondiamo via.
+53:49
+53 minutes, 49 seconds
+E un algoritmo eh tra quelli appunto più utilizzati è questo, ma in realtà è una scatola che contiene vari algoritmi, è agglomerative
+53:58
+53 minutes, 58 seconds
+nesting, abbreviato Agnes. Va bene? Allora, cosa facciamo?
+54:06
+54 minutes, 6 seconds
+Partiamo dai vari punti. Quindi ogni cluster e inizialmente è un algoritmo anche questo iterativo, a ogni allo
+54:13
+54 minutes, 13 seconds
+stato iniziale ogni punto vive nel suo cluster e poi si fondono cluster tramite un criterio di collegamento, quello che
+54:22
+54 minutes, 22 seconds
+si chiama linkage criteri, ok? Dobbiamo decidere sostanzialmente qual è la distanza tra i cluster.
+54:30
+54 minutes, 30 seconds
+Implicitamente stiamo decidendo una qualche funzione di rischio, ok? Quando diciamo quant'è la distanza tra i cluster, non è che stiamo proprio
+54:38
+54 minutes, 38 seconds
+diminuendo il rischio, ma stiamo dicendo qual è effettivamente la nozione di rischio. Allora, quali sono i criteri di collegamento? Beh, dove vedete? Se
+54:46
+54 minutes, 46 seconds
+disegno i punti, no? Quindi ho il mio cluster, beh, facciamo così, facciamolo in nero, altrimenti ho il mio cluster
+54:53
+54 minutes, 53 seconds
+C1, che sono questi punti, ho un altro cluster che è C2, che sono questi due punti e C3. Ok,
+55:02
+55 minutes, 2 seconds
+ora devo capire, diciamo, lo step successivo sarà diffondere due di questi cluster. Come faccio a decidere? Beh,
+55:10
+55 minutes, 10 seconds
+vado a vedere come prima partivo dai punti e dico i punti più vicini li metto insieme al passo zero faccio questo. Eh,
+55:17
+55 minutes, 17 seconds
+gli step successivi devo dire prendo i due cluster più vicini e li fondo in un singolo cluster per andare avanti nella mia costruzione della gerarchia. E qui bisogna capire qual è la distanza.
+55:28
+55 minutes, 28 seconds
+Quindi devo dire una distanza, una loss, se volete, tra un un cluster C1 e un cluster C2, oppure una loss tra C1 e C3.
+55:38
+55 minutes, 38 seconds
+Qui disegno sembrerebbe che C1 sia abbastanza lontano da C3 e C2 invece sarà vicino a C3. Ma come facciamo a
+55:45
+55 minutes, 45 seconds
+quantificare? No, ovviamente devo calcolare dei numeri, quindi devo capire quale di questi numeri, questa distanza
+55:53
+55 minutes, 53 seconds
+loss tra i vari cluster è il più piccolo e poi scelgo quello più piccolo e unisco i due cluster e vado avanti con l'algoritmo.
+56:03
+56 minutes, 3 seconds
+Allora, come faccio a dire qual è il più piccolo? Eh, allora, ci sono varie tecniche, cioè vari criteri. Allora, c'è il minimum linkage, cioè cosa si fa?
+56:14
+56 minutes, 14 seconds
+la distanza tra C1 e C, ma facciamo tra C con i e CJ, va bene? Così è più
+56:21
+56 minutes, 21 seconds
+Allora, cosa vado a fare? Allora, qui ho C, qui ho C,
+56:29
+56 minutes, 29 seconds
+vado a confrontare tutti gli individui, no?
+56:32
+56 minutes, 32 seconds
+Tutte le possibili distanze tra gli individui dentro il cluster e vado a vedere qual è la più piccola. Ok?
+56:39
+56 minutes, 39 seconds
+Quindi, se per caso ci sono due individui molto vicini, tipo questo punto qui è molto vicino a questo punto
+56:45
+56 minutes, 45 seconds
+qui, eh loro vinceranno e se volete come se dovessi costruire un ponte, no, tra queste due isole, vado a vedere, cioè
+56:53
+56 minutes, 53 seconds
+una è la Sicilia e l'altra è non è un'isola la Calabria, vado nel punto più vicino, ok? Devo fare un un ponte
+57:00
+57 minutes
+spendendo il minimo, quindi faccio il minimo sulle x in c con i y in cj,
+57:08
+57 minutes, 8 seconds
+quindi vado a prendere le coppie e poi faccio la distanza. Ad esempio, se la distanza euclidea, faccio x - y e la distanza oppure la funzione di loss tra
+57:18
+57 minutes, 18 seconds
+i punti, se ho definito un'altra loss, tipo un'altra distanza o qualcos'altro.
+57:22
+57 minutes, 22 seconds
+Ok? Ecco, qual è il problema qui? che bastano proprio due punti vicini e tutto il cluster eh risultano vicini, quindi
+57:29
+57 minutes, 29 seconds
+magari il cluster era un po' sfortunato, c'era questouter che era lì e un altro che era molto vicino, magari tutti gli
+57:36
+57 minutes, 36 seconds
+altri punti erano tutt'altra parte e questo risulta molto piccolo, quindi si fondono. Quindi è molto sensibile quando andiamo a fare il minimo, è un po'
+57:44
+57 minutes, 44 seconds
+troppo sensibile a eventuali outlyer, situazioni in cui c'è sfortunate in cui una coppia di punti si trova casualmente vicina. Ok? Beh, allora andiamo
+57:53
+57 minutes, 53 seconds
+all'opposto, potremmo fare il complete linkage, cioè andiamo a fare il massimo dei punti. Ok? Quindi cosa andiamo a fare? Andiamo a vedere i punti più
+58:01
+58 minutes, 1 second
+lontani, ok? Non fatemelo scrivere, appunto. Prendo su tutte le coppie, vado a vedere la distanza, ok? Quindi vado a vedere proprio i più lontani. Va bene?
+58:10
+58 minutes, 10 seconds
+Anche questo un po' sfortunato, cioè non è detto che di nuovo va dare gli estremi e di solito in probabilità in statistica non aiuta molto. Quello che aiuta è di
+58:18
+58 minutes, 18 seconds
+fare le medie, quindi si va a fare l'average linkage ed è quello effettivamente implementato di di in
+58:25
+58 minutes, 25 seconds
+standard, quindi eh chiamiamolo L average C i CJ.
+58:32
+58 minutes, 32 seconds
+Cosa andiamo a fare? Andiamo a fare la media, quindi facciamo la somma su tutte le x in C i, le Y in C. Facciamo la
+58:40
+58 minutes, 40 seconds
+distanza xi - y x - y e poi dividiamo per il numero di punti c con i c con j.
+58:50
+58 minutes, 50 seconds
+Va bene? Avrete quanti punti? Tante quanti sono le coppie, ok? E così avete la media e questo, diciamo, non è né un
+58:58
+58 minutes, 58 seconds
+estremo né l'altro e di solito funziona meglio. Ok? Quindi c'è un'euristica qui, non è che c'è molto da dire. Ok? Quindi
+59:06
+59 minutes, 6 seconds
+con questo criterio uno sceglie un criterio, lo porta avanti fino alla fine, di solito con Agnes e passo dopo
+59:13
+59 minutes, 13 seconds
+passo unisce i vari cluster partendo da il caso banale in cui tutti i punti sono cluster diversi e via arriva a a fare
+59:21
+59 minutes, 21 seconds
+ilendrogramma. Ok? Quindi descriviamo per bene l'algoritmo.
+59:26
+59 minutes, 26 seconds
+Quindi, fissato il costo, uno dice calcolo la matrice per tutte le coppie di punti, vado a farmi le distanze.
+59:33
+59 minutes, 33 seconds
+Questa a volte si chiama matrice delle o distanze tra i tra tutti i cluster.
+59:39
+59 minutes, 39 seconds
+Poi prendo i cluster più vicini, quindi all'inizio unisco i punti, poi unisco punti e cluster eventualmente, ok? E poi infine solo cluster.
+59:47
+59 minutes, 47 seconds
+Unisco i cluster più vicini e ripeto aggiorno la matrice delle distanze perché nel momento in cui ho unito adesso tutti quei punti vanno a finire nello stesso cluster, devo aggiornare
+59:56
+59 minutes, 56 seconds
+tutte le possibili distanze, però poi ripeto ripeto ripeto il quattro, no? Quattro
+1:00:03
+1 hour, 3 seconds
+ricomincio da due e ripeto finché alla fine non ho unito tutto e eh abbiamo creato il nostro dendrogramma.
+1:00:12
+1 hour, 12 seconds
+Va bene? In effetti, quindi, ora sappiamo cosa c'è nell'altezza, nelle dissimilarità, nelle similarità, nelle Y. Metteremo, a seconda del nostro
+1:00:21
+1 hour, 21 seconds
+criterio di linkage, metteremo effettivamente la distanza tra i cluster, ok? Quindi attenti che se usate
+1:00:29
+1 hour, 29 seconds
+Agnes con eh linkage criteri diversi, criteri diversi, attenti che sulle y, cioè magari dentro gramma sono simili,
+1:00:37
+1 hour, 37 seconds
+ma le altezze potrebbero essere diverse perché state usando criteri diversi per calcolare le distanze tra i cluster.
+1:00:45
+1 hour, 45 seconds
+Va bene? Eh, allora vediamo invece come funziona l'opposto, quello divisivo.
+1:00:51
+1 hour, 51 seconds
+Allora, divisivo c'è questo Diana, forse Diana, no?
+1:00:57
+1 hour, 57 seconds
+Eh, divisive analysis, vabbè, giusto per dare un nome simpatico. Allora, di nuovo qui si inizia, dicevamo, con un singolo
+1:01:04
+1 hour, 1 minute, 4 seconds
+cluster, quindi si parte dall'alto, un singolo cluster e dividiamo iterativamente in sottogruppi, sotto
+1:01:11
+1 hour, 1 minute, 11 seconds
+cluster, finché non abbiamo spezzettato tutto e ogni punto sarà in un singolo cluster. Allora, qui qual è la
+1:01:19
+1 hour, 1 minute, 19 seconds
+difficoltà? Dobbiamo capire il criterio di divisione. Allora, è facile in queste situazioni dire "Ok, prenderò eh
+1:01:26
+1 hour, 1 minute, 26 seconds
+prenderò so che so la mediana di una certa componente taglio a metà". Diana non fa così. Ci sono, invece per le
+1:01:34
+1 hour, 1 minute, 34 seconds
+classificazione ci sono gli alberi binari, non so se avete mai sentito, però appunto no, Diana fa una cosa leggermente diversa, non è proprio un
+1:01:42
+1 hour, 1 minute, 42 seconds
+taglio netto. Allora quello che fa prende tra i vari cluster che abbiamo già costruito, diciamo,
+1:01:50
+1 hour, 1 minute, 50 seconds
+magari non siamo al punto iniziale, c'è solo un cluster che va diviso ed è quello, altrimenti identifica quello più grande. Quello più grande nel senso che
+1:01:58
+1 hour, 1 minute, 58 seconds
+ha un diametro maggiore. Diametro cosa sarebbe? sarebbe il massimo delle distanze eh delle coppie di punti lì
+1:02:05
+1 hour, 2 minutes, 5 seconds
+dentro. Ad esempio, se se io qui ho un punto X e un punto Y dentro lo stesso cluster, il diametri sono quelli più
+1:02:12
+1 hour, 2 minutes, 12 seconds
+distanti possibili, quello sarà il diametro. Ok? è lo stesso. Magari qui c'è un punto qui e un punto qua, quindi questo avrà un diametro più grande.
+1:02:20
+1 hour, 2 minutes, 20 seconds
+Questo magari no, perché magari il diametro è raggiunto qui, per come l'ho disegnato, eh vabbè, il disegno un poco
+1:02:28
+1 hour, 2 minutes, 28 seconds
+indicativo. Quindi vado a selezionare quello più grande e comincio a tagliare quello più grande. Quando abbiamo identificato quello con diametro
+1:02:35
+1 hour, 2 minutes, 35 seconds
+maggiore, anche lì il diametro dipende dalla loss, della funzione di potrebbe essere a distanza e l'idea, ma anche altre distanze.
+1:02:43
+1 hour, 2 minutes, 43 seconds
+A quel punto ho deciso che devo tagliare quel cluster. Allora lo taglierò in due parti, però cosa faccio? Prendo dentro il mio cluster che è il diametro
+1:02:51
+1 hour, 2 minutes, 51 seconds
+maggiore, vado a cercare il punto più dissimile dagli altri, quello che sta più lontano da tutti, no? tipo se fosse
+1:02:58
+1 hour, 2 minutes, 58 seconds
+un outlier, magari sono tutti qua vicini e poi c'è lui, eh, l'isolato che se ne sta bello lontano. Allora, parto da lui
+1:03:07
+1 hour, 3 minutes, 7 seconds
+e dico: "Ok, io userò lui come, diciamo, nuovo, se volete, sarebbe un centro del nuovo cluster e userò lui per tagliare
+1:03:15
+1 hour, 3 minutes, 15 seconds
+via una bella fetta". Allora, cosa vado a fare? Beh, ho parto dal punto più lontano, vado a cercare quelli più
+1:03:22
+1 hour, 3 minutes, 22 seconds
+vicini a lui, no? Dico, "Ah, questo è molto vicino a lui". Vai, se ne vai con con il punto più lontano e appunto
+1:03:29
+1 hour, 3 minutes, 29 seconds
+iterando però attenti, bisogna capire se questo punto è più vicino al nostro candidato punto più lontano oppure ai
+1:03:38
+1 hour, 3 minutes, 38 seconds
+rimanenti. Quindi bisogna avere anche una misura di distanza tra un punto e cluster qui internamente. Comunque, allora si fa un po' una procedura di taglio, non voglio entrare proprio nel
+1:03:46
+1 hour, 3 minutes, 46 seconds
+dettaglio che è un po' noioso, però a un certo punto quindi si individua una separazione che non è necessariamente un taglio netto e lungo una certa
+1:03:55
+1 hour, 3 minutes, 55 seconds
+componente o qualcos'altro, insomma è costruito punto per punto. Ok? Però a quel punto quindi si si è deciso come
+1:04:02
+1 hour, 4 minutes, 2 seconds
+spezzare il cluster in due sottocluster e a quel punto si procede ripetendo.
+1:04:08
+1 hour, 4 minutes, 8 seconds
+Quindi abbiamo tagliato in modo non banale e andiamo avanti. Non è detto che allo step successivo taglieremo lo stesso. Andiamo di nuovo a selezionare
+1:04:15
+1 hour, 4 minutes, 15 seconds
+quello che è il diametro maggiore e tagliamo lui e così via. Insomma, alla fine però eh sicuramente terminiamo perché i punti sono n, ogni volta
+1:04:24
+1 hour, 4 minutes, 24 seconds
+tagliamo. Se c'è un punto solo nel cluster, quello rimane lì, non viene più tagliato e si termina. Ok?
+1:04:31
+1 hour, 4 minutes, 31 seconds
+Bene. Quindi divisivo parte, insomma, dall'alto verso il basso. Qui non è, vedete, non avete neanche dato le
+1:04:38
+1 hour, 4 minutes, 38 seconds
+formule. Se volete nei comandi di R c'è tutto l'Help che descrive per bene i vari criteri di divisione, perché anche lì qui per l'agglomerazione abbiamo
+1:04:47
+1 hour, 4 minutes, 47 seconds
+detto che ci sono diversi criteri di collegamento. Lo stesso sarà per la divisione, insomma, in che senso è il più lontano? In che senso è più dissimile dagli altri? Bisogna specificare tutti questi parametri.
+1:04:57
+1 hour, 4 minutes, 57 seconds
+Insomma, nella pratica si sono individuati dei criteri ragionevoli e si usano quelli.
+1:05:03
+1 hour, 5 minutes, 3 seconds
+Ecco. Ok. Allora, questo, diciamo, è un po' una carrellata su quattro algoritmi, metodi principali
+1:05:11
+1 hour, 5 minutes, 11 seconds
+di clustering. Adesso però rimangono le le domande forse più interessanti, perché se non ci interessano molto gli
+1:05:19
+1 hour, 5 minutes, 19 seconds
+algoritmi vogliamo capire come selezionare un cioè quali sono i criteri per avere un buon clustering. Ok?
+1:05:27
+1 hour, 5 minutes, 27 seconds
+Allora, in particolare c'è un parametro da determinare il numero dei cluster.
+1:05:31
+1 hour, 5 minutes, 31 seconds
+Allora, o qualcuno ci dice all'inizio, guarda, io voglio dividere la mia popolazione in due sottopolazioni e k =
+1:05:38
+1 hour, 5 minutes, 38 seconds
+2 non mi interessa. Poi il risultato che sarà, provo i vari metodi e dammi un risultato con k = 2. Sì.
+1:05:46
+1 hour, 5 minutes, 46 seconds
+Eh, molto più spesso in realtà non sappiamo neanche quale sia il K giusto, quindi vogliamo determinare K. Però in effetti dopo vedremo che anche se
+1:05:54
+1 hour, 5 minutes, 54 seconds
+sappiamo qual è il K giusto, potremmo voler confrontare metodi diversi.
+1:05:58
+1 hour, 5 minutes, 58 seconds
+Ciascuno ha creato il cluster con le sue tecniche, quindi vorremmo anche degli indicatori più generali per confrontare la bontà di un clustering. Comunque,
+1:06:05
+1 hour, 6 minutes, 5 seconds
+allora, se la domanda è come determinare K, eh, non c'è un K giusto, cioè non c'è proprio la la risposta, non c'è quello
+1:06:14
+1 hour, 6 minutes, 14 seconds
+giusto. Ok? Dipende da qual è lo scopo che uno deve fare di questi cluster, ok?
+1:06:18
+1 hour, 6 minutes, 18 seconds
+Cioè, se il cluster devo farci, devo interpretarlo, non potrò avere un K che sia 100.000. Se magari ho 1 milione di
+1:06:27
+1 hour, 6 minutes, 27 seconds
+punti, l'ho diviso in cluster da 100.000. 100.000 cluster, boh, non so cosa me ne farò. Quindi vorrò magari un K piccolo, se il mio obiettivo è la
+1:06:34
+1 hour, 6 minutes, 34 seconds
+l'interpretabilità. Se ho un'applicazione in biologia di qualche natura strana, magari anche K grande, 50 100 potrebbe essere utile. Ok? Quindi
+1:06:43
+1 hour, 6 minutes, 43 seconds
+attenti che non c'è né un range di K giusto né diciamo un K ottimale. Dipende da qual è l'obiettivo. Di solito, se
+1:06:51
+1 hour, 6 minutes, 51 seconds
+l'obiettivo è dare degli cluster che sono interpretabili appunto da da noi esseri umani, il K dovrà essere parecchio piccolo.
+1:07:00
+1 hour, 7 minutes
+Ok?
+1:07:01
+1 hour, 7 minutes, 1 second
+Comunque, allora, vogliamo avere dei criteri, quindi ci saranno più criteri in base a quello che misuriamo per selezionare e individuare un K. E
+1:07:10
+1 hour, 7 minutes, 10 seconds
+allora vediamone un po'. Anche qui c'è la letteratura svariata. Quando vedete che ci sono 100.000 criteri, qualcuno vi propone "Ah, ma questo criterio è
+1:07:18
+1 hour, 7 minutes, 18 seconds
+meglio", chiedetevi perché ci sono tutti questi criteri, perché non ce n'è uno giusto. Ok? Se ce ne fosse uno che effettivamente funziona sempre ed è
+1:07:27
+1 hour, 7 minutes, 27 seconds
+ottimale in tutte le situazioni, allora qui non ci sarebbero questi criteri. C'è un po' di selezione naturale anche di questi criteri, no? Allora, vediamo uno
+1:07:35
+1 hour, 7 minutes, 35 seconds
+che è un non criterio, secondo me, però spesso viene raccontato, che è il metodo del gomito, elbow method.
+1:07:44
+1 hour, 7 minutes, 44 seconds
+Poi vediamo un indice per avere un indicatore un po' più ragionevole, ok?
+1:07:49
+1 hour, 7 minutes, 49 seconds
+Che è l'indice di DAN. Sono tutte cose abbastanza classiche. Ma c'è tanta letteratura che poi si si riaggiorna, si
+1:07:57
+1 hour, 7 minutes, 57 seconds
+rialimenta, vanno un po' di moda anche queste cose. E poi un buon indicatore che secondo me rimane tra quelli più
+1:08:03
+1 hour, 8 minutes, 3 seconds
+validi è la silhouette che è un po' una versione un po' più complicata dell'indice di DAN. Vabbè,
+1:08:11
+1 hour, 8 minutes, 11 seconds
+poi appunto ci sono mille altri criteri, ci sono anche letteratura su questo, ma insomma basta avere qualche criterio, diciamo, almeno dice io ho argomentato
+1:08:19
+1 hour, 8 minutes, 19 seconds
+usando questi criteri, se qualcun altro comincia a dire eh ma questi criteri non vanno bene, allora chiedete, discutiamo altri criteri, insomma, se c'è
+1:08:27
+1 hour, 8 minutes, 27 seconds
+qualcos'altro che che può sembrare migliore. Dipende comunque dalle applicazioni. Ecco, allora vediamo un
+1:08:33
+1 hour, 8 minutes, 33 seconds
+po' questo non metodo del elbow. Devo dire non criterio perché ora vediamo qual è il difetto.
+1:08:43
+1 hour, 8 minutes, 43 seconds
+Comunque l'idea qual è? Abbiamo facciamo soltanto per K means e tutto questo si può fare per qualsiasi clustering, per qualsiasi algoritmo e così via. Allora,
+1:08:51
+1 hour, 8 minutes, 51 seconds
+il punto qual è? Abbiamo le varie i vari rischi, in questo caso la within cluster summon squares, quindi abbiamo la
+1:08:59
+1 hour, 8 minutes, 59 seconds
+variabilità, questa somma dei quadrati, delle distanze, dai centroidi, dai centroidi e così via. Eh, allora per ogni K abbiamo girato Kins, diciamo che abbiamo un loss ottimale.
+1:09:12
+1 hour, 9 minutes, 12 seconds
+E allora l'idea qual è? Plottiamo al vari K e vediamo cosa succede.
+1:09:17
+1 hour, 9 minutes, 17 seconds
+Più cluster abbiamo, più potremo mettere centri nelle posizioni giuste e a quel punto la loss complessiva, la la
+1:09:25
+1 hour, 9 minutes, 25 seconds
+variabilità, se volete, no, all'interno di ciascun cluster comincerà a diminuire. E quindi quello che uno nota è che al crescere di K = 1, vabbè K = 1,
+1:09:34
+1 hour, 9 minutes, 34 seconds
+K = 2, ma 1 togliamolo, dai, non è proprio clustering, k = 3 e così via. Si
+1:09:42
+1 hour, 9 minutes, 42 seconds
+accorge che il numero di cluster cresce e questa loss diminuisce, ok? Diminuisce bene. Quindi abbiamo per ogni K una
+1:09:51
+1 hour, 9 minutes, 51 seconds
+loss, poi vediamo mercoledì è un qualcosa di concreto. E allora il metodo del dell'elbo cosa dice? Del del gomito?
+1:09:58
+1 hour, 9 minutes, 58 seconds
+dice "Beh, se la curva è fatta così, magari inizialmente diminuisce molto, la disegno come un continuo e poi smette di
+1:10:07
+1 hour, 10 minutes, 7 seconds
+diminuire così tanto, cioè ha una specie di, appunto, un gomito, ok? Cioè, abbiamo una situazione in cui continua a diminuire, eh, però comincia a diminuire
+1:10:17
+1 hour, 10 minutes, 17 seconds
+l'incremento." Ok? Va bene? Quindi prima diminuisce rapidamente e poi l'incremento assoluto, diciamo,
+1:10:24
+1 hour, 10 minutes, 24 seconds
+diminuisce, insomma, smette di di di decrescere così rapidamente. E allora questo è il K ottimale. Ok? In questa
+1:10:32
+1 hour, 10 minutes, 32 seconds
+situazione, se uno vedesse un grafico proprio di questo tipo, dice "Ok, è il Bow Methodolta ce l'ha fatta, ha trovato il K
+1:10:39
+1 hour, 10 minutes, 39 seconds
+ottimale". Qual è il problema? Che nella realtà intanto non si vede, non si riesce a riconoscere a occhio chi è questo metodo, qual è questo elbow?
+1:10:48
+1 hour, 10 minutes, 48 seconds
+Pure a questo punto poi ci sono altri problemi un po' più gravi, nel senso che non sempre quindi il grafico è di questo
+1:10:55
+1 hour, 10 minutes, 55 seconds
+tipo e eh vabbè ora vabbè parliamo un attimo dell'intuizione, poi vi dico quali sono i difetti. Cioè l'intuizione
+1:11:03
+1 hour, 11 minutes, 3 seconds
+qual è? che prima quando K è abbastanza grande stiamo separando, cioè quando K, scusate, è piccolo, quindi 2 3,
+1:11:11
+1 hour, 11 minutes, 11 seconds
+separiamo effettivamente dei cluster veri. Quindi quando aggiungiamo un punto la distanza, questa variabilità, questa loss diminuisce molto perché stiamo
+1:11:20
+1 hour, 11 minutes, 20 seconds
+isolando dei cluster veri. Poi a un certo punto l'idea sarebbe che se stiamo con Kpo quando aumentiamo di un punto stiamo
+1:11:27
+1 hour, 11 minutes, 27 seconds
+tagliando dei cluster che non sono veri cluster e quindi questo effetto della diminuizione del del rischio comincia a
+1:11:35
+1 hour, 11 minutes, 35 seconds
+diminuire, cioè avete che il rischio diminuisce più lentamente. Ok? Quindi quando finché separiamo veri cluster, qualunque cosa sia, stiamo
+1:11:44
+1 hour, 11 minutes, 44 seconds
+effettivamente ottenendo un grande vantaggio nel nel rischio, altrimenti poi ci si assesta. Ok? Beh, allora qual
+1:11:52
+1 hour, 11 minutes, 52 seconds
+è lo svantaggio? Il problema è che tanto questo mezzo vi ho solo disegnato un punto e vi ho detto se vedete qualcosa del genere piazzate lì il capo ottimale,
+1:12:00
+1 hour, 12 minutes
+va bene, ma come faccio a definirlo se devo dirlo a un computer? Trovami il punto ottimale, come fa a trovarlo? Poi
+1:12:08
+1 hour, 12 minutes, 8 seconds
+qual è il problema un po' più grave? è questo che se cioè si può fare degli esempi in cui dataset proprio che a occhio sono totalmente diversi hanno la
+1:12:17
+1 hour, 12 minutes, 17 seconds
+stessa curva di questo di questa rischio che scende a crescere di K, quindi il metodo dell'Elbow darebbe lo stesso K,
+1:12:25
+1 hour, 12 minutes, 25 seconds
+ma a occhio si vede proprio che sono K completamente disparati, quelli ottimali, ok? Quindi attenzione che è un criterio che non funziona, cioè sembra
+1:12:34
+1 hour, 12 minutes, 34 seconds
+fallire e non è neanche ben definito, ok? Quindi attenti a non usarlo a scatola chiusa. Il mio consiglio è sì,
+1:12:41
+1 hour, 12 minutes, 41 seconds
+se c'è la possibilità fatelo, girate questo grafico e magari scoprite che c'è un punto di gomito e magari lo accoppiate con altri
+1:12:49
+1 hour, 12 minutes, 49 seconds
+indicatori che ora andiamo a vedere. Va bene? E altro problema in effetti richiede di calcolare
+1:12:57
+1 hour, 12 minutes, 57 seconds
+richiede di calcolare queste inerzie questi rischi per k per vari k.
+1:13:06
+1 hour, 13 minutes, 6 seconds
+Ora, in effetti, se uno ha già usato un metodo gerarchico, ce li ha tutti i K e quindi può fare un semplicemente un
+1:13:15
+1 hour, 13 minutes, 15 seconds
+un for su tutti i K che vuole, ha già calcolato una volta sola. E il problema è che se uso un algoritmo tipo K means o pam ogni volta che devo calcolare il
+1:13:23
+1 hour, 13 minutes, 23 seconds
+rischio devo devo far girare l'algoritmo, quindi se è molto costoso poi a un certo punto diventa molto svantaggioso. Tutto per avere un grafico
+1:13:31
+1 hour, 13 minutes, 31 seconds
+qualitativo che magari non non so neanche ben interpretare. Ok? Quindi attenti a Elbow Method.
+1:13:40
+1 hour, 13 minutes, 40 seconds
+Ecco, allora vediamo qualcosa di più quantitativo.
+1:13:43
+1 hour, 13 minutes, 43 seconds
+Allora, più quantitativo cominciamo con questo indice di DAN.
+1:13:47
+1 hour, 13 minutes, 47 seconds
+E allora l'idea qual è? Abbiamo un concetto di distanza tra cluster che abbiamo visto anche prima, no, per i metodi gerarchici. Quindi proviamo a
+1:13:56
+1 hour, 13 minutes, 56 seconds
+usarlo e vediamo un po' la distanza, confrontiamo quindi la distanza minima tra i cluster, cioè quanto i cluster
+1:14:03
+1 hour, 14 minutes, 3 seconds
+sono vicini tra loro con la variabilità all'interno del del singolo cluster.
+1:14:09
+1 hour, 14 minutes, 9 seconds
+Quindi andiamo a fare i diametri, no? Il diametro era quello che compariva nel metodo divisivo, la distanza tra classe era quella che compariva nel metodo agglomerativo. Allora, mettiamo insieme
+1:14:18
+1 hour, 14 minutes, 18 seconds
+questi indicatori e costruiamo, cioè ha costruito DAN questo indice. Allora, lo facciamo per la distanza, ma si potrebbe fare anche per un'altra funzione di
+1:14:26
+1 hour, 14 minutes, 26 seconds
+loss. Quindi se abbiamo un cluster, diciamo, con K eh in sottoinsiemi, allora per ogni
+1:14:34
+1 hour, 14 minutes, 34 seconds
+sottoinsieme CJ possiamo definire il diametro. E il diametro era quello che vi ho detto prima parole, quindi andiamo a fare dentro lo stesso cluster, andiamo a vedere il massimo delle distanze.
+1:14:45
+1 hour, 14 minutes, 45 seconds
+Quindi dentro lo singolo cluster X e Y nello stesso cluster andiamo a fare il massimo delle distanze. Quindi quanto lontani possono stare i punti dentro il
+1:14:53
+1 hour, 14 minutes, 53 seconds
+cluster? E poi date coppie di cluster C e CJ diverse e andiamo a fare il minimo.
+1:15:01
+1 hour, 15 minutes, 1 second
+Questo sarebbe il single linkage, ok?
+1:15:04
+1 hour, 15 minutes, 4 seconds
+Andiamo a vedere quello dicevamo prima, il ponte, poi si può cambiare, si può mettere la media, anche qui si può fare l'average e altre cose. Ok? Però questa
+1:15:13
+1 hour, 15 minutes, 13 seconds
+è la definizione originaria di di don. E allora cosa fa questo indice? Va a vedere a numeratore il minimo delle distanze tra cluster.
+1:15:23
+1 hour, 15 minutes, 23 seconds
+Ok?
+1:15:24
+1 hour, 15 minutes, 24 seconds
+e a denominatore il massimo del diametro. Ok? Faccio questo rapporto.
+1:15:30
+1 hour, 15 minutes, 30 seconds
+Innanzitutto, intanto sono sempre distanze, quindi almeno viene una quantità che non ha unità di misura, sto facendo distanze su distanze, quindi
+1:15:37
+1 hour, 15 minutes, 37 seconds
+alla fine è una quantità positiva che non ha una sua scala. In effetti l'altro
+1:15:43
+1 hour, 15 minutes, 43 seconds
+svantaggio del del dell'Elbow è che in effetti eh state confrontando delle quantità che dipendono anche dall'unità
+1:15:51
+1 hour, 15 minutes, 51 seconds
+di misura, perché la il rischio quadratico si misura come unità di misura al quadrato, ok? Quindi attenti
+1:15:58
+1 hour, 15 minutes, 58 seconds
+sempre a pensare all'unità di misura. E ora in questo caso è un indicatore, ok?
+1:16:03
+1 hour, 16 minutes, 3 seconds
+Lo vogliamo grande o lo vogliamo piccolo questo indice di DAN? Cioè, sarà meglio avere un cluster con con questo criterio, con un un indice di DAN grande
+1:16:11
+1 hour, 16 minutes, 11 seconds
+o un indice di DAN piccolo. Allora, idealmente noi vorremmo che la distanza tra i vari cluster sia grande, quindi il
+1:16:19
+1 hour, 16 minutes, 19 seconds
+numeratore sia grande e i diametri, che sarebbero appunto quanto grandi possono essere questi cluster, siano piccoli.
+1:16:28
+1 hour, 16 minutes, 28 seconds
+Ok? D'accordo? Perché non ci piacerebbe, ad esempio, un cluster del genere, no, in cui c'è un punto lontano, questo darebbe un diametro molto grande, eh,
+1:16:36
+1 hour, 16 minutes, 36 seconds
+questo non ci piace. Ok? Piuttosto vorremmo spezzarlo in due sottocluster, ok? Anche se fosse così. Quindi, allora
+1:16:44
+1 hour, 16 minutes, 44 seconds
+vogliamo effettivamente un indice di DAN grande. Ok? Ora quanto grande? Dipende, va bene? Quindi più alto è è questo
+1:16:52
+1 hour, 16 minutes, 52 seconds
+indice, meglio sono separati i cluster e eh i diametri sono più piccoli
+1:16:59
+1 hour, 16 minutes, 59 seconds
+possibilmente, quindi più alti sono i valori, meglio è. Quindi se uno vuole selezionare K in base a questo indice di DAN, plotta per i vari K, calcola i vari
+1:17:09
+1 hour, 17 minutes, 9 seconds
+gli indici e va a scegliere il K maggiore in un range che gli interessa.
+1:17:14
+1 hour, 17 minutes, 14 seconds
+Tipo mi interessa K da 2 a 10 perché di più comunque non mi interessa e vado a prendere quello maggiore. Ok?
+1:17:21
+1 hour, 17 minutes, 21 seconds
+Poi ha i suoi svantaggi anche questo indice, eh, perché sta usando una distanza, sta usando questa nozione di minimo come single linkage che potrebbe
+1:17:30
+1 hour, 17 minutes, 30 seconds
+essere un po' troppo sensibile. Quindi, attenti che, insomma, non è oro colato neanche l'indice di dan, però può essere
+1:17:37
+1 hour, 17 minutes, 37 seconds
+utile, quindi magari uno accoppia indice di DAN e elbow. Vediamo invece l'ultimo indicatore.
+1:17:45
+1 hour, 17 minutes, 45 seconds
+Sì, tanto finiamo proprio a alle 4:00 e ci lasciamo, no? direi eh silhouette.
+1:17:53
+1 hour, 17 minutes, 53 seconds
+Eh silhouette è l'ultimo indicatore, va bene o sì? Tanto E vediamo invece un'evoluzione, se
+1:18:02
+1 hour, 18 minutes, 2 seconds
+volete, dell'indice di DAN. Di nuovo cerchiamo di misurare un po' la la vicinanza eh di un punto rispetto agli altri
+1:18:10
+1 hour, 18 minutes, 10 seconds
+elementi del cluster e invece rispetto alla vicinanza di questo punto agli agli ai punti degli altri cluster. Ok? Quindi per ogni elemento, per ogni
+1:18:19
+1 hour, 18 minutes, 19 seconds
+osservazione, andiamo a fare una quantità che chiamiamo silhouette, ok?
+1:18:24
+1 hour, 18 minutes, 24 seconds
+Quindi vediamo un po' comeè fatta, va bene? Poi eventualmente questa questa indicazione si media su tutti i punti oppure all'interno del cluster. Però il
+1:18:32
+1 hour, 18 minutes, 32 seconds
+punto è questo, andiamo a definire queste due quantità e poi le andiamo a sottrarre. La prima, dato un punto X che
+1:18:40
+1 hour, 18 minutes, 40 seconds
+sta in un cluster, nella nell'insieme CJ de cluster, andiamo a fare la cosiddetta adesione, chiamiamola Ax, cioè cosa
+1:18:48
+1 hour, 18 minutes, 48 seconds
+andiamo a fare? Andiamo a vedere la media sul cluster in cui ci siamo, no? De I
+1:18:55
+1 hour, 18 minutes, 55 seconds
+punti, vedete? Prendiamo i punti Y in CJ, andiamo a fare la media delle distanze del punto X con gli altri
+1:19:03
+1 hour, 19 minutes, 3 seconds
+punti. Vedete, c'è un c - 1 qu gi -1 perché ho tolto quel punto X. Ok? Quindi cosa sta facendo? Sta facendo una specie
+1:19:10
+1 hour, 19 minutes, 10 seconds
+di indicatore, no, di quanto il mio punto X sia effettivamente vicino agli altri punti. Ad esempio, una situazione del genere, se i punti y sono tutti
+1:19:19
+1 hour, 19 minutes, 19 seconds
+lontani, questo questa media verrà abbastanza grande. Invece un'adesione grande vorrei dire che lui si trova bene
+1:19:27
+1 hour, 19 minutes, 27 seconds
+insieme a tutti gli altri, è abbastanza vicino agli altri. Ok? In media.
+1:19:32
+1 hour, 19 minutes, 32 seconds
+Poi però vado a confrontare il punto X con quelli che stanno negli altri cluster. Allora, cosa vado a fare? Vado di nuovo a fare una specie di average
+1:19:41
+1 hour, 19 minutes, 41 seconds
+linkage, cioè cosa vado a fare? Vado a vedere su tutti gli altri cluster U, chiamiamoli U diversi da J, dal mio
+1:19:48
+1 hour, 19 minutes, 48 seconds
+cluster che dove mi trovo dove X si trova e vado a fare la media della distanza tra il punto X, che è quello
+1:19:55
+1 hour, 19 minutes, 55 seconds
+che ho scelto, e gli altri punti Y negli altri cluster. Quindi cosa vado a fare?
+1:19:59
+1 hour, 19 minutes, 59 seconds
+Vado a vedere qua, ad esempio, c'è il cluster, questo è CJ, questo è Cu e vado a vedere la media
+1:20:08
+1 hour, 20 minutes, 8 seconds
+di queste distanze qui. Quindi vado a vedere quanto effettivamente X preferirebbe stare col cluster CU. Da questo punto di vista vado a vedere la
+1:20:16
+1 hour, 20 minutes, 16 seconds
+media delle distanze tra X e i punti nel cluster C. Poi questo ovviamente ci saranno dei cluster che sono molto lontani da X, quelli naturalmente li
+1:20:24
+1 hour, 20 minutes, 24 seconds
+tolgo perché vado a fare il minimo su vado a vedere i cluster che è più vicino in questo senso.
+1:20:30
+1 hour, 20 minutes, 30 seconds
+Quindi ho due termini adesione, quindi adesione piccola, no? Vorrei dire che queste distanze medie sono piccole.
+1:20:38
+1 hour, 20 minutes, 38 seconds
+Bene. E invece separazione, separazione piccola vorrà dire che invece il punto preferiva stare con con l'altro cluster,
+1:20:46
+1 hour, 20 minutes, 46 seconds
+non quello in cui è stato infilato. Eh, e allora come vado a confrontare questi due? Vado a fare la cosiddetta
+1:20:53
+1 hour, 20 minutes, 53 seconds
+silhouette, cioè faccio la differenza tra separazione e adesione. Ok? Ora di
+1:21:01
+1 hour, 21 minutes, 1 second
+nuovo separazione e adesione sono lunghezze, sono distanze. Se ho usato le distanze clidee, quindi vorrei una quantità che sia invece senza unità di
+1:21:09
+1 hour, 21 minutes, 9 seconds
+misura, perché se riscalo tutto di un fattore du cambio unità di misura, mi cambierebbe tutta questa differenza.
+1:21:15
+1 hour, 21 minutes, 15 seconds
+Quindi divido per il massimo tra a di x e bx. Così ottengo un numero che sicuramente si può vedere facilmente, è
+1:21:24
+1 hour, 21 minutes, 24 seconds
+può essere anche negativo, eh? Può essere tra -1 e 1. Ok?
+1:21:34
+1 hour, 21 minutes, 34 seconds
+Sì. Ok, vediamo un pochino.
+1:21:42
+1 hour, 21 minutes, 42 seconds
+Ecco, nel momento in cui ho calcolato la silhouette, faccio la silhouette media, quindi per ogni punto posso calcolare
+1:21:49
+1 hour, 21 minutes, 49 seconds
+questa silhouette. Vedete, faccio la differenza, appunto, perché sono effetti contrastanti, no? l'adesione e la separazione.
+1:21:57
+1 hour, 21 minutes, 57 seconds
+E vabbè, posso avere la silhouette media per i cluster e oppure la silhouette media su tutti i
+1:22:04
+1 hour, 22 minutes, 4 seconds
+punti. Quella si chiama anche score, a volte si chiama silhouette score. Ok? Allora, cosa mi dice questo indicatore?
+1:22:11
+1 hour, 22 minutes, 11 seconds
+Mi dice immediamente quanto i punti preferiscono stare nel loro cluster rispetto ad andare nella saltare, se volete, nell'altro cluster. Ok?
+1:22:19
+1 hour, 22 minutes, 19 seconds
+Allora, vediamo un po' di dare un'interpretazione. Allora, se la silhouette è circa 1, andiamo a vedere il i valori
+1:22:28
+1 hour, 22 minutes, 28 seconds
+estremi, no? Quando è circa uno, cosa vuol dire? Vuol dire che l'adesione a x che sto andando a sottrarre è piccola e
+1:22:36
+1 hour, 22 minutes, 36 seconds
+invece la separazione x bx è molto grande, quindi vuol dire che perfetto, no? Questo questo punto si trova bene
+1:22:43
+1 hour, 22 minutes, 43 seconds
+con i suoi e non vuole andare dagli altri, ok? e quindi mi dice che x è ben assegnato al suo cluster. Ok? Quindi
+1:22:51
+1 hour, 22 minutes, 51 seconds
+valori grandi della sue et come per l'indice di DAN, valori grandi ci piacciono, però grandi in una scala tra tra -1 e 1. Ok? Se è zero vuol dire che
+1:22:59
+1 hour, 22 minutes, 59 seconds
+è un po' così, è indeciso, cioè c'è sia la possib, cioè quella differenza numeratore vale circa zero, quindi è tanto felice di stare con i suoi quanto
+1:23:06
+1 hour, 23 minutes, 6 seconds
+vorrebbe saltare con l'altro cluster, quindi diciamo è vicino al bordo, uno potrebbe pensare necessariamente geometrico è questo
+1:23:14
+1 hour, 23 minutes, 14 seconds
+bordo. O invece quando è negativo potrebbe essere che in realtà il punto stava meglio con l'altro cluster CU, quello dove preferirebbe saltare, ok?
+1:23:22
+1 hour, 23 minutes, 22 seconds
+perché si trova male con i suoi e non si e invece si troverebbe bene con i vicini o quantomeno si trova meglio con i vicini. Allora, quali sono poi
+1:23:31
+1 hour, 23 minutes, 31 seconds
+indicativamente dei insomma questo è un numero tra -1 e 1, quindi insomma se faccio la silhouette media su tutti i punti, quindi posso usarlo sia per
+1:23:39
+1 hour, 23 minutes, 39 seconds
+individuare se un punto si trova bene o no nel suo cluster, oppure posso usarlo come indicatore. Allora, se faccio la media su tutti i punti, trovo la
+1:23:48
+1 hour, 23 minutes, 48 seconds
+silhouette media. Allora, quali sono range? ragionevoli. Allora, se il silhouette è più grande di 0,7,
+1:23:56
+1 hour, 23 minutes, 56 seconds
+diciamo un clustering forte, comunque più grande di 0,5 un buon clustering. Se siete molto sotto, tipo 0 sotto un
+1:24:05
+1 hour, 24 minutes, 5 seconds
+quarto, ma sono cose indicative, eh, non è che vuol dire che c'è un clustering un po' debole o che potrebbe essere meglio preferire un altro clustering. In
+1:24:14
+1 hour, 24 minutes, 14 seconds
+particolare, potete quindi usare questa silhouette per calcolare il K, no?
+1:24:18
+1 hour, 24 minutes, 18 seconds
+Quindi se avete diversi K, diversi cluster, anche diversi cluster con lo stesso K, ma creati con algoritmi diversi, potete calcolare la silhouette
+1:24:26
+1 hour, 24 minutes, 26 seconds
+e dire "Beh, scelgo quello con la silhouette più grande". Vabbè, è un criterio, eh, non è che ci siano ehm
+1:24:34
+1 hour, 24 minutes, 34 seconds
+motivi a volte per selezionare questo rispetto all'indice di dan. Questo però è un criterio un po' più fine perché va a vedere anche i singoli punti e così via. Attenzione però sempre alla Curse
+1:24:43
+1 hour, 24 minutes, 43 seconds
+of Dimensionality che poi ne parleremo perché stiamo usando comunque le distanze per calcolare questi questi
+1:24:50
+1 hour, 24 minutes, 50 seconds
+valori della silhouette. Quindi di nuovo potrebbe esserci un problema di base che è legato al fatto che le distanze non sono molto rappresentative, non sono
+1:24:58
+1 hour, 24 minutes, 58 seconds
+molto utili. Ok? Però comunque sì, minore di 0,25 non può mai essere.
+1:25:03
+1 hour, 25 minutes, 3 seconds
+No, no, può essere. Cioè, fa un cluster orribile, cioè sì, assolutamente. Cioè, anzi adesso vi do all Non so se l'ho
+1:25:11
+1 hour, 25 minutes, 11 seconds
+messo tra le vari obiettivi, però allora, appunto, c'è una piccola demo e potete scaricarla. Allora, se la scaricate è
+1:25:19
+1 hour, 25 minutes, 19 seconds
+meglio, perché vi spiego anche perché quando l' andate ad aprire,
+1:25:27
+1 hour, 25 minutes, 27 seconds
+quindi scaricatevela e giocate perché secondo me, cioè, esplorate questo questi vari concetti. Allora, clustering
+1:25:34
+1 hour, 25 minutes, 34 seconds
+3 dovrei averela caricata, come al solito, andate su, quindi magari mercoledì, provate entro mercoledì a
+1:25:41
+1 hour, 25 minutes, 41 seconds
+vedere se riuscite a girare questa demo in locale perché può essere utile. Allora, andiamo. Grazie. Sì.
+1:25:50
+1 hour, 25 minutes, 50 seconds
+Allora, l'ultimo, scusi, ancora quello cheeva lei quella vicinatore 25,
+1:25:56
+1 hour, 25 minutes, 56 seconds
+però cioè c'è questa maggiore uscita, diciamo, intorno all'interno Sì. Ora non siate così rigidi. Allora, tutta questa cosa del clustering è molto
+1:26:05
+1 hour, 26 minutes, 5 seconds
+esplorativa, ok? Non è che è una definizione matematica che è buono, cioè ho fatto ho preso un dataset a caso per
+1:26:12
+1 hour, 26 minutes, 12 seconds
+mercoledì mi è venuta una siluetta di 0.46. Ho detto, "Vabbè, non è non è un granché". Però provando diversi metodi
+1:26:20
+1 hour, 26 minutes, 20 seconds
+veniva sempre 0,46. Quindi quello può essere un'indicazione che si cede clustering, forse con altri K si potrebbe fare meglio. Insomma, usatela
+1:26:28
+1 hour, 26 minutes, 28 seconds
+sempre con un metodo esplorativo senza, cioè non è un dogma che deve essere 0,75, come il p value non deve essere
+1:26:35
+1 hour, 26 minutes, 35 seconds
+0.05. Attenti, eh, cioè dipende sempre, vale il principio iniziale, dipende dalle applicazioni che avete in mente.
+1:26:43
+1 hour, 26 minutes, 43 seconds
+Allora, come funziona questa demo?
+1:26:45
+1 hour, 26 minutes, 45 seconds
+scegliamo i di disegnare i punti come facevamo prima con i medoidi, va bene?
+1:26:53
+1 hour, 26 minutes, 53 seconds
+Quindi giocateci voi, quindi disegnate i punti come volete. La cosa interessante che magari vedremo mercoledì meglio è
+1:27:02
+1 hour, 27 minutes, 2 seconds
+che si può salvare i punti, quindi come i giochi di carte, poi vi scambiate i vari cluster e quindi potete salvare i
+1:27:10
+1 hour, 27 minutes, 10 seconds
+punti e caricarli. Ok? Come vengono salvati i punti? con un formato che vedremo mercoledì, se non avete mai visto, è il formato CSV, va bene?
+1:27:18
+1 hour, 27 minutes, 18 seconds
+Formato CSV semplicemente contiene le coordinate dei punti eh con una virgola in mezzo per dire la X e la Y, perché in questo caso sono punti bidimensionali.
+1:27:27
+1 hour, 27 minutes, 27 seconds
+Allora, l'obiettivo qual è? Siccome mi piaceva trasformarli in un giochino, ho fatto generare, quindi non sono sicuro eh che siano tutti obiettivi
+1:27:34
+1 hour, 27 minutes, 34 seconds
+ragionevoli, però eh potete cercare di trovare dei punti in modo tale, ad
+1:27:42
+1 hour, 27 minutes, 42 seconds
+esempio, che il dendrogramma mostri tre cluster molto chiari e quindi poi
+1:27:48
+1 hour, 27 minutes, 48 seconds
+interpretare il il fatto che i punti si uniscono in modo efficace. Vabbè, qui volete un dentogramma con tre cluster molto chiari. In questo caso non sarà il
+1:27:57
+1 hour, 27 minutes, 57 seconds
+dataset giusto, ecco, non c'è una vera risposta giusta, insomma, non è tipo un arcade, insomma, esplorate un po' voi.
+1:28:04
+1 hour, 28 minutes, 4 seconds
+Andate poi nel tab di clusterise e potete scegliere il clustering. Allora, di algoritmi, come vi dicevo, ne ho ne
+1:28:11
+1 hour, 28 minutes, 11 seconds
+abbiamo messi quattro, però si può fare tante varianti. Ad esempio pam si può scegliere il tipo di costo, quindi se
+1:28:18
+1 hour, 28 minutes, 18 seconds
+Euclideo o la metrica Taxicab L1 Manattan, insomma, oppure Agnes. Vi ricordo, potete scegliere il criterio di
+1:28:27
+1 hour, 28 minutes, 27 seconds
+linkage. Facciamo un esempio, facciamo girare solo K means, ok? K means e scegliamo due cluster e lo calcoliamo.
+1:28:36
+1 hour, 28 minutes, 36 seconds
+Ok, vedete? Ha funzionato bene. Insomma, almeno ragionevolmente bene. Che indicatori vi lascia questa piccola
+1:28:43
+1 hour, 28 minutes, 43 seconds
+demo? il within cluster squares 0.8 in questo caso, l'indice di 0.11 e la silhouette media. Questa invece che
+1:28:51
+1 hour, 28 minutes, 51 seconds
+cos'è? Questa è la silhouette, vi ricordo la silhouette per ogni punto avrebbe il suo valore di silhouette, quindi potrebbe essere più indicativo
+1:29:00
+1 hour, 29 minutes
+andare a vedere la silhouette all'interno dei singoli cluster e vedere se c'è un cluster che ha una silhouette troppo piccola, magari quel cluster lo
+1:29:08
+1 hour, 29 minutes, 8 seconds
+togliamo. Ok? Può si può usare anche così in senso esplorativo la silhouette non è soltanto la silhouette media.
+1:29:13
+1 hour, 29 minutes, 13 seconds
+L'indice di DAN è un po' invece un indice solo. Ok? Se usate un metodo, quindi giocateci voi perché è più
+1:29:21
+1 hour, 29 minutes, 21 seconds
+divertente, se usate un metodo eh agglomerativo o divisivo ma gerarchico, oltre alla silhouette, vi compare qui
+1:29:29
+1 hour, 29 minutes, 29 seconds
+sotto il dentrogramma. Vabbè, questa volta li ho disegnati così. Vabbè, forse mi veniva più carino. Questo dendrogramma vi mostra, vedete le
+1:29:37
+1 hour, 29 minutes, 37 seconds
+altezze? Cosa dicono le altezze? Abbiamo fatto 2 k = 2. Ci dice che i punti 1 2 3 4 5 sono tutti nel classer rosso e
+1:29:45
+1 hour, 29 minutes, 45 seconds
+stanno qui. 6 7 8 9 10 e 11 stanno tutti nel claster blu e vedete le altezze più o meno. Vedete? Cioè questa prima
+1:29:53
+1 hour, 29 minutes, 53 seconds
+separazione e poi dopo le altre sono più o meno lo stesso livello. Questo ci dice cosa? che effettivamente k = 2 c'è questa buona separazione e poi le altre
+1:30:01
+1 hour, 30 minutes, 1 second
+separazioni sono un po' così, cioè non è infatti se noi facciamo k = 3 vedrete comincerà a separare dei punti
+1:30:09
+1 hour, 30 minutes, 9 seconds
+per forza deve separarli perché ho forzato ad avere tre classe, però vedete ha isolato questo cinque che era un po' più lontano da 1 2 3 4 però vedete vabbè
+1:30:18
+1 hour, 30 minutes, 18 seconds
+ora la silhouette per un singolo, vabbè, sì, no, è la media della silhouette per quel singolo punto che è
+1:30:25
+1 hour, 30 minutes, 25 seconds
+zero. Vedete? lui sta proprio al bordo in un certo senso, ma ma fatelo anche per altri K, insomma, insomma, vedete
+1:30:32
+1 hour, 30 minutes, 32 seconds
+che dopo un po' eh appunto questi cluster un po' banali non vi aiutano molto sulla silhouette. Ehm allora
+1:30:39
+1 hour, 30 minutes, 39 seconds
+appunto giocateci un po', tanto tempo ne abbiamo. Mercoledì vediamo cosa succede.
+1:30:44
+1 hour, 30 minutes, 44 seconds
+Provate a risolvere qualcuna di queste e poi se trovate un diagramma che vi piace salvatelo, così poi potete ricaricarlo e mostrarlo ai vostri amici.
+1:30:54
+1 hour, 30 minutes, 54 seconds
+Va bene? Poi mercoledì vediamo il comandier.
+57:02
+[4K Live] Chopin Complete Ballades & Liszt Ballade No.2 - Yejin Noh | 쇼팽 발라드 전곡 & 리스트 발라드 2번 - 노예진
+NCM KLASSIK
+234k 5 mo ago
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+85 watching
+2:58
+FROZEN 3 (2027) | TEASER TRAILER | Walt Disney Animation (D23)
+SLUURP
+2.5m 1 mo ago
+2:11:43
+The National Philharmonic Orchestra of Ukraine – 12th Ukrainian Music Days in Warsaw
+Fundacja Pro Musica Viva
+3.3k Streamed 7 days ago
+New
+1:08
+Walk, Run, Crawl, RL Fun | Boston Dynamics | Atlas
+Boston Dynamics
+9.7m 1 yr ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+223k 13 hr ago
+New
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+8:13
+Chi se ne frega di Jev?
+Salvatore Sanfilippo
+6.1k 3 hr ago
+New
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+4:55
+Martha Argerich e l'austero maestro
+Angelo Angelastro
+30k 4 mo ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+5:43
+Gigi Proietti - La pioggia nel pineto (Gabriele D'Annunzio)
+Gigi Proietti Fans
+1.3m 9 yr ago
+13:44
+Trump IMPLODES After SHUT UP By Carney To His FACE!
+Jack Cocchiarella
+1.9m 1 yr ago
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+Mix
+My Mix
+Relja Lukic, Ezio Bosso, Kristen Bell and more
+2:10
+The Angry Birds Movie 3 | Official Trailer (2026 Movie)
+Paramount Pictures
+and Angry Birds
+8.9m 2 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+36:16
+Interview with Mario Monicelli and Nanni Moretti (1977) (Subtitled)
+Diffusion Offline
+70k 1 yr ago
+Auto-dubbed
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+15:55
+"Carney Just Did What No Leader Has Ever Done to Trump!" | Bill Clinton
+Abubakar Halifa
+98k 2 days ago
+New
+5:24
+1986: How to Spot the Upper Class | That's Life! | BBC Archive
+BBC Archive
+2.7m 5 mo ago

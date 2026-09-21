@@ -1,0 +1,1194 @@
+# Serie storiche I: visualizzazione, decomposizione e previsione elementare {#sec-serie-decomposizione}
+
+## Obiettivi del capitolo
+
+Al termine del capitolo dovresti essere in grado di:
+
+* spiegare perché le serie storiche richiedono un cambio di paradigma rispetto a tutto ciò che abbiamo visto finora (clustering, classificazione, regressione), passando dall'assunzione di **indipendenza** a quella di **dipendenza temporale**, e perché è proprio la dipendenza a rendere possibile la previsione;
+* leggere correttamente un time plot, un grafico stagionale e un grafico di sottoserie, distinguendo a occhio trend, stagionalità e rumore;
+* descrivere la decomposizione di una serie storica in trend, stagionalità, ciclo e residuo, scegliere in modo motivato tra decomposizione additiva e moltiplicativa, e valutare criticamente la qualità di una decomposizione;
+* costruire e interpretare una serie ritardata, un lag plot e la funzione di autocorrelazione (ACF), riconoscendo il ruolo delle bande di significatività e l'effetto "mascherante" del trend;
+* applicare differenziazione, trasformazioni logaritmiche/Box-Cox e rimozione del trend via regressione per rendere una serie più trattabile, e calcolare esplicitamente una componente stagionale e i residui;
+* descrivere i modelli di previsione elementari (naive, media, naive stagionale, drift, KNN) e spiegarne pregi e limiti su serie con trend e/o stagionalità diversi;
+* spiegare perché la cross-validation "ordinaria" (k-fold, leave-one-out) non è applicabile alle serie storiche, e descrivere le alternative corrette (divisione temporale train/test, rolling origin/walk-forward).
+
+## Un cambio di paradigma: dall'indipendenza alla dipendenza
+
+### Motivazione
+
+Nei capitoli precedenti — statistica descrittiva, clustering, classificazione, regressione — l'ipotesi di lavoro, esplicita o implicita, era sempre la stessa: i dati osservati $\{x_i\}$ o $\{(x_i,y_i)\}$ costituiscono un **campione statistico di variabili indipendenti**, estratte dalla stessa distribuzione. È questa assunzione a garantire, ad esempio, che l'errore di generalizzazione stimato su un test set sia informativo sul comportamento futuro del modello (capitolo 4, sulla classificazione), e che il bootstrap possa ricampionare liberamente le osservazioni (capitolo 7, sulla regressione lineare multipla). Con le serie storiche, questa assunzione va abbandonata deliberatamente: non solo i dati *non* sono indipendenti nel tempo, ma è **precisamente la dipendenza a essere l'oggetto di studio**.
+
+Vale la pena soffermarsi sul perché. Se le osservazioni $y_1,\ldots,y_t$ fossero indipendenti, aver osservato mesi o anni di storia non direbbe assolutamente nulla su $y_{t+1}$: per definizione di indipendenza, conoscere il passato non altera la distribuzione del futuro. Le serie storiche esistono, come oggetto di studio a sé, proprio perché in tantissimi fenomeni reali — economici, finanziari, climatici, epidemiologici — il passato *è* informativo sul futuro. L'obiettivo dell'analisi delle serie storiche è allora duplice: **misurare** questa dipendenza (quanto e come il passato è collegato al presente) e **sfruttarla** per costruire previsioni.
+
+### Concetto e definizione
+
+::: {.callout-important title="Definizione"}
+Una **serie storica** (o *serie temporale*, in inglese *time series*, abbreviato `ts` in R) è una sequenza di osservazioni ordinate nel tempo
+$$
+(y_t)_{t=1,\ldots,T},
+$$
+a valori in $\mathbb{R}$ (serie **univariata**) o più in generale in $\mathbb{R}^d$ (serie **multivariata**, se si osservano contemporaneamente più caratteristiche).
+:::
+
+L'indice $t$ non è un'etichetta arbitraria come lo era $i$ per un campione i.i.d.: rappresenta il tempo, ha un **ordine** intrinseco, e questo ordine è parte della struttura del problema — non lo si può rimescolare senza perdere informazione. Dati economici, finanziari, climatici ed epidemiologici sono gli esempi più immediati: chiunque abbia consultato i dati ISTAT avrà notato che la forma "naturale" in cui vengono presentati è già quella di serie storica, perché l'interesse è proprio osservare come una quantità cambia nel tempo. Un altro esempio familiare, per chi ha vissuto la pandemia di Covid-19, sono i bollettini quotidiani dei contagi: anche in quel caso l'oggetto di interesse era una sequenza temporale, non un campione di osservazioni scambiabili.
+
+### Intuizione: previsione, non filtraggio
+
+Il corso si concentra su un obiettivo specifico: la **previsione** (*forecasting*) di valori futuri della serie, cioè stimare $y_{t+h}$ per $h>0$ avendo osservato $y_1,\ldots,y_t$. Esiste un problema statistico affine ma concettualmente diverso, il **filtraggio** (*filtering*), che consiste nello stimare lo *stato attuale* di un sistema a partire da osservazioni rumorose (ad esempio: dato un segnale GPS rumoroso, qual è la posizione vera adesso?). Non ci occuperemo di filtraggio in questo corso, ma è utile sapere che esiste, per non confondere i due obiettivi quando si incontra il termine altrove.
+
+### Domande di comprensione
+
+1. Perché, se le osservazioni di una serie storica fossero indipendenti nel tempo, la previsione diventerebbe impossibile in linea di principio?
+2. In che senso il "campione" con cui abbiamo lavorato nei capitoli 1–8 e la "serie storica" di questo capitolo condividono la stessa notazione formale (una sequenza di numeri) ma richiedono modelli statistici radicalmente diversi?
+3. Fai un esempio di dato che potrebbe essere trattato sia come campione i.i.d. sia come serie storica, a seconda della domanda che ci si pone.
+
+## Visualizzare una serie storica: il time plot
+
+### Motivazione
+
+Per un campione i.i.d. lo strumento grafico di base era lo scatterplot: l'ordine delle osservazioni non aveva alcun significato, quindi aveva senso disperdere i punti liberamente nel piano. Con le serie storiche l'ordine è invece l'informazione principale: lo strumento grafico primario diventa dunque il **grafico temporale** (*time plot* o *line plot*), con il tempo sull'asse delle ascisse.
+
+### Concetto ed esempio
+
+```{r}
+#| label: airpassengers-plot
+#| message: false
+library(forecast)
+library(ggplot2)
+data("AirPassengers")
+autoplot(AirPassengers, main = "Serie AirPassengers")
+```
+
+`AirPassengers` registra il numero mensile di passeggeri aerei negli Stati Uniti tra il 1949 e il 1960 (in migliaia). È uno degli esempi più citati nella letteratura sulle serie storiche proprio perché mostra, in modo pulito, i due ingredienti principali che impareremo a isolare: un **andamento crescente di lungo periodo** (il trend) e delle **oscillazioni che si ripetono regolarmente** entro l'anno (la stagionalità, dovuta ai picchi di viaggi nelle vacanze).
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+In un time plot, chiediti sempre due cose separatamente: (1) c'è un andamento di lungo periodo, crescente o decrescente? (2) ci sono oscillazioni che si ripetono con una periodicità riconoscibile? Le due domande sono indipendenti: una serie può avere trend senza stagionalità, stagionalità senza trend, entrambe, o nessuna delle due (puro rumore).
+:::
+
+Non tutte le serie storiche hanno questa forma pulita. Consideriamo un esempio di natura molto diversa, gli indici azionari europei:
+
+```{r}
+#| label: eustock-plot
+data("EuStockMarkets")
+autoplot(EuStockMarkets, main = "Indici azionari europei (1991–1998)")
+```
+
+Su un orizzonte di circa sette anni, tutti e quattro gli indici mostrano un andamento crescente. Ma attenzione: se restringessimo la finestra temporale a pochi mesi, quell'andamento crescente sparirebbe quasi completamente, lasciando spazio a oscillazioni irregolari — quello che nel gergo finanziario si chiama rischio. La lezione statistica è che **trend e rumore sono nozioni relative alla scala temporale di osservazione**: si guadagna (in media) nel lungo periodo, ma nel breve-medio periodo domina l'incertezza. Terremo a mente questo caveat quando, più avanti, applicheremo modelli di previsione a `EuStockMarkets` e li vedremo comportarsi in modo deludente.
+
+Infine un terzo esempio, complementare ai primi due perché **privo di trend**:
+
+```{r}
+#| label: nottem-plot
+data("nottem")
+autoplot(nottem, main = "Temperatura media mensile a Nottingham (1920–1939)")
+```
+
+`nottem` raccoglie la temperatura media mensile registrata a Nottingham per vent'anni: il livello medio resta sostanzialmente costante nel tempo, ma la stagionalità (il ciclo caldo/freddo dell'anno) è evidentissima, insieme a un rumore genuino — si notino gli anni in cui gennaio è insolitamente rigido o insolitamente mite. Terremo questi tre esempi (`AirPassengers`, `EuStockMarkets`, `nottem`) come riferimento per l'intero capitolo.
+
+### Domande di comprensione
+
+1. Perché lo scatterplot, lo strumento principale per dati i.i.d., è quasi sempre inadeguato per una serie storica?
+2. In `EuStockMarkets`, cosa cambierebbe nella tua lettura del grafico se disponessi solo degli ultimi tre mesi di dati anziché di sette anni?
+3. `nottem` non ha trend ma ha stagionalità molto forte: costruisci mentalmente l'esempio opposto (trend forte, nessuna stagionalità) e descrivi che aspetto avrebbe il suo time plot.
+
+## Decomposizione di una serie storica
+
+### Motivazione
+
+Osservando `AirPassengers` abbiamo distinto informalmente due ingredienti: un andamento di lungo periodo e delle oscillazioni regolari. Formalizzare questa distinzione — la **decomposizione** — è il primo passo di qualunque analisi seria di una serie storica, perché permette di ragionare separatamente su ciascuna componente e, in prospettiva, di costruire previsioni componente per componente (prevedere il trend è un problema diverso, e spesso più semplice, che prevedere l'intera serie).
+
+### Concetto e definizione
+
+::: {.callout-important title="Definizione"}
+Una serie storica $(y_t)_t$ si può rappresentare come sovrapposizione di quattro contributi:
+
+* **Trend** $(T_t)_t$: andamento di lungo periodo;
+* **Stagionalità** $(S_t)_t$: fluttuazioni regolari che si ripetono entro un periodo fisso;
+* **Ciclo** $(C_t)_t$: variazioni lente, non perfettamente periodiche;
+* **Componente residua** $(R_t)_t$: tutto ciò che rimane dopo aver isolato trend, stagionalità e ciclo.
+:::
+
+Il ciclo merita un commento a parte. In economia si parla spesso di cicli di 20–30 anni (espansione, crisi, ripresa): sono variazioni con una certa regolarità, ma su una scala temporale troppo ampia per essere "stagionalità" (che per definizione si ripete entro un periodo fisso e noto, come l'anno) e troppo irregolare per essere un trend pulito. Nella pratica, quando non lo isoliamo esplicitamente, il ciclo finisce **assorbito nel trend** (se la sua periodicità è più ampia della stagionalità) oppure **nel residuo** — mai nella stagionalità, che per costruzione ha periodo fisso e noto. Nella maggior parte dei modelli che vedremo lavoreremo con sole tre componenti: trend, stagionalità, residuo.
+
+::: {.callout-warning title="Attenzione"}
+Il termine "residuo" qui **non ha lo stesso significato** dei residui della regressione lineare (capitolo 6): non sono gli scarti di un modello adattato ai minimi quadrati, ma semplicemente "tutto ciò che rimane" dopo aver sottratto trend e stagionalità. Per evitare confusione concettuale, preferiamo spesso i termini **rumore** o **rimanenza**, riservando "residuo" al contesto della regressione.
+:::
+
+### Intuizione
+
+Idealmente, la componente residua $(R_t)$ dovrebbe essere **rumore bianco** (*white noise*): un campione di variabili identicamente distribuite, indipendenti, a media zero e varianza costante — cioè senza più alcuna struttura riconoscibile. È un obiettivo, non un dato di fatto: una decomposizione "riesce bene" nella misura in cui il residuo che produce si avvicina al rumore bianco, e "riesce male" se nel residuo permane ancora struttura (trend residuo, autocorrelazione, stagionalità non catturata). Vedremo più avanti come verificare concretamente questo aspetto tramite l'ACF dei residui.
+
+### Domande di comprensione
+
+1. Perché il ciclo economico non può, per definizione, finire nella componente stagionale?
+2. Cosa significa, in pratica, dire che un residuo "è rumore bianco"? Elenca almeno tre proprietà che dovrebbe avere.
+3. Perché è pedagogicamente utile non chiamare $(R_t)$ "residuo" tout court, nonostante sia una tentazione naturale visto il linguaggio usato in regressione?
+
+## Decomposizione additiva e moltiplicativa
+
+### Motivazione
+
+Una volta deciso che una serie storica è somma di componenti, resta da specificare *come* si combinano. Le due scelte più comuni sono additiva e moltiplicativa; la scelta tra le due non è puramente estetica, ha conseguenze pratiche su come si calcolano previsioni e residui.
+
+### Concetto
+
+::: {.callout-important title="Definizione"}
+**Decomposizione additiva**:
+$$
+y_t = T_t + S_t + R_t.
+$$
+**Decomposizione moltiplicativa**:
+$$
+y_t = T_t \times S_t \times R_t.
+$$
+Passando al logaritmo, una decomposizione moltiplicativa diventa additiva:
+$$
+\log(y_t) = \log(T_t) + \log(S_t) + \log(R_t).
+$$
+:::
+
+### Intuizione
+
+Come si riconosce, in pratica, se una serie richiede una decomposizione moltiplicativa piuttosto che additiva? Il campanello d'allarme visivo più affidabile è questo: **osserva se l'ampiezza delle oscillazioni stagionali cresce insieme al livello della serie**. Se la serie sale (per effetto del trend) e le oscillazioni intorno al trend diventano via via più ampie in valore assoluto, allora la stagionalità sta effettivamente *moltiplicando* il trend (un contributo stagionale del $+10\%$ produce un'oscillazione assoluta piccola quando il livello è basso, e una grande quando il livello è alto): la decomposizione moltiplicativa è la scelta più naturale. Se invece l'ampiezza delle oscillazioni resta costante indipendentemente dal livello, la decomposizione additiva è preferibile.
+
+Guardiamo di nuovo `AirPassengers`:
+
+```{r}
+#| label: airpassengers-again
+autoplot(AirPassengers, main = "Serie AirPassengers")
+```
+
+**Prima di calcolare.** Confronta le oscillazioni intorno al 1950 con quelle intorno al 1960: crescono, restano costanti, o si riducono? In base a questa sola osservazione, quale tipo di decomposizione ti aspetti sia più adatta?
+
+Nella serie dei passeggeri le oscillazioni di dicembre/gennaio (i picchi di viaggio festivi) sono piccole quando il numero totale di passeggeri è basso (inizio anni '50) e diventano molto più ampie quando il numero totale è alto (fine anni '50): è proprio l'indizio della natura moltiplicativa.
+
+### Esempio
+
+Confrontiamo esplicitamente le due decomposizioni usando `decompose()` — per ora la trattiamo come una "scatola nera": vedremo l'algoritmo di stima (basato su una media mobile) più avanti, quando affronteremo il capitolo sullo smoothing esponenziale.
+
+```{r}
+#| label: decompose-mult
+fit_mult <- decompose(AirPassengers, type = "multiplicative")
+autoplot(fit_mult) + ggtitle("Decomposizione moltiplicativa di AirPassengers")
+```
+
+```{r}
+#| label: decompose-add
+fit_add <- decompose(AirPassengers, type = "additive")
+autoplot(fit_add) + ggtitle("Decomposizione additiva di AirPassengers")
+```
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+In entrambi i grafici osserviamo lo stesso trend crescente e la stessa stagionalità periodica: la differenza sostanziale sta nel pannello del residuo. Confrontando i due, si nota che nella decomposizione **additiva** il residuo mantiene ancora un po' più a lungo una struttura visibile (compare, scompare, ricompare); nella **moltiplicativa** questa struttura è un po' meno evidente, anche se **in entrambi i casi permane un residuo di struttura**: nessuna delle due decomposizioni è pienamente soddisfacente, e questo è normale con uno strumento elementare come `decompose()`. È un giudizio qualitativo, non un test formale, ma è esattamente il tipo di controllo che dovresti sempre fare dopo una decomposizione: guardare il pannello dei residui e chiedersi se assomiglia a rumore bianco.
+:::
+
+### Limiti
+
+::: {.callout-warning title="Attenzione"}
+La scelta tra additivo e moltiplicativo è un'euristica esplorativa, non un teorema: in alcune serie nessuna delle due funziona bene (lo vedremo tra poco a proposito di trend esponenziali "difficili"), e in altre la differenza è ininfluente ai fini pratici. Non aspettarti sempre un verdetto netto.
+:::
+
+### Domande di comprensione
+
+1. Perché passare al logaritmo trasforma una decomposizione moltiplicativa in una additiva? Verificalo algebricamente a partire dalla definizione.
+2. Immagina una serie storica di vendite mensili di un negozio in forte crescita, con picchi natalizi che diventano via via più marcati in valore assoluto man mano che il negozio cresce. Quale decomposizione useresti, e perché?
+3. Guardando solo il pannello dei residui di `decompose(AirPassengers, type = "additive")`, come giudicheresti la qualità della decomposizione? Che cosa dovresti vedere se fosse "perfetta"?
+
+## Grafici stagionali e grafici di sottoserie
+
+### Motivazione
+
+Il time plot mostra insieme trend e stagionalità, il che può renderne difficile una lettura separata. Due grafici alternativi permettono di concentrare l'attenzione specificamente sulla stagionalità.
+
+### Concetto: il grafico stagionale
+
+Il **grafico stagionale** (*seasonal plot*) si costruisce "spezzando" la serie storica anno per anno (o periodo per periodo, in generale) e sovrapponendo le curve così ottenute su un unico asse che rappresenta la posizione entro il periodo (i 12 mesi, i 7 giorni della settimana, ecc.).
+
+```{r}
+#| label: seasonplot-air
+ggseasonplot(AirPassengers)
+```
+
+```{r}
+#| label: seasonplot-nottem
+ggseasonplot(nottem) +
+  ggtitle("Temperatura media mensile a Nottingham (1920–1939)") +
+  theme(legend.position = "none")
+```
+
+### Interpretazione
+
+Nel grafico di `AirPassengers`, ogni curva colorata rappresenta un anno diverso: partendo dalla curva più bassa (1949) e salendo via via alle curve successive, il progressivo slittamento verso l'alto **rivela il trend**, mentre la forma comune a tutte le curve (bassa a inizio/fine anno, alta in estate) rivela la **stagionalità**. Nel grafico di `nottem`, dove non c'è trend, le curve dei vari anni si sovrappongono quasi perfettamente: è un'ulteriore conferma dell'assenza di trend, che avevamo già notato dal time plot.
+
+### Concetto: il grafico di sottoserie
+
+Un secondo modo di isolare la stagionalità è il **grafico di sottoserie** (*subseries plot*): invece di collegare i valori cronologicamente entro ciascun anno, si collegano tra loro tutti i valori di gennaio (di anni diversi), poi tutti quelli di febbraio, e così via, ottenendo tante mini-serie storiche quante sono le posizioni nel periodo.
+
+```{r}
+#| label: subseries-air
+ggsubseriesplot(AirPassengers) +
+  ggtitle("AirPassengers: grafico stagionale di sottoserie")
+```
+
+```{r}
+#| label: subseries-nottem
+ggsubseriesplot(nottem) +
+  ggtitle("nottem: grafico stagionale di sottoserie")
+```
+
+::: {.callout-note title="Come leggere il risultato"}
+In ciascun riquadro (uno per mese), la linea blu orizzontale rappresenta la **media** di quella sottoserie — cioè la media di tutti i valori di gennaio, tutti quelli di febbraio, eccetera. Questo dettaglio non è solo grafico: quelle stesse medie sono esattamente il numero che useremo più avanti per **calcolare esplicitamente la componente stagionale** $S_j$. Il grafico di sottoserie, in altre parole, anticipa visivamente il calcolo che faremo alla fine del capitolo.
+:::
+
+Un'osservazione pratica sull'ordine delle operazioni: quando si opera per davvero (e non solo per esplorare graficamente), conviene di norma **prima rimuovere il trend e poi stimare la stagionalità** sulla serie detrendizzata, perché un trend forte tende a "sporcare" le medie di sottoserie (si veda ad esempio, in `AirPassengers`, come ciascun mese mostri comunque un andamento crescente nel grafico di sottoserie, semplicemente per effetto del trend). Il grafico di sottoserie in sé, però, si può disegnare indipendentemente dal fatto che il trend sia già stato rimosso o no.
+
+### Domande di comprensione
+
+1. Se una serie non avesse alcuna stagionalità, che aspetto avrebbe il suo grafico stagionale? E il suo grafico di sottoserie?
+2. Perché le linee blu del grafico di sottoserie anticipano il calcolo della componente stagionale che faremo più avanti?
+3. In `AirPassengers`, il grafico di sottoserie mostra un trend crescente *entro ciascun mese*. Cosa lo causa, se il grafico è pensato per isolare la stagionalità?
+
+## Diagrammi a dispersione per serie multivariate
+
+### Concetto
+
+Quando si hanno più serie storiche osservate sugli stessi istanti temporali $y_t = (y_{1,t},\ldots,y_{d,t})$, uno strumento utile per visualizzarne le correlazioni reciproche è, semplicemente, lo scatterplot a coppie, esattamente come nel caso i.i.d.:
+
+```{r}
+#| label: pairs-eustock
+pairs(as.data.frame(EuStockMarkets))
+```
+
+### Esempio e interpretazione
+
+I quattro indici azionari europei mostrano tutti nuvole di punti allungate lungo la diagonale principale, segno di **correlazione positiva** tra loro: è un risultato atteso, dato che tutti e quattro condividono lo stesso andamento crescente di fondo osservato nel time plot multivariato. Se un indice fosse cresciuto mentre un altro fosse calato, ci saremmo aspettati un'associazione negativa nello scatterplot corrispondente.
+
+::: {.callout-note title="Come leggere il risultato"}
+Questo grafico si può leggere esattamente come il correlogramma incontrato a proposito della correlazione di Pearson (capitolo 3, sulla riduzione della dimensionalità e la PCA): il tempo $t$ qui gioca il ruolo di un indice come un altro. La particolarità delle serie storiche è che a questa idea si può aggiungere il ritardo — di cui parliamo nella prossima sezione — per chiederci non solo "$x$ e $y$ sono correlate *allo stesso istante*?" ma anche "$x$ oggi è correlata con $y$ di ieri, o della settimana scorsa?".
+:::
+
+### Domande di comprensione
+
+1. Cosa significherebbe, in termini economici, osservare uno scatterplot con nuvola di punti orientata in senso *decrescente* tra due indici azionari?
+2. Perché uno scatterplot semplice, senza tenere conto dei ritardi, può non essere sufficiente a cogliere tutte le relazioni interessanti fra due serie storiche?
+
+## La serie ritardata e l'operatore di ritardo
+
+### Motivazione
+
+Fin qui abbiamo usato solo strumenti grafici. Per arrivare a un numero che quantifichi la dipendenza temporale — passo indispensabile per costruire previsioni — dobbiamo prima costruire, a partire dalla serie originale, delle nuove serie "spostate nel tempo".
+
+### Concetto e definizione
+
+::: {.callout-important title="Definizione"}
+Indichiamo con $L$ l'**operatore di ritardo** (*lag*, in inglese):
+$$
+(Ly)_t = y_{t-1}, \qquad (L^2 y)_t = y_{t-2}, \qquad (L^k y)_t = y_{t-k}.
+$$
+La serie ritardata $L^k y$ è definita solo per i tempi $t \ge k+1$.
+:::
+
+::: {.callout-tip title="Approfondimento"}
+Il testo di riferimento del corso (Hyndman e Athanasopoulos, *Forecasting: Principles and Practice*) usa la notazione $B$ (*backshift*) al posto di $L$. Sono esattamente lo stesso operatore; in queste note manteniamo $L$, più tradizionale nella letteratura statistica generale, ma se consulti il testo tieni presente l'equivalenza.
+:::
+
+### Intuizione
+
+Perché la serie ritardata è definita solo a partire da $t=k+1$? Semplicemente perché applicare un ritardo "consuma" le prime osservazioni: se disponi di dati dal tempo $1$ al tempo $T$, per calcolare $y_{t-k}$ hai bisogno che $t-k\ge 1$, cioè $t\ge k+1$. Più ritardi applichi, più osservazioni iniziali "perdi" — è il prezzo da pagare per costruire questa nuova informazione.
+
+La serie ritardata serve a due scopi collegati: da un lato, permette di **espandere le caratteristiche** di una serie storica anche univariata, costruendo un vettore di feature $(y_{t-1}, y_{t-2}, \ldots, y_{t-L})$ utile, ad esempio, per un modello KNN (lo vedremo più avanti in questo stesso capitolo); dall'altro, e soprattutto, permette di **quantificare la dipendenza temporale** confrontando la serie con le proprie versioni ritardate.
+
+### Esempio: i lag plot
+
+Un modo naturale per visualizzare la relazione tra $y_t$ e $y_{t-k}$ è, di nuovo, uno scatterplot: si chiama **lag plot**.
+
+```{r}
+#| label: lagplot-air
+gglagplot(AirPassengers, lags = 1, geom = "point", do.lines = FALSE) +
+  ggtitle("Lag plot di AirPassengers, k = 1")
+```
+
+```{r}
+#| label: lagplot-nottem
+gglagplot(nottem, set.lags = 1, geom = "point", do.lines = FALSE) +
+  ggtitle("Lag plot di nottem, k = 1")
+```
+
+```{r}
+#| label: lagplot-eustock
+gglagplot(EuStockMarkets, set.lags = 100, geom = "point", do.lines = FALSE) +
+  ggtitle("Lag plot di EuStockMarkets, k = 100")
+```
+
+### Interpretazione
+
+Vale, come sempre, la convenzione standard sui quadranti già incontrata a proposito della correlazione nel capitolo 3: un'associazione **positiva** produce una nuvola di punti concentrata nel primo e terzo quadrante, un'associazione **negativa** nel secondo e quarto. In `AirPassengers` osserviamo un'associazione chiaramente positiva; in `nottem` l'associazione è ancora positiva ma più dispersa, segno di un legame meno forte punto-a-punto (anche se, come vedremo, la stagionalità di `nottem` produce comunque un'autocorrelazione elevata a ritardi opportuni).
+
+::: {.callout-warning title="Attenzione"}
+Nel lag plot di `EuStockMarkets` a ritardo $100$, lo stesso docente del corso segnala onestamente di non essere sicuro se l'unità temporale sottostante sia il giorno di calendario o il giorno di borsa (il dataset non lo documenta con chiarezza). È un'ottima occasione per ricordare una regola pratica generale: **leggi sempre la documentazione di un dataset** (`?EuStockMarkets` in R) prima di trarre conclusioni quantitative precise sulla scala temporale.
+:::
+
+### Lag plot con stagionalità
+
+Combinando l'idea del grafico stagionale con quella del lag plot si ottiene un grafico più ricco, in cui si osserva la nuvola di punti separatamente per ciascuna posizione nel periodo (ciascun mese):
+
+```{r}
+#| label: lagplot-seasonal-air
+gglagplot(AirPassengers, lags = 1, geom = "point", do.lines = TRUE, seasonal = TRUE) +
+  ggtitle("Lag plot con stagionalità, AirPassengers")
+```
+
+```{r}
+#| label: lagplot-seasonal-nottem
+gglagplot(nottem, lags = 1, geom = "point", do.lines = TRUE, seasonal = TRUE) +
+  ggtitle("Lag plot con stagionalità, nottem")
+```
+
+Il confronto è istruttivo: in `AirPassengers` **tutti i mesi** mostrano comunque un'associazione positiva, semplicemente a causa del trend condiviso da tutte le sottoserie mensili. In `nottem`, dove il trend non c'è, le nuvole di punti relative a ciascun mese si posizionano in zone diverse del piano — suggerendo che **ogni mese potrebbe avere una propria intensità di correlazione**, un'informazione più fine di quanto un singolo lag plot aggregato potrebbe mostrare.
+
+### Domande di comprensione
+
+1. Perché $L^k y$ non è definita per $t < k+1$? Rispiega il ragionamento con parole tue, senza limitarti a citare la formula.
+2. In un lag plot con associazione negativa, in quali quadranti ti aspetti che si concentrino i punti? Perché?
+3. Perché in `AirPassengers` tutti i mesi mostrano un'associazione positiva nel lag plot con stagionalità, mentre in `nottem` no?
+
+## Autocovarianza e autocorrelazione
+
+### Motivazione
+
+I lag plot danno un'impressione visiva della dipendenza tra $y_t$ e $y_{t-k}$, ma per confrontare rigorosamente ritardi diversi, e per costruire un criterio automatico che riveli anche periodicità non evidenti a occhio, serve una quantità numerica: la correlazione tra la serie e le proprie versioni ritardate.
+
+### Concetto e definizione
+
+::: {.callout-important title="Definizione"}
+Data una serie storica $y=(y_t)$ e la sua ritardata $L^ky$, si definiscono:
+
+**Autocovarianza** (di ordine $k$):
+$$
+\operatorname{C}(y)_k = \operatorname{cov}(y, L^k y) = \frac{1}{n-k}\sum_{t=k+1}^{n} (y_t-\bar y)(y_{t-k}-\bar y).
+$$
+
+**Autocorrelazione** (ACF, *AutoCorrelation Function*):
+$$
+\operatorname{acf}(y)_k = \operatorname{cor}(y, L^k y).
+$$
+:::
+
+Come sempre, la covarianza dipende dall'unità di misura di $y$, quindi in pratica si lavora quasi sempre con la versione standardizzata, l'ACF. Valori vicini a $\pm 1$ indicano una forte dipendenza lineare fra la serie e la sua ritardata di $k$ tempi; una serie stagionale mostra autocorrelazioni elevate a ritardi multipli del periodo.
+
+::: {.callout-tip title="Approfondimento"}
+La costante di normalizzazione $1/(n-k)$ nella formula sopra è la scelta più naturale dal punto di vista concettuale — dopotutto ci sono esattamente $n-k$ coppie $(y_t,y_{t-k})$ disponibili — ma l'implementazione effettiva usata da `acf()`/`ggAcf()` in R può differire leggermente (ad esempio con $1/(n-k+1)$, o con altre piccole varianti a seconda del pacchetto). Non è un errore, è solo una scelta di normalizzazione diversa che ha un impatto trascurabile sul risultato: quello che conta concettualmente è la formula sopra, non l'ultima cifra decimale prodotta dal software.
+:::
+
+### Intuizione: lettura guidata dell'ACF di `nottem`
+
+```{r}
+#| label: acf-nottem
+#| message: false
+ggAcf(nottem)
+```
+
+Questo grafico merita una lettura riga per riga, perché è un esempio particolarmente chiaro:
+
+* a **ritardo 1** l'autocorrelazione è alta e positiva (circa $0.7$): mesi consecutivi hanno temperature simili, ragionevole in un fenomeno climatico che cambia con continuità;
+* a **ritardo 2** l'autocorrelazione è già più bassa: l'associazione si affievolisce man mano che ci si allontana nel tempo;
+* a **ritardo 3** l'autocorrelazione è praticamente nulla;
+* a **ritardo 6** l'autocorrelazione diventa **fortemente negativa**: sei mesi dopo si è passati da una stagione all'altra (inverno vs. estate), quindi le temperature sono agli antipodi;
+* a **ritardo 12** l'autocorrelazione torna **fortemente positiva**: un anno dopo il ciclo stagionale si ripete, e la temperatura è di nuovo simile.
+
+Le due linee blu tratteggiate delimitano una **banda di significatività** (tipicamente al livello del 95%): se una barra ricade all'interno della banda, il valore corrispondente dell'autocorrelazione campionaria è statisticamente indistinguibile da zero, e non ci si dovrebbe leggere alcuna struttura reale. Se una barra esce dalla banda, l'evidenza di autocorrelazione a quel ritardo è statisticamente significativa.
+
+### Il ruolo del trend
+
+```{r}
+#| label: acf-airpassengers
+#| message: false
+ggAcf(AirPassengers)
+```
+
+Qui la lettura è diversa e più delicata. `AirPassengers` ha una stagionalità annuale evidente a occhio, quindi ci si aspetterebbe un picco marcato a ritardo 12. Invece osserviamo un'autocorrelazione elevata e positiva **a tutti i ritardi**, che decresce solo lentamente: è l'effetto del **trend**, non della stagionalità. Poiché la serie cresce costantemente, confrontarla con una versione ritardata di 5, 12 o 23 mesi produce comunque un'associazione positiva, semplicemente perché entrambe le versioni condividono lo stesso andamento di fondo. **Il trend maschera la stagionalità nell'ACF**: per rivelare la vera struttura periodica bisogna prima rimuovere il trend, come faremo nella prossima sezione.
+
+### Uso pratico
+
+L'ACF è uno strumento particolarmente utile per **confermare o scoprire il periodo** di una serie stagionale, anche in situazioni in cui la stagionalità non è evidente a colpo d'occhio dal solo time plot.
+
+### Domande di comprensione
+
+1. Nell'ACF di `nottem`, perché il ritardo 6 mostra un'autocorrelazione fortemente *negativa* mentre il ritardo 12 la mostra fortemente *positiva*?
+2. Cosa significa, operativamente, che una barra dell'ACF ricade dentro la banda di significatività?
+3. Perché la presenza di un trend forte tende a "nascondere" i picchi stagionali nell'ACF? Che soluzione proponi?
+
+## Correlazione incrociata
+
+### Motivazione
+
+Quando si dispone di due (o più) serie storiche osservate sugli stessi tempi, ci si può chiedere se una sia collegata all'altra non solo allo stesso istante, ma anche con un certo ritardo: la variazione di $x$ oggi anticipa una variazione di $y$ tra due mesi?
+
+### Concetto
+
+::: {.callout-important title="Definizione"}
+Date due serie storiche $(x_t)$ e $(y_t)$ osservate sugli stessi tempi, si definiscono:
+
+**Covarianza incrociata**: $C_{xy}(k) = \operatorname{cov}(x, L^k y)$.
+
+**Correlazione incrociata** (*cross-correlation*, CCF): $\operatorname{ccf}_{xy}(k) = \operatorname{corr}(x, L^k y)$.
+:::
+
+### Esempio
+
+```{r}
+#| label: ccf-eustock
+#| message: false
+ggAcf(EuStockMarkets) + ggtitle("Correlazione incrociata, EuStockMarkets")
+```
+
+### Interpretazione
+
+::: {.callout-warning title="Attenzione"}
+A differenza della covarianza ordinaria (per cui $\operatorname{cov}(x,y)=\operatorname{cov}(y,x)$), la correlazione incrociata **non è simmetrica**: in generale $C_{xy}(k) \neq C_{yx}(k)$. Il motivo è che $C_{xy}(k)$ confronta $x$ al tempo $t$ con $y$ ritardata di $k$ tempi (cioè $y$ al tempo $t-k$), mentre $C_{yx}(k)$ confronta $y$ al tempo $t$ con $x$ ritardata — sono due domande diverse. È un errore concettuale comune trattare $C_{xy}$ come se fosse simmetrica come la covarianza ordinaria.
+:::
+
+Nell'esempio degli indici azionari europei, osserviamo una fascia di correlazione elevata che decresce lentamente al crescere del ritardo, di nuovo per effetto del trend comune a tutte le serie: è lo stesso fenomeno di mascheramento già discusso per l'ACF, qui esteso al caso incrociato.
+
+::: {.callout-tip title="Approfondimento"}
+Vale la pena una nota di prudenza pratica, applicabile a tutto questo capitolo: **le analisi di autocorrelazione e cross-correlazione tendono a funzionare meno bene sui dati finanziari**, perché i dati finanziari sono tipicamente molto rumorosi. Questo non significa che non valga la pena studiarli con questi strumenti, ma va tenuta bassa l'aspettativa di trovare pattern puliti come quelli osservati in `AirPassengers` o `nottem`.
+:::
+
+### Domande di comprensione
+
+1. Costruisci un esempio concreto (anche solo descrittivo) in cui $C_{xy}(k)$ sia grande ma $C_{yx}(k)$ sia vicino a zero.
+2. Perché i dati finanziari sono un terreno più difficile per queste tecniche rispetto a serie come `AirPassengers` o `nottem`?
+
+## De-trendizzare una serie: la differenziazione
+
+### Motivazione
+
+Abbiamo visto che il trend maschera la stagionalità nell'ACF. Prima di poter studiare la stagionalità in modo pulito, conviene quindi eliminare il trend. La strategia più semplice è la **differenziazione**.
+
+### Concetto e definizione
+
+::: {.callout-important title="Definizione"}
+L'**operatore di differenza finita** è $\operatorname{diff} = I - L$, cioè
+$$
+\operatorname{diff}(y)_t = y_t - y_{t-1}.
+$$
+:::
+
+### Intuizione
+
+La differenziazione a tempi discreti gioca lo stesso ruolo della derivata per funzioni continue: una funzione lineare nel tempo ha derivata costante, quindi differenziare una volta un trend lineare additivo lo elimina, lasciando solo una costante. Formalmente, se $y_t = \beta_0 + \beta_1 t + S_t$ (trend lineare più stagionalità periodica, senza rumore per semplicità), allora
+$$
+\operatorname{diff}(y)_t = \beta_1 + \operatorname{diff}(S_t)_t:
+$$
+il trend è sparito, resta solo la costante $\beta_1$ e la componente stagionale differenziata. Più in generale, la regola pratica è: **una differenziazione rimuove un trend lineare, due differenziazioni un trend quadratico, e così via**; si applica la differenziazione ripetutamente finché il trend non sembra scomparso.
+
+### Esempio
+
+```{r}
+#| label: diff-nottem
+autoplot(nottem, main = "nottem (nero) e differenziata (blu)") +
+  autolayer(diff(nottem), series = "differenziata") +
+  scale_colour_manual(values = c("differenziata" = "blue"))
+```
+
+`nottem` non aveva trend, quindi ci aspettiamo che la differenziazione non abbia molto da "rimuovere". Ma osserviamo comunque un effetto collaterale: la serie differenziata appare visibilmente più irregolare — un trade-off tipico della differenziazione, che introduce rumore aggiuntivo pur "consumando" solo l'informazione di primo ordine.
+
+```{r}
+#| label: acf-diff-nottem
+#| message: false
+library(patchwork)
+p1 <- ggAcf(nottem) + ggtitle("ACF di nottem originale")
+p2 <- ggAcf(diff(nottem)) + ggtitle("ACF di nottem differenziata")
+p1 / p2
+```
+
+Il confronto delle due ACF mostra che, nonostante l'aumento di irregolarità visiva, la struttura periodica (il picco a ritardo 12, l'anticorrelazione a ritardo 6) resta sostanzialmente riconoscibile: la differenziazione, quando non c'è trend da rimuovere, non distrugge troppa informazione, anche se peggiora leggermente la leggibilità.
+
+Consideriamo ora `AirPassengers`, dove il trend è forte:
+
+```{r}
+#| label: diff-air
+diff_AP <- diff(AirPassengers)
+autoplot(AirPassengers, main = "AirPassengers (nera) e differenziata (blu)") +
+  autolayer(diff_AP, series = "differenziata") +
+  scale_colour_manual(values = c("differenziata" = "blue"))
+```
+
+```{r}
+#| label: acf-diff-air
+#| message: false
+p1 <- ggAcf(AirPassengers) + ggtitle("ACF di AirPassengers originale")
+p2 <- ggAcf(diff(AirPassengers)) + ggtitle("ACF di AirPassengers differenziata")
+p1 / p2
+```
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+Il confronto è netto: nell'ACF originale la stagionalità era mascherata dal trend (tutti i ritardi mostravano correlazione elevata); nell'ACF della serie differenziata emerge un picco pulito a ritardo 12 (e uno più debole a ritardo 24), praticamente circondato da valori all'interno della banda di non-significatività. Un semplice passaggio di differenziazione ha "ripulito" enormemente l'ACF, confermando in modo netto il periodo annuale.
+:::
+
+Resta però un problema visibile: nella serie differenziata, l'ampiezza delle oscillazioni cresce comunque negli anni più recenti — è la traccia residua della natura *moltiplicativa* di questa serie (la differenza tra valori grandi resta grande anche dopo la differenziazione). Questo osservazione motiva direttamente il prossimo passo.
+
+### Limiti
+
+::: {.callout-warning title="Attenzione"}
+Applicare la differenziazione più e più volte non è gratuito: ogni applicazione consuma un'osservazione e aumenta l'irregolarità della serie. La regola pratica "differenzia finché il trend non scompare" va quindi applicata con parsimonia, verificando ogni volta se il guadagno in pulizia dell'ACF giustifica la perdita di regolarità.
+:::
+
+### Domande di comprensione
+
+1. Perché una singola differenziazione rimuove un trend lineare ma non uno quadratico?
+2. Nell'ACF di `AirPassengers` differenziata, perché ci si aspetta un picco proprio a ritardo 12 e non, ad esempio, a ritardo 7?
+3. Che problema resta irrisolto dopo aver differenziato `AirPassengers`, e perché la sola differenziazione non può risolverlo?
+
+## Trasformazioni: logaritmo e Box-Cox
+
+### Motivazione
+
+Il problema lasciato in sospeso — l'ampiezza delle oscillazioni che cresce nel tempo — è tipico delle serie con natura moltiplicativa. La soluzione naturale è passare a una scala logaritmica prima di differenziare, esattamente come avevamo fatto per trasformare una decomposizione moltiplicativa in additiva.
+
+### Concetto
+
+::: {.callout-important title="Definizione"}
+$$
+\operatorname{diff}(\log y)_t = \log(y_t) - \log(y_{t-1}) = \log\!\left(\frac{y_t}{y_{t-1}}\right).
+$$
+Più in generale, la **trasformazione di Box-Cox** con parametro $\lambda$ è
+$$
+y_t^{(\lambda)} = \begin{cases} \dfrac{y_t^\lambda - 1}{\lambda}, & \lambda \neq 0,\\[4pt] \log(y_t), & \lambda = 0. \end{cases}
+$$
+:::
+
+### Intuizione
+
+La differenza dei logaritmi ha un'interpretazione pratica diretta: tornando alla scala originale, $\operatorname{diff}(\log y)_t$ corrisponde al **rapporto** $y_t/y_{t-1}$, cioè a un tasso di variazione percentuale (un valore vicino a $0$ corrisponde a variazione nulla, un valore di $\log(1.05)\approx 0.05$ a una crescita di circa il 5%). È per questo che le serie finanziarie sono spesso analizzate direttamente sui log-rendimenti.
+
+La famiglia di Box-Cox va pensata come un'interpolazione continua tra "nessuna trasformazione" ($\lambda=1$, a meno di una costante) e il logaritmo ($\lambda=0$): $\lambda$ è un iperparametro che può essere stimato dai dati (in R, in modo quasi automatico), e a volte un valore intermedio funziona meglio sia della scala originale sia del logaritmo puro.
+
+### Esempio
+
+```{r}
+#| label: log-diff-air
+p1 <- autoplot(log(AirPassengers), main = "log(AirPassengers)")
+p2 <- autoplot(diff(log(AirPassengers)), colour = "blue", main = "differenza del logaritmo")
+p1 / p2
+```
+
+```{r}
+#| label: acf-log-diff-air
+#| message: false
+p1 <- ggAcf(log(AirPassengers)) + ggtitle("ACF di log(AirPassengers)")
+p2 <- ggAcf(diff(log(AirPassengers))) + ggtitle("ACF della differenza del logaritmo")
+p1 / p2
+```
+
+### Interpretazione
+
+Con due trasformazioni elementari — logaritmo e differenza — le oscillazioni della serie trasformata risultano ora tutte sulla stessa scala, senza più l'aumento di ampiezza osservato prima. L'ACF, già buona dopo la sola differenziazione, migliora ulteriormente: i valori non significativi diventano ancora più piccoli, lasciando un singolo picco pulito.
+
+::: {.callout-tip title="Approfondimento"}
+Non aspettarti che logaritmo e differenziazione risolvano sempre tutto: esistono serie storiche per cui né una decomposizione additiva né una moltiplicativa sono pienamente soddisfacenti. La famiglia di Box-Cox, con $\lambda$ stimato dai dati, offre in questi casi un compromesso più flessibile.
+:::
+
+### Domande di comprensione
+
+1. Spiega perché $\operatorname{diff}(\log y)_t$ si può interpretare come un tasso di variazione percentuale.
+2. Che relazione c'è tra $\lambda=1$ e "nessuna trasformazione" nella famiglia di Box-Cox? E tra $\lambda=0$ e il logaritmo?
+3. In quali circostanze ti aspetteresti che nessuna trasformazione tra quelle viste risolva in modo soddisfacente il problema dell'ampiezza crescente delle oscillazioni?
+
+## Rimozione del trend tramite regressione
+
+### Motivazione
+
+La differenziazione elimina il trend ma non lo *stima* esplicitamente: non fornisce mai un valore per $T_t$. Un'alternativa che restituisce anche una stima esplicita del trend è il fitting di un modello di regressione sui tempi.
+
+### Concetto
+
+::: {.callout-important title="Definizione"}
+Se supponiamo che la serie storica abbia la forma
+$$
+y_t = \beta_0 + \beta_1 t + S_t + R_t,
+$$
+possiamo stimare il trend con la retta di regressione di $y_t$ rispetto a $x_t=t$:
+$$
+y_t = \beta_{0,\text{OLS}} + \beta_{1,\text{OLS}}\, t + \varepsilon_t := T_t + \varepsilon_t,
+$$
+ottenendo la serie **de-trendizzata** $y_t - T_t$.
+:::
+
+### Esempio
+
+```{r}
+#| label: trend-lineare-air
+time <- 1:length(AirPassengers)
+fit_lm <- lm(AirPassengers ~ time)
+trend_est <- predict(fit_lm)
+trend_est_ts <- ts(trend_est, start = start(AirPassengers), frequency = frequency(AirPassengers))
+autoplot(AirPassengers, main = "AirPassengers e trend stimato (lineare)") +
+  autolayer(trend_est_ts, series = "trend stimato") +
+  scale_colour_manual(values = c("trend stimato" = "red"))
+```
+
+**Prima di calcolare.** Guardando questo grafico, ti sembra che una retta catturi bene il trend in *tutti* i sotto-periodi della serie, o solo in alcuni? In particolare, cosa succede negli anni finali della serie?
+
+```{r}
+#| label: detrend-lineare
+detrend <- AirPassengers - trend_est_ts
+p1 <- autoplot(AirPassengers, main = "AirPassengers (nero) e trend lineare rimosso (blu)") +
+  autolayer(detrend, series = "detrendizzata") +
+  scale_colour_manual(values = c("detrendizzata" = "blue"))
+p2 <- ggAcf(detrend, main = "ACF della serie detrendizzata")
+p1 / p2
+```
+
+### Il momento socratico: perché una retta non basta
+
+**Dopo il calcolo.** Guardando il grafico con la retta di regressione sovrapposta, si può notare che negli anni centrali e finali la serie tende a crescere più rapidamente della retta stimata: la retta sottostima sistematicamente il trend a lungo termine.
+
+Il problema, in sostanza, è questo: se la decomposizione è **moltiplicativa** — come sospettavamo per `AirPassengers` — allora spesso non solo l'ampiezza delle oscillazioni cresce, ma il trend stesso è di natura **esponenziale**, non lineare. Ed è un fenomeno tipico non solo delle serie di conteggio come questa, ma soprattutto delle serie finanziarie, dove una crescita composta (interesse composto, crescita percentuale costante) produce esattamente un andamento esponenziale. Un fit lineare, in questi casi, sottostima sistematicamente il trend nel lungo periodo, perché una retta cresce troppo lentamente rispetto a un'esponenziale.
+
+La correzione naturale è fare il fit sul logaritmo della serie, e poi tornare alla scala originale con l'esponenziale:
+
+```{r}
+#| label: trend-esponenziale-air
+time <- 1:length(AirPassengers)
+fit_lm_log <- lm(log(AirPassengers) ~ time)
+trend_est_exp <- exp(predict(fit_lm_log))
+trend_est_exp_ts <- ts(trend_est_exp, start = start(AirPassengers), frequency = frequency(AirPassengers))
+autoplot(AirPassengers, main = "AirPassengers e trend stimato (esponenziale)") +
+  autolayer(trend_est_exp_ts, series = "trend stimato") +
+  scale_colour_manual(values = c("trend stimato" = "red"))
+```
+
+```{r}
+#| label: detrend-esponenziale
+detrend_mult <- AirPassengers / trend_est_exp_ts
+p1 <- autoplot(detrend_mult, colour = "blue", main = "Serie detrendizzata (moltiplicativa)")
+p2 <- ggAcf(detrend_mult, main = "ACF della serie detrendizzata (esponenziale)")
+p1 / p2
+```
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+Confrontando i due approcci: la differenziazione tende a produrre un'ACF più pulita (come visto in precedenza), ma **non fornisce mai una stima esplicita del trend**. La regressione (lineare o log-lineare) fornisce invece una curva di trend interpretabile — utile, ad esempio, se vogliamo prevedere separatamente trend e stagionalità — al prezzo, di solito, di residui un po' più grandi rispetto alla differenziazione. Nessuno dei due metodi è strettamente "migliore": la scelta dipende dall'obiettivo (pulire l'ACF per scoprire il periodo, oppure ottenere una stima esplicita del trend da poter estrapolare).
+:::
+
+### Limiti
+
+::: {.callout-warning title="Attenzione"}
+Un fit di regressione lineare o log-lineare sul tempo è **estrapolazione**, nel senso più delicato del termine: nulla garantisce che l'andamento stimato sui dati storici continui a valere fuori dal periodo osservato. Un trend esponenziale stimato su dieci anni di dati può risultare del tutto irrealistico se proiettato cinquant'anni nel futuro.
+:::
+
+### Domande di comprensione
+
+1. Perché una retta di regressione tende a sottostimare un trend di natura esponenziale nel lungo periodo?
+2. In quali situazioni preferiresti la differenziazione alla regressione per rimuovere il trend, e viceversa?
+3. Quali rischi comporta usare un trend stimato (lineare o esponenziale) per estrapolare previsioni molto lontane nel tempo?
+
+## Calcolo esplicito della componente stagionale e dei residui
+
+### Motivazione
+
+Abbiamo ormai tutti gli ingredienti per completare la decomposizione "a mano": rimuovere il trend, individuare il periodo tramite l'ACF, e infine calcolare esplicitamente la componente stagionale sfruttando esattamente l'idea già vista nel grafico di sottoserie.
+
+### Concetto
+
+::: {.callout-important title="Definizione"}
+Dato un periodo $m$ (ad esempio $m=12$ per dati mensili), la **componente stagionale** si stima mediando le osservazioni corrispondenti alla stessa posizione entro il periodo:
+$$
+S_j = \frac{1}{N}\sum_{i=0}^{N-1} y_{j+im}, \qquad j=1,\ldots,m,
+$$
+dove $N\approx T/m$ è il numero di cicli completi osservati. Il **residuo** è definito come
+$$
+R_t := y_t - T_t - S_{(t \bmod m)},
+$$
+da cui la decomposizione additiva
+$$
+y_t = T_t + S_{(t \bmod m)} + R_t.
+$$
+Nel caso moltiplicativo, la componente stagionale si calcola in modo analogo ma sui logaritmi, e la decomposizione diventa $y_t = T_t \times S_{(t\bmod m)} \times R_t$.
+:::
+
+Si osservi la connessione con quanto già visto: $S_j$ è esattamente la media della sottoserie relativa alla posizione $j$, la stessa linea blu del grafico di sottoserie — ma questa volta calcolata dopo aver rimosso il trend.
+
+### Esempio: nottem (nessun trend da rimuovere)
+
+```{r}
+#| label: seasonal-nottem
+#| message: false
+library(dplyr)
+
+compute_seasonal <- function(ts_data) {
+  freq <- frequency(ts_data)
+  df <- data.frame(time = time(ts_data), value = as.numeric(ts_data))
+  seasonal_avg <- df %>%
+    group_by(season = round((time %% 1) * freq)) %>%
+    summarize(seasonal_value = mean(value, na.rm = TRUE)) %>%
+    ungroup() %>%
+    arrange(season)
+  seasonal_component <- rep(seasonal_avg$seasonal_value, length.out = length(ts_data))
+  ts(seasonal_component, frequency = freq, start = start(ts_data))
+}
+
+seasonal_part <- compute_seasonal(nottem)
+residuals_nottem <- nottem - seasonal_part
+
+p1 <- autoplot(nottem, main = "nottem (nero), componente stagionale (rosso)")
+p2 <- autoplot(seasonal_part, colour = "red", main = "Componente stagionale stimata")
+p3 <- ggAcf(residuals_nottem, main = "ACF dei residui")
+p1 / p2 / p3
+```
+
+`nottem` non ha trend, quindi qui `compute_seasonal()` si applica direttamente alla serie originale. La componente stagionale risulta perfettamente periodica per costruzione (è la stessa curva ripetuta ogni 12 mesi), mentre i residui, pur mostrando ancora un po' di correlazione (non esattamente a 12 mesi, curiosamente), sono complessivamente più piccoli e meno strutturati della serie originale.
+
+### Esempio: AirPassengers (decomposizione moltiplicativa completa)
+
+```{r}
+#| label: seasonal-air-mult
+time_idx <- 1:length(AirPassengers)
+fit_lm_log <- lm(log(AirPassengers) ~ time_idx)
+trend_est_exp <- exp(predict(fit_lm_log))
+trend_est_exp_ts <- ts(trend_est_exp, start = start(AirPassengers), frequency = frequency(AirPassengers))
+detrend_mult <- AirPassengers / trend_est_exp_ts
+
+seasonal_part_log <- compute_seasonal(log(detrend_mult))
+residuals_log <- log(AirPassengers) - seasonal_part_log
+
+p1 <- autoplot(AirPassengers, main = "AirPassengers e trend stimato (esponenziale)") +
+  autolayer(trend_est_exp_ts, series = "trend") +
+  scale_colour_manual(values = c("trend" = "red"))
+p2 <- autoplot(exp(seasonal_part_log), main = "Componente stagionale (scala originale)")
+p3 <- ggAcf(residuals_log, main = "ACF dei log-residui (decomposizione moltiplicativa)")
+p1 / p2 / p3
+```
+
+### Interpretazione
+
+::: {.callout-warning title="Attenzione"}
+Guardando l'ultima ACF, la decomposizione non è particolarmente efficace: i residui mostrano ancora una struttura di trend residuo, cioè l'ACF non cade dentro le bande di non-significatività come vorremmo. È un giudizio esplicito e onesto sulla qualità della decomposizione elementare che abbiamo appena costruito "a mano": trovare il trend con un semplice fit esponenziale non è la strategia migliore possibile. Vedremo, nel prossimo capitolo sullo smoothing esponenziale e sulla famiglia ETS (capitolo 10) e più avanti nel capitolo sui modelli ARIMA (capitolo 11), strategie di decomposizione e stima del trend più sofisticate (ad esempio basate su medie mobili o su modelli statistici espliciti).
+:::
+
+Questo criterio — controllare se l'ACF dei residui rientra nelle bande di non-significatività — è il modo operativo più semplice per **valutare la qualità** di una decomposizione: una buona decomposizione lascia residui che assomigliano a rumore bianco.
+
+### Esempio aggiuntivo: una serie sintetica di vendite mensili
+
+Per esercitarti con la decomposizione su un caso nuovo, generiamo una serie simulata che imita le vendite mensili di un piccolo negozio in crescita, con un effetto stagionale la cui ampiezza cresce insieme al livello (tipica firma di una struttura moltiplicativa):
+
+```{r}
+#| label: vendite-sintetiche
+set.seed(750)
+n_anni <- 8
+t_idx <- 1:(n_anni * 12)
+trend_vendite <- 100 + 1.5 * t_idx
+stagionalita_pct <- rep(c(0.05, -0.05, -0.10, -0.05, 0.05, 0.15,
+                          0.20, 0.10, -0.05, -0.10, -0.05, 0.15), n_anni)
+rumore <- rnorm(length(t_idx), mean = 0, sd = 0.03)
+vendite <- trend_vendite * (1 + stagionalita_pct) * (1 + rumore)
+vendite_ts <- ts(vendite, start = c(2017, 1), frequency = 12)
+
+autoplot(vendite_ts, main = "Vendite mensili simulate di un negozio")
+```
+
+Osserva l'ampiezza delle oscillazioni stagionali nei primi anni rispetto agli ultimi.
+
+**Prima di calcolare**: in base a quanto discusso sulla scelta tra decomposizione additiva e moltiplicativa, quale delle due ti aspetti sia più adeguata per questa serie? Prova a rispondere prima di eseguire il codice seguente.
+
+```{r}
+#| label: decompose-vendite
+fit_vendite <- decompose(vendite_ts, type = "multiplicative")
+autoplot(fit_vendite)
+```
+
+**Dopo il calcolo**: confronta la tua previsione con il risultato. Prova anche a eseguire `decompose(vendite_ts, type = "additive")` e a confrontare i residui delle due decomposizioni: quale ACF dei residui ti aspetti sia più vicina al rumore bianco?
+
+### Domande di comprensione
+
+1. Perché la componente stagionale calcolata con `compute_seasonal()` è, per costruzione, esattamente periodica, mentre la serie originale non lo è mai esattamente?
+2. Nella decomposizione di `AirPassengers`, cosa indica il fatto che l'ACF dei residui non rientri nelle bande di significatività?
+3. Nell'esempio delle vendite simulate, quale caratteristica visiva del time plot ti ha permesso di anticipare la scelta tra additivo e moltiplicativo?
+
+## Modelli elementari di previsione
+
+### Motivazione
+
+Fino a questo punto ci siamo occupati di descrivere e "ripulire" una serie storica. Ma l'obiettivo dichiarato fin dall'inizio del capitolo è la **previsione**. Prima di affrontare modelli sofisticati (che vedremo nei prossimi due capitoli), vale la pena conoscere alcuni modelli elementari: sono spesso un ottimo punto di partenza, un termine di paragone imprescindibile per giudicare se un modello più complesso vale davvero la pena, e in alcuni contesti applicativi (anche professionali) sono già sufficienti.
+
+### Concetto e notazione
+
+::: {.callout-important title="Definizione"}
+Indichiamo con $\hat y_{t+h|t}$ la **previsione** del valore $y_{t+h}$, costruita usando solo l'informazione osservata $(y_s)_{s=1,\ldots,t}$. I quattro modelli elementari sono:
+
+* **Naive**: $\hat y_{t+h|t} = y_t$ (l'ultimo valore osservato);
+* **Media**: $\hat y_{t+h|t} = \bar y_t$ (la media di tutti i valori osservati fino a $t$);
+* **Naive stagionale**: $\hat y_{t+h|t} = y_{(t+h)-km}$, dove $m$ è il periodo e $k=\lceil h/m\rceil$ è il più piccolo intero tale che $(t+h)-km \le t$ (l'ultimo valore osservato nella sottoserie stagionale corrispondente);
+* **Drift**: $\hat y_{t+h|t} = y_t + h\,\dfrac{y_t - y_1}{t-1}$ (stima elementare, non ai minimi quadrati, di un trend lineare).
+:::
+
+### Intuizione
+
+Ciascuno di questi modelli codifica un'ipotesi minima diversa: il naive assume che "domani sarà come oggi" (nessun trend, nessuna stagionalità); la media assume che il livello sia stabile e usa tutta la storia per stimarlo, il che lo rende robusto al rumore ma cieco a qualunque trend o stagionalità; il naive stagionale riconosce la periodicità ma non il trend; il drift stima un trend elementare (la pendenza media osservata dall'inizio alla fine della serie) ma ignora la stagionalità.
+
+### Esempio
+
+```{r}
+#| label: forecast-elementari-air
+naive_fit <- naive(AirPassengers, h = 24)
+snaive_fit <- snaive(AirPassengers, h = 24)
+drift_fit <- rwf(AirPassengers, h = 24, drift = TRUE)
+
+autoplot(AirPassengers) +
+  autolayer(naive_fit, series = "Naive", PI = FALSE) +
+  autolayer(snaive_fit, series = "Seasonal naive", PI = FALSE) +
+  autolayer(drift_fit, series = "Drift", PI = FALSE) +
+  ggtitle("Previsioni elementari per AirPassengers") +
+  guides(colour = guide_legend(title = "Metodo"))
+```
+
+### Prima di calcolare / dopo il calcolo: nottem
+
+Consideriamo ora `nottem`, dove sappiamo già che non c'è trend ma c'è forte stagionalità.
+
+**Prima di calcolare.** Sulla base di quanto sai di questa serie, quale dei quattro metodi elementari ti aspetti funzioni meglio? Quale ti aspetti funzioni peggio, e perché?
+
+```{r}
+#| label: forecast-elementari-nottem
+naive_fit_n <- naive(nottem, h = 24)
+snaive_fit_n <- snaive(nottem, h = 24)
+drift_fit_n <- rwf(nottem, h = 24, drift = TRUE)
+mean_fit_n <- meanf(nottem, h = 24)
+
+autoplot(nottem) +
+  autolayer(naive_fit_n, series = "Naive", PI = FALSE) +
+  autolayer(snaive_fit_n, series = "Seasonal naive", PI = FALSE) +
+  autolayer(drift_fit_n, series = "Drift", PI = FALSE) +
+  autolayer(mean_fit_n, series = "Media", PI = FALSE) +
+  ggtitle("Previsioni elementari per nottem") +
+  guides(colour = guide_legend(title = "Metodo"))
+```
+
+**Dopo il calcolo.** Confronta il grafico con la tua previsione. In assenza di trend, la media e il naive stagionale dovrebbero comportarsi ragionevolmente bene, mentre naive e drift tendono a essere poco realistici (il naive resta bloccato sull'ultimo valore osservato, magari un mese "estremo"; il drift estrapola un trend che di fatto non esiste).
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+Nessuno di questi quattro modelli è "il migliore" in assoluto: la scelta dipende dalla struttura della serie (presenza di trend, presenza di stagionalità) e dall'orizzonte di previsione $h$. Per questo servono strumenti quantitativi di confronto — la cross-validation temporale, di cui parliamo nella prossima sezione — invece di affidarsi solo all'impressione visiva.
+:::
+
+### Limiti
+
+::: {.callout-warning title="Attenzione"}
+Non sottovalutare questi modelli solo perché sono elementari: in molti contesti applicativi reali (compresi progetti aziendali concreti) un modello naive stagionale o drift ben scelto è già sufficiente, e batte spesso modelli più sofisticati mal specificati. La complessità di un modello non è un merito in sé.
+:::
+
+### Domande di comprensione
+
+1. Perché il modello "media" è particolarmente inadatto quando c'è un trend evidente, come in `AirPassengers`?
+2. Il modello drift usa solo il primo e l'ultimo valore osservato per stimare la pendenza. Che differenza c'è rispetto a una stima del trend con i minimi quadrati come quella vista nella sezione precedente?
+3. Descrivi una serie storica (anche ipotetica) per cui il modello naive stagionale sarebbe la scelta più sensata tra i quattro.
+
+## Previsione con KNN per serie storiche
+
+### Motivazione
+
+I modelli elementari codificano ciascuno un'ipotesi molto specifica e rigida. Un'alternativa più flessibile, che abbiamo già incontrato per la classificazione (capitolo 4) e per la regressione (capitolo 6) — "avrete visto KNN in tutte le salse", si potrebbe dire — è adattare l'idea di K-Nearest Neighbors alla previsione di serie storiche.
+
+### Concetto
+
+::: {.callout-important title="Definizione"}
+Fissato un insieme di ritardi $\mathcal{L}\subseteq\{1,2,\ldots\}$, si costruisce per ogni tempo $t$ un vettore di caratteristiche
+$$
+(y_{t-\ell})_{\ell\in\mathcal{L}} \in \mathbb{R}^{|\mathcal{L}|}.
+$$
+Dato un nuovo istante da prevedere, si individuano i $k$ tempi passati $t_1,\ldots,t_k$ le cui caratteristiche sono più vicine (in $\mathbb{R}^{|\mathcal{L}|}$) a quelle del presente, e si pone
+$$
+\hat y_{t+1|t} = \frac{y_{t_1}+y_{t_2}+\cdots+y_{t_k}}{k}.
+$$
+:::
+
+### Intuizione
+
+L'idea è, letteralmente, "cercare pattern simili nel passato": se in $k$ occasioni precedenti la serie ha mostrato un andamento (negli ultimi $|\mathcal{L}|$ tempi) molto simile a quello attuale, la previsione più ragionevole è la media di ciò che è successo subito dopo, in quelle occasioni. È un approccio "agnostico" rispetto alla struttura della serie: non richiede di dichiarare esplicitamente cosa sia trend e cosa sia stagionalità, il che lo rende adatto a serie non lineari o rumorose in cui quella distinzione è difficile da fare a priori.
+
+### Esempio
+
+```{r}
+#| label: knn-forecast-air
+library(tsfknn)
+model_knn <- knn_forecasting(AirPassengers, h = 24, lags = 1:12, k = 3, transform = "none")
+autoplot(model_knn) + ggtitle("Previsione KNN per AirPassengers (lag 1:12, k=3)")
+```
+
+```{r}
+#| label: knn-forecast-air-neighbours
+model_knn_1 <- knn_forecasting(AirPassengers, h = 1, lags = 1:12, k = 3, transform = "none")
+autoplot(model_knn_1, highlight = "neighbours") +
+  ggtitle("KNN: quali istanti passati vengono usati per la previsione?")
+```
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+Il secondo grafico mostra concretamente cosa fa l'algoritmo: usando come caratteristiche i 12 mesi precedenti, i tre "vicini" più simili al presente risultano essere l'istante immediatamente precedente e i due istanti analoghi di uno o due anni prima — esattamente il tipo di pattern stagionale che ci aspetteremmo trovasse un essere umano guardando il grafico "a occhio".
+:::
+
+Come i modelli naive, però, KNN nella sua forma di base **soffre dello stesso limite rispetto al trend**: se la serie è cresciuta costantemente, tutti i pattern simili trovati nel passato avranno valori sistematicamente più bassi di quelli attuali, e la media dei vicini sottostimerà il valore futuro. Una correzione pratica consiste nell'applicare KNN a una versione della serie con trend rimosso (ad esempio in scala moltiplicativa):
+
+```{r}
+#| label: knn-forecast-air-trend
+model_knn_mult <- knn_forecasting(AirPassengers, h = 24, lags = 1:12, k = 3, transform = "multiplicative")
+autoplot(model_knn_mult) + ggtitle("KNN con correzione per trend moltiplicativo")
+```
+
+Su una serie molto più rumorosa, come uno degli indici di `EuStockMarkets`, la stessa tecnica produce risultati assai meno convincenti:
+
+```{r}
+#| label: knn-forecast-eustock
+model_knn_stock <- knn_forecasting(EuStockMarkets[, 4], h = 200, lags = 1:3, k = 3, transform = "multiplicative")
+autoplot(model_knn_stock) + ggtitle("Previsione KNN su una serie finanziaria (FTSE)")
+```
+
+### Limiti
+
+::: {.callout-warning title="Attenzione"}
+KNN per serie storiche introduce **due iperparametri** da scegliere: il numero di vicini $k$ e l'insieme di ritardi $\mathcal{L}$ (in pratica, quanti mesi/periodi indietro guardare). Scelte diverse possono produrre previsioni radicalmente diverse — alcune ragionevoli, altre completamente fuori scala — specialmente su serie rumorose come quelle finanziarie. Non esiste una scelta "giusta" a priori: serve, ancora una volta, una procedura di validazione, che è l'argomento della prossima sezione.
+:::
+
+### Domande di comprensione
+
+1. In che senso KNN per serie storiche riusa esattamente la stessa idea di KNN per la regressione, cambiando solo la definizione di "vicinanza"?
+2. Perché KNN, nella sua forma di base, tende a sottostimare sistematicamente i valori futuri di una serie con trend crescente?
+3. Perché ci si aspetta che KNN funzioni peggio su una serie finanziaria rumorosa che su `AirPassengers`?
+
+## Validazione incrociata per serie storiche
+
+### Motivazione
+
+Abbiamo appena visto diversi modelli (naive, media, naive stagionale, drift, KNN con vari iperparametri) e la domanda naturale è: quale scegliere? Nei capitoli su classificazione e regressione (in particolare il capitolo 4) la risposta era la **cross-validation** (leave-$p$-out, k-fold). Con le serie storiche, però, questa risposta va **adattata**, perché la procedura ordinaria violerebbe l'ordine temporale dei dati.
+
+### Concetto: perché k-fold e leave-one-out non funzionano
+
+::: {.callout-warning title="Attenzione"}
+Nella k-fold o nella leave-one-out cross-validation ordinarie, i dati vengono divisi in blocchi (o singole osservazioni) **scelti senza tenere conto dell'ordine**: alcune osservazioni usate per il training possono benissimo essere temporalmente successive a quelle usate per il test. Per una serie storica questo equivale a un **leakage** (fuga di informazione dal futuro): il modello "impara" usando dati che, nella realtà della previsione, non sarebbero ancora disponibili. Il risultato è una stima dell'errore di generalizzazione **artificialmente ottimistica** e inutilizzabile in pratica.
+:::
+
+La regola fondamentale, valida per qualunque procedura di validazione su serie storiche, è quindi: **non usare mai osservazioni future per addestrare o validare un modello che deve prevedere il passato rispetto a quelle osservazioni**.
+
+### Divisione train/test temporale
+
+Il primo accorgimento, sempre raccomandato indipendentemente dal fatto che si faccia poi una cross-validation vera e propria, è dividere la serie in due **intervalli temporali consecutivi**, non in un campionamento casuale:
+
+::: {.callout-important title="Definizione"}
+Si definisce
+$$
+\text{train} = (y_t)_{t=1,\ldots,T_{\text{train}}}, \qquad \text{test} = (y_t)_{t=T_{\text{train}}+1,\ldots,T},
+$$
+tipicamente con una proporzione $80\%/20\%$. Si allena il modello solo sul train, si producono le previsioni $\hat y_{T_{\text{train}}+1|T_{\text{train}}},\ldots,\hat y_{T|T_{\text{train}}}$, e si confrontano con i valori veri del test tramite una metrica come
+$$
+\text{MSE} = \frac{1}{T-T_{\text{train}}}\sum_{t=T_{\text{train}}+1}^{T} \left(y_t - \hat y_{t|T_{\text{train}}}\right)^2.
+$$
+:::
+
+```{r}
+#| label: train-test-split
+train_data <- window(AirPassengers, end = c(1958, 12))
+test_data <- window(AirPassengers, start = c(1959, 1))
+model_snaive <- snaive(train_data, h = length(test_data))
+
+autoplot(train_data) +
+  autolayer(test_data, series = "test") +
+  autolayer(model_snaive, series = "previsione (seasonal naive)", PI = FALSE) +
+  ggtitle("AirPassengers: train/test e previsione") +
+  theme(legend.position = "bottom")
+```
+
+::: {.callout-warning title="Attenzione"}
+Una singola divisione train/test è semplice ma ha lo stesso difetto già incontrato in classificazione e regressione con la validazione singola (capitolo 4): valuta il modello su **un solo intervallo temporale**, quindi il risultato può dipendere fortemente da quale particolare finestra sia finita nel test set. Con le serie storiche il problema è persino più delicato: se il risultato non convince, non si può "ripetere l'esperimento" con un altro campione — di solito si dispone di **una sola** serie storica.
+:::
+
+### Rolling origin (walk-forward validation)
+
+La soluzione, analoga nello spirito alla k-fold cross-validation, è la **validazione rolling origin** (o *walk-forward*):
+
+::: {.callout-important title="Definizione"}
+Si fissa un insieme di **origini** temporali $t_1<t_2<\cdots<t_K$. Per ciascuna origine $t_i$, si allena il modello usando solo i dati fino a $t_i$ e si valutano le previsioni su un orizzonte fisso $h$:
+$$
+\hat y_{t_i+1|t_i}, \hat y_{t_i+2|t_i}, \ldots, \hat y_{t_i+h|t_i}.
+$$
+Si aggrega l'errore su tutte le origini e su tutto l'orizzonte, ad esempio
+$$
+\text{MSE} = \frac{1}{K\cdot h}\sum_{i=1}^{K}\sum_{j=1}^{h}\left(y_{t_i+j} - \hat y_{t_i+j|t_i}\right)^2.
+$$
+:::
+
+A ogni origine si "fa scorrere in avanti" il punto di taglio tra passato e futuro — da cui il nome — e si valuta la performance su molte finestre temporali diverse, anziché su una sola. Una terza variante, che non useremo esplicitamente ma vale la pena conoscere, è la **blocked CV**, in cui invece di ampliare progressivamente il training set lo si fa scorrere a blocchi consecutivi di dimensione fissa.
+
+### Esempio: confronto tra modelli elementari
+
+```{r}
+#| label: tscv-elementari
+cv_naive <- tsCV(AirPassengers, forecastfunction = naive, h = 24)
+cv_snaive <- tsCV(AirPassengers, forecastfunction = snaive, h = 24)
+cv_drift <- tsCV(AirPassengers, forecastfunction = rwf, h = 24, drift = TRUE)
+
+rmse_naive <- sqrt(colMeans(cv_naive^2, na.rm = TRUE))
+rmse_snaive <- sqrt(colMeans(cv_snaive^2, na.rm = TRUE))
+rmse_drift <- sqrt(colMeans(cv_drift^2, na.rm = TRUE))
+
+df_rmse <- data.frame(
+  h = rep(1:24, 3),
+  RMSE = c(rmse_naive, rmse_snaive, rmse_drift),
+  Metodo = rep(c("Naive", "Seasonal naive", "Drift"), each = 24)
+)
+
+ggplot(df_rmse, aes(x = h, y = RMSE, colour = Metodo)) +
+  geom_line() + geom_point() +
+  labs(title = "RMSE via rolling origin CV, al variare dell'orizzonte h",
+       x = "Orizzonte di previsione (mesi)", y = "RMSE") +
+  theme_minimal()
+```
+
+### Interpretazione
+
+::: {.callout-note title="Come leggere il risultato"}
+Il grafico permette un confronto quantitativo, non solo visivo, tra i tre modelli **al variare dell'orizzonte di previsione**. Tipicamente si osserva che il naive stagionale è competitivo entro un anno (perché coglie bene la periodicità), mentre il drift diventa relativamente migliore proprio intorno a $h=12$ (un anno intero, dove la stagionalità "si richiude" su se stessa e conta soprattutto la stima del trend); oltre l'anno, l'errore del drift tende a crescere di nuovo. Il naive puro, che ignora sia trend sia stagionalità, è quasi sempre il peggiore. La scelta del modello "migliore" dipende quindi esplicitamente da **quale orizzonte di previsione interessa**, non è un verdetto assoluto.
+:::
+
+### Selezione di iperparametri per KNN
+
+La stessa idea di rolling-origin CV si applica alla selezione degli iperparametri $(k, \mathcal{L})$ del modello KNN, esattamente come la k-fold CV si usava per scegliere $k$ nel KNN di classificazione/regressione (capitolo 4):
+
+```{r}
+#| label: knn-cv-selezione
+#| eval: false
+evaluate_kNN <- function(ts_data, k_values, lag_values, h = 12) {
+  results <- expand.grid(k = k_values, lag = lag_values)
+  results$RMSE <- NA
+  for (i in 1:nrow(results)) {
+    fcast_fun <- function(x, h) {
+      model <- knn_forecasting(x, h = h, lags = 1:results$lag[i], k = results$k[i], transform = "none")
+      structure(list(mean = as.numeric(model$prediction), fitted = NULL, x = x), class = "forecast")
+    }
+    cv_errors <- tsCV(ts_data, forecastfunction = fcast_fun, h = h)
+    results$RMSE[i] <- sqrt(mean(cv_errors^2, na.rm = TRUE))
+  }
+  results
+}
+
+cv_results <- evaluate_kNN(AirPassengers, k_values = c(2, 5, 10, 15), lag_values = c(2, 5, 10, 15))
+
+ggplot(cv_results, aes(x = factor(lag), y = RMSE, colour = factor(k))) +
+  geom_point(size = 3) + geom_line(aes(group = k)) +
+  labs(title = "Rolling origin CV per KNN (AirPassengers)",
+       x = "Numero massimo di ritardi", y = "RMSE", colour = "k") +
+  theme_minimal()
+```
+
+### Limiti
+
+::: {.callout-warning title="Attenzione"}
+Applicando la stessa procedura a una serie finanziaria rumorosa (ad esempio uno degli indici di `EuStockMarkets`), la superficie di errore al variare di $k$ e $\mathcal{L}$ tende a essere molto meno regolare: combinazioni di iperparametri diverse possono suggerire previsioni qualitativamente opposte (alcune crescenti, altre decrescenti) senza un vincitore chiaro. È un altro sintomo, coerente con quanto già osservato per l'ACF e la cross-correlazione, del fatto che questi strumenti — pur concettualmente corretti — funzionano meglio su serie con struttura riconoscibile (trend, stagionalità pulita) che su serie dominate dal rumore.
+:::
+
+### Domande di comprensione
+
+1. Spiega, con parole tue, perché una k-fold cross-validation "ordinaria" applicata direttamente a una serie storica costituirebbe un leakage.
+2. Nella validazione rolling origin, cosa rappresentano le "origini" $t_1,\ldots,t_K$, e perché farne scorrere più di una è meglio di una singola divisione train/test?
+3. Perché il confronto tra naive, seasonal naive e drift può cambiare risultato a seconda dell'orizzonte $h$ scelto?
+4. Perché ti aspetti che la selezione di $(k,\mathcal{L})$ per KNN tramite rolling-origin CV sia più difficile (meno stabile) su una serie finanziaria che su `AirPassengers`?
+
+## Cosa ricordare
+
+* Le serie storiche rompono deliberatamente l'ipotesi di indipendenza che ha retto tutti i capitoli precedenti: è proprio la dipendenza temporale a rendere possibile la previsione.
+* Il time plot (non lo scatterplot) è lo strumento grafico primario; grafici stagionali e di sottoserie aiutano a isolare specificamente la stagionalità.
+* Una serie storica si decompone in trend, stagionalità, ciclo e residuo; la scelta tra decomposizione additiva e moltiplicativa si guida con l'euristica pratica: se l'ampiezza delle oscillazioni cresce con il livello della serie, conviene la moltiplicativa (equivalentemente: lavorare sul logaritmo).
+* Non chiamare "residuo" la componente residua di una serie storica nello stesso senso dei residui di regressione: sono concetti diversi, meglio "rumore" o "rimanenza".
+* L'autocorrelazione (ACF) misura la dipendenza lineare tra la serie e le sue versioni ritardate; il trend maschera la stagionalità nell'ACF, quindi va rimosso prima di cercare il periodo.
+* Differenziazione, logaritmo/Box-Cox e regressione sul tempo sono le tre strategie elementari per de-trendizzare una serie; ciascuna ha vantaggi e limiti diversi (pulizia dell'ACF vs. stima esplicita del trend).
+* I modelli elementari di previsione (naive, media, naive stagionale, drift) e KNN adattato alle serie storiche sono punti di partenza legittimi, non giocattoli: spesso bastano, e sono sempre un termine di paragone per modelli più sofisticati.
+* La cross-validation per serie storiche deve rispettare l'ordine temporale: mai usare informazione futura per addestrare o validare; la procedura corretta è la validazione rolling origin (walk-forward), non la k-fold o la leave-one-out ordinarie.
+* I metodi di questo capitolo funzionano meglio su serie con struttura riconoscibile (trend, stagionalità pulita) e peggio su serie molto rumorose come quelle finanziarie: è un limite pratico, non un errore di applicazione.
+
+## Domande di riepilogo
+
+1. Un collega applica una k-fold cross-validation standard a una serie storica mensile per scegliere il numero di ritardi di un modello KNN. Cosa gli faresti notare?
+2. Spiega la differenza tra "ciclo" e "stagionalità" in una decomposizione di serie storica, e perché il ciclo non ha mai una componente propria nella decomposizione a tre termini che abbiamo usato in questo capitolo.
+3. Una serie storica mostra un'ACF con valori elevati e positivi a *tutti* i ritardi, senza un picco chiaramente distinguibile. Quale spiegazione proponi, e quale operazione suggeriresti prima di trarre conclusioni sulla stagionalità?
+4. Perché l'operatore di ritardo $L$ e l'operatore di differenza $\operatorname{diff}=I-L$ sono collegati, e in che senso la differenziazione è un "analogo discreto" della derivata?
+5. Confronta, per una serie con trend forte ma stagionalità debole, come si comporterebbero verosimilmente i modelli naive, media, seasonal naive e drift.
+6. Perché la scelta tra decomposizione additiva e moltiplicativa non è solo un dettaglio tecnico ma influenza anche come si calcolano la componente stagionale e i residui?
+7. In che senso la validazione rolling origin per serie storiche è "una specie di" k-fold cross-validation, e in che senso se ne discosta necessariamente?
+8. Un modello KNN per la previsione di una serie storica produce risultati molto instabili al variare degli iperparametri $(k,\mathcal{L})$ su una serie finanziaria, ma risultati stabili su `AirPassengers`. Che cosa spiega questa differenza?
+
+## Laboratorio R: leggere i dati, non programmare
+
+Il dataset `co2` (incluso nella base di R) registra le concentrazioni mensili di CO₂ atmosferica rilevate all'osservatorio di Mauna Loa dal 1959 al 1997: una serie con trend molto marcato e stagionalità annuale regolare, diversa nella forma da `AirPassengers` ma altrettanto istruttiva.
+
+### Comprendere
+
+```{r}
+#| label: lab-co2-plot
+data("co2")
+autoplot(co2, main = "Concentrazione di CO2 atmosferica, Mauna Loa")
+```
+
+1. Descrivi a parole il trend e la stagionalità visibili in questo grafico. Ti sembra più vicina, per forma, a `AirPassengers` o a `nottem`? Perché?
+2. In base all'ampiezza delle oscillazioni stagionali nel tempo, ti aspetti che una decomposizione additiva o moltiplicativa sia più adatta a `co2`? Motiva la risposta prima di calcolare qualunque cosa.
+
+### Ragionare
+
+```{r}
+#| label: lab-co2-decompose
+fit_co2 <- decompose(co2, type = "additive")
+autoplot(fit_co2)
+```
+
+```{r}
+#| label: lab-co2-acf
+#| message: false
+ggAcf(co2)
+```
+
+3. L'ACF di `co2` mostra un decadimento lento a tutti i ritardi, simile a quanto osservato per `AirPassengers`. Quale operazione dovresti applicare prima di poter leggere chiaramente il periodo stagionale?
+4. Applica `diff()` a `co2` e ricalcola l'ACF (`ggAcf(diff(co2))`). Descrivi cosa cambia, e a quale ritardo ti aspetti (e osservi) il picco più marcato.
+5. Confronta il pannello dei residui della decomposizione additiva di `co2` con quello di `AirPassengers` (additiva) visto nel capitolo. Quale delle due decomposizioni ti sembra più vicina al rumore bianco?
+
+### Esplorare con R
+
+```{r}
+#| label: lab-co2-forecast
+#| message: false
+train_co2 <- window(co2, end = c(1990, 12))
+test_co2 <- window(co2, start = c(1991, 1))
+
+fc_naive <- naive(train_co2, h = length(test_co2))
+fc_snaive <- snaive(train_co2, h = length(test_co2))
+fc_drift <- rwf(train_co2, h = length(test_co2), drift = TRUE)
+
+autoplot(train_co2) +
+  autolayer(test_co2, series = "osservato") +
+  autolayer(fc_naive, series = "naive", PI = FALSE) +
+  autolayer(fc_snaive, series = "seasonal naive", PI = FALSE) +
+  autolayer(fc_drift, series = "drift", PI = FALSE) +
+  ggtitle("Previsioni su co2: train fino al 1990, test 1991+") +
+  theme(legend.position = "bottom")
+```
+
+6. Prima di guardare i numeri: quale dei tre metodi ti aspetti abbia l'errore più basso su questo test set, dato che `co2` ha sia trend sia stagionalità marcati? Calcola l'MSE di ciascuno sul test set e verifica.
+
+```{r}
+#| label: lab-co2-mse
+#| eval: false
+mse_naive <- mean((test_co2 - fc_naive$mean)^2)
+mse_snaive <- mean((test_co2 - fc_snaive$mean)^2)
+mse_drift <- mean((test_co2 - fc_drift$mean)^2)
+c(naive = mse_naive, snaive = mse_snaive, drift = mse_drift)
+```
+
+7. Ripeti l'analisi con `tsCV()` per un confronto rolling-origin più robusto (analogo a quello svolto nel capitolo per `AirPassengers`), con orizzonte `h = 12`. Il ranking dei tre metodi cambia rispetto alla singola divisione train/test? Cosa suggerisce questo sulla robustezza delle conclusioni tratte da una singola divisione train/test?
+8. Prova infine un modello KNN (`tsfknn::knn_forecasting`) su `co2` con un paio di scelte di `lags` e `k` a tua discrezione. Confronta visivamente la previsione con quella del seasonal naive: quale ti sembra più credibile, e perché?

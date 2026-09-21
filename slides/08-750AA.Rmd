@@ -1,0 +1,813 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "10/11/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 8'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+library(caret)
+library(glmnet)
+library(car)
+```
+
+
+
+
+#  Riduzione dei modelli di regressione
+
+
+## Ripasso: modello di regressione multipla
+
+- Modello:
+\[
+Y = \Phi(X)\beta + \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, \sigma^2)
+\]
+
+- Stima OLS: matrice di Gram $G = \Phi(\bm{x})^T \Phi(\bm{x})$
+\[
+\beta_{OLS} = G^{-1} \Phi(\bm{x})^T \bm{y}
+\]
+
+- Ipotesi principali:
+  1. Nessuna collinearità: $G$ invertibile
+  2. Indipendenza dei residui  e *omoschedasticità* ($\sigma^2$ costante)
+
+
+## Obiettivi della lezione
+
+- Diagnosticare la **(multi-)collinearità**.
+
+- Comprendere la **riduzione dei modelli** di regressione lineare.
+
+- Introdurre la **regressione su componenti principali** (PCR).
+
+- Motivare e applicare la **regolarizzazione** (Ridge e Lasso).
+
+
+
+## Collinearità e multi-collinearità
+
+**Definizione:** relazioni (quasi) lineari tra due o più predittori.
+
+- **Effetto:** $G = \Phi(\bm{x})^T \Phi(\bm{x})$ è difficilmente invertibile
+
+- **Conseguenze**:
+  - Stime numeriche imprecise
+  - Varianze dei parametri gonfiate
+  - Interpretazione dei coefficienti difficile
+
+
+## Un esempio di collinearità (generato):
+
+Consideriamo un modello generato con
+
+- $X_1=X_2+\delta$ con $\delta ~ \mathcal{N}(0, 10^{-2})$ (collinearità forte)
+
+- $Y= 3 X_1 + 2 X_2 + \varepsilon$
+
+- $n=100$ osservazioni
+
+
+
+
+## Gaussianità dei residui
+
+
+```{r}
+set.seed(123)
+n <- 100
+x1 <- rnorm(n)
+x2 <- x1 + rnorm(n, sd=0.1) # collinearità forte
+y <- 3*x1 + 2*x2 + rnorm(n)
+df <- data.frame(x1=x1, x2=x2, y=y)
+model_col <- lm(y ~ x1 + x2, data=df)
+
+# plot residui vs y e istogramma
+par(mfrow=c(1,2))
+hist(resid(model_col), main="Istogramma dei residui", xlab="Residui", col="blue")
+qqnorm(resid(model_col), main="QQplot residui", xlab="Residui")
+qqline(resid(model_col), col="red")
+# aggiungi densità gaussiana
+
+```
+
+## Sommario del modello
+
+
+```{r}
+
+summary(model_col)
+
+```
+
+
+## Sommario del modello (altri dati generati)
+
+```{r}
+
+set.seed(12)
+n <- 100
+x1 <- rnorm(n)
+x2 <- x1 + rnorm(n, sd=0.1) # collinearità forte
+y <- 3*x1 + 2*x2 + rnorm(n)
+df <- data.frame(x1=x1, x2=x2, y=y)
+model_col <- lm(y ~ x1 + x2, data=df)
+summary(model_col)
+```
+
+
+## Correlogramma
+
+Possiamo *diagnosticare* la collinearità tramite la matrice di correlazione (o correlogramma):
+
+```{r}
+library(GGally)
+ggpairs(df, columns=1:3)
+```
+
+
+## Multi-collinearità
+
+Quando *tre o più fattori di ingresso* sono allineati il correlogramma potrebbe non essere sufficiente. 
+
+Altri indicatori:
+
+1. **Condizionamento di G:** $\kappa(G) = \|G\| \|G^{-1}\|$
+  - Indica la sensibilità delle soluzioni ai cambiamenti nei dati.
+  - Valori elevati (es. $\kappa(G) > 1000$) indicano collinearità significativa.
+  
+
+2. **Variance Inflation Factor (VIF):** $VIF_j = \frac{1}{1 - R_j^2}$
+  - $R_j^2$ è il coefficiente di determinazione della regressione della caratteristica $\phi_j$ sulle altre di ingresso (il fattore di uscita $y$ non è incluso).
+  - Valori elevati (es. $VIF_j > 5$ o $10$) indicano collinearità significativa per la variabile $j$.
+  
+  
+  
+## Un esempio di multi-collinearità (generato)
+
+
+Consideriamo un modello generato con
+
+- $X_1$, $X_2$ indipendenti
+
+- $X_3 = X_1 - X_2 + \delta$ con $\delta ~ \mathcal{N}(0, 10^{-4})$
+
+- $Y= 1 +2 X_1 + 3 X_2 -X_3 + \varepsilon$
+
+- $n=100$ osservazioni
+
+
+## Gaussianità dei residui
+
+```{r}
+set.seed(123)
+
+n <- 100
+
+# Generiamo due variabili indipendenti
+x1 <- rnorm(n, mean = 0, sd = 1)
+x2 <- rnorm(n, mean = 0, sd = 1)
+
+# Costruiamo x3 come combinazione lineare di x1 e x2 + piccolo rumore
+# Se il rumore è molto piccolo, abbiamo quasi dipendenza perfetta
+x3 <-  x1 -  x2 + rnorm(n, sd = 1e-2)
+
+# # Osserva che x1 e x2 non sono correlate in modo forte (circa 0)
+# cor(x1, x2)
+# cor(x1, x3)
+# cor(x2, x3)
+
+# Costruiamo la risposta y con coefficienti noti
+
+y <- 1 + 2*x1 + 3*x2 -x3 + rnorm(n, sd = 0.5)
+
+df <- data.frame(y = y, x1 = x1, x2 = x2, x3 = x3)
+library(car)   # per vif()
+model_col <- lm(y ~ x1 + x2 + x3, data = df)
+par(mfrow=c(1,2))
+hist(resid(model_col), main="Istogramma dei residui", xlab="Residui", col="blue")
+qqnorm(resid(model_col), main="QQplot residui", xlab="Residui")
+qqline(resid(model_col), col="red")
+
+```
+
+## Sommario del modello
+
+```{r}
+summary(model_col)
+```
+
+## Sommario del modello (altri dati)
+
+```{r}
+set.seed(12)
+
+n <- 100
+
+# Generiamo due variabili indipendenti
+x1 <- rnorm(n, mean = 0, sd = 1)
+x2 <- rnorm(n, mean = 0, sd = 1)
+
+# Costruiamo x3 come combinazione lineare di x1 e x2 + piccolo rumore
+# Se il rumore è molto piccolo, abbiamo quasi dipendenza perfetta
+x3 <-  x1 -  x2 + rnorm(n, sd = 1e-2)
+
+# # Osserva che x1 e x2 non sono correlate in modo forte (circa 0)
+# cor(x1, x2)
+# cor(x1, x3)
+# cor(x2, x3)
+
+# Costruiamo la risposta y con coefficienti noti
+
+y <- 1 + 2*x1 + 3*x2 -x3 + rnorm(n, sd = 0.5)
+
+df <- data.frame(y = y, x1 = x1, x2 = x2, x3 = x3)
+library(car)   # per vif()
+fit <- lm(y ~ x1 + x2 + x3, data = df)
+summary(fit)
+
+```
+
+## Diagnosi mediante correlogramma
+
+```{r}
+library(GGally)
+ggpairs(df, columns=2:4)
+```
+
+
+## Diagnosi tramite indicatori
+
+
+- VIF
+```{r}
+# VIF
+vif_values <- vif(fit)
+vif_values
+```
+
+
+```{r}
+# Condizionamento e autovalori di X'X
+X <- model.matrix(fit)
+XtX <- t(X) %*% X
+eigs <- eigen(XtX)$values
+kappa_X <- kappa(X)   # condizion number
+```
+
+- Condizionamento della matrice di Gram: ``r round(kappa_X, 2)``
+
+
+## Gestione della (multi-)collinearità
+
+Una volta individuata la collinearità $\rightarrow$ varie strategie:
+
+- *Ridurre* il modello selezionando/eliminando variabili correlate
+
+- Usare **PCA** (*riduzione dimensionale*)
+
+- Applicare **regolarizzazione**  (*aumenta il bias*)
+
+
+
+
+## Riduzione tramite selezione di variabili
+
+**Obiettivo**: selezionare un sottoinsieme di variabili predittive rilevanti.
+
+- Motivazioni:
+
+  1. Ridurre collinearità
+  
+  2. Semplificazione interpretativa
+
+- Strategie principali:
+
+  * **Test di significatività** 
+  
+  * **Criteri informativi:** AIC, BIC
+  
+  * **Procedure stepwise:** `forward`, `backward`, `both`
+  
+
+
+## Test di significatività dei coefficienti
+
+- Per ogni coefficiente $\beta_j$ confrontiamo
+  \[
+  H_0 : \beta_j = 0 \quad\quad \quad \quad H_1 : \beta_j \neq 0
+  \]
+
+- Usiamo il **t-test** associato al rapporto: $SE_j = RSE \sqrt{ (G^{-1})_{jj} }$
+  \[
+  t_j = \frac{\beta_{OLS,j}}{SE_j}
+  \]
+  
+-  *p-value*: $P(T > t_j)$ dove $T$ è una variabile $t$ di Student
+
+- **Decisione:** rimuovere la variabile se il *p-value* è elevato (es. $> 0,05$).
+
+- **Pro:** interpretazione chiara.  
+- **Contro:** rischio di esclusione casuale dovuta a campioni piccoli o **collinearità**.
+
+
+## Esempio (dataset Boston Housing)
+
+
+```{r}
+data(Boston, package="MASS")
+model <- lm(medv ~ ., data = Boston)
+# print solo coefficienti e significatività
+summary(model)$coefficients[,c(1,4)]
+
+```
+
+## Esempio (dataset Boston Housing)
+
+```{r, echo=FALSE, message=FALSE}
+library(MASS)
+model_full <- lm(medv ~ ., data = Boston)
+## Grafico a barre della significatività dei coefficienti
+coef_summary <- summary(model_full)$coefficients
+coef_df <- data.frame(
+  Variable = rownames(coef_summary),
+  Estimate = coef_summary[, "Estimate"],
+  PValue = coef_summary[, "Pr(>|t|)"]
+)
+ggplot(coef_df[-1, ], aes(x = reorder(Variable, -PValue), y = -log10(PValue))) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_hline(yintercept = -log10(0.05), color = "red", linetype = "dashed") +
+  labs(title = "Significatività dei coefficienti nel modello Boston Housing",
+       x = "Variabile",
+       y = expression(-log[10](p))) +
+  theme_minimal()
+```
+
+
+## Criteri informativi: AIC e BIC
+
+**Idea:** bilanciare *qualità dell’adattamento* (varianza) e *complessità del modello* (bias) in un singolo indicatore.
+
+- Si definiscono per modelli generali basati sulla verosimiglianza $\mathcal{L}(\theta; D)$.
+
+- **AIC (Akaike Information Criterion):**
+  \[
+  AIC = 2p - 2\log(\mathcal{L}(\theta_{MLE}; D))
+  \]
+  dove $\theta \in \R^p$ sono i parametri del modello.
+
+- **BIC (Bayesian Information Criterion):**
+  \[
+  BIC = p \log(n) - 2\log(\mathcal{L}(\theta_{MLE}; D))
+  \]
+  dove $n$ è la taglia dei dati. 
+
+- **Interpretazione:**
+  * Valori più bassi $\rightarrow$ modello preferibile.
+  * BIC penalizza di più i modelli complessi.
+  
+  
+## Esempio indicatori (dataset Boston)
+
+
+```{r, echo=FALSE}
+
+# plot di AIC introducendo variabili nella regressione di Boston
+
+library(MASS)
+model_full <- lm(medv ~ ., data = Boston)
+
+model_lstat <- lm(medv ~ lstat, data = Boston)
+
+model_lstat_nox <- lm(medv ~ lstat + nox, data = Boston)
+
+```
+
+
+- Usando solo la variabile `lstat`: AIC: ``r round(AIC(model_lstat), 2)``, BIC: ``r round(BIC(model_lstat), 2)``
+
+- Usando `lstat` e `nox`: AIC: ``r round(AIC(model_lstat_nox), 2)``, BIC: ``r round(BIC(model_lstat_nox), 2)``
+
+- Usando tutte le variabili: AIC: ``r round(AIC(model_full), 2)``, BIC: ``r round(BIC(model_full), 2)``.
+
+
+
+## Procedure stepwise
+
+**Algoritmi** che aggiungono/rimuovono variabili per minimizzare AIC/BIC o massimizzare la significatività.
+
+  -  **Selezione in avanti** (forward selection) parte dal modello nullo, aggiunge le variabili una per una.
+
+  -  **Eliminazione all'indietro** (backward elimination) parte dal modello completo, rimuove le meno significative.
+
+  - **Stepwise (both):** combina aggiunte e rimozioni.
+
+
+-  **Pro:** automatizza la selezione, utile per dataset medi.
+
+- **Contro:** rischia di *inseguire il rumore* (overfitting), non garantisce il modello ottimo globale.
+
+
+
+## Esempio: selezione stepwise in avanti tramite t-test
+
+```{r, message=FALSE, warning=FALSE}
+library(MASS)
+data(Boston)
+
+alpha_in <- 0.05
+current_vars <- c()
+remaining_vars <- setdiff(names(Boston), "medv")
+
+get_best_p <- function(vars_in, vars_out) {
+  sapply(vars_out, function(v) {
+    f <- as.formula(paste("medv ~", paste(c(vars_in, v), collapse = " + ")))
+    summary(lm(f, data = Boston))$coefficients[v, 4]
+  })
+}
+
+steps <- data.frame(
+  Step = integer(),
+  Variable = character(),
+  PValue = numeric(),
+  stringsAsFactors = FALSE
+)
+
+repeat {
+  pvals <- get_best_p(current_vars, remaining_vars)
+  best_var <- names(which.min(pvals))
+  best_p <- min(pvals)
+  # add line to steps data frame for later plot
+  steps <- rbind(steps, data.frame(
+    Step = nrow(steps) + 1,
+    Variable = best_var,
+    PValue = best_p,
+    stringsAsFactors = FALSE
+  ))
+  if (best_p < alpha_in) {
+    current_vars <- c(current_vars, best_var)
+    remaining_vars <- setdiff(remaining_vars, best_var)
+  } else break
+}
+
+final_formula <- as.formula(paste("medv ~", paste(current_vars, collapse = " + ")))
+model_final <- lm(final_formula, data = Boston)
+#summary(model_final)
+
+#print data.frame showing number of steps p-value
+steps
+```
+
+----
+
+```{r}
+library(ggplot2)
+# plot steps p-values and name of added variable
+ggplot(steps, aes(x = Step, y = -log10(PValue))) +
+  geom_line(linewidth = 1, color = "steelblue") +
+  geom_point(size = 2, color = "darkred") +
+  geom_text(aes(label = Variable), vjust = -0.5, size = 3.2, angle = 30) +
+  labs(
+    title = "Evoluzione del p-value durante la selezione stepwise in avanti",
+    x = "Passo della selezione",
+    y = expression(-log[10](p))
+  ) +
+  theme_minimal()
+
+```
+
+ 
+## Esempio: selezione stepwise (both) via AIC su Boston
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(MASS)
+library(ggplot2)
+
+# Esegui selezione stepwise e salva l'output completo
+#model_full <- lm(medv ~ ., data = Boston)
+#step_out <- stepAIC(model_full, direction = "backward", trace = TRUE)
+
+model_null <- lm(medv ~ 1, data = Boston)
+model_full <- lm(medv ~ ., data = Boston)
+
+step_out <- stepAIC(model_null, 
+                      scope = list(lower = model_null, upper = model_full), 
+                      direction = "both", 
+                      trace = TRUE)
+
+# Estrai i valori di AIC dal tracciato (parsing dell'output)
+aic_trace <- data.frame(
+  Step = seq_along(step_out$anova$AIC),
+  Action = step_out$anova$Step,
+  AIC = step_out$anova$AIC
+)
+
+# Rimuovi eventuali righe NA
+aic_trace <- aic_trace[!is.na(aic_trace$AIC), ]
+```
+
+```{r}
+aic_trace
+```
+
+----
+
+```{r}
+# Grafico dell'evoluzione dell'AIC
+ggplot(aic_trace, aes(x = Step, y = AIC)) +
+  geom_line(linewidth = 1, color = "steelblue") +
+  geom_point(size = 2, color = "darkred") +
+  geom_text(aes(label = Action), vjust = -0.5, size = 3.2, angle = 30) +
+  labs(
+    title = "Evoluzione dell’AIC durante la selezione stepwise",
+    x = "Passo della selezione",
+    y = "Valore di AIC"
+  ) +
+  theme_minimal()
+```
+
+## Esempio: selezione stepwise backward via BIC su Boston
+
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(MASS)
+library(ggplot2)
+
+# Esegui selezione stepwise e salva l'output completo
+#model_full <- lm(medv ~ ., data = Boston)
+# step_out <- stepAIC(model_full, direction = "backward", trace = TRUE)
+# model_null <- lm(medv ~ 1, data=Boston)
+model_start <- lm(medv ~ tax +zn+black+ptratio, data = Boston)
+model_full <- lm(medv ~ ., data = Boston)
+
+step_out <- step(model_full, 
+                      scope = list(lower = model_null, upper = model_full), 
+                      direction = "backward", 
+                      trace = TRUE, k=log(nrow(Boston)))
+
+# Estrai i valori di AIC dal tracciato (parsing dell'output)
+aic_trace <- data.frame(
+  Step = seq_along(step_out$anova$AIC),
+  Action = step_out$anova$Step,
+  BIC = step_out$anova$AIC
+)
+
+# Rimuovi eventuali righe NA
+aic_trace <- aic_trace[!is.na(aic_trace$BIC), ]
+```
+
+```{r}
+aic_trace
+```
+
+----
+
+
+```{r}
+# Grafico dell'evoluzione dell'AIC
+ggplot(aic_trace, aes(x = Step, y = BIC)) +
+  geom_line(linewidth = 1, color = "steelblue") +
+  geom_point(size = 2, color = "darkred") +
+  geom_text(aes(label = Action), vjust = -0.5, size = 3.2, angle = 30) +
+  labs(
+    title = "Evoluzione del BIC durante la selezione stepwise all'indietro",
+    x = "Passo della selezione",
+    y = "Valore di BIC"
+  ) +
+  theme_minimal()
+```
+
+
+
+## PCA per la regressione
+
+**Richiamo**: PCA trasforma/riduce le variabili in nuove combinazioni **ortogonali**:
+
+```{r}
+pca <- prcomp(scale(Boston[,-14]))
+#scree plot in ggplot2 for the variance explained with xlab
+
+# screeplot(pca, main="Scree Plot delle componenti principali", col="blue", pch=19)
+library(ggplot2)
+var_explained <- pca$sdev^2 / sum(pca$sdev^2)
+var_df <- data.frame(
+  Component = seq_along(var_explained),
+  VarianceExplained = var_explained
+)
+ggplot(var_df, aes(x = Component, y = VarianceExplained)) +
+  geom_line(linewidth = 1, color = "steelblue") +
+  geom_point(size = 2, color = "darkred") +
+  labs(
+    title = "Scree Plot delle componenti principali",
+    x = "Componente principale",
+    y = "Varianza spiegata"
+  ) +
+  theme_minimal()
+
+```
+
+## Biplot
+
+
+```{r}
+#Biplot con ggplot2 
+library(ggfortify)
+autoplot(pca, data = Boston, colour = 'medv') +
+  ggtitle("PCA del dataset Boston Housing (esclusa medv)") +
+  theme_minimal()
+```
+
+
+
+## Regressione su componenti principali (PCR)
+
+Si sostituiscono i predittori originali con le prime $k$ componenti principali:
+
+ $$\bm{z}_{\le k} = \Phi(\bm{x}) U_{\le k}$$
+
+- Modello ridotto: parametri $(\alpha_0, \alpha_1, \ldots, \alpha_k)$:
+\[
+\bm{y} = \alpha_0 + \bm{z}_{\le k} \alpha + \varepsilon
+\]
+
+
+## Esempio (Boston) PCR sulle prime $3$ componenti principali
+
+
+```{r}
+lm_pcr <- lm(Boston$medv ~ pca$x[, 1:3])
+summary(lm_pcr)
+```
+
+
+## Pro e contro della PCR
+
+- **Vantaggi**: 
+
+  * Elimina collinearità
+  
+
+  * Riduce dimensionalità
+  
+  * (Spesso) migliora la generalizzazione
+  
+- **Svantaggi**:
+
+  * Perdita di interpretabilità
+  
+  * Scelta del numero di componenti $k$ (cross-validation)
+  
+  * PCR non considera la variabile di uscita $y$ ($\rightarrow$ PLS come alternativa)
+
+
+
+## Regolarizzazione
+
+**Idea**: introdurre una limitazione sui parametri di un modello $h(; \theta)$ per rendere più  stabile la stima:
+
+- **Vincolo**:
+\[
+\min_{\theta} \cur{ MSE(h(; \theta)) \, : \, \nor{ \theta - \tilde \theta } \le M }
+\]
+
+- **Penalizzazione**:
+\[
+\min_{\theta}  MSE(h(; \theta)) + \lambda \nor{ \theta - \tilde \theta }^2
+\]
+
+- Scelta della regolarizzazione (distanza). *Esempi fondamentali*:
+  * **Ridge (L2):**  $\nor{\theta} = \nor{\theta}_2 := \sqrt{ \sum_j \theta_j^2 }$
+  * **LASSO (L1):**  $\nor{\theta} = \nor{\theta}_1 := \sum_j |\beta_j|$
+
+
+##  Regressione Ridge 
+
+$$ \theta_{Ridge, \lambda} \in \arg \min_{\theta} MSE(h(; \theta)) + \lambda \nor{ \theta  }^2_2 $$
+
+
+- Penalizza la grandezza dei coefficienti, *non li seleziona*.
+
+- Per modelli lineari $h(x; \theta) = \Phi(x) \beta$ $\rightarrow$ formula esplicita:
+\[ 
+\beta_{Ridge, \lambda}= ( G + \lambda \operatorname{Id} )^{-1} \Phi(\bm{x}) \bm{y}
+\]
+dove $G =\Phi(\bm{x})^T \Phi(\bm{x})$
+
+- Risolve il problema dell'invertibilità di $G$.
+
+- **Problema**: stima di $\lambda$ (iperparametro $\rightarrow$ cross-validation)
+
+## Esempio (Boston)
+
+```{r}
+X <- model.matrix(medv ~ ., Boston)[, -1]
+y <- Boston$medv
+cv_ridge <- cv.glmnet(X, y, alpha = 0)
+plot(cv_ridge)
+```
+
+----
+
+```{r}
+coef(cv_ridge, s = "lambda.min")
+```
+
+## LASSO 
+
+$$ \theta_{LASSO, \lambda} \in \arg \min_{\theta} MSE(h(; \theta)) + \lambda \nor{ \theta  }_1 $$
+
+- Seleziona *automaticamente* le variabili
+
+- Nessuna formula esplicita.
+
+- Scelta di $\lambda$ tramite cross-validation.
+
+## Esempio
+
+```{r}
+cv_lasso <- cv.glmnet(X, y, alpha = 1)
+plot(cv_lasso)
+```
+
+----
+
+```{r}
+coef(cv_lasso, s = "lambda.min")
+```
+
+
+## Intepretazione della regolarizzazione
+
+Il termine di penalizzazione si può interpretare in due modi:
+
+- **variazionale**: introdurre bias in modo controllato
+
+- **bayesiano**: *distribuzione a priori* sui coefficienti
+
+
+- Punto di vista variazionale:
+
+  - OLS è una stima non distorta ($bias^2 = 0$) ma con alta varianza
+  
+  - Ridge/LASSO introducono bias, ma **riducendo la varianza totale** 
+  
+  - $\rightarrow$ errore di generalizzazione minore
+
+
+## Punto di vista bayesiano
+
+Ricordiamo che $\theta_{OLS} = \theta_{MLE}$ per residui gaussiani. 
+
+- La regolarizzazione è una **stima MAP** con una **distribuzione a priori** sui parametri:
+$$ \theta_{MAP} \in \arg \max_\theta p(\theta) \mathcal{L(\theta; D)}$$
+
+- **Ridge**: $p(\theta) \propto \exp\bra{ - \frac \lambda 2 \nor{\theta}^2_2 }$  (gaussiana)
+
+- **LASSO**: $p(\theta) \propto \exp\bra{- \lambda \nor{\theta}_1}$ (Laplace)
+
+
+- la regolarizzazione rappresenta **conoscenza a priori** sulla dimensione o sparsità.
+
+- Altre distribuzioni: es. *regolarizzazione elastica* (Elastic Net).
+
+
+## Riassunto dei metodi di riduzione/regoralizzazione
+
+| Metodo   | Vantaggi                  | Svantaggi                   |
+| -------- | ------------------------- | --------------------------- |
+| OLS      | Semplice e interpretabile | Instabile con collinearità  |
+| Stepwise | Selezione automatica      | Rischio overfitting         |
+| PCA      | Elimina collinearità      | Perdita di interpretabilità |
+| Ridge    | Stime stabili             | Non seleziona variabili     |
+| Lasso    | Selezione automatica      | Introduce bias              |
+
+
+
+

@@ -1,0 +1,690 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "13/10/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 4'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+```
+
+# Classificazione
+
+## Introduzione alla classificazione
+
+- **Problema:** dato un insieme di osservazioni
+$$ \{ (x_i, \ell_i) \}_{i=1, \ldots, n } $$
+dove
+
+  - $x_i\in F$ sono *caratteristiche* (features) dei dati
+  
+  - $\ell_i \in C$ sono etichette (classi, *labels*) 
+ 
+- determinare un *classificatore*:
+$$ h: F \to C, \quad h(x) =\ell $$
+
+- **Obiettivi della lezione**:
+
+  - Comprendere i metodi di classificazione *classici* (statistici).
+  
+  - Conoscere le metriche di performance.
+  
+
+---
+
+La classificazione è fondamentale in statistica e machine learning.
+
+- Si tratta di un problema di apprendimento *supervisionato*:
+$$ \{ (x_i, \ell_i)\}_{i=1,\ldots, n} \Rightarrow h: x \to h(x).$$
+
+*Esempi*: 
+
+- Determinare la specie dei fiori del dataset Iris in base a lunghezza e ampiezza dei petali.
+
+- Determinare se un messaggio di posta è spam oppure no.
+
+- Determinare se un tumore è benigno o maligno.
+
+- Determinare per quale candidato voterà un individuo in base alle sue attività online\ldots.
+
+
+## K-Nearest Neighbors (KNN): caso $k=1$
+
+- **Idea**: punti con caratteristiche simili hanno una etichetta simile.
+
+- *Classificatore al primo vicino*: dato $x \in F \subseteq \R^d$, troviamo il punto nel *training set* $i(x)$ con caratteristiche **più vicine** a $x$
+$$ i(x) \in \arg \min_{i=1, \ldots, n} \| x_i - x \|$$
+e classifichiamo $h(x) := \ell_{i(x)}$.
+
+- **Vantaggi**: intiuitivo, semplice da implementare, anche con metriche diverse dall'Euclidea (Manhattan,\ldots)
+
+- **Svantaggi**: sensibile al *rumore* (varianza), costo computazionale se $n \gg 1$, curse of dimensionality.
+
+ 
+
+## Esempio (iris)
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Width, colour = Species) )+geom_point()+ggtitle("Dataset Iris")+geom_point(x=6, y=1.4, col="red", shape=3, size=5)
+
+```
+
+
+## KNN: Caso $k$ generale
+
+Per **alleviare** il problema della varianza:
+
+  - fissiamo un parametro $k$, ad es, $k=2, 3, 4,\ldots$ (meglio se dispari) 
+  
+  - dato $x \in F \subseteq \R^d$, troviamo i $k$ punti nel *training set* $i_1(x), i_2(x), \ldots, i_k(x)$ con *features* **più vicine** a $x$ e le rispettive *labels*
+  $$ \ell_{i_1}, \ell_{i_2}, \ldots, \ell_{i_k}$$
+  
+  - definiamo $h_{knn}(x)$ pari alla label più frequente nelle $k$.
+  
+  
+- **Problema:** come determinare il migliore valore di $k$?
+  
+
+## Esempio
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Width, colour = Species) )+geom_point()+ggtitle("Dataset Iris")+geom_point(x=6, y=1.4, col="red", shape=3, size=5)
+
+```
+
+
+
+## Hello KNN!
+
+![](logos/hello-knn.jpg){#id .class width="50%" height="50%"}
+
+-   Giocate voi!
+<https://dario-trevisan.shinyapps.io/HelloNeighborKNN/>
+
+-   Codice (R shiny) disponibile nel team e nella pagina del corso
+
+
+## Accuratezza/errore
+
+L'*accuratezza* (accuracy) di un classificatore è una metrica di performance. 
+  - Indica la percentuale di dati classificati in modo corretto:
+$$ \operatorname{Acc(h)}  = $$
+  - **Problema**: su quali dati calcolare l'accuratezza?
+
+  - **Training Error**: calcolato sui dati originali (*training set*)
+$$ \sum_{i=1}^n 1_{\{ h(x_i) \neq \ell_i \} }$$
+
+  - **Test Error**: calcolato su un *insieme di verifica* $\{(x_j, \ell_j )\}_{j=1, \ldots, m}$ (*test set*) per valutare la *generalizzazione* del modello.
+
+
+## Esempio (iris)
+
+```{r}
+
+n =120 # 80%  del campione è usato come training il rimanente è test
+set.seed(50)
+iris_sample <- sample(150, 120)
+
+iris_sample <- 1:120
+
+iris_train <- iris[iris_sample,]
+
+iris_test <- iris[-iris_sample, ]
+
+error <- data.frame( "training" = numeric(), "test" = c(), "k"=numeric() )
+
+for(k in 1:10 ){
+# calcola le classi sul training/test set
+
+knn_iris_train <- knn(iris_train[, 1:4], iris_train[, 1:4], iris_train[, 5], k)
+knn_iris_test  <- knn(iris_train[, 1:4], iris_test[, 1:4], iris_train[, 5], k)
+
+# calcola l'accuratezza e aggiungi una riga al dataframe error
+
+error <- rbind(error,  data.frame( "training" = mean(knn_iris_train != iris_train$Species ), "test" =    mean(knn_iris_test != iris_test$Species ), "k" = k) )
+                         
+                         
+}
+
+ggplot(error, aes(x =k, y=training, col="error")) +geom_line(aes(col="training"), linewidth=2)+geom_line(aes(x=k, y=test, col="test"), linewidth=2)+ylab("errore")+ggtitle("Errore di classificazione kNN al variare di k, dataset iris")
+
+
+```
+
+
+## Errore di generalizzazione
+
+**Problema: ** La decomposizione del dataset in *train* e *test* è del tutto arbitraria,
+
+- si *sprecano* dati per valutare la performance (ad esempio per selezionare $k$)
+
+- il *vero* obiettivo è di valutare l'accuratezza su *nuovi* dati.
+
+- **Modello probabilistico** dei dati non osservati: $(X,L)\in F\times C$ è aleatorio, l'**errore di generalizzazione** di $h$ è
+$$ P( h(X) \neq L)$$
+- I dati $\{(x_i, \ell_i)\}_{i=1\ldots, n}$ sono un campione di *variabili aleatorie indipendenti*, tutte con la stessa *legge* di $(X,L)$.
+
+
+
+
+## Richiami di probabilità
+
+Date affermazioni (*eventi*) $A$, $I$, la probabilità
+$$ P(A|I) \in [0,1] $$
+indica il grado di validità di $A$ (supponendo di aver) osservato $I$.
+
+- $P(A|I) \approx 1$ $\Rightarrow$ $A$ è ritenuta vera
+
+- $P(A|I) \approx 0$ $\Rightarrow$ $A$ è ritenuta falsa
+
+
+## Parametrizzazioni alternative
+
+- $P(A|I) \in [0,1]$
+
+-  logaritmo: $\log(P(A|I))$
+
+-  quote (*odds*): 
+$$ \operatorname{Odds}(A|I) = \frac{P(A|I)}{P(\text{non $A$} | I)} \in [0, \infty]$$
+
+    
+- logit 
+$$ \operatorname{Logit}(A|I) = \log( \operatorname{Odds}(A|I) ) \in [-\infty, \infty]$$
+
+
+## Regole di calcolo (eventi)
+
+- **Regola della somma**: $P(\text{$A$ oppure $B$}|I) = P(A|I)+P(B|I)$, se $A$, $B$ *incompatibili*.
+
+- **Probabilità della negazione**: $P(\text{non $A$}|I) = 1- P(A|I)$
+
+- **Regola del prodotto**: $P(\text{$A$ e $B$}|I) = P(A|I) P(B|\text{$A$ e $I$})$
+
+- **Formula di Bayes**: $P(A|B) = P(A) P(B|A)/P(B)$, oppure
+$$ \operatorname{Odds}(A|B) = \operatorname{Odds}(A) \frac{ \mathcal{L}(A; B) }{\mathcal{L}(\text{non $A$}; B)}$$
+
+
+- **Verosimiglianza**: $\mathcal{L}(A; B) = P(B|A)$.
+
+- **Indipendenza**: $P(A|B) = P(A)$.
+
+
+## Variabili aleatorie
+
+- **Sistema di alternative:** $(A_\ell)_{\ell \in E}$ eventi tali che *esattamente uno è sempre vero* (non si sa quale)
+
+- **Esempio**: $A_\ell =$ *il dato test è di classe* $\ell$, con $E= C$ (possibili classi)
+
+- Caratteristica aleatoria $X \in E$ è un sistema di alternative
+$$ A_x = \{ X= x \} = \text{la caratteristica $X$ vale $x$}$$
+
+
+## Regole di calcolo (variabili)
+
+
+- Densità discreta: $P(L\in U) = \sum_{\ell \in U} P(L=\ell)$
+- Densità continua: $P(X \in [a,b]) = \int_a^b p(X = x) dx$
+- Notazione (*imprecisa ma comoda*) $P(X|I) = P(X=\cdot|I)$.
+
+
+- **Regola del prodotto**: $P(X=x, L=\ell) = P(X=x|I) P(L=\ell| X=x)$.
+
+- **Formula di Bayes**: $P(L=\ell|X=x) = P(L=\ell) P(X=x|L=\ell)/P(X=x)$, oppure
+$$ \operatorname{Odds}(L=\ell|X=x) = \operatorname{Odds}(L=\ell) \frac{ \mathcal{L}(\ell; x) }{\mathcal{L}(L\neq \ell; x)}$$
+
+- **Verosimiglianza**: $\mathcal{L}(L=\ell; x) = P(X=x|L=\ell)$.
+
+- **Indipendenza**: $P(X=x|Y=y) = P(X=x)$.
+
+
+## Esempi
+
+- Densità *Bernoulli*: $X \in \cur{0,1}$, 
+$$P(X = x) = q^x (1-q)^{1-x}$$
+
+- Densità *Binomiale*: $X \in \cur{0,1,\ldots, n}$,
+$$P(X = x) = {n \choose x} q^{x}(1-q)^{n-x}$$
+
+- Densità *Gaussiana*: $X \in \R$, 
+$$p(X = x) = \exp\bra{ - \frac{(x-\mu)^2}{2 \sigma^2 } }$$
+
+## Modello statistico per la classificazione
+
+- Supponiamo che:
+  - i dati del training set $\{ z_i = (x_i, \ell_i)\}_{i=1, \ldots, n}$ sono osservazioni di *variabili aleatorie indipendenti* tutte con la stessa legge (densità)
+  $$ P(Z_1, \ldots, Z_n) = P(Z_1) P(Z_2) \ldots, P(Z_n)$$
+  - il dato (o i dati) del test set sono pure i.i.d. con la stessa legge $Z=(X,L)$. 
+  
+
+- Un classificatore $h: F \to C$ dipende da $\mathcal{D} = (Z_i)_{i=1}^n$ e l'*errore di generalizzazione* è il rischio atteso
+$$ P( h (X) \neq L) = \mathbb{E}[ 1_{h(X) \neq L } ]$$
+
+## Convalida incrociata (cross-validation)
+
+**Obiettivo**: *stimare* dai dati osservati l'errore di generalizzazione $P( h (X) \neq L)$
+
+- **Idea naive**: 
+  - *Train set* (circa 80\% dei dati) per calcolare il classificatore $h$
+  - *Test set* (il rimanente) per verificare l'accuratezza
+  
+- **Problema**: troppo *rigida*, rischiamo di scegliere il classificatore in base a come abbiamo diviso.
+
+- **Soluzione** è la convalida incrociata, in cui variamo la decomposizione *Train/Test* in modo da mitigare il rischio.
+
+- **In pratica**: 
+ - *Train/Validation set* (80\% dei dati) per calcolare vari $h$, stimare errori di generalizzazione, selezionare parametri ecc.
+ - *Test set* per verifica finale sul modello selezionato.
+ 
+
+## Leave p-out (Lp0) CV 
+
+- Un metodo di CV: 
+
+  - fissare $p$ (e.g., $p=1$ o $p=2$\ldots)
+  
+  - scartare $p$ elementi dal training set 
+  
+  - calcolare l'accuratezza sui $p$ elementi rimossi del classificatore $h$ ottenuto (dal training set senza i $p$)
+  
+  - *mediare* l'accuratezza ottenuta variando su tutte (o molte) scelte di $p$ elementi
+
+
+- **Problema:** il numero *totale* di possibili scelte di $p$ elementi da rimuovere su $n$ osservazioni è 
+$$ {n \choose p} \approx n^p.$$
+
+## Esempio
+
+
+```{r}
+
+n =120 # 80%  del campione è usato come training/CV il rimanente è test
+set.seed(50)
+iris_sample <- sample(150, 120)
+
+#iris_sample <- 1:120
+
+iris_train <- iris[iris_sample,]
+
+iris_test <- iris[-iris_sample, ]
+
+error <- data.frame( "training" = numeric(), "CV"= numeric(), "test" = c(), "k"=numeric() )
+
+for(k in 1:10 ){
+# calcola le classi sul training/test set
+
+knn_iris_train <- knn(iris_train[, 1:4], iris_train[, 1:4], iris_train[, 5], k)
+knn_iris_test  <- knn(iris_train[, 1:4], iris_test[, 1:4], iris_train[, 5], k)
+knn_iris_cv <- knn.cv(iris_train[,1:4], iris_train[,5], k)
+
+# calcola l'accuratezza e aggiungi una riga al dataframe error
+
+error <- rbind(error,  data.frame( "training" = mean(knn_iris_train != iris_train$Species ), "CV"= mean(knn_iris_cv != iris_train[, 5]),  "test" =   mean(knn_iris_test != iris_test$Species ), "k" = k) )
+                         
+                         
+}
+
+ggplot(error, aes(x =k, y=training, col="error")) +geom_line(aes(col="training"),  linewidth=2)+
+  #geom_line(aes(x=k, y=test, col="test"), linewidth=1)+#+
+  geom_line(aes(x=k, y=CV, col="LoO CV"),  linewidth=2)  +
+ylab("errore")+ggtitle("Errore di kNN al variare di k, dataset iris")
+
+
+
+```
+
+----
+
+```{r}
+
+ggplot(error, aes(x =k, y=training, col="error")) +geom_line(aes(col="training"),  linewidth=2)+
+  geom_line(aes(x=k, y=test, col="test"), linewidth=1)+
+  geom_line(aes(x=k, y=CV, col="LoO CV"),  linewidth=2)  +
+ylab("errore")+ggtitle("Errore di kNN al variare di k, dataset iris")
+
+
+
+```
+
+
+
+## k-Fold CV
+
+- **Procedura**:
+  - fissare $k$ (nulla a che vedere con il $k$ di $k$NN)
+  - Dividere il dataset in $k$ parti uguali (*folds*)
+  - Per ogni fold:
+     - Utilizzare gli altri $k-1$ folds per calcolare il classificatore
+     - Utilizzare il fold selezionato come validation set
+     
+- *Esempio*: Con $k=5$, il dataset è diviso in $5$ parti; il modello viene addestrato su $4$ parti e testato su $1$, ripetendo l'operazione $5$ volte.
+
+
+## Pro e contro di k-Fold CV
+
+Vantaggi:
+
+- **Meno costoso di LOOCV**: Richiede solo $k$ passaggi
+
+- **Maggiore generalizzazione**: Ogni fold rappresenta una porzione del dataset.
+
+Svantaggi:
+
+- **Scelta di k** può influenzare le stime 
+
+- **Possibili fluttuazioni** a seconda della suddivisione dei dati.
+
+
+## Compromesso bias-varianza
+
+*Per molti modelli* le curve di errore al variare di un parametro di *regolarizzazione* interpolano tra due *estremi*:
+
+  - **Overfitting**: il classificatore $h$ si adatta troppo ai dati di addestramento ($k$-NN con $k$ piccolo) $\Rightarrow$ il *training error* è basso, il *test/validation* error è alto.
+  
+  - **Underfitting**: il classificatore è troppo semplice per catturare la struttura dei dati ($k$-NN con $k$ grande) $\Rightarrow$ il *training* error è alto (vicino al *test/validation* error)
+  
+- **Attenzione:** vedremo la decomposizione 
+$$ Errore = Bias + Varianza +Rumore $$
+non è *sempre* vero in tutti i modelli il *compromesso* tra bias/varianza.
+
+
+## Esempio
+
+```{r}
+library(MedDataSets)
+library(tidyr)
+#n =120 # 80%  del campione è usato come training/CV il rimanente è test
+#set.seed(50)
+#iris_sample <- sample(150, 120)
+Pima_tr2_df_tidy = drop_na(Pima_tr2_df)
+
+
+#iris_sample <- 1:120
+
+#iris_train <- iris[iris_sample,]
+
+#iris_test <- iris[-iris_sample, ]
+
+error <- data.frame( "training" = numeric(), "CV"= numeric(), "k"=numeric() )
+
+for(k in 1:20 ){
+# calcola le classi sul training/test set
+
+knn_train <- knn(Pima_tr2_df_tidy[, 1:7], Pima_tr2_df_tidy[, 1:7], Pima_tr2_df_tidy[, 8], k)
+#knn_iris_test  <- knn(iris_train[, 1:4], iris_test[, 1:4], iris_train[, 5], k)
+knn_cv <- knn.cv(Pima_tr2_df_tidy[,1:7], Pima_tr2_df_tidy[,8], k)
+
+# calcola l'accuratezza e aggiungi una riga al dataframe error
+
+error <- rbind(error,  data.frame( "training" = mean(knn_train != Pima_tr2_df_tidy[, 8] ), "CV"= mean(knn_cv != Pima_tr2_df_tidy[, 8]),  "k" = k) )
+                         
+                         
+}
+
+ggplot(error, aes(x =k, y=training, col="error")) +geom_line(aes(col="training"),  linewidth=2)+
+  #geom_line(aes(x=k, y=test, col="test"), linewidth=1)+#+
+  geom_line(aes(x=k, y=CV, col="LoO CV"),  linewidth=2)  +
+ylab("errore")+ggtitle("Errore di kNN al variare di k, dataset Pima_tr2_df (MetDadaSets)")
+
+
+
+
+```
+
+## Bias e varianza
+
+
+```{r}
+# Carica le librerie necessarie
+library(ggplot2)
+library(gridExtra)
+
+# Funzione per creare un bersaglio
+create_target <- function(bias, variance) {
+  radius <- c(1, 2, 3, 4)  # Raggi dei cerchi
+  df <- expand.grid(x = seq(-4, 4, length.out = 100), y = seq(-4, 4, length.out = 100))
+  df$dist <- sqrt(df$x^2 + df$y^2)
+  df$target <- cut(df$dist, breaks = c(-Inf, radius), labels = c("Dentro", "Primo cerchio", "Secondo cerchio", "Terzo cerchio"), right = FALSE)
+  
+  # Colori per i cerchi
+  colors <- c("green", "yellow", "orange", "red")
+  
+  ggplot(df, aes(x, y, fill = target)) +
+    geom_raster(interpolate = TRUE) +
+    scale_fill_manual(values = colors, guide = FALSE) +
+    geom_point(aes(x = 0, y = 0), color = "black", size = 3) +  # Punto centrale
+    labs(title = paste("Bias:", bias, "Varianza:", variance), 
+         x = "Predizioni", y = "Reale") +
+    coord_fixed() +
+    theme_void() +
+    theme(plot.title = element_text(hjust = 0.5))
+}
+
+# Crea i 4 bersagli
+target1 <- create_target("Alto", "Alto")    # Alto Bias, Alto Varianza
+target2 <- create_target("Alto", "Basso")   # Alto Bias, Basso Varianza
+target3 <- create_target("Basso", "Alto")   # Basso Bias, Alto Varianza
+target4 <- create_target("Basso", "Basso")  # Basso Bias, Basso Varianza
+
+# Organizza i bersagli in una griglia 2x2
+grid.arrange(target1, target2, target3, target4, ncol = 2)
+```
+
+## Classificatori binari:
+
+- **Problema**: l'accuratezza potrebbe non essere un buon indicatore di prestazione.
+
+- Studiamo nel dettaglio il caso di *classi binarie*  $C = \cur{-1, 1}$ (Negativi, Positivi).
+
+- **Esempio**: se la **prevalenza** dei positivi $p(L = 1) \approx 1\%$ è piccola, allora $h(x) = -1$ per ogni $x\in F$ ha accuratezza grande: $99\%$
+
+
+## Matrice di confusione (confusion matrix)
+
+- **Definizione** è una tabella di contingenza per valutare le prestazioni di un classificatore $h$.
+
+- **Elementi della matrice**:
+  - **Vero Positivo (TP)**,
+  - **Falso Positivo (FP)**, o *falso allarme*
+  - **Vero Negativo (TN)**,
+  - **Falso Negativo (FN)**, o *mancato allarme*
+
+\[
+\begin{array}{|c|c|c|}
+\hline
+ & \text{Predetto Positivo} & \text{Predetto Negativo} \\
+\hline
+\text{Positivo (Reale)} & TP & FN \\
+\hline
+\text{Negativo (Reale)} & FP & TN \\
+\hline
+\end{array}
+\]
+
+
+## Esempio
+
+Consideriamo il dataset ``Pima_tr2_df`` dal pacchetto ``MedDataSets`` e applichiamo $k$-nn su una decomposizione *Train+Test* di $100+100$ osservazioni. Le classi sono l'ottava osservazione (presenza o assenza di diabete).
+
+```{r}
+set.seed(42)
+data_sample <- sample(200, 100)
+
+
+train <- Pima_tr2_df_tidy[data_sample,]
+test <- Pima_tr2_df_tidy[-data_sample,]
+
+#set k in knn
+k=7
+
+knn_test <- knn(train[, 1:7], test[, 1:7], train[, 8], k=5)
+
+# confusion matrix is obtained by two columns
+
+confusion_matrix <- table( "Reale"= test[,8], "Classificato"= knn_test)
+
+# Print confusion matrix
+print(confusion_matrix)
+
+# Calculate TPR and FPR
+TP <- confusion_matrix[2, 2]  # True Positives
+TN <- confusion_matrix[1, 1]  # True Negatives
+FP <- confusion_matrix[1, 2]  # False Positives
+FN <- confusion_matrix[2, 1]  # False Negatives
+
+# True Positive Rate (TPR)
+TPR <- TP / (TP + FN)
+# False Positive Rate (FPR)
+FPR <- FP / (FP + TN)
+
+# Print TPR and FPR
+#cat("True Positive Rate (TPR):", round(TPR, 2), "\n")
+#cat("False Positive Rate (FPR):", round(FPR, 2), "\n")
+
+
+```
+
+
+
+## Calcolo delle Metriche
+
+- **Accuratezza**:
+  \[
+  \operatorname{Acc} = \frac{TP + TN}{P+N} \approx P(h(X) = L)
+  \]
+- **Prevalenza**:
+  \[ 
+  \operatorname{Prevalenza} = \frac{P}{P+N} \approx P( L=+1)
+  \]
+- **Precisione**:
+  \[
+  \operatorname{Precisione} = \frac{TP}{TP + FP} \approx P(L=+1 | h(X) =+1)
+  \]
+- **Potenza/tasso dei veri positivi/sensitività/richiamo**:
+  \[
+  \operatorname{TPR} = \frac{TP}{P} \approx P(h(X)=+1| L=+1)
+  \]
+- **Errore di tipo I/tasso dei falsi positivi**:
+  \[
+  \operatorname{FPR} = \frac{FP}{N} \approx P(h(X) = +1 | L=-1)
+  \]
+
+
+## Esempio di Confusion Matrix
+
+- Consideriamo il classificatore per il diabete trovato con $k$-NN
+  
+|               | Predetto Positivo | Predetto Negativo |
+|---------------|-------------------|-------------------|
+| Reale Positivo| 18 (TP)           | 16 (FN)           |
+| Reale Negativo| 11 (FP)            | 55 (TN)          |
+
+- **Calcolo delle Metriche**:
+  - Accuratezza: \( \frac{18 + 55}{100} = 73\% \)
+  - Prevalenza: \( \frac{18+16}{100} = 34\% \)
+  - Precisione: \( \frac{18}{18 + 11} = 62\% \)
+  - Potenza: \( \frac{18}{18 + 16} = 53\% \)
+  - Errore tipo I: \( \frac{11}{11+55} = 17\% \)
+  
+---
+
+## Commenti sulla Confusion Matrix
+
+- **Vantaggi**:
+  - Fornisce informazioni dettagliate sulle prestazioni del classificatore.
+  - Permette di identificare dove fallisce (FP e FN).
+
+- **Svantaggi**:
+  - Non fornisce informazioni sulla probabilità di errore (passare ai tassi di falsi positivi/negativi).
+  - Difficile confrontare matrici di classificatori diversi.
+
+
+## Grafico FPR/TPR
+
+
+**Idea**: dato un classificatore $h$, plottiamo la coppia di metriche $(FPR, TPR)$ (*errore I specie*, *potenza*) nel quadrato $[0,1]^2$.
+
+- Un classificatore ideale ha valori $(0,1)$ (angolo in alto a sx).
+
+- Un classificatore completamente random ha valori sulla diagonale.
+
+- Più il punto è in alto a sinistra, meglio è la performance del modello.
+
+
+
+## Esempio ($k$-NN al variare di $k$)
+
+
+
+```{r}
+
+rates <- data.frame("FPR" = numeric(), "NPR" = numeric(), "k" = numeric())
+
+for(k in 1:50){
+
+knn_test <- knn(train[, 1:7], test[, 1:7], train[, 8], k)
+
+# confusion matrix is obtained by two columns
+
+confusion_matrix <- table( "Reale"= test[,8], "Classificato"= knn_test)
+
+# Print confusion matrix
+#print(confusion_matrix)
+
+# Calculate TPR and FPR
+TP <- confusion_matrix[2, 2]  # True Positives
+TN <- confusion_matrix[1, 1]  # True Negatives
+FP <- confusion_matrix[1, 2]  # False Positives
+FN <- confusion_matrix[2, 1]  # False Negatives
+
+# True Positive Rate (TPR)
+TPR <- TP / (TP + FN)
+# False Positive Rate (FPR)
+FPR <- FP / (FP + TN)
+rates <- rbind(rates, data.frame(TPR, FPR, k))
+}
+
+ggplot(rates, aes(x=FPR, y=TPR, col=k))+geom_point()+xlim(0,1)+ylim(0,1)+geom_abline(slope=1, intercept=0, col='red') + ggtitle("FPR/TPR al variare di k, dataset Pima_tr2_df")
+
+```
+
+
+
+## Curva ROC e AUC
+
+- *Spesso* un classificatore $h$ permette di introdurre un parametro $t$ di soglia.
+
+- Esempio: $k$-NN con $k$-fissato: si valuta $h(x)=+1$ se il numero di vicini positivi tra i $k$ è $>t$ ($k$-NN standard si ottiene per $t=k/2$)
+
+- Si plotta allora la curva ottenuta al variare del parametro detta *curva ROC*.
+
+- L'area sotto la curva (*AUC*) è spesso usato come (singolo) indicatore della performance del modello. 
+
+- **Attenzione**: non è un indicatore di un singolo classificatore, bensì degli indicatori al variare del parametro di soglia.
+
+
+
+

@@ -1,0 +1,2258 @@
+
+IT
+755AA 2025 10 13 lezione 7
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+222 views  13 Oct 2025
+Classificazione, descrizione del problema, metodo knn, accuratezza, modello statistico della classificazione (dati i.i.d.), richiami di probabilità, definizione di rischio atteso. Deomposizione train/validation e test sets. Tecniche di cross validation: leave-p-out, k-fold CV. Trade-off tra bias/varianza e come si evidenzia nelle curve di errore.
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:01
+1 second
+Bene, oh, oggi iniziamo un argomento nuovo, più o meno diamo un argomento a settimana, però mi rendo conto, non so
+0:09
+9 seconds
+se tra oggi e mercoledì riusciamo a finire tutto. Eventualmente si sfora un po' con questo argomento anche a lunedì,
+0:16
+16 seconds
+quindi perché ci sono oggi è un po' più lunga perché dobbiamo fare anche dei richiami. Ecco. Allora, qual è l'argomento che vogliamo studiare? è il problema della classificazione.
+0:27
+27 seconds
+Allora, abbiamo già studiato il clustering.
+0:30
+30 seconds
+Nel clustering cosa c'era dato? C'erano date semplicemente delle osservazioni e ci siamo immaginati noi di dividerle in
+0:38
+38 seconds
+cluster che potrebbero essere delle classi. N il problema della classificazione è leggermente diverso perché, diciamo,
+0:47
+47 seconds
+ricade nel cosiddetto apprendimento supervisionato. In machine learning uno traduce così, però vedrete ora la differenza qual è. Cioè, nel problema,
+0:55
+55 seconds
+nella classificazione è ben chiaro, diciamo, qual è un errore e qual è invece una risposta corretta. Mentre per il clustering avevamo un po' questa
+1:03
+1 minute, 3 seconds
+esplorazione, non si sapeva bene quale fosse la risposta giusta. Invece il problema è il seguente, quindi ci ha dato un insieme di osservazioni, quindi
+1:12
+1 minute, 12 seconds
+un campione, se pensate, no, di taglia n. Ora le osservazioni le ho già divide così, l'ho divise in questo modo.
+1:18
+1 minute, 18 seconds
+Abbiamo le per ciascuna individuo abbiamo delle x con i e una li vediamo cosa sono queste queste cose. Le x con
+1:27
+1 minute, 27 seconds
+i, diciamo, stanno in un insieme feste pensare r^ d qualche spazio euclideo, ma
+1:34
+1 minute, 34 seconds
+pensiamolo come uno spazio astratto di caratteristiche e le chiamiamo fché sono features, caratteristiche dei dati.
+1:42
+1 minute, 42 seconds
+E invece la L è una etichetta e sta in un insieme C, diciamo, delle classi, va bene? Ora
+1:50
+1 minute, 50 seconds
+potreste pensare che L è la classe a cui l'etichetta che indica quale classe appartiene l'individuo. La chiamo L
+1:58
+1 minute, 58 seconds
+perché così sono labels, ok? Sono etichette. Quindi, capite, abbiamo già i dati, abbiamo deciso, se volete, perché
+2:05
+2 minutes, 5 seconds
+poi nella pratica uno decide cos'è feature e cos'è label, ok?
+2:11
+2 minutes, 11 seconds
+E e l'obiettivo qual è della classificazione? Vogliamo appunto trovare, determinare quello che è un classificatore, una funzione.
+2:20
+2 minutes, 20 seconds
+Tipicamente proprio una funzione. Poi magari ci può essere, adesso vediamo una funzione che dipende, che ha qualcosa di aleatorio dentro, però comunque la
+2:28
+2 minutes, 28 seconds
+pensiamo come una funzione, per cui date le caratteristiche, date le feature e quindi di un di un ipotetico individuo X
+2:36
+2 minutes, 36 seconds
+ci dà una sua label, la sua classe a cui dovrebbe appartenere. Ok? Quindi questo è l'obiettivo. Vedete è già formulato in
+2:44
+2 minutes, 44 seconds
+modo diverso rispetto al clustering in cui dividevamo gli insiemi in cluster e così via. Ad esempio, il numero delle
+2:53
+2 minutes, 53 seconds
+classi delle label di solito è già dato, mentre quando avevamo il clustering un problema era determinare quanti cluster.
+3:01
+3 minutes, 1 second
+Ora in questo caso di solito è già dato.
+3:03
+3 minutes, 3 seconds
+O quantomeno si può magari aggiungere un un una classe in più dicendo non so classificare quelli non classificati.
+3:11
+3 minutes, 11 seconds
+Ok.
+3:12
+3 minutes, 12 seconds
+Allora, vediamo un po' l'obiettivo di questa lezione di mercoledì dove faremo un po' esercitazione e vediamo se c'è tempo introduciamo qualche altro
+3:20
+3 minutes, 20 seconds
+concetto e poi finiremo per forza mi sa lunedì e di esibire insomma cioè raccontarvi un pochino che cosa quali
+3:29
+3 minutes, 29 seconds
+sono i metodi di classificazione o perdonate il termine classificazione classici, cioè quelli statistici
+3:37
+3 minutes, 37 seconds
+perché poi chiaramente questo è un problema così importante che negli anni si è sviluppato ulteriorment mente. E ora ci sono molti metodi che sono più di
+3:44
+3 minutes, 44 seconds
+apprendimento statistico, insomma, machine learning, diciamo. Noi restiamo magari sul ramo un po' più classico e spingiamo un po' di più, diciamo, sul
+3:53
+3 minutes, 53 seconds
+sulle metriche di performance, cioè quando un classificatore è buono, quali sono gli errori che può fare, che tipo di errori fa e così via. Va bene? Poi
+4:02
+4 minutes, 2 seconds
+non è che i metodi classici, quelli standard, funzionino sempre male, bisogna sempre usare reti neurali. Eh,
+4:09
+4 minutes, 9 seconds
+però eh però appunto ultimamente eh con i dati dimensioni elevate sia nella
+4:17
+4 minutes, 17 seconds
+taglia che nella dimensione delle feature ci sono metodi un po' più ehm performanti. Va bene? Quindi oggi
+4:24
+4 minutes, 24 seconds
+vedremo in realtà soltanto un algoritmo, un metodo per avere qualcosa di concreto in mano e ci concentriamo magari perlopi
+4:31
+4 minutes, 31 seconds
+sulle metriche di performance, ok? e faremo anche dei ripassi e dei richiami di probabilità perché vedremo che sarà
+4:38
+4 minutes, 38 seconds
+un po' importante, cioè si potrebbe anche evitare, però diventa poi un po' macchinosa la situazione. Allora, quindi
+4:46
+4 minutes, 46 seconds
+la classificazione, questo problema è fondamentale in tantissimi ambiti ed è studiato sia in statistica che, diciamo, in machine learning, quando si vogliono
+4:54
+4 minutes, 54 seconds
+usare algoritmi e magari si si, insomma, si sacrifica un po' di interpretabilità dal punto di vista statistico o di garanzie dal punto di vista statistico e
+5:03
+5 minutes, 3 seconds
+si va invece soltanto a cercare la performance, diciamo. Questo è un po' quello che distingue un po' tra statistica e machine learning. Però,
+5:11
+5 minutes, 11 seconds
+allora se vogliamo dire che tipo di problema è, perché vedremo anche la regressione appartiene in questa classe di problemi, è un problema in cui
+5:19
+5 minutes, 19 seconds
+appunto abbiamo una serie di esempi che possiamo chiamare training set insieme di addestramento. Quindi, come dicevamo,
+5:28
+5 minutes, 28 seconds
+no, per ogni individuo abbiamo le sue caratteristiche e le sue la sua etichetta e l'obiettivo è di imparare, di determinare questa funzione di
+5:36
+5 minutes, 36 seconds
+classificazione. Ok? Quindi, quando siete in situazione in cui avete appunto gli esempi e dagli esempi imparate e poi
+5:44
+5 minutes, 44 seconds
+procedete con una una funzione che avete imparato si chiama apprendimento supervisionato. Mentre il clustering di
+5:51
+5 minutes, 51 seconds
+per sé o anche la PCA sono tecniche in cui non ci sono gli esempi in cui sapete se state facendo bene o male e quello sarebbe apprendimento non supervisionato.
+6:02
+6 minutes, 2 seconds
+Allora, ovviamente aree in cui si applica la classificazione, ma nominatemene forse qualcuna in cui non ci sia un problema del genere, no?
+6:10
+6 minutes, 10 seconds
+Quindi immaginate, io devo valutare i vostri esami. Allora, ho gli esempi degli anni precedenti, non ce li ho in questo caso, però se ce li avessi,
+6:17
+6 minutes, 17 seconds
+potrei avere già il mio classificatore e so come attribuire se uno ha superato l'esame oppure no, insomma in base alle caratteristiche magari degli studenti
+6:25
+6 minutes, 25 seconds
+degli anni precedenti. Quindi capite, anche legato al clustering perché magari inizialmente per stabilire quali sono queste classi uno ha fatto delle decisioni, ha creato dei cluster e ora
+6:34
+6 minutes, 34 seconds
+deve imputare alle nuovi esempi e deve darli a queste cluster che ha già costruito queste classi, quindi sono comunque collegati anche in questo modo.
+6:43
+6 minutes, 43 seconds
+Beh, allora l'esempio, diciamo, di base che vedremo oggi è determinare la specie dei fiori in base alla lunghezza e ampiezza dei petali. Quindi, vi ricordate questo dataset iris, no?
+6:52
+6 minutes, 52 seconds
+c'erano quattro colonne e lunghezze e larghezze dei petali e poi c'era una quinta colonna che era la
+6:59
+6 minutes, 59 seconds
+specie. Quindi in effetti è già diviso, no? Le X, le Xi sono le le quattro dimensioni relative alla lunghezza
+7:06
+7 minutes, 6 seconds
+larghezza di petali, sepali, erano quattro numeri e poi la specie è la nostra etichetta, la label. Ok? Avevamo tre specie, 150 osservazioni, n = 150.
+7:17
+7 minutes, 17 seconds
+Vabbè, questo però è un esempio giocattolo, no? a noi interessa applicazioni più concrete. Allora, eh classificazione è ovunque.
+7:25
+7 minutes, 25 seconds
+Un esempio standard in cui vedremo magari da magari vi racconto un attimo, però appunto se avete un o meglio ce
+7:33
+7 minutes, 33 seconds
+l'avete sicuramente perché la posta di Ateneo funziona e ce l'ha e c'è il suo bel filtro antispam. Allora, ogni messaggio che arriva, il classificatore
+7:41
+7 minutes, 41 seconds
+deve decidere se il messaggio è spazzatura oppure farlo passare. E anche qui allora c'è un programma, un
+7:49
+7 minutes, 49 seconds
+algoritmo che è un classificatore, quindi ha studiato tanti esempi, sa in qualche modo che ci sono messaggi di
+7:56
+7 minutes, 56 seconds
+tipo spam e altri non di tipo spam e molto spesso però fa degli errori. Non so se avete anche voi incontrato a volte
+8:03
+8 minutes, 3 seconds
+nella cartella dello spam cose che uno dice "Ma questa doveva arrivarmi un mese fa, invece me ne sono accorto solo adesso". No, quindi il filtro antispam
+8:11
+8 minutes, 11 seconds
+tendenzialmente funziona come un classificatore, ok? Ma eh ma ce ne sono tantissimi altri. Ad esempio, se siete
+8:19
+8 minutes, 19 seconds
+un medico potreste avere bisogno di anzi quello che fa un medico in effetti spesso è di essere un classificatore, no? riceve delle informazioni, delle
+8:27
+8 minutes, 27 seconds
+caratteristiche sulla base degli esami che ha fatto e poi vi classifica, ad esempio, se avete una malattia, se un
+8:34
+8 minutes, 34 seconds
+tumore è benigno o maligno. Ok? Quindi, boh, insomma, questo è un un classificatore che uno avrebbe esperto.
+8:42
+8 minutes, 42 seconds
+La domanda è se si possa automatizzare o aiutare con la statistica questo tipo di classificazione, ma di tutto in realtà
+8:49
+8 minutes, 49 seconds
+è, anzi spesso è più comune parlare di problemi di classificazione piuttosto che di regressione. Vedremo che la regressione è un'evoluzione, se volete,
+8:58
+8 minutes, 58 seconds
+della classificazione con infinite classi, un continuo di classi. Ad esempio, se siete andati a votare,
+9:05
+9 minutes, 5 seconds
+secondo me Google altro social network in cui siate sa già sapeva già chi avreste votato, perché ci
+9:12
+9 minutes, 12 seconds
+sanno classificare e sanno sicuramente determinare per quali candidati voteremo. Va bene? Quindi il voto è
+9:18
+9 minutes, 18 seconds
+segreto, ma in realtà non è così segreto, purtroppo, in base alle nostre attività quotidiane e e così via.
+9:27
+9 minutes, 27 seconds
+Infatti poi come si usa questa cosa? ora forse più presente negli Stati Uniti che che in Europa, no? Ci sono cioè momento in cui bisogna distinguere i distretti e chi vota per determinati candidati, no?
+9:38
+9 minutes, 38 seconds
+Noi ci basiamo un po' sulle regioni geografiche, ma negli Stati Uniti c'è ci sono battaglie eh feroci perché decidono di ridisegnare i distretti in base a
+9:47
+9 minutes, 47 seconds
+sapendo a chi voterà, perché lo sanno come si vota, le persone votano più o meno sempre gli stessi partiti e a quel punto si sanno giocare e avere più o
+9:54
+9 minutes, 54 seconds
+meno candidati una una fazione oppure l'altra, capite? Quindi l'importanza di saper stimare e classificare bene anche le intenzioni di voto. Va bene?
+10:05
+10 minutes, 5 seconds
+Allora, dai, quindi sperando di avervi un po' detto che è importante, ma immaginate anche voi nella vita di tutti i giorni quanto spesso usate la
+10:12
+10 minutes, 12 seconds
+classificazione e vediamo un algoritmo semplice su cui iniziare e faremo poi le nostre discussioni sulle metriche e
+10:21
+10 minutes, 21 seconds
+appunto la bontà di questo di questo algoritmo. Poi i discorsi che faremo per questo li eh insomma declineremo per gli altri algoritmi che sono un po' più
+10:30
+10 minutes, 30 seconds
+complicati magari da raccontare, però poi magari sono più soddisfacenti, hanno un po' di più struttura dietro. Allora,
+10:37
+10 minutes, 37 seconds
+vediamo. Quindi, questo algoritmo è il l'algoritmo dei K primi vicini, cioè K Narest neighbors e KNN. Attenzione, non
+10:47
+10 minutes, 47 seconds
+confondere con K means, tutta un'altra cosa. E cominciamo con la versione più semplice. Allora, facciamo il k = 1, cioè l'algoritmo al primo vicino. Ok?
+10:58
+10 minutes, 58 seconds
+Allora, qual è l'idea? L'idea che abbiamo le nostre feature, la stessa idea che avevamo per i clustering, no?
+11:03
+11 minutes, 3 seconds
+Vi ricordate? eh caratteristiche vicine, cioè vettori di caratteristiche vicine andranno a finire nello stesso cluster e
+11:10
+11 minutes, 10 seconds
+qui diciamo che allora punti con caratteristiche vicino vicine avranno la stessa etichetta.
+11:18
+11 minutes, 18 seconds
+Ok? Quanto vicine? Eh, bisogna un po' vedere. Allora, quindi come funziona l'algoritmo? Facciamo il caso del primo vicino, cioè prendiamo un
+11:27
+11 minutes, 27 seconds
+un vettore di feature, di caratteristiche, ecco, supponiamo adesso per per renderlo concreto che siamo in RD.
+11:34
+11 minutes, 34 seconds
+Fate finta, so Iris, avete quattro osservazioni. A quel punto, dato il nostro X che dobbiamo classificare, cosa
+11:41
+11 minutes, 41 seconds
+facciamo? Cosa fa questo metodo? Andiamo a cercare su tutto il nostro training set, su tutti i nostri esempi che
+11:48
+11 minutes, 48 seconds
+abbiamo, andiamo a trovare quel indice I, sperabilmente ce ne sarà uno solo,
+11:55
+11 minutes, 55 seconds
+che ha le caratteristiche più vicine all' x che invece voglio classificare. Quindi, vedete, cosa andiamo a fare?
+12:02
+12 minutes, 2 seconds
+Andiamo a fare larg min. Andiamo a cercare quindi l'indice che minimizza la distanza tra i varie x con i e e l' x
+12:11
+12 minutes, 11 seconds
+obiettivo. Ok? Adesso lo vediamo anche graficamente che è molto semplice in dimensione due. Ok, abbiamo trovato il
+12:17
+12 minutes, 17 seconds
+suo vicino, cioè il vettore del nostro Ah, come mai? Vediamo un po'.
+12:27
+12 minutes, 27 seconds
+Vabbè, questo mi ci tiene svegli.
+12:30
+12 minutes, 30 seconds
+Allora, ehm, troviamo il vettore più vicino e a quel punto cosa usiamo? Beh, usiamo la
+12:38
+12 minutes, 38 seconds
+caratteristica, la label, scusate, l'etichetta di quello. Ok? Quindi definiamo hx come la label della
+12:45
+12 minutes, 45 seconds
+l'etichetta dellindice di X che è quello più vicino a lì. Ok? Vabbè, un dice molto semplice perché no? Abbiamo già
+12:52
+12 minutes, 52 seconds
+risolto il problema, è un algoritmo abbastanza intuitivo, no? perché punti vicini, quindi avranno più o meno le stesse classi semplice da implementare.
+13:01
+13 minutes, 1 second
+Ora quanto semplice va un attimo discusso perché se n è molto grande avete tantissimi punti di esempio e
+13:09
+13 minutes, 9 seconds
+dovreste in teoria cercarli tutti, però ci sono accorgimenti per cercare di semplificare un po' eh la ricerca, no?
+13:16
+13 minutes, 16 seconds
+Perché vedete, ne avete n se 1 milione prima di avere la risposta su uno devo cercare tutti gli esempi e vedere qual è il più vicino e poi alla fine trovo
+13:24
+13 minutes, 24 seconds
+quello lì e lo uso. Beh, vabbè, magari si può migliorare la ricerca. E poi in realtà nulla dice di usare metrica
+13:32
+13 minutes, 32 seconds
+euclidea. Se le nostre caratteristiche uno vuole usare metriche pesate, pesare più alcune caratteristiche, altre meno così via, eh allora possiamo usarla.
+13:41
+13 minutes, 41 seconds
+Basta usare una metrica diversa. Ok?
+13:44
+13 minutes, 44 seconds
+Qualcuno vede degli svantaggi per questo algoritmo? Così se non ce ne sono finiamo la lezione, no? Cosa dite? Quale
+13:53
+13 minutes, 53 seconds
+potrebbe essere uno svantaggio di questo algoritmo?
+13:57
+13 minutes, 57 seconds
+Eh, magari non è subito evidente, ma c'è un problema di sensibilità, diciamo, al rumore, diciamo. Ora vediamo negli
+14:06
+14 minutes, 6 seconds
+esempi cosa succede. Cioè, ci potrebbero essere delle situazioni in cui c'è un punto che ha una, cioè che è stato etichettato male, magari e vicino a sé
+14:15
+14 minutes, 15 seconds
+si porta tutta una bella isoletta di altri punti che verranno etichettati male, mentre magari questo stava in un in un oceano, no, di altri punti
+14:22
+14 minutes, 22 seconds
+etichettati in un modo, c'è lui che è stato etichettato sbagliato. Allora, è molto sensibile al rumore. Poi vedremo che questo ci cioè è un concetto legato
+14:31
+14 minutes, 31 seconds
+alla varianza del nostro algoritmo, del nostro metodo. Poi c'è l'altro problema che avevo già un po' evidenziato, cioè che è facile da implementare, ma se
+14:38
+14 minutes, 38 seconds
+siamo un po' così ingenui eh ogni volta dobbiamo guardarci tutti e ed nne i
+14:45
+14 minutes, 45 seconds
+punti per trovare quello più vicino e potrebbe essere un po' scomodo.
+14:52
+14 minutes, 52 seconds
+E infine ecco questo è il solito problema. Questo andrebbe qualcuno doveva già dirlo, cioè se avete un algoritmo basato sulla distanza, c'è il
+15:00
+15 minutes
+solito discorso che quando le caratteristiche vanno ad avere distanze su spazi di dimensione elevata, magari
+15:08
+15 minutes, 8 seconds
+le distanze rivendono poco rappresentative e c'è il solito fenomeno della course of dimensionality, va bene?
+15:14
+15 minutes, 14 seconds
+Però questo è perché abbiamo scelto la la distanza essenzialmente. Quindi allora come si risolvono un po' queste questioni. Ora vediamo per la Curso of Dimensionality in realtà il discorso è
+15:23
+15 minutes, 23 seconds
+spesso. Uno fa prima una PCA, proietta, riduce su dimensioni più basse, così cerca un po' di alleviare questo
+15:31
+15 minutes, 31 seconds
+problema e poi fa il KNN. Ok? Quindi a volte è accoppiata con una PCAI o comunque qualche altra tecnica di
+15:38
+15 minutes, 38 seconds
+riduzione dimensionale. Il costo computazionale, vi dicevo, è un problema algoritmico. Bisogna trovare algoritmi
+15:45
+15 minutes, 45 seconds
+intelligenti per organizzare bene i dati in modo che ogni volta non mi costi così tanto. Magari apprezzo di fare qualcosa
+15:52
+15 minutes, 52 seconds
+di non esattamente eh es, cioè di non esatto, magari non trovo esattamente il più vicino. E adesso cerchiamo di capire la questione del rumore che è più una questione statistica.
+16:03
+16 minutes, 3 seconds
+Allora, vediamo se si vede un pochino i colori, non tantissimo, ma è il proiettore. Allora, qui abbiamo il nostro dataset Iris, ok? Il solito. E ho
+16:12
+16 minutes, 12 seconds
+plottato, però questa volta queste non sono le componenti principali, avrei dovuto forse, ma insomma ero stanco.
+16:18
+16 minutes, 18 seconds
+Allora, ho fatto eh la lunghezza di sepali contro la larghezza di petali. Va bene? Quindi, comunque, già non sono
+16:26
+16 minutes, 26 seconds
+tutte e quattro le dimensioni, però se uno va a vedere un pochino, dice "Ok, se devo classificare un punto, facciamo che il punto che nuovo ha queste
+16:34
+16 minutes, 34 seconds
+caratteristiche qui, si trova qui, ha questa lunghezza di di sepali e questa larghezza di petali. Beh, allora cosa devo andare a fare? Devo andare a vedere
+16:41
+16 minutes, 41 seconds
+il più vicino. Facciamo finta che abbiamo solo queste due caratteristiche, non le altre due che non vediamo, quindi sarà difficile. Vado a vedere più
+16:48
+16 minutes, 48 seconds
+vicino. Eh, il più vicino è questo. Beh, è rosso. Quindi anche quel nuovo punto è classificato come specie rossa che è setosa. Ok? Beh, fin qui tutto bene, no?
+17:00
+17 minutes
+Se i punti li trovo qui va bene, se li trovo qui sono circondati da verdi. Ma se mi trovo vicino al bordo, diciamo, in una situazione in cui ci sono rossi e
+17:09
+17 minutes, 9 seconds
+blu, un po' meno precisa, quindi ho individuato questo punto con la croce, no? Qui vedete il più vicino
+17:15
+17 minutes, 15 seconds
+effettivamente è il blu, quindi lui verrebbe classificato come blu, però tutto intorno, vedete, a parte un altro
+17:24
+17 minutes, 24 seconds
+blu, ce ne sono tantissimi di verdi, quindi forse non è tanto bene classificarlo come blu, ma potrebbe essere più un esempio di verde. E quei
+17:33
+17 minutes, 33 seconds
+due blu sono dei casi eccezionali che stavano lì, eh, quindi un po' sporcando.
+17:39
+17 minutes, 39 seconds
+Sono del rumore che ho nelle mie nei miei dati.
+17:42
+17 minutes, 42 seconds
+Quindi, comunque, vedete, anche graficamente il punto è che ogni volta che avete un punto di un certo colore, questo individua intorno a sé la
+17:50
+17 minutes, 50 seconds
+regione, no, dei punti X che sono più vicini a lui rispetto ad altri punti e tutti i punti lì dentro vengono classificati con quel colore. Quando
+17:58
+17 minutes, 58 seconds
+avete una situazione in cui avete punti di due colori, si creano delle piccole isolette, delle bolle, no? In questo caso avreste una piccola bolla di punti
+18:05
+18 minutes, 5 seconds
+blu, un'altra piccola bolla di punti blu e tutto il resto è classificato verde.
+18:10
+18 minutes, 10 seconds
+Ok? e uno non vorrebbe una cosa del genere perché magari quei punti sono finiti lì per sbaglio. Ok? Quindi il punto è che vogliamo rimuovere un po' il
+18:19
+18 minutes, 19 seconds
+rumore e questo tipo di rumore è detto in modo più concreto come varianza. Poi ci torniamo, analizzeremo un po' più precisamente.
+18:28
+18 minutes, 28 seconds
+E allora, quindi come si fa? Beh, si fa semplicemente una anche una risposta intuitiva. Uno dice "Ok, K = 1, vado a vedere solo il primo vicino, ma magari
+18:37
+18 minutes, 37 seconds
+lui l'ho beccato blu, ma il secondo, il terzo, il quarto vicino erano tutti verdi allora cosa faccio? Fisso un K,
+18:45
+18 minutes, 45 seconds
+che so, fisso K = 2 3, meglio se sono dispari, perché ora vedete bisogna fare una specie di votazione, no? Quindi
+18:53
+18 minutes, 53 seconds
+fissiamo un K e vediamo cosa fa Kest Nigor generale.
+18:59
+18 minutes, 59 seconds
+Va bene? Quindi fissiamo ad esempio K = 3, giusto per dire, fissiamone uno. 3.
+19:04
+19 minutes, 4 seconds
+Allora si va dato un punto X con queste caratteristiche vogliamo classificarlo, andiamo a trovare non il primo vicino,
+19:12
+19 minutes, 12 seconds
+ma i primi k, quindi i primi tre vicini, quindi più vicino, il secondo più vicino, il terzo più vicino se k = 3.
+19:19
+19 minutes, 19 seconds
+Ok? Quindi li vado a individuare, li chiamo i1 di x, i2 di x fino a i k x.
+19:25
+19 minutes, 25 seconds
+Quindi saranno tre diversi, sperando che siano non ci siano perché a volte potrebbe accadere che siete in una situazione proprio, diciamo,
+19:34
+19 minutes, 34 seconds
+borderline, no? E sono esattamente ne avete che so K + 1 perché due distanze coincidono. Beh, comunque immaginando
+19:41
+19 minutes, 41 seconds
+che siano tutte diverse queste distanze, le prendete le prime K, le più vicine e andate a vedere le rispettive etichette.
+19:48
+19 minutes, 48 seconds
+Quindi avremo il primo vicino che pesa ci dà l'etichetta L1, la secondo che ci dà l'etichetta L2, il terzo fino al
+19:56
+19 minutes, 56 seconds
+cappesimo. Benissimo. Quindi abbiamo queste etichette, immaginate prima, no?
+20:00
+20 minutes
+Verde, verde, blu, verde, verde, insomma, se ne ho fatti cinque. Beh, cosa vado a fare? Faccio un voto di
+20:07
+20 minutes, 7 seconds
+maggioranza, ok? Vado a vedere qual è eh la label più frequente di queste K.
+20:17
+20 minutes, 17 seconds
+Quindi capite, meglio se dispari, perché se se fosse ad esempio se fate un problema di classificazione binaria, ne prendete due vi trovate una di un colore
+20:25
+20 minutes, 25 seconds
+e una dell'altra e dovete fare poi uno spareggio, lanciate magari una moneta, ma diciamo supponendo che non ci siano ambiguità, andiamo a prendere la label
+20:33
+20 minutes, 33 seconds
+più frequente in queste K e quindi definiamo il classificatore KNN H con
+20:41
+20 minutes, 41 seconds
+quel K fissato di X come questa etichetta. Ok, adesso vediamo nell'esempio cosa succede. Ok,
+20:48
+20 minutes, 48 seconds
+ovviamente si pone adesso è un po' un problema così che si si mangia la coda, no? Abbiamo detto introduciamo questo
+20:55
+20 minutes, 55 seconds
+nuovo K, però come vi ricordate in tante altre occasioni, come andiamo a scegliere il parametro K? Questo è di
+21:02
+21 minutes, 2 seconds
+nuovo un iper parametro, però questa volta vedremo che è un po' diversa la storia perché abbiamo un obiettivo abbastanza chiaro, ok? e quindi
+21:10
+21 minutes, 10 seconds
+cercheremo il miglior K in base all'obiettivo che è quello di fare pochi errori nella nostra classificazione.
+21:18
+21 minutes, 18 seconds
+Allora, vediamo un po' nell'esempio Kenen qui cosa succede. Vedete, se il punto è questo, beh, allora se se siamo facciamo un caso facile, no? Se sono qui
+21:26
+21 minutes, 26 seconds
+che io prenda k = 1 2 3 4 5, insomma, alla fine vedrò sempre rossi. Qui siamo tranquillissimi. Però vedete la scelta
+21:34
+21 minutes, 34 seconds
+di K può essere rilevante qui, no? In questo punto, se faccio k = 2,
+21:41
+21 minutes, 41 seconds
+forse trovo ancora blu. A occhio sembrerebbe che trovo ancora blu, ma se faccio k = 5 comincio a vederne tre di
+21:49
+21 minutes, 49 seconds
+verdi e due di blu ed è classificato verde. Ok? Quindi capite? Quindi la scelta del K ci va a vedere quanto
+21:56
+21 minutes, 56 seconds
+intorno dobbiamo guardarci e più grande sarà K più andremo lontano e faremo una media. Attenzione, quindi già si capisce
+22:04
+22 minutes, 4 seconds
+che K troppo grande non potrà andare bene, cioè prendete K = N, vuol dire che prendete tutti i punti e a quel punto
+22:13
+22 minutes, 13 seconds
+niente, state guardando tutti i punti e viene semplicemente si vota per la classe più rappresentata, no? Quindi
+22:21
+22 minutes, 21 seconds
+bisogna cercare un K giusto. K troppo piccolo potrebbe darci questo problema di oscillazioni, di errori locali. capo
+22:27
+22 minutes, 27 seconds
+troppo grande, non va bene. Ora vedremo cosa dice l'errore. Allora, se vogliamo giocare e vi allenate, aguzzate la
+22:36
+22 minutes, 36 seconds
+vista, eh, vedete un po' questo, scaricatevelo oppure giocateci online,
+22:46
+22 minutes, 46 seconds
+semplicemente, sì, ho automatizzato un po' di cose, ma vediamolo anche in pratica per capire cosa succede, no?
+22:51
+22 minutes, 51 seconds
+Facciamo così. Allora, questa demo c'è una demo, ma c'è anche il gioco. Il gioco è proprio questo che dicevo, cioè dovete classificare con un n e così via.
+23:02
+23 minutes, 2 seconds
+Attenti che anche nel gioco si scopre una cosa interessante. Comunque guardiamo un attimo la demo. Datemi facciamo un esempio, dai. Vogliamo fare ad esempio
+23:10
+23 minutes, 10 seconds
+una faccetta. Ok, va bene, facciamo gli occhi. Ok, questi sono la prima classe.
+23:17
+23 minutes, 17 seconds
+Ok, e ora facciamo la seconda classe.
+23:20
+23 minutes, 20 seconds
+Potete divertirvi, fate fate, insomma, rappresentate come volete. Facciamo la classe due, ci facciamo una bella faccia così.
+23:29
+23 minutes, 29 seconds
+Ecco qua. Vedete? Ora, in questa situazione i punti che sono vicini alla linea
+23:36
+23 minutes, 36 seconds
+orizzontale saranno classificati in modo giusti. Adesso facciamo un nuovo test point. Allora, se io scelgo K = 1, eh, e
+23:45
+23 minutes, 45 seconds
+sono qui, vedete, mi trovo in una situazione di incertezza. Ora vedete, magari per come ho posizionato il punto, sono più vicino alla classe 1, i rossi, oppure sarò più vicino alla classe 2.
+23:56
+23 minutes, 56 seconds
+Devo andare soltanto a vedere il primo più vicino. Vediamo come me lo classifica. mi dice rosso. Però se ad
+24:02
+24 minutes, 2 seconds
+esempio prendo K = 3, vediamo cosa succede se faccio un punto simile.
+24:09
+24 minutes, 9 seconds
+Ecco, vediamo un po' cosa succede. No, ancora rosso. Mh, c'è qualcosa di sbagliato
+24:15
+24 minutes, 15 seconds
+nella demo. Vediamo un attimo. Eh, aspettate, cancello i punti di testa.
+24:22
+24 minutes, 22 seconds
+Vediamo se così va.
+24:25
+24 minutes, 25 seconds
+Mh, mi sa che No, mi sa che c'è qualche gap nella demo. E ieri mi funzionava, eh. Ok, ora
+24:33
+24 minutes, 33 seconds
+ha fatto giusto. No, invece no, sta facendo contrario. Mannaggia.
+24:41
+24 minutes, 41 seconds
+Vediamo. Mh.
+24:46
+24 minutes, 46 seconds
+Beh, ok. Allora, perdonatem cerco di aggiustarvela dopo. Ieri funzionava, oggi ha deciso di no. Comunque, se
+24:53
+24 minutes, 53 seconds
+provate il gioco, questo vi evidenzia una cosa interessante. Il gioco sembra funzionare un po' meglio. Allora, avete
+25:00
+25 minutes
+un dataset e vi viene dato un punto da classificare. Eccolo qui. Allora, notate subito una cosa interessante che eh è importante capire le unità di misura.
+25:12
+25 minutes, 12 seconds
+Vedete, qui abbiamo altezza contro BP.
+25:16
+25 minutes, 16 seconds
+Cos'è? Vediamo un po'. Ah, se avete dubbi su cos'è il dataset c'è scritto qua. Eccolo qua. Altezza contro BP è la pressione del sangue. Va bene.
+25:28
+25 minutes, 28 seconds
+E torniamo al Dove l'ho beccato? Qua.
+25:35
+25 minutes, 35 seconds
+Eh, me l'ha cambiata. Scusate, com'è che mi ha fatto sta cosa? Ok, vabbè.
+25:39
+25 minutes, 39 seconds
+Comunque il punto è che divertitevi a farlo da soli, è importante anche la scala. Eh, attenti perché se usate le
+25:47
+25 minutes, 47 seconds
+distanze euclidee può essere al solito discorso come valeva per la PCA. Ci sono magari delle dimensioni in cui avete
+25:54
+25 minutes, 54 seconds
+usato delle unità di misura e queste vengono molto distorte, no? E quindi quando andate a vedere la distanza tra due punti è tutto dominato magari da una
+26:02
+26 minutes, 2 seconds
+componente. Quindi spesso KNN, quindi ve ne accorgete che qui è io quando rappresentare il grafico, vedete
+26:09
+26 minutes, 9 seconds
+ad esempio qui la dose, ora questo è un altro dataset, la dose è tra 0,5 e 2 e la lunghezza è tra 10 e 30. Quindi se
+26:17
+26 minutes, 17 seconds
+usate KNN senza fare uno scaling, senza standardizzare i vostri dati, cosa che è fortemente consigliata, beh, a meno che
+26:25
+26 minutes, 25 seconds
+non abbiate motivi di non farlo. Eh, qui vedete che questa componente dose in realtà conta poco, cioè tutti i punti
+26:32
+26 minutes, 32 seconds
+sono molto vicini sull'asse delle X rispetto invece al componente Y. Ok?
+26:37
+26 minutes, 37 seconds
+Quindi quando andiamo a vedere questo punto, vedete, alla fine immaginate di schiacciare tutto e più vicino, vabbè, risulta quello verde. Vediamo se è
+26:45
+26 minutes, 45 seconds
+giusto, almeno se il giochino funziona, sennò devo ritirarlo da Clicchiamo.
+26:50
+26 minutes, 50 seconds
+Allora, qua dice classifichiamo.
+26:55
+26 minutes, 55 seconds
+Ora questo punto, vediamo, lo facciamo rosso. Vediamo un po' cosa dice. Sì, hai applicato correttamente un n, però il vero punto era VC. Va bene? Niente.
+27:05
+27 minutes, 5 seconds
+Quindi a volte può capitare che uno sbaglia anche applicando KNN correttamente, però attenti che appunto il
+27:14
+27 minutes, 14 seconds
+le dimensioni, cioè le unità di misura contano e quindi come per la PCA, anzi spesso si accoppia PCA e poi KNN, attenti che appunto è è determinante.
+27:25
+27 minutes, 25 seconds
+Quindi attenti, il buon consiglio è di scalare i dati. Qui nel gioco non è fatto. Ora questa cosa invece mi spiace che non funziona. Vediamo un attimo se riesco a farla ripartire.
+27:35
+27 minutes, 35 seconds
+Quindi uno fa un po' di punti. Scegliamo un'altra classe. Capisco come mai.
+27:42
+27 minutes, 42 seconds
+Ok, vediamo un punto da classificare. Vediamo se lo fa in modo giusto.
+27:48
+27 minutes, 48 seconds
+No, proprio sbagliato. Ok, cioè devo aver sbagliato qualcosa nel nel colore, forse. Vediamo se lo mette qui.
+27:57
+27 minutes, 57 seconds
+Ah, no, però aspettate, forse. Ok, aspettate, vediamo questo.
+28:04
+28 minutes, 4 seconds
+Classifica. Sì, ora sembra andare meglio, scusate, per qualche motivo un po' aleatorio. Qui il più vicino è 4, è quello rosso.
+28:13
+28 minutes, 13 seconds
+Ok, ma cambiamo il K, vediamo cosa succede. Ecco, vedete? Con K = 2.
+28:20
+28 minutes, 20 seconds
+Mh, non ci credo ancora molto. Vediamo. K = 3. Mh, k = 3. Sì, mi sembra giusto, no?
+28:27
+28 minutes, 27 seconds
+Perché questo due, vedete, è in mezzo ai rossi. viene classificato rosso correttamente. Il quattro che è lì in
+28:33
+28 minutes, 33 seconds
+alto, eh, vede i due vicini triangolini, blu, cos'è? e il rosso, però vince il rosso, viene classificato
+28:41
+28 minutes, 41 seconds
+correttamente. Ok, allora vabbè, giocateci un pochino. L'unico dubbio è se carica le cose, cioè sembrerebbe non
+28:49
+28 minutes, 49 seconds
+essere non aggiornare in tempo reale le le cose come dovrebbe fare. Comunque tornando al alle nostre slide,
+29:00
+29 minutes
+quindi giocateci un po'. È un algoritmo molto semplice, non è complicato e vedremo mercoledì che è una riga di
+29:08
+29 minutes, 8 seconds
+comando di R, insomma, non è non è complicato, però andiamo a vedere quindi come valutare la prestazione, no?
+29:16
+29 minutes, 16 seconds
+abbiamo diversi K, quindi non abbiamo solo un classificatore, possiamo giocarcene più di uno.
+29:23
+29 minutes, 23 seconds
+E quindi la domanda è l'errore. Come misuriamo l'errore? Beh, l'errore è, diciamo,
+29:31
+29 minutes, 31 seconds
+l'opposto dell'accuratezza, no? Farà tanti errori, quantomeno sarà accurato.
+29:37
+29 minutes, 37 seconds
+Allora, l'accuratezza accuracy in inglese è di un classificatore, è la prima metrica di performance che andiamo a definire.
+29:45
+29 minutes, 45 seconds
+Allora, come cosa andiamo a contare?
+29:46
+29 minutes, 46 seconds
+Beh, andiamo a contare la percentuale di dati classificati in modo corretto sui dati totali. Quindi abbiamo numero di
+29:55
+29 minutes, 55 seconds
+classificazioni corrette, classificazioni corrette su esempi totali.
+30:07
+30 minutes, 7 seconds
+Ok? Però uno non è molto soddisfatto da questa definizione, no? perché dice è molto accurato e sarà 100% di
+30:14
+30 minutes, 14 seconds
+accuratezza. Quindi tutti gli esempi sono classificati in modo corretto. 50% dipende da quante sono le classi, no? Se
+30:22
+30 minutes, 22 seconds
+sono due classi e gli presento esempi di, insomma, con metà esempi di un metà di un altro tipo, potrebbero essere che che sta tirando a casa oppure no.
+30:31
+30 minutes, 31 seconds
+Quindi, chiaramente, vogliamo un'accuratezza elevata, però c'è un problema, cioè quando dico gli esempi totali, no, la classificazioni corrette,
+30:40
+30 minutes, 40 seconds
+cioè su quali dati sto effettivamente calcolando l'accuratezza.
+30:45
+30 minutes, 45 seconds
+Ok? Questo è la domanda perché io ho gli esempi, no? Ho gli esempi che sono n osservazioni, ciascuno ha le sue
+30:53
+30 minutes, 53 seconds
+caratteristiche e la sua label e poi posso creare il mio classificatore, ad esempio KNN, ok? e magari per K diversi
+31:02
+31 minutes, 2 seconds
+avrò accuratezze diverse e quindi posso fare posso dire "Ok, valutiamo l'errore sui miei dati che ho,
+31:09
+31 minutes, 9 seconds
+no? Questo che tipo di errore? È quello che si chiama a volte eh il l'errore di training, ok? È l'errore ovviamente
+31:17
+31 minutes, 17 seconds
+cos'è un errore? Uno, se la mia label prevista è diversa da quella vera e zero se invece era uguale a quella vera c'ho
+31:25
+31 minutes, 25 seconds
+azzeccato, no? Eh, allora il training error è un primo un modo di misurare l'accuratezza. Ora a dire vero il
+31:32
+31 minutes, 32 seconds
+training error non è proprio la percentuale, no? Quindi se fate 1 su n così ottenete un numero che è compreso tra 0 e 1, già meglio, no?
+31:42
+31 minutes, 42 seconds
+Però ripeto, qual è secondo voi il problema di misurare l'errore sul training sul training set, sull'insieme
+31:50
+31 minutes, 50 seconds
+degli esempi che avete, no? Cioè, qual è il miglior classificatore da questo punto di vista?
+31:56
+31 minutes, 56 seconds
+Se voglio rendere piccolo questo errore, qual è il classificatore che ci azzecca sempre? Noi abbiamo kn
+32:03
+32 minutes, 3 seconds
+e ke1 n, cioè va a vedere, io vado a vedere proprio sui dati dei miei esempi e lui devo cercare il punto più vicino e
+32:11
+32 minutes, 11 seconds
+sarà quello e vado a usare la sua etichetta a meno che proprio non ci siano due dati che coincidono, hanno etichette diverse. Questo si chiama rumore.
+32:19
+32 minutes, 19 seconds
+Diciamo se i dati hanno caratteristiche diverse, ci danno etichette diverse a quel punto, scusate, stesse
+32:26
+32 minutes, 26 seconds
+caratteristiche ci danno, cioè non c'è mai due dati con le stesse caratteristiche, diciamo così, esattamente. Allora, a quel punto 1 nn è
+32:34
+32 minutes, 34 seconds
+perfetto perché qualsiasi dato io prenda dei miei dati d' esempio io li so quali sono, vado a vedere, vado a vedere la sua etichetta e sto restituendo quella.
+32:43
+32 minutes, 43 seconds
+Quindi in effetti da questo punto di vista uno nen è ottimale. È ottimale.
+32:51
+32 minutes, 51 seconds
+Ma il problema qual è? Non è quello che vogliamo fare, no? Cioè noi gli esempi ce li abbiamo, ma non vogliamo classificare gli esempi. Quello sarebbe
+33:00
+33 minutes
+torniamo al clustering. Invece noi vogliamo l'errore su dati che non abbiamo ancora osservato.
+33:06
+33 minutes, 6 seconds
+Ma se non li abbiamo ancora osservato, come facciamo? Beh, diciamo che potremmo avere qualcuno che ci fornisce un
+33:14
+33 minutes, 14 seconds
+insieme di verifica, un cosiddetto test set, un insieme di dati su cui verificare il nostro
+33:21
+33 minutes, 21 seconds
+classificatore. Quindi abbiamo ulteriori dati che non sono necessariamente quelli di training, anzi di solito sono appunto
+33:29
+33 minutes, 29 seconds
+separati da quelli e lì valutiamo che cosa? valutiamo di nuovo l'accuratezza, ma su quei nuovi dati, ok? Che non sono
+33:37
+33 minutes, 37 seconds
+quelli inseriti inizialmente nel mio nel mio ad esempio nel mio eh elenco che ho in KNN, no? In quegli n. E quindi
+33:46
+33 minutes, 46 seconds
+valutiamo che cosa? La capacità del modello del mio classificatore di generalizzare. La parola chiave è generalizzazione.
+33:53
+33 minutes, 53 seconds
+Ok? Cioè, quindi vogliamo vedere non come forma sui dati del mio esempio, ma sui nuovi dati che dovrò dargli.
+34:01
+34 minutes, 1 second
+Però chi me li dà questi? Ok, quindi torniamo alla questione iniziale. Sì, ma non ho perché non ci piace però il
+34:10
+34 minutes, 10 seconds
+training cioè perché non possiamo vedere su quelli che abbiamo? Beh, certo, su quelli che abbiamo, cioè su tutti quelli che abbiamo, eh, beh, perché da questo punto di
+34:18
+34 minutes, 18 seconds
+vista, cioè la risposta breve è perché allora 1 n va benissimo, perché questo fa errore zero, non c'è, cioè non
+34:24
+34 minutes, 24 seconds
+sbaglia mai. Invece se tu prendi 2 nn, 3 nn, cioè vai a vedere i tre vicini, potrebbe essere che proprio anche già
+34:33
+34 minutes, 33 seconds
+sul tuo training set, ora vediamo nella pagina successiva, sul tuo training set già vedi dell'errore. Allora dice "Ma è una schifezza se faccio errore sul training set, almeno il training set
+34:41
+34 minutes, 41 seconds
+devo, cioè i miei esempi devo classificarli correttamente?" Invece no, cioè c'è una Ora vedremo il punto chiave, a volte c'è questo dilemma. È
+34:50
+34 minutes, 50 seconds
+meglio ammettere un po' di errore su anche sul training set, questa è la statistica classica che, diciamo, consiglia questo, di ammettere un po' di
+34:58
+34 minutes, 58 seconds
+errore sul training set purché sia in basso l'errore sul test. Ok? Cioè, noi possiamo anche non imparare esattamente
+35:05
+35 minutes, 5 seconds
+il training set, i nostri esempi, purché poi quando è il momento di avere dati nuovi lì l'errore non sia così alto, ok?
+35:14
+35 minutes, 14 seconds
+Perché altrimenti uno memorizza soltanto le caratteristiche dei suoi esempi.
+35:17
+35 minutes, 17 seconds
+L'idea è che dobbiamo generalizzare, cioè imparare, classificare, bisogna sia memorizzare qualcosa, ma anche
+35:25
+35 minutes, 25 seconds
+dimenticarsi qualcos'altro. Ok? Quando imparate quando imparavate la lezione di storia, non imparate storia o matematica, ancora peggio come imparate
+35:34
+35 minutes, 34 seconds
+una poesia, no? Una poesia imparate a memoria e poi la recitate. Questo classificatore deve imparare qualcosina delle nostre caratteristiche, ma non
+35:42
+35 minutes, 42 seconds
+troppo, altrimenti si concentra troppo sui suoi sui suoi esempi. Ok. Sì. N N è Narest neor, no? È il nostro algoritmo KNN.
+35:53
+35 minutes, 53 seconds
+Sì, sì. è l'unico algoritmo che abbiamo, era per non farvi perché ci sono questi concetti generali che ora vediamo, li applichiamo a K&N, ma si applicano a tutti gli altri classificatori. Ok?
+36:03
+36 minutes, 3 seconds
+Quindi il punto è abbiamo due nozioni d'errore, quella di training sugli esempi che ho e quella di test che però
+36:11
+36 minutes, 11 seconds
+chi me l'ha dato il test? Ora vediamo un po' qual è il trucchetto che di solito si opera. Io adesso vi fornisco questi
+36:18
+36 minutes, 18 seconds
+due grafici. Ora non si vede benissimo, eh, però le curve sono abbastanza chiare, no? Vedete, qui è l'errore,
+36:27
+36 minutes, 27 seconds
+quindi attenzione, più più alta è la curva, maggiore è l'errore. E i colori sono il training error, quindi quella
+36:35
+36 minutes, 35 seconds
+blu, e il test error. Ok? Allora, qui cosa ho fatto? Il dataset Iris è uno solo, sono 150 osservazioni.
+36:46
+36 minutes, 46 seconds
+Allora, cosa ho detto? Beh, artificialmente ho spezzato 150 osservazioni e ho detto, "Beh, 120
+36:54
+36 minutes, 54 seconds
+sono training". Ok, faccio finta di aver ricevuto le 120 e 30 di test, quindi
+37:01
+37 minutes, 1 second
+training e test. Ok, quindi cosa ho fatto? I miei dati ne ho salvati un pochino, quelli
+37:09
+37 minutes, 9 seconds
+non li ho dati al KNN, altrimenti conoscevo anche quelli. Quindi ho fatto finta di aver ricevuto solo 120. Adesso vediamo. 120 è perché ho preso l'80%.
+37:19
+37 minutes, 19 seconds
+Ok? Uno può prendere una percentuale, di solito una grossa percentuale dei dati la può usare per eh training per
+37:27
+37 minutes, 27 seconds
+stimare, per creare questo classificatore e poi una un'altra parte di li mantiene per fare il test. Ok? Ora
+37:35
+37 minutes, 35 seconds
+vediamo che c'è, cioè questa idea si evolve ora nella cross validation un po' più importante. Quindi diciamo una regola un po' così ma è arbitraria.
+37:43
+37 minutes, 43 seconds
+Infatti l'80% dei dati nel training è rimanente 20% test. Va bene? Quindi attenzione però li ho presi a caso, cioè
+37:51
+37 minutes, 51 seconds
+ho campionato, poi in realtà non li ho così presi a caso, ho fatto finché non trovavo un grafico che mi piaceva, insomma, ho fatto un po' di cherry picking per per
+37:58
+37 minutes, 58 seconds
+l'esempio, però tutti i grafici mostrano questo che sicuramente per K, questo è il K, no? K = 1. Questo è l'errore al
+38:06
+38 minutes, 6 seconds
+vari k, no? Di kn, questo algoritmo, però con i k diversi. Allora, con k = 1, vedete l'errore sul training è zero, ci
+38:16
+38 minutes, 16 seconds
+azzecca perfettamente con k = 2 o 3, che sarà qua. Vabbè, forse devo mettere una scala intera, era meglio. K = 3. Vedete?
+38:25
+38 minutes, 25 seconds
+K = 3. C'è un po' di errore, non sempre classifica in modo giusto sul training set, sui miei esempi. Io sapevo qual era
+38:33
+38 minutes, 33 seconds
+la sua caratteristica, però qual è il punto? Vedete, a me interessa invece idealmente il test. Quindi qui con k = 1
+38:41
+38 minutes, 41 seconds
+sono qui, k = 2 cresciuto, peggio, potrebbe essere una brutta indicazione se però magari vedete dopo diminuisce e
+38:49
+38 minutes, 49 seconds
+magari ora qui insomma la situazione è sceso di nuovo com'era con il k = 1, non è il massimo, ma potrebbe accadere che il test, l'errore del test scenda di più, ok? Rispetto a prendere k = 1. Ok?
+39:03
+39 minutes, 3 seconds
+Ora, questo è un esempio che ed è andata così, ma appunto, quindi per mostrarvi che avete
+39:10
+39 minutes, 10 seconds
+due curve diverse, una è l'errore di training e l'altra è l'errore di test e tendenzialmente l'errore sul training è
+39:17
+39 minutes, 17 seconds
+molto basso perché avete gli esempi e il classificatore sa è ha visto gli esempi e qualunque sia l'algoritmo di solito ne
+39:26
+39 minutes, 26 seconds
+tiene conto. Quello che ci vogliamo rendere piccolo invece è l'errore di test. Ok?
+39:33
+39 minutes, 33 seconds
+Eh, però appunto se voi dite questo esempio che abbiamo fatto 120 e 30 è totalmente arbitrario. Come si fa ad
+39:41
+39 minutes, 41 seconds
+avere una teoria? Sper un pochino come gestire questa questa cosa? Quindi, intanto abbiamo decomposto in modo arbitraria, casuale, se volete, preso
+39:49
+39 minutes, 49 seconds
+120 punti a caso e 30 li ho lasciati fuori, però arbitrario. E poi qual è il
+39:56
+39 minutes, 56 seconds
+problema della di questa operazione? è che così ho sprecato dei dati, no?
+40:03
+40 minutes, 3 seconds
+Perché mentre potevo usare, diciamo, quei 30 dati e li ho salvati, ho detto questi li tengo per il test.
+40:11
+40 minutes, 11 seconds
+Vabbè, però potevi usarli per il training, va bene? E quindi uno dice magari li potevo usare per selezionare K. Quindi, allora, come operazione può
+40:20
+40 minutes, 20 seconds
+andare bene, ma ci sono un po' di problemi. In particolare un po' l'arbitrarietà del fatto che ho scelto una volta, ho detto che 120 sono
+40:28
+40 minutes, 28 seconds
+training e e 30 punti invece li ho salvati per il test. E comunque il vero obiettivo non è neanche di studiare quei
+40:36
+40 minutes, 36 seconds
+150 esempi, no? Il nostro obiettivo sarebbe di avere nuovi dati. I nuovi dati, però finché non me li dà nessuno
+40:43
+40 minutes, 43 seconds
+non è che posso inventarmeli, no? Quindi allora la situazione è insomma un po' statica. Se ci si ferma un po' a questa
+40:52
+40 minutes, 52 seconds
+cosa. Non possiamo certo inventarci nuovi dati, però possiamo dire questo.
+40:57
+40 minutes, 57 seconds
+Creiamo un modello nella nostra testa e diciamo come dovrebbero essere i nuovi dati, cosa stiamo cercando di
+41:03
+41 minutes, 3 seconds
+rappresentare e creiamo degli errori ideali. Ok? Allora, l'errore ideale è
+41:11
+41 minutes, 11 seconds
+com'è dato? Beh, uno dice i dati che ho osservato, ma anche quelli che non ho ancora osservato, sono delle variabili
+41:20
+41 minutes, 20 seconds
+aleatorie e quindi ora, non so se ricordate da statistica 1 le variabili aleatorie cosa rappresentano. Adesso facciamo un po' di richiame. E nel
+41:29
+41 minutes, 29 seconds
+momento in cui dico che i dati sono X unetich un scusate X delle feature delle caratteristiche e L unetichetta
+41:37
+41 minutes, 37 seconds
+aleatoria che però sono accoppiate X ed sono una variabile congiunta insieme vanno l'etichetta e le sue
+41:44
+41 minutes, 44 seconds
+caratteristiche. Beh, allora l'errore di generalizzazione, quello ideale, quello che vorrei capire e rendere piccolo, è
+41:52
+41 minutes, 52 seconds
+la probabilità che il mio h valutato su un'etichetta, scusate, su una caratteristica X, eh
+42:01
+42 minutes, 1 second
+beh, l'errore è la probabilità che HX sia diverso dalla sua label, ok?
+42:07
+42 minutes, 7 seconds
+L'accuratezza, se volete, è la probabilità che HX sia uguale ad L. Ok?
+42:12
+42 minutes, 12 seconds
+Vabbè, questo se volete vi dice che volendo possiamo usare la probabilità per costruire un modello di come dovrebbero essere le cose e magari ora
+42:22
+42 minutes, 22 seconds
+avremo delle indicazioni su insomma anche com'è fatto questo errore. Ok?
+42:27
+42 minutes, 27 seconds
+Quindi allora questo è il nostro obiettivo ideale.
+42:31
+42 minutes, 31 seconds
+Come prima, però non è che abbiamo risolto la situazione, sono sempre eh quantità ideali. come dire i dati che osserverò, vorrò fare in modo che H sia
+42:40
+42 minutes, 40 seconds
+tale che minimizzi questo errore di generalizzazione che però, vedete, è diverso dai dati che ho osservato, anzi l'ho proprio reso un
+42:49
+42 minutes, 49 seconds
+dato ideale che non so quale sia, ma ci sarà questo nuovo esempio. Ovviamente anche i dati che ho osservato, quindi le
+42:56
+42 minutes, 56 seconds
+coppie x con i L, se voglio usare appunto la probabilità della statistica inferenziale perché stiamo facendo quindi inferenza su dei dati che non
+43:04
+43 minutes, 4 seconds
+abbiamo ancora osservato, beh, allora dirò che anche le coppie X con I, li sono quello che si chiama un campione di
+43:11
+43 minutes, 11 seconds
+variabili aleatorie indipendenti, ok? E richiederò che anche loro abbiano la stessa legge dei dati che andrò a
+43:18
+43 minutes, 18 seconds
+osservare. Ok? C'è questa ipotesi di fondo, i dati sono casuali, ho fatto n osservazioni, ma quelle n osservazioni
+43:26
+43 minutes, 26 seconds
+che ho hanno le stesse caratteristiche, pur essendo casuali, delle nuove osservazioni che andrò a fare. Certo, se avessero caratteristiche totalmente
+43:34
+43 minutes, 34 seconds
+diverse sto facendo qualcosa che si dice anche fuori dalla distribuzione e questo ci insomma rende un problema perché uno
+43:43
+43 minutes, 43 seconds
+un classificatore magari ha imparato qualcosa e poi vado a applicarlo su dati che non c'entrano niente con quelli che aveva visto inizialmente e questo mi
+43:51
+43 minutes, 51 seconds
+darà risultati spazzatura tendenzialmente. Ok? Quindi l'ipotesi che fa funzionare un po' tutta la teoria della classificazione e gli algoritmi
+43:59
+43 minutes, 59 seconds
+che poi vedremo è questo che i dati osservati e anche i campioni che vedremo in futuro hanno tutti la stessa legge.
+44:07
+44 minutes, 7 seconds
+Ok?
+44:09
+44 minutes, 9 seconds
+E allora a questo punto visto che abbiamo parliamo di legge di variabiliatorie e probabilità adesso non so c'era qualcuno che non aveva mai
+44:17
+44 minutes, 17 seconds
+fatto corsi di probabilità giusto? È presente in aula qualcuno?
+44:22
+44 minutes, 22 seconds
+Comunque un piccolo richiamo non fa mai male, no? Allora, ricordiamoci cos'è una probabilità, anche perché poi alcune cose entreranno negli algoritmi un po'
+44:30
+44 minutes, 30 seconds
+più sofisticati. Eh, ricordatevi, no, che le affermazioni e proposizioni della probabilità si chiamano eventi
+44:39
+44 minutes, 39 seconds
+e date una coppia di queste affermazioni, potete attribuire un grado di fiducia che si chiama probabilità che
+44:47
+44 minutes, 47 seconds
+l'affermazione A sia vera sapendo o avendo osservato I. Ad esempio, la probabilità che esca sei eh al lancio
+44:54
+44 minutes, 54 seconds
+del dado sapendo che il dado era truccato oppure che non era truccato. E ricordatevi, no, la scala della probabilità naturale è tra 0 e 1 e 1 è quando è vera e zero quando è falso.
+45:05
+45 minutes, 5 seconds
+Tendenzialmente questa è la situazione, però nulla vieta di usare altre altre scale. Eh, attenzione che nella
+45:12
+45 minutes, 12 seconds
+classificazione vedremo ad esempio il i classificatori alla regressione logistica. In realtà si
+45:19
+45 minutes, 19 seconds
+usa non la probabilità che è un numero 301, ma è neanche il logaritmo delle probabilità che potrebbe essere pure una buona scala. Se uno ha delle probabilità
+45:28
+45 minutes, 28 seconds
+piccole, magari usando il logaritmo eh capisce, no? Se 10^ -3 il logaritmo diventerà, cioè diventerà -3 per
+45:36
+45 minutes, 36 seconds
+logaritmo, ma facciamo il logaritmo in base 10 diventa -3. Oppure se siete degli scommettitori usate le le quote. A volte si usano le quote, cioè la
+45:44
+45 minutes, 44 seconds
+probabilità di un'affermazione di un evento diviso la probabilità della sua negazione. Ok? Allora, siccome la
+45:52
+45 minutes, 52 seconds
+probabilità è sempre tra 0 e 1, la quota diventa adesso un numero tra 0 e più infinito. Ok? Se andate a scommettere
+45:59
+45 minutes, 59 seconds
+quota 1 a 1, no? 1 a 1 è quota che si chiamano OD in inglese, significa che la
+46:08
+46 minutes, 8 seconds
+probabilità è 50%. Ok? Quindi magari vabbè non dovete allenarvi a scommettere, ma questo è un altro modo
+46:16
+46 minutes, 16 seconds
+di parametrizzare la stessa cosa, stessa grado di fiducia. E infine, visto che parliamo di questo, si può mescolare anche la probabilità col le ODS con il
+46:25
+46 minutes, 25 seconds
+logaritmo e si ottengono queste sono le log ODS, ok? e semplicemente è il logaritmo delle OD. Ok? Questo sarà
+46:34
+46 minutes, 34 seconds
+utile, poi vedremo nella regressione logistica, ok? E è un modo diverso sempre di parametrizzare la stessa cosa
+46:41
+46 minutes, 41 seconds
+perché chiaramente dalle ODS uno torna alla probabilità, dal logaritmo basta prendere esponenziale, quindi sono tutte trasformazion
+46:48
+46 minutes, 48 seconds
+invertibili, però insomma dipende un po' quello che preferite. Se siete scommettitori magari usate le ODS, altrimenti se siete probabiliz usate la
+46:57
+46 minutes, 57 seconds
+probabilità. Oppure vedremo anche questa log eh delle ODS può essere utile. Ok?
+47:04
+47 minutes, 4 seconds
+Quindi magari per esempio provate usando questa così vi familiarizzate un attimo, prendete un evento e dite "Beh, questo
+47:11
+47 minutes, 11 seconds
+ha probabilità eh un quinto, allora quali sono le quote? Quali sono le log od ODS?" Oppure
+47:19
+47 minutes, 19 seconds
+partite dalle log ods e tornate alla probabilità. Fate un piccolo esercizietto, vedrete che sono tutte corrispondenze, eh, una è invertibile e
+47:28
+47 minutes, 28 seconds
+quindi si può tornare indietro da una all'altra.
+47:31
+47 minutes, 31 seconds
+Ecco, allora, al di là di questo, però eh se uno usa, ad esempio, la probabilità solito tra 0 e 1, può stabilire delle regole molto semplici e
+47:40
+47 minutes, 40 seconds
+ve le richiamo, no? c'era la regola della somma che si chiama l'additività che vi dice che se avete due eventi incompatibili
+47:48
+47 minutes, 48 seconds
+la probabilità dell'unione di A oppure B è la somma delle due probabilità.
+47:54
+47 minutes, 54 seconds
+Attenti, incompatibili. Cosa voleva dire?
+47:57
+47 minutes, 57 seconds
+Non l'ho scritto. Cioè, voleva dire che la probabilità di A e B data all'informazione era zero. Ok?
+48:05
+48 minutes, 5 seconds
+Questo voleva dire incompatibile, cioè non si realizzano mai entrambi. Ok? date zero all'affermazione A e B sono entrambi realizzati, entrambi veri. Ok?
+48:16
+48 minutes, 16 seconds
+E poi c'era la probabilità della negazione che segue da da questo fatto che la probabilità di non A è 1 meno la probabilità di A.
+48:25
+48 minutes, 25 seconds
+ve le richiamo brevemente, ma queste ve le ricordate spero, da statistica 1. Poi c'era la regola del prodotto o la probabilità composta, cioè avete la
+48:34
+48 minutes, 34 seconds
+probabilità di A e B è la probabilità di A per la probabilità di B. Attenzione in generale, sapendo
+48:42
+48 minutes, 42 seconds
+anche A, ok? Dovete aggiungere che sapete A, altrimenti c'è una caso speciale che è quello dell'indipendenza.
+48:51
+48 minutes, 51 seconds
+Ops, non, ecco, non l'ho messa nell'elenco subito dopo.
+48:56
+48 minutes, 56 seconds
+Indipendenza forse viene dopo, era quando la
+49:02
+49 minutes, 2 seconds
+probabilità di A e B, vi ricordate? Era la probabilità di A per la probabilità di B. Ok? Mh, capisco perché oggi fa sta
+49:12
+49 minutes, 12 seconds
+cosa. Va bene, ecco, allora, l'indipendenza era questa questo fatto che la probabilità di di sapere che siano vere entrambe era il
+49:20
+49 minutes, 20 seconds
+prodotto delle probabilità separate, no, di A e di B. Ecco, più complicata invece era la formula di Beyes, vi ricordate
+49:28
+49 minutes, 28 seconds
+che che diceva una cosa interessante che diceva come aggiornare una probabilità sapendo di aver osservato qualcosa?
+49:37
+49 minutes, 37 seconds
+Allora, questa era la vecchia probabilità a priori per due termini che erano la probabilità di B sapendo A.
+49:45
+49 minutes, 45 seconds
+Questa si chiama a volte la verosimiglianza e poi andava diviso la probabilità di B.
+49:52
+49 minutes, 52 seconds
+Questa gli scommettitori la scrivono anche in termini di ODS e le ODS, le quote di A, sapendo che è arrivato B,
+50:00
+50 minutes
+sono le vecchie quote per questo rapporto di verossimiglianza. Ok? questo rapporto di verosimiglianza.
+50:11
+50 minutes, 11 seconds
+Eh, cosa sono? Adesso vi spiego facilmente. Questa L è solo un'altra scrittura, si chiama likelihood, verosimiglianza in inglese, ma è
+50:18
+50 minutes, 18 seconds
+semplicemente, eccolo qua, la verosimiglianza di A relativa a B è la probabilità di B sapendo A. Insomma, sì, è soltanto un modo diverso per rigirare
+50:27
+50 minutes, 27 seconds
+la stessa cosa, una probabilità condizionata.
+50:30
+50 minutes, 30 seconds
+Ok? Eh, vedremo i classificatori ce ne sono di basati sulla forma di BES, quindi sarà importante richiamare questa, ma era quella che permetteva di
+50:38
+50 minutes, 38 seconds
+appunto aggiornare le probabilità avendo osservato qualcosa.
+50:44
+50 minutes, 44 seconds
+E l'indipendenza ecco, sì, l'ho scritta prima in un modo relativa alla regola del prodotto, però ricordatevi l'indipendenza era anche si poteva dire
+50:51
+50 minutes, 51 seconds
+anche così, A e B sono indipendenti se sapere B, ad esempio, non cambia la probabilità di A. Quindi sapere o non
+50:58
+50 minutes, 58 seconds
+sapere B non cambiava nulla ai fini della probabilità che assegniamo ad A.
+51:05
+51 minutes, 5 seconds
+Ed è anche simmetrico, no? Vi ricordate che è come dire anche che PB B sapendo A, è uguale a PB B.
+51:15
+51 minutes, 15 seconds
+Va bene? Allora, queste regole di calcolo le conoscete e però appunto facciamo richiamo brevissimo. Ci sono eh
+51:24
+51 minutes, 24 seconds
+anche le variabili relatorie, quindi non c'è non ci sono solo gli eventi, vi ricordate? Gli eventi erano la probabilità elementare. Poi uno va a combinarli con sistemi di alternative.
+51:34
+51 minutes, 34 seconds
+E allora un sistema di alternative, vi ricordate, era una situazione in cui uno ha tutto il suo spazio, la sua
+51:41
+51 minutes, 41 seconds
+informazione e la la divide, no, la spezzettava in una partizione. E ad esempio lancio un dado e ho delle
+51:49
+51 minutes, 49 seconds
+alternative, esce 1, esce 2, esce 3, esce 4, esce 5, esce 6. Sei alternative.
+51:55
+51 minutes, 55 seconds
+Qual è cos'è che caratterizza un sistema d'alternativa? Che sono tutte affermazioni, eventi di cui calcoliamo la probabilità. Quello che sappiamo è
+52:03
+52 minutes, 3 seconds
+che è sempre vero che esattamente uno è vero di questi, cioè è sempre uno di questi solo di questi eventi sarà vero.
+52:10
+52 minutes, 10 seconds
+Di solito non si sa non si sa quale, però esattamente uno è vero. Non è mai vero che sono veri due sono
+52:17
+52 minutes, 17 seconds
+incompatibili a due a due e anche ricoprono tutto il nostro insieme
+52:24
+52 minutes, 24 seconds
+o o la nostra informazione ce la coprono tutta. E ad esempio un sistema di alternative in questo contesto della
+52:31
+52 minutes, 31 seconds
+classificazione è questa, cioè abbiamo un nuovo dato e il dato che ad esempio è un test del test set il dato è di classe
+52:39
+52 minutes, 39 seconds
+L, quindi al variare di tutte le classi noi sappiamo che i dati avranno una sola classe, non sappiamo quale. Quindi per
+52:47
+52 minutes, 47 seconds
+ogni possibile classe abbiamo chiamiamo la etichetta L, abbiamo un'alternativa, ok? E quindi se le possibili classi sono
+52:55
+52 minutes, 55 seconds
+due, avremo un sistema di alternative con una, cioè due alternative, alternative semplici, se sono tre, tre alternative e così via.
+53:04
+53 minutes, 4 seconds
+Ecco, più in generale, quando uno comincia a lavorare con le con le coi sistemi di alternative si accorge che in realtà, anche questo esempio delle
+53:13
+53 minutes, 13 seconds
+classi, l'indice su cui indicizza le alternative può essere in effetti caricato di un significato. In questo
+53:21
+53 minutes, 21 seconds
+caso l'alternativa L significa l'etichetta, la label è proprio L.
+53:27
+53 minutes, 27 seconds
+Quindi potremmo fare lo stesso, ad esempio, per le caratteristiche, per le feature, potremmo dire che eh chiamiamo un'alternativa A con X. Uso la stessa
+53:35
+53 minutes, 35 seconds
+lettera, però sono cose diverse. Eh label e feature sono variabili, sono quantità totalmente diverse. E potremmo dire a con x significa che la
+53:43
+53 minutes, 43 seconds
+caratteristica del mio dato vale x piccolo. Potrei chiamare x grande, no?
+53:48
+53 minutes, 48 seconds
+La caratteristica che non conosco e x piccolo il valore specifico. Di solito la notazione è questa in probabilità. E allora anche questo ci dà un altro
+53:57
+53 minutes, 57 seconds
+sistema di alternative e quindi in effetti una caratteristica aleatoria o una feature o una label o qualsiasi altra quantità che voi non conosciate,
+54:06
+54 minutes, 6 seconds
+se sapete che è un valore in un insieme, chiamiamolo e possibile degli esiti e sapete che c'è un valore specifico, ma
+54:14
+54 minutes, 14 seconds
+non sapete quale, allora vi conviene trattarlo come una variabile aleatoria.
+54:18
+54 minutes, 18 seconds
+Questa è, insomma, le variabiliatorie sono solo un modo di scrivere più compatto i sistemi di alternative. Ok?
+54:26
+54 minutes, 26 seconds
+Se poi vi ricordate tutti tutta la teoria, non mi ricordo statistica uno quanto abbiamo insistito, ma se qualcuno è familiare con altre teorie va bene,
+54:35
+54 minutes, 35 seconds
+però appunto il senso delle variabiliatorie è questo, insomma. Ok?
+54:39
+54 minutes, 39 seconds
+Uno vuole trattare sistemi di alternative in modo più efficace. E allora quando ha le variabili aleatorie può fare diverse cose. ricordo ci sono
+54:48
+54 minutes, 48 seconds
+le densità, le densità discrete che significa che la vostra variabile, ad esempio per le label, per le caratteristiche, no, spesso sono
+54:57
+54 minutes, 57 seconds
+discrete e scusate le classi, no, sono discrete e quindi uno può calcolare la probabilità che l'etichetta sia in un
+55:05
+55 minutes, 5 seconds
+insieme di etichette come la somma delle probabilità che l'etichetta sia effettivamente uguale a L alare di L in quell'insieme,
+55:13
+55 minutes, 13 seconds
+ma questo vale per altre variabili discrete. Oppure questo sarà più simile per le caratteristiche, per le feature, magari le caratteristiche sono un continuo, sono un insieme reale, di numeri reali.
+55:24
+55 minutes, 24 seconds
+Allora lì, vi ricordate, c'è la densità continua. Significa che la probabilità che la caratteristica la feature sia in
+55:31
+55 minutes, 31 seconds
+un intervallo si calcolava come integrale della densità in quell'intervallo. Ok? Poi queste densità discrete, continue, ce ne sono tante e alcune sono comode per fare dei modelli.
+55:42
+55 minutes, 42 seconds
+Più in generale a volte scriviamo anche così, eh, la uso anch'io sta scrittura un po' non precisima. A volte scriviamo
+55:50
+55 minutes, 50 seconds
+PX, quindi vi permetto di usarla perché ho visto che tanto la usano tutti. Px a volte è per dire la densità, ok? Una
+55:58
+55 minutes, 58 seconds
+variabile, attenti, eh, non necessariamente discreta o continua. Ci sono variabili che sono misto, però diciamo che sia discreta o continua io
+56:06
+56 minutes, 6 seconds
+chiamo la densità px. Va bene? Attenti che però la densità è una funzione eh precisamente, no, del valore che le
+56:15
+56 minutes, 15 seconds
+date, cioè voi valutate la densità in un punto e quello vi dice appunto la probabilità o la densità continua di
+56:22
+56 minutes, 22 seconds
+probabilità in quel punto. Allora, queste regole che abbiamo visto prima per gli eventi si riscrivono per le variabili, va bene?
+56:32
+56 minutes, 32 seconds
+questo crash course di di probabilità non c'è molto da dire. Eh, ad esempio, poi le riprendiamo queste, la prossima volta vedremo degli stimatori basati
+56:41
+56 minutes, 41 seconds
+sulla formula di Bayes e quindi uno cosa può dire? Esempio, vedete, c'è la regola del prodotto che dice la probabilità che
+56:48
+56 minutes, 48 seconds
+le caratteristiche siano X e la label sia L. E allora cosa è uguale? è uguale la probabilità che la caratteristica sia
+56:56
+56 minutes, 56 seconds
+X per la probabilità che l'etichetta sia L sapendo la caratteristica, ok? Che è quello che ci interessa a dire il vero,
+57:04
+57 minutes, 4 seconds
+no? Cioè sapendo la caratteristica noi vogliamo trovare l'etichetta. Quindi questo è un oggetto importante per noi,
+57:12
+57 minutes, 12 seconds
+però volendo c'è la forma di Bayes che dice anche che si può invertire la situazione. Però vediamo ad esempio se voglio la probabilità che l'etichetta
+57:20
+57 minutes, 20 seconds
+sia L, sapendo che la che la caratteristica è X, questa come si calcola? Con la probabilità che l'etichetta sia L, senza aver visto
+57:29
+57 minutes, 29 seconds
+ancora le caratteristiche del mio del mio nuovo test point e poi la moltiplico per la verosimiglianza. La
+57:37
+57 minutes, 37 seconds
+verosimiglianza cos'è? la probabilità che la caratteristica sia x sapendo l'etichetta e poi la formula di Beers direbbe
+57:46
+57 minutes, 46 seconds
+dividete per questo termine. Però per chi si ricorda un po' da dal corso di probabilità questo termine denominatore era un po' noioso e in effetti se uno
+57:54
+57 minutes, 54 seconds
+interessa solo le ODS, ad esempio per le ODS scompare perché è comune a tutti questo termine px = x pic. La
+58:02
+58 minutes, 2 seconds
+verosimiglianza, appunto, di un'etichetta relativa alle caratteristiche è come prima per gli eventi, è solo un
+58:09
+58 minutes, 9 seconds
+modo diverso per riscrivere la probabilità condizionata, eh, cioè è la probabilità di osservare certe caratteristiche sapendo che l'etichetta è è L.
+58:20
+58 minutes, 20 seconds
+Va bene? Allora, questo e anche l'indipendenza si può riscrivere facilmente, appunto, non è Allora,
+58:27
+58 minutes, 27 seconds
+quindi finiamo questo parentesi rapidissima sulla probabilità. Allora, ci sono degli esempi di densità che vale
+58:34
+58 minutes, 34 seconds
+la pena di ricordare. Allora, ce ne sono tantissimi, hanno tanti nomi speciali, forse al corso di statistica uno ne abbiamo visto anche qualcuno in più,
+58:42
+58 minutes, 42 seconds
+però noi, diciamo, mantenendo la situazione al minimo abbiamo le densità bernulli, che è un caso molto semplice,
+58:50
+58 minutes, 50 seconds
+però comodo, perché a volte abbiamo dei dati in cui c'è presente o assente, no? Zero se è assente, uno se è presente.
+58:58
+58 minutes, 58 seconds
+Quindi questa è la nostra caratteristica. Eh, allora la probabilità eh di una la densità discreta di una variabile che ha solo due valori, 0
+59:06
+59 minutes, 6 seconds
+oppure 1, eh la chiamiamo Bernulli, ricordatevi il nome, ma e cosa indica
+59:13
+59 minutes, 13 seconds
+questa cosa? Fa viene, eh cosa indica? Abbiamo semplicemente
+59:20
+59 minutes, 20 seconds
+vogliamo dire che la probabilità è Q se x = 1, quindi se è presente questo
+59:27
+59 minutes, 27 seconds
+questo questa caratteristica e 1 - q = 0. Ok? Poi se uno vuole metterli
+59:34
+59 minutes, 34 seconds
+insieme in una formula comoda trova q^ x * 1 - q^ 1 - x perché quando x è 0 q^ x vi fa 1 e 1 - q invece alla 1 - 0 vi fa 1 - q.
+59:46
+59 minutes, 46 seconds
+Cioè, quindi torna questa forma e quando X è 1 trovate Q. Ok? Vabbè, questo è un caso di esempio di densità discreta. Poi
+59:55
+59 minutes, 55 seconds
+dalla Bernulli, se qualcuno ricorda cosa succedeva quando si facevano tanti esempi indipendenti, tante osservazioni
+1:00:03
+1 hour, 3 seconds
+indipendenti e si andava a contare il numero di successi negli esperimenti, si trovava una densità binomiale e la binomiale contava il numero di successi.
+1:00:12
+1 hour, 12 seconds
+Numero di successi di successi. Quindi questo è un esperimento, un esperimento.
+1:00:20
+1 hour, 20 seconds
+E questo invece è un numero di successi in n esperimenti e se vi ricordate questi esperimenti
+1:00:28
+1 hour, 28 seconds
+dovevano essere tutti indipendenti tra loro. Se non sono indipendenti non si trova questa densità. Allora, questo è il numero di successi. Come che
+1:00:37
+1 hour, 37 seconds
+probabilità ha? Beh, c'era questo coefficiente binomiale. Eccolo qui, n su X. E poi c'è la stessa cosa qui, vedete?
+1:00:44
+1 hour, 44 seconds
+Q^ X è quasi, perché qui è un esperimento, quindi è 1 - q^ 1 - x. Qui abbiamo n esperimenti e 1 - q^ n - x.
+1:00:54
+1 hour, 54 seconds
+Allora, com'è fatta questa densità binomiale?
+1:00:57
+1 hour, 57 seconds
+Se qualcuno ricorda il grafico, se vi ricordate qui mettiamo x, il numero di successi, quindi abbiamo
+1:01:05
+1 hour, 1 minute, 5 seconds
+0 1 2 3 4 fino a n. E qui mettiamo la probabilità. Com'è fatta questa questa
+1:01:13
+1 hour, 1 minute, 13 seconds
+funzione di densità? era una curva campana, però discreta, quindi avete dei valori tipo che cresce un po' e poi
+1:01:20
+1 hour, 1 minute, 20 seconds
+decresce. Ok. Ok. E in effetti questa curva campana poi vi ricordate c'è il torem limezia centrale, ci sono dei
+1:01:28
+1 hour, 1 minute, 28 seconds
+risultati che dicono quando facciamo tanti tanti esperimenti eh osserviamo delle delle densità che sono non più
+1:01:36
+1 hour, 1 minute, 36 seconds
+discrete, sono continue, però somigliano un po' come curva ed effettivamente sono le densità gaussiane. Va bene, mi sa che
+1:01:43
+1 hour, 1 minute, 43 seconds
+useremo solo queste tre densità, se va tutto bene, magari useremo o mi rimangio la parola. Però la densità gausiana
+1:01:52
+1 hour, 1 minute, 52 seconds
+invece com'era fatta? La densità gausiana era una variante continua della binomiale, quindi questa volta i valori sono un continuo e rappresentavano le
+1:01:59
+1 hour, 1 minute, 59 seconds
+oscillazioni di di una quantità intorno al suo alla sua media campionaria. Va bene? E allora com'è questa densità continua?
+1:02:09
+1 hour, 2 minutes, 9 seconds
+Prendetela come definizione. Intanto qua è sbagliata perché manca un fattore a 2 piσ qu. Ok? Però il punto chiave è che
+1:02:18
+1 hour, 2 minutes, 18 seconds
+c'è l'esponenziale di - un polinomio di secondo grado, come fatto? Lo scriviamo come x - un parametro di media, che è
+1:02:27
+1 hour, 2 minutes, 27 seconds
+tipo il centro della nostra curva diviso sigma al quadrato che è la la varianza e c'è anche un fattore 1/2o. Poi se volete
+1:02:35
+1 hour, 2 minutes, 35 seconds
+essere completi c'è anche un fattore fuori che è 1 su √ 2 piσ sigma qu. Va bene? Quello sta lì perché le densità,
+1:02:41
+1 hour, 2 minutes, 41 seconds
+vi ricordo, devono integrare a uno. Poi per per i nostri scopi alla fine faremo sempre rapporti tra le densità, quindi
+1:02:48
+1 hour, 2 minutes, 48 seconds
+questo questo fattore potevamo anche non metterlo. Comeè fatta la curva della Gaussiana? Vabbè, magari se non ve la ricordate la rivediamo, ma abbiamo già
+1:02:56
+1 hour, 2 minutes, 56 seconds
+visto campioni di gausiane, quindi insomma non dovrebbe spaventarvi. È solo per ricordarvi la formula.
+1:03:02
+1 hour, 3 minutes, 2 seconds
+Ecco, allora vediamo un po' eh di chiarire quindi un po' meglio questo modello statistico probabilistico per la classificazione. Quindi, quali
+1:03:10
+1 hour, 3 minutes, 10 seconds
+sono le ipotesi? Allora, i nostri dati del training set, come dicevamo, sono delle variabili, chiamiamole Z, dove c'è
+1:03:18
+1 hour, 3 minutes, 18 seconds
+la coppia della X, le caratteristiche e L, che sono le etichette e quindi ciascuna Z I sono tutte osservazioni di
+1:03:28
+1 hour, 3 minutes, 28 seconds
+variabiliatorie tra di loro indipendenti, ok? Quindi facciamo questa ipotesi importante. I dati sono stati raccolti,
+1:03:35
+1 hour, 3 minutes, 35 seconds
+non ci sono associazioni tra le varie osservazioni, sono indipendenti tra loro, però hanno tutti la stessa legge,
+1:03:42
+1 hour, 3 minutes, 42 seconds
+la stessa densità. Quindi, se voglio scrivere la densità, siccome sono indipendenti, voglio scrivere la densità congiunta, cioè z1, z2, z3, z4, zn, si
+1:03:52
+1 hour, 3 minutes, 52 seconds
+spezzerà come prodotto delle singole densità di z1 * z2 e così via, zn. Ok?
+1:03:59
+1 hour, 3 minutes, 59 seconds
+Ma non solo. Questi sono i nostri dati del training set, dell'insieme degli esempi. Cosa succede invece con il test?
+1:04:05
+1 hour, 4 minutes, 5 seconds
+Anche i dati del test, l'ipotesi è la stessa, sono pure indipendenti, tutti con la stessa legge. Quindi anche se
+1:04:13
+1 hour, 4 minutes, 13 seconds
+fosse uno solo il punto del test, poi nella realtà uno ha più dati di test, anche lui però ha la stessa legge, la
+1:04:20
+1 hour, 4 minutes, 20 seconds
+stessa densità dei dati del training set. Quindi capite, sono tutti indipendenti tra loro, ma c'è un legame di fondo che è il fatto che abbiano
+1:04:28
+1 hour, 4 minutes, 28 seconds
+tutti la stessa legge. Ok? Questo li tiene insieme. Non è che il test è completamente diverso dal training.
+1:04:34
+1 hour, 4 minutes, 34 seconds
+Questo renderebbe impossibile il problema, no? Se qualcuno decide che il test è completamente diverso, eh, c'è poco da fare. Allora, che cos'è un
+1:04:43
+1 hour, 4 minutes, 43 seconds
+classificatore? un classificatore, quindi è una funzione, dicevamo come come prima che è una funzione che come
+1:04:49
+1 hour, 4 minutes, 49 seconds
+input prende una caratteristica, quindi una feature fini insieme f, i valori della x e poi come output ci dà una
+1:04:59
+1 hour, 4 minutes, 59 seconds
+label, una una classe, un'etichetta, però chiediamo anche che dipenda ovviamente da i miei dati, dalle mie
+1:05:07
+1 hour, 5 minutes, 7 seconds
+osservazioni, quindi Z1, Z2, ZN del training set, ok? Quindi non soltanto una funzione dell' x input, ma anche
+1:05:17
+1 hour, 5 minutes, 17 seconds
+anche se non lo scriviamo in modo esplicito, pensate a KN, dipende da quali sono i dati del mio training set, quindi una funzione di due cose, dei dati e anche dell' x di input.
+1:05:28
+1 hour, 5 minutes, 28 seconds
+E va bene. Allora, con questa definizione che cos'è l'errore di generalizzazione? è quello che abbiamo scritto prima, è la probabilità che HX
+1:05:37
+1 hour, 5 minutes, 37 seconds
+su un test, su un punto di testo da L, quindi la probabilità di di classificare in modo sbagliato. Questa volta è anche
+1:05:45
+1 hour, 5 minutes, 45 seconds
+detto il rischio atteso perché perché ecco non ho richiamato il valore atteso, altrimenti mi mi mandavate a quel paese,
+1:05:53
+1 hour, 5 minutes, 53 seconds
+ma il valore atteso, vi ricordate, era il valore medio di una variabile oratoria, c'era una definizione di valore medio, un valore tipico, intuitivamente valore medio è una
+1:06:02
+1 hour, 6 minutes, 2 seconds
+definizione precisa. Ed è il valor medio di che cosa? beh, del loss della nostra del nostro costo che è uno se
+1:06:10
+1 hour, 6 minutes, 10 seconds
+classifichiamo male e zero se classifichiamo bene. Quindi vedremo che anche per la regressione c'è un rischio atteso che invece usa la loss
+1:06:18
+1 hour, 6 minutes, 18 seconds
+quadratica. Va bene? Quindi per la classificazione è questo l'errore di generalizzazione.
+1:06:25
+1 hour, 6 minutes, 25 seconds
+Eh, allora facciamo un attimo però il punto. Abbiamo detto variabili relatorie, tutto bene? questa idea che abbiamo variabili osservazioni
+1:06:33
+1 hour, 6 minutes, 33 seconds
+dipendenti, però nella pratica come facciamo? Come stimare?
+1:06:39
+1 hour, 6 minutes, 39 seconds
+Quindi ora non è tanto un problema di inventarci un obiettivo. L'obiettivo ce l'abbiamo, è rendere più piccolo possibile il rischio atteso. Però come
+1:06:47
+1 hour, 6 minutes, 47 seconds
+stimare il rischio atteso? Noi non conosciamo nulla, eccetto gli esempi, ok? Tendenzialmente abbiamo solo questi
+1:06:54
+1 hour, 6 minutes, 54 seconds
+esempi, quindi dovremmo inventarci un modo per costruire, se volete, delle variabili aleatorie, magari con dei
+1:07:03
+1 hour, 7 minutes, 3 seconds
+parametri e da lì stimiamo i parametri e poi stimiamo anche il rischio atteso.
+1:07:08
+1 hour, 7 minutes, 8 seconds
+Eh, in realtà, appunto, cos'è il discorso? Gli stimatori, vi ricordate?
+1:07:12
+1 hour, 7 minutes, 12 seconds
+C'erano tante nozioni di stimatore, nozione statistica di stimatore,
+1:07:19
+1 hour, 7 minutes, 19 seconds
+la statistica uno, no? di stimatore era che cosa? Una funzione, l'abbiamo chiamata t, forse t di x1 xn, no? T di
+1:07:28
+1 hour, 7 minutes, 28 seconds
+z1 zn che andava a stimare una certa quantità, un certo parametro. Ok? Quindi noi
+1:07:36
+1 hour, 7 minutes, 36 seconds
+adesso andiamo a stimare con a partire dalle osservazioni andiamo a fare una stima e uno potrebbe capire se questi
+1:07:43
+1 hour, 7 minutes, 43 seconds
+stimatori siano, vi ricordate, consistenti, corretti, così via, però andremo a trovare uno stimatore sulla base dei nostri dati di queste quantità,
+1:07:51
+1 hour, 7 minutes, 51 seconds
+ok? del rischio atteso. Quindi questa decomposizione che ci siamo fatti prima, ci siamo inventati in training set e
+1:07:59
+1 hour, 7 minutes, 59 seconds
+test set, possiamo rivederla come costruire uno stimatore di questo rischio atteso che è il nostro ideale,
+1:08:06
+1 hour, 8 minutes, 6 seconds
+il nostro obiettivo. Ok, va bene. Allora, vediamo però se c'è qualche altro modo di stimare questo
+1:08:13
+1 hour, 8 minutes, 13 seconds
+rischio atteso. Ok? E il difetto che avevamo visto prima era: "Se prendiamo 120 osservazioni e 30 sono test e le 120
+1:08:22
+1 hour, 8 minutes, 22 seconds
+sono training". A parte dipende da come le abbiamo scelte.
+1:08:26
+1 hour, 8 minutes, 26 seconds
+Vi invito, poi mercoledì vediamo se uno cambia il modo in cui prende l'insieme chiaramente ottiene un grafico diverso.
+1:08:33
+1 hour, 8 minutes, 33 seconds
+E quindi qual è il punto? Beh, facciamo così, vogliamo sì usare i nostri dati, quelli di cui disponiamo, e questa idea
+1:08:41
+1 hour, 8 minutes, 41 seconds
+naive, diciamo, di training set, 80% dei dati, test set 20%, per verificare
+1:08:49
+1 hour, 8 minutes, 49 seconds
+l'accuratezza, cerchiamo di renderla un po' più potente che, cioè, va bene come idea, però ha i suoi difetti, cioè dipende da come abbiamo scelto i punti,
+1:08:58
+1 hour, 8 minutes, 58 seconds
+è un po' così arbitraria anche la la scelta di 80% 20%. Quindi, allora, come facciamo?
+1:09:06
+1 hour, 9 minutes, 6 seconds
+Eh beh, semplicemente è quella che si chiama convalida incrociata in italiano è cross validation in inglese, va bene?
+1:09:14
+1 hour, 9 minutes, 14 seconds
+Cv, a volte abbreviato CV, cross validation, cioè cosa facciamo? E il
+1:09:21
+1 hour, 9 minutes, 21 seconds
+nostro insieme di dati di osservazione è un insieme di n osservazioni e lo spezziamo in tanti modi come training
+1:09:29
+1 hour, 9 minutes, 29 seconds
+set e test e idealmente lo spezzeremo in tutti i modi possibili. Ok, ora vediamo in questo modo cosa facciamo. Non
+1:09:36
+1 hour, 9 minutes, 36 seconds
+scegliamo un modo preciso, andiamo a mediare poi su tutti questi modi di spezzare e quindi almeno il rischio legato al fatto che ho scelto proprio io
+1:09:44
+1 hour, 9 minutes, 44 seconds
+una decomposizione speciale di training set e test set, riesco a mitigarlo, insomma, scompare un pochino. Va bene?
+1:09:53
+1 hour, 9 minutes, 53 seconds
+Poi nella pratica vi dico anche cosa succede perché appunto non finisce qui, cioè quindi avremo un insieme che è di testate
+1:10:01
+1 hour, 10 minutes, 1 second
+di train, no, no train sì, train validation, quindi avremo questo insieme che potrebbe essere sempre 80% 90% dei
+1:10:09
+1 hour, 10 minutes, 9 seconds
+dati e lì facciamo questa operazione per stimare il nostro rischio atteso e però
+1:10:16
+1 hour, 10 minutes, 16 seconds
+poi riserviamo comunque in pratica si riserva comunque poi un piccolo test set per verificare il modello finale. Qual è
+1:10:24
+1 hour, 10 minutes, 24 seconds
+il punto? Perché spesso usiamo questa decomposizione, no, questo rischio atteso per stimare dei parametri. Ok? Se usassimo tutti i dati per stimare i
+1:10:33
+1 hour, 10 minutes, 33 seconds
+parametri, poi nel momento in cui abbiamo fatto la nostra decisione finale, non siamo sicuri se l'abbiamo fatta troppo influenzati da il nostro
+1:10:41
+1 hour, 10 minutes, 41 seconds
+training set. Ok? E quindi il punto è che ci riserviamo comunque una piccola piccola finestra di punti di test
+1:10:47
+1 hour, 10 minutes, 47 seconds
+proprio finale per per insomma per per validare l'ultima volta, diciamo, dopo che abbiamo fatto ad esempio la scelta di cap e scelta di altri
+1:10:56
+1 hour, 10 minutes, 56 seconds
+parametri. Ok? Quindi, allora, in pratica la situazione avete train e validation set e un piccolo test set che
+1:11:04
+1 hour, 11 minutes, 4 seconds
+è quello finale. Eh, quello non lo dovete toccare mai se non proprio alla fine quando dite "Ok, l'errore stimato sul sul test set è questo, va bene?"
+1:11:13
+1 hour, 11 minutes, 13 seconds
+Cioè, l'operazione invece grossa è quella del train validation. Ok? Allora, vediamo come si fa questa validazione.
+1:11:20
+1 hour, 11 minutes, 20 seconds
+Tempo ne abbiamo? Sì, dai, ce l'abbiamo.
+1:11:23
+1 hour, 11 minutes, 23 seconds
+E e si tratta di estendere un po' questa idea, di spezzare, no? eh in training set e test set, però facciamolo
+1:11:30
+1 hour, 11 minutes, 30 seconds
+all'interno de dei nostro del nostro eh e facciamolo in modo sistematico soprattutto. Allora, vediamo. Ci sono almeno due modi che vi racconto, poi si
+1:11:38
+1 hour, 11 minutes, 38 seconds
+possono fare in tanti modi. Allora, il primo è la cross validation live p out
+1:11:46
+1 hour, 11 minutes, 46 seconds
+e p è un parametro oppure P. Ma com'è questa cosa che oggi fa così? Non capisco.
+1:11:56
+1 hour, 11 minutes, 56 seconds
+Cioè, qua è carico. Vediamo se c'è.
+1:12:09
+1 hour, 12 minutes, 9 seconds
+Presentation. Perfetto. Tutto carico.
+1:12:11
+1 hour, 12 minutes, 11 seconds
+Presentazione e beh, vabbè, non c'è modo di saperlo.
+1:12:21
+1 hour, 12 minutes, 21 seconds
+Allora, cosa fa questo metodo di validazione incrociata? Eh, cosa significa? Spezziamo il nostro insieme.
+1:12:32
+1 hour, 12 minutes, 32 seconds
+Beh, prima fissiamo P che dicevo un parametro, però tipicamente P è molto piccolo, eh, 1 2, perché vedrete che ora è molto costoso scegliere P grandi. Ok,
+1:12:41
+1 hour, 12 minutes, 41 seconds
+fissiamo P. Allora, cosa si fa? Togliamo P elementi dal nostro training set.
+1:12:48
+1 hour, 12 minutes, 48 seconds
+Bene, a quel punto alleniamo, cioè costruiamo lo stimatore, il classificatore su il training set a
+1:12:57
+1 hour, 12 minutes, 57 seconds
+cui abbiamo sottratto quei PP e poi calcoliamo l'accuratezza su quei punti, ok? Quindi usiamo quei P punti
+1:13:04
+1 hour, 13 minutes, 4 seconds
+che avevamo scartato come un test set, ok? Ovviamente, quindi a seconda di come scartiamo questi Punti, avremo dei
+1:13:13
+1 hour, 13 minutes, 13 seconds
+risultati diversi, no? Delle accuratezze diverse. Quindi, come facciamo a mettere tutto insieme? Beh, mediamo l'accuratezza, però ogni volta che
+1:13:20
+1 hour, 13 minutes, 20 seconds
+scegliamo P avremo un classificatore diverso, tipo immaginate KN con un insieme diverso. Classifichiamo, vediamo l'errore, abbiamo un'accuratezza e poi
+1:13:29
+1 hour, 13 minutes, 29 seconds
+alla fine però mediamo idealmente su tutte su tutte le scelte di Pi. Ok? Questo è
+1:13:37
+1 hour, 13 minutes, 37 seconds
+il leave P out. Lasciate P fuori per fare il training e poi fate il suomma il
+1:13:44
+1 hour, 13 minutes, 44 seconds
+test su quei P. Ok? Attenzione che questo ci potrebbero essere quei quei veri 20% di punti che avete lasciato
+1:13:51
+1 hour, 13 minutes, 51 seconds
+fuori nel test finale, quelli pure li li lasciate fuori, eh del LP p out vi riservate soltanto qui, lavorate
+1:13:58
+1 hour, 13 minutes, 58 seconds
+sull'80% diciamo. Ok? Qual è il problema di questa tecnica? Beh, sembra buona perché uno dice in effetti non sto
+1:14:06
+1 hour, 14 minutes, 6 seconds
+scegliendo un sottoinsieme speciale e ne sto scegliendo tutti, mediando su tutti. E il problema però che sono tanti, no?
+1:14:14
+1 hour, 14 minutes, 14 seconds
+Quando avete il modo di scegliere P elementi su n, che sono i nostri osservazioni, è sono proprio il
+1:14:21
+1 hour, 14 minutes, 21 seconds
+coefficiente binomiale, lo stesso che c'è nella distribuzione binomiale n su p. E questo come va? È n * n - 1 n - 2
+1:14:30
+1 hour, 14 minutes, 30 seconds
+fino n - p + 1 e quindi cresce come n^ p. Quindi immaginate che se avete 1 milione di dati eh dovete fare 1 milione
+1:14:39
+1 hour, 14 minutes, 39 seconds
+alla p di possibili sottoinsiemi, ok? è più uguale 1. Ancora va bene. Quindi in effetti leave one out
+1:14:48
+1 hour, 14 minutes, 48 seconds
+eh one out è eh va bene, quindi più uguale 1 perché avete ancora n, però già più uguale 2
+1:14:56
+1 hour, 14 minutes, 56 seconds
+uno dice ho n² potrebbero essere tantissimi questi sottoinsiemi, ok?
+1:15:01
+1 hour, 15 minutes, 1 second
+Quindi di solito si fa con n molto piccolo con p molto piccolo e in particolare se n è piccolo allora si può far crescere un po' p. Va bene?
+1:15:11
+1 hour, 15 minutes, 11 seconds
+Però vediamo cosa succede nell'esempio.
+1:15:13
+1 hour, 15 minutes, 13 seconds
+Poi mercoledì vediamo il codice anche qui. Eh, allora, leave one out. Sì, scusate, one a volte si scrive con la O,
+1:15:22
+1 hour, 15 minutes, 22 seconds
+quindi è lì L L O o O. Ok? So, le one out e al solito il vari K, quindi mentre
+1:15:29
+1 hour, 15 minutes, 29 seconds
+quello di prima, vi ricordate? erano 120 osservazioni, questa volta ancora ne ho prese 120, ma su quelle 120 di training faccio anche la cross validation. Ok?
+1:15:42
+1 hour, 15 minutes, 42 seconds
+Quindi cosa di cosa mi rendo conto? Beh, allora questo lo sapevamo già già lo sapevamo che se andate a vedere il training error
+1:15:50
+1 hour, 15 minutes, 50 seconds
+e in particolare con k = 1 avete errore 0 perché one nn knn con n = 1 non dà
+1:15:57
+1 hour, 15 minutes, 57 seconds
+nessun errore. Poi però questo errore comincia a crescere.
+1:16:01
+1 hour, 16 minutes, 1 second
+E invece cosa succede all'errore qui stimato, no? Questa cross validation che sta cercando di stimare l'errore che mi interessa, l'errore di generalizzazione.
+1:16:10
+1 hour, 16 minutes, 10 seconds
+Vedete? Parte, cresce un pochino, oscilla e poi magari ci sono delle situazioni in cui diventa più basso. Ok?
+1:16:18
+1 hour, 16 minutes, 18 seconds
+Qui in effetti ora questo è un grafico vero, lontano dai grafici ideali che uno si racconta spesso nella storia, però il
+1:16:25
+1 hour, 16 minutes, 25 seconds
+punto quale sarebbe? che magari crescere di K cerco delle situazioni in cui l'errore non di training ma questo di cross validation sia più basso. Qui in
+1:16:34
+1 hour, 16 minutes, 34 seconds
+effetti se volessi dire voglio abbattere un po' l'errore di cross validation non vado a prendere k = 1, ma andrò a prendere questo punto qui dove ho k = 7.
+1:16:45
+1 hour, 16 minutes, 45 seconds
+Ok? Basandomi su questo potrei fare questa tipo di decisione. Ok?
+1:16:51
+1 hour, 16 minutes, 51 seconds
+Però eh vediamo un pochino, sono comunque errori piccoli, eh siamo stiamo parlando di un 5%.
+1:16:59
+1 hour, 16 minutes, 59 seconds
+Però appunto questo è l'idea. Non andiamo a cercare quando il training, l'errore sul training è basso, ma quello di cross validation, perché sto stimando l'errore invece quello teorico atteso.
+1:17:10
+1 hour, 17 minutes, 10 seconds
+Cosa succede però se poi rimetto dentro il training set, il test set? Diciamo che ho fatto la mia decisione, ho scelto K = 7. A quel punto vado a testare il
+1:17:18
+1 hour, 17 minutes, 18 seconds
+mio il mio metodo e cosa succede con K = 7? Beh, vedete, non siamo neanche troppo sfortunati.
+1:17:25
+1 hour, 17 minutes, 25 seconds
+Il test error, questo è fatto sui rimanente 20%, no? Quei 30 punti.
+1:17:29
+1 hour, 17 minutes, 29 seconds
+Vedete? In effetti ci ha azzeccato le il cross validation è uguale al test. È un caso, eh, non è non è che sia sempre
+1:17:36
+1 hour, 17 minutes, 36 seconds
+così. Ok? In effetti, vedete, se mi andavo a basare soltanto sul test avrei scelto K = 5. Vedete il test, l'errore
+1:17:44
+1 hour, 17 minutes, 44 seconds
+sul test set, per quanto sia un numeri piccoli, questa volta è sceso a zero, cioè azzecava completamente k nn con k =
+1:17:52
+1 hour, 17 minutes, 52 seconds
+5, con cinque vicini mi dava un errore z0, quindi era perfetto. Io sceglievo k = 5, però vedete k = 5, se vado a vedere
+1:18:01
+1 hour, 18 minutes, 1 second
+la stima della cross validation era quasi più grande, no, di k = 7. Quindi vedete, e era insomma un po' troppo
+1:18:09
+1 hour, 18 minutes, 9 seconds
+rischioso basarsi sul test, cioè la cross validation ha mediato su tutti i possibili questi test e ci ha dato
+1:18:16
+1 hour, 18 minutes, 16 seconds
+un'indicazione un po' più robusta. Ecco, va bene. Magari su questo specifico testare meglio, ma se devo adesso usare il vero
+1:18:25
+1 hour, 18 minutes, 25 seconds
+test set che non avrò ancora visto, andrò con K = 7. Va bene? Ok. E questo è il primo metodo di di cross validation.
+1:18:38
+1 hour, 18 minutes, 38 seconds
+Il problema che vi dicevo è appunto live P out cross validation richiede
+1:18:46
+1 hour, 18 minutes, 46 seconds
+richiede n^ p e iterazioni, no?
+1:18:53
+1 hour, 18 minutes, 53 seconds
+Beh, allora si può fare qualcosa di, insomma, sarà certamente meno efficace, ma comunque buono. Allora, c'è quest'altra tipo di cross validation che
+1:19:01
+1 hour, 19 minutes, 1 second
+è la keyfold cross validation. Cosa facciamo?
+1:19:05
+1 hour, 19 minutes, 5 seconds
+Beh, ve la descrivo col disegnetto che è più semplice. Allora, abbiamo i nostri dati. Immaginiamo di averli ordinati in
+1:19:12
+1 hour, 19 minutes, 12 seconds
+una sequenza, magari permutate, non è necessariamente quella che vi è stata data inizialmente. Fissiamo K, che so K
+1:19:20
+1 hour, 19 minutes, 20 seconds
+uguale, in questo caso K = 5. Quindi spezzate i vostri dati in cinque sottoinsiemi tutti con gli stessi numero
+1:19:29
+1 hour, 19 minutes, 29 seconds
+di elementi. Quindi questo sarà n circa N / K. n / k elementi ciascuno. E a quel
+1:19:38
+1 hour, 19 minutes, 38 seconds
+punto cosa fate? Beh, facciamo la stessa cosa del live p out, ma ne lasciamo fuori n su k. Quindi iniziamo lasciando fuori, selezioniamo questo insieme, lui
+1:19:47
+1 hour, 19 minutes, 47 seconds
+lo teniamo fuori, facciamo il training su tutti gli altri, quindi il training set diventano tutti i rimanenti e poi
+1:19:55
+1 hour, 19 minutes, 55 seconds
+usiamo il classificatore ottenuto su quelli per valutare l'accuratezza nel nostro insieme che abbiamo selezionato.
+1:20:01
+1 hour, 20 minutes, 1 second
+Questo per il primo, poi per il secondo e poi per il terzo, poi per il quarto e poi per il quinto. Ok? Quindi alla fine
+1:20:08
+1 hour, 20 minutes, 8 seconds
+avremo K eh risultati, K accuratezze che andiamo a mediare. Ok? Quindi questo qua ha il
+1:20:17
+1 hour, 20 minutes, 17 seconds
+vantaggio. Qual è il punto? Beh, sicuramente abbiamo K, abbiamo molte meno iterazioni rispetto al live p out, ok? E però a volte abbiamo una stima
+1:20:26
+1 hour, 20 minutes, 26 seconds
+buona pure perché ne stiamo prendendo tanti, cioè n su k è quello che era Pa,
+1:20:33
+1 hour, 20 minutes, 33 seconds
+ok? Quindi stiamo facendo, ne lasciamo fuori parecchie. Di solito uno prende k = 10, quindi lascia fuori n su 10 gli
+1:20:40
+1 hour, 20 minutes, 40 seconds
+elementi e quindi in quel caso comunque una buona stima. Va bene? Quindi questa è il Kfold cross validation, quindi uno
+1:20:48
+1 hour, 20 minutes, 48 seconds
+fissa K come prima fissava P, stavolta appunto è pure piccolo, però questo significa che prendiamo tanti punti,
+1:20:56
+1 hour, 20 minutes, 56 seconds
+dividiamo il dataset in in K parti uguali, questi fals e per ogni fold usiamo gli altri dati fuori da quel
+1:21:04
+1 hour, 21 minutes, 4 seconds
+sottoinsieme per fare per calcolare il classificatore e poi usiamo il folder selezionato per
+1:21:13
+1 hour, 21 minutes, 13 seconds
+valutare l'accuratezza o vedere l'errore e poi a quel punto mediamo, ok? E quindi ad esempio con K uguale 5 abbiamo visto
+1:21:21
+1 hour, 21 minutes, 21 seconds
+prima il disegno e ripeteremo cinque volte la procedura di di train e test.
+1:21:29
+1 hour, 21 minutes, 29 seconds
+Allora, ovviamente eh c'è un vantaggio, sì, perché abbiamo K che controlliamo, mentre prima era n^ p, questa volta K uno lo prende, dice voglio fare 10
+1:21:37
+1 hour, 21 minutes, 37 seconds
+volte. Immaginate che sia molto costoso, no, fare il calcolo del classificatore.
+1:21:42
+1 hour, 21 minutes, 42 seconds
+Se è molto costoso, uno va su K fold, fa k = 10, fa 10 volte il calcola 10 volte un classificatore. Ogni volta è molto
+1:21:50
+1 hour, 21 minutes, 50 seconds
+costoso, ma lo fa 10 volte, invece di farlo n^a p vol.
+1:21:56
+1 hour, 21 minutes, 56 seconds
+E e d'altra parte c'è anche questo vantaggio che il lacuratezza non la valutiamo su P elementi ma su n / kti,
+1:22:05
+1 hour, 22 minutes, 5 seconds
+quindi abbiamo magari è molto più rappresentativa la in questo caso abbiamo un insieme più grande di di punti su cui valutare l'accuratezza.
+1:22:14
+1 hour, 22 minutes, 14 seconds
+Beh, ovviamente gli svantaggi sono che vabbè, potete scegliere K in modo diverso, ma anche
+1:22:23
+1 hour, 22 minutes, 23 seconds
+anche qui il modo in cui avete spezzato i vostri dati potrebbe risentirne, ok?
+1:22:28
+1 hour, 22 minutes, 28 seconds
+Quindi a volte si prende una una permutazione casuale dei dati o si campionano questi Kfold in modo casuale, in modo che magari i dati non siano
+1:22:36
+1 hour, 22 minutes, 36 seconds
+presentati in modo strano. Immaginate, no? In Iris, vi ricordate? In Iris, avete naturalmente le 50 osservazioni
+1:22:44
+1 hour, 22 minutes, 44 seconds
+corrispondono alle tre specie. Avete il 50 50. Se fate K fold cross validation con K = 3 vi andate proprio a prendere
+1:22:53
+1 hour, 22 minutes, 53 seconds
+quelli di una classe, valutate i classificatore sulle altre due, cioè state siete stati sfortunati, no? avete trovato una situazione in cui non avete
+1:23:01
+1 hour, 23 minutes, 1 second
+proprio rappresentanti della specie nel vostro training set, questo non lo volete. Però diciamo a parte questo, Kefold ha i suoi vantaggi, c'è anche un
+1:23:10
+1 hour, 23 minutes, 10 seconds
+vantaggio che vedremo più avanti, che quando tratteremo serie storiche, nelle serie storiche non è vero che i dati sono indipendenti e identicamente
+1:23:18
+1 hour, 23 minutes, 18 seconds
+distribuiti. C'è una nozione di tempo ed effettivamente uno non può fare live one out cross validation perché non può prendere a caso i punti e toglierli.
+1:23:28
+1 hour, 23 minutes, 28 seconds
+però può fare qualcosa di simile a questa Kefold Cross Validation, perché nella Kefold Cross Validation uno spezza, prende degli intervalli e se non
+1:23:37
+1 hour, 23 minutes, 37 seconds
+distrugge l'ordine la serie storica rimane, cioè valuteremo finestre temporali per fare una cross validation, va bene? Quindi questo è un vantaggio.
+1:23:50
+1 hour, 23 minutes, 50 seconds
+Allora, eh vediamo soltanto di arrivare, vi spiego quest'ultimo concetto, poi ci
+1:23:57
+1 hour, 23 minutes, 57 seconds
+fermiamo, va bene? Sono sono tante cose, mi rendo conto. Quindi andiamo un po' più lenti e mercoledì
+1:24:06
+1 hour, 24 minutes, 6 seconds
+e riprendiamo con le altre figure di merito, insomma, di performance. Allora, quindi per chiarirci cosa stiamo
+1:24:13
+1 hour, 24 minutes, 13 seconds
+dicendo? Stiamo dicendo che c'è il training error e il test error che andiamo a stimare con la cross validation. Va benissimo. Allora, quello
+1:24:21
+1 hour, 24 minutes, 21 seconds
+che succede molto spesso, non sempre, eh, però molto spesso, succede che le curve di errore, quindi potreste
+1:24:28
+1 hour, 24 minutes, 28 seconds
+rappresentarne due, no? Idealmente avete errore, quindi avete, che so, parametro k
+1:24:36
+1 hour, 24 minutes, 36 seconds
+= 1 2 3 e così via, no? E qui abbiamo gli errori, l'accuratezza o l'errore.
+1:24:42
+1 hour, 24 minutes, 42 seconds
+Facciamo l'errore. Allora, cosa succede per l'errore? Abbiamo visto, ad esempio, KNN, no? Per K = 1 non avete errori di
+1:24:51
+1 hour, 24 minutes, 51 seconds
+training, poi K = 2 magari cresce un pochino, k = 3 cresce un pochino e così via. Invece l'altro errore, cosa
+1:24:58
+1 hour, 24 minutes, 58 seconds
+possiamo sperare? almeno potremmo sperare che con K uguale picc, cioè con
+1:25:04
+1 hour, 25 minutes, 4 seconds
+K = 1, K piccolo, avete un un errore grande, potremmo sperare,
+1:25:13
+1 hour, 25 minutes, 13 seconds
+e al crescere di K magari questo errore un po' diminuisce, l'abbiamo visto prima, non era proprio una curva bellissima, però nel mondo ideale uno
+1:25:20
+1 hour, 25 minutes, 20 seconds
+saspetterebbe che al crescere di K ci sarà una situazione in cui l'errore, questo è l'errore di test, eh test error
+1:25:28
+1 hour, 25 minutes, 28 seconds
+o di cross validation e quello blu è il training.
+1:25:35
+1 hour, 25 minutes, 35 seconds
+Quindi uno si aspetterebbe in un mondo ideale che l'errore magari per il primo K =1 c'è un test error, ma andando un
+1:25:42
+1 hour, 25 minutes, 42 seconds
+po' più in là quell'effetto del rumore un po' si mitica e l'errore sul test diminuisce, poi magari però ricomincia
+1:25:49
+1 hour, 25 minutes, 49 seconds
+ad aumentare. Ok? Quindi il grafico tipico dell'errore è questa curva AU. Allora, diciamo, non
+1:25:59
+1 hour, 25 minutes, 59 seconds
+è quello che succede sempre, avete visto anche prima, insomma, non è che fosse veramente una curva U, però i due estremi di solito ci sono, ok? Non dico
+1:26:07
+1 hour, 26 minutes, 7 seconds
+che proprio deve essere una bella curva U, però i due estremi ci sono, cioè i due estremi sono due, sono questi. Il caso K = 1, diciamo k piccolo, è la situazione in cui c'è overfeitting. Ok?
+1:26:19
+1 hour, 26 minutes, 19 seconds
+Cosa vuol dire? Vuol dire che c'è troppa varianza, cioè vuol dire che il classificatore e vedete con K ug va a cercare il punto
+1:26:27
+1 hour, 26 minutes, 27 seconds
+più vicino e magari si insomma si impara troppo i dati e si impara anche il rumore, impara il fatto che i dati a
+1:26:34
+1 hour, 26 minutes, 34 seconds
+volte non sono giusti. Ok? Allora, il classificatore si adatta troppo ai dati di addestramento. E come si fa a vedere in effetti da queste curve di errore?
+1:26:44
+1 hour, 26 minutes, 44 seconds
+Beh, quando avete il test cross validation error che è grande e il training error che è piccolo, in questa
+1:26:51
+1 hour, 26 minutes, 51 seconds
+situazione c'è overfitting, tendenzialmente. Ok? Quindi, quando riuscite a imparare bene i dati, il
+1:26:58
+1 hour, 26 minutes, 58 seconds
+classificatore è perfetto sui vostri dati, ma quando andate a vedere il test è un
+1:27:06
+1 hour, 27 minutes, 6 seconds
+grosso errore. Quindi qua c'è overfitting, diciamo, potrebbe, magari ci sono altri motivi, ma potrebbe essere un buon indicatore di
+1:27:13
+1 hour, 27 minutes, 13 seconds
+overfitting. Quindi avete un errore di trading molto basso perché INN è zero, quindi avete imparato esattamente i dati, ma fate un errore grande sul test.
+1:27:22
+1 hour, 27 minutes, 22 seconds
+Bene. E qual è l'altro estremo?
+1:27:25
+1 hour, 27 minutes, 25 seconds
+e l'altro estremo è il K. Allora, siete underfitting, diciamo, qui c'è troppo bias, ok? Quello il termine tecnico è bias.
+1:27:38
+1 hour, 27 minutes, 38 seconds
+Mentre qui il termine tecnico è varianza, avete troppa varianza.
+1:27:44
+1 hour, 27 minutes, 44 seconds
+E in quest'altro caso è bias. Cosa si intende? Beh, si intende che il classificatore è troppo semplice e
+1:27:50
+1 hour, 27 minutes, 50 seconds
+immaginate, no? knn con k = n, cioè prendete tutti i vostri dati, non state veramente guardando i punti vicini,
+1:27:57
+1 hour, 27 minutes, 57 seconds
+state guardando tutti. Troppo semplice, qualsiasi dato prendiate vi darà sempre la stessa risposta. E allora in questa situazione cosa succede? Che il training
+1:28:06
+1 hour, 28 minutes, 6 seconds
+error, anche l'errore sul training è grande, ok? E di solito è vicino al test al test error, perché vuol dire che il
+1:28:15
+1 hour, 28 minutes, 15 seconds
+vostro classificatore è una funzione troppo semplice e risponde male sia al training error che il test error. Ok?
+1:28:21
+1 hour, 28 minutes, 21 seconds
+Allora, in questo caso uno deve cercare di ottenere invece uno stimatore più complicato, ridurrà K nel nostro caso, ok?
+1:28:29
+1 hour, 28 minutes, 29 seconds
+E e quindi quello che uno cerca di solito, la tradizione insomma statistica, vi dice che c'è questo compromesso che avete dei parametri e
+1:28:37
+1 hour, 28 minutes, 37 seconds
+dovete sceglierli in modo ottimale cercando un comprimesso tra situazioni di overfitting e underfitting e cercare quindi una situazione dove c'è varianza
+1:28:46
+1 hour, 28 minutes, 46 seconds
+non troppo grande, biaspo grande anche lui. Ok, poi vedremo quella c'è una decomposizione dell'errore
+1:28:54
+1 hour, 28 minutes, 54 seconds
+almeno nel costo quadratico abbastanza elegante, però attenti che poi nella realtà questa cosa è un po' come cercare, no, è un po' come
+1:29:03
+1 hour, 29 minutes, 3 seconds
+cercare l'elbow e attenzione perché il non tutti i modelli non tutti i modelli mostrano questo compromesso eh tra bias
+1:29:11
+1 hour, 29 minutes, 11 seconds
+e varianza. Ci sono modelli che funzionano stato dell'arte e sono fuori da questo paradigma. Quindi c'è molti
+1:29:19
+1 hour, 29 minutes, 19 seconds
+modelli semplici come KNN, si vede, vedremo anche negli altri modelli semplici che studieremo, ma attenzione non è sempre così. però è un buon
+1:29:26
+1 hour, 29 minutes, 26 seconds
+indicatore capire l'errore, cioè confrontare l'errore di training con l'errore di test e capire se c'è in una situazione in cui c'è troppa varianza,
+1:29:35
+1 hour, 29 minutes, 35 seconds
+quindi errore di training basso, errore di test, oppure troppo bias che sono tutte e due grandi e schiacciati tra di loro. Vuol dire che il modello è troppo
+1:29:43
+1 hour, 29 minutes, 43 seconds
+semplice, non non riesce a classificatore è troppo banale. Eh, finiamo con questa slide e vi lascio.
+1:29:50
+1 hour, 29 minutes, 50 seconds
+Quindi, ad esempio, qui ho preso K, l'ho fatto crescere molto, è un dataset un po' diverso perché Iris era troppo banale, non si vedeva neanche sto fenomeno. Allora, vedete cosa succede.
+1:30:00
+1 hour, 30 minutes
+Il training error cresce, cresce e alla fine si appiattisce, ok? Arriva qui. E i dataset ha comunque 200 osservazioni e
+1:30:09
+1 hour, 30 minutes, 9 seconds
+non sto prendendo proprio tutte. E invece l'altro, il cross validation error, che sarebbe la la nostra stima
+1:30:16
+1 hour, 30 minutes, 16 seconds
+del testror, vedete? oscilla un pochino, diminuisce. Quindi se dovessi scegliere un K mi prenderei K = 5 qui, però poi
+1:30:23
+1 hour, 30 minutes, 23 seconds
+vedete diminuisce e si appiattisce anche lui. Ok? Qui vedete non è proprio una curva a U, ok? Però insomma comunque la
+1:30:30
+1 hour, 30 minutes, 30 seconds
+situazione se volessi nel mondo ideale sarebbe stata una cosa del genere. Zac.
+1:30:35
+1 hour, 30 minutes, 35 seconds
+Questo va bene. Ovviamente la curva che vedete nei testi non è quella che trovate nei dati reali, ok? Però appunto
+1:30:44
+1 hour, 30 minutes, 44 seconds
+qui al crescere di K inizialmente abbiamo troppa varianza. Qui c'è troppo bias e invece dobbiamo cercarci per il
+1:30:51
+1 hour, 30 minutes, 51 seconds
+nostro modello KNN una situazione intermedia. Va bene? Richiameremo questo concetto di bias e varianza più avanti
+1:30:59
+1 hour, 30 minutes, 59 seconds
+e io direi fermiamoci qui e poi vediamo le misure d'errore per i classificatori binari mercoledì. Va bene? Però portate
+1:31:07
+1 hour, 31 minutes, 7 seconds
+comunque il computer, vediamo un po' di di fare un po' di codice R.
+1:31:19
+1 hour, 31 minutes, 19 seconds
+Ш.
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+5:43
+How does Atlas learn? | Inside the Lab | Boston Dynamics
+Boston Dynamics
+938k 4 mo ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+80 watching
+3:04
+The Orville 1:7 Majority Rule, Absolute Unstructured Democracy
+Brooke Marino
+633k 3 yr ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+223k 13 hr ago
+New
+5:23
+2026 Fields Medal: Hong Wang
+Simons Foundation
+554k 1 mo ago
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+8:58
+Martha Argerich, il pianoforte raccontato dal violino - Via dei Matti n.0 del 15/01/2026
+Rai
+21k 8 mo ago
+1:38
+Atlas Airborne | Boston Dynamics & @rai-inst
+Boston Dynamics
+and RAI Institute
+2.3m 7 mo ago
+16:15
+Travaglio Show! Lancia un Affondo Durissimo Contro La Russa e lo Ridicolizza
+Attualità Politica
+169k 2 wk ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+29:08
+Top 50 FUNNIEST Crashes from Red Bull Soapbox Race
+Red Bull Soapbox
+3.7m 3 mo ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+5:30
+Raimondo Vianello e la valletta ciociara (1968)
+pietromollo
+993k 7 yr ago
+2:13
+Rogue Robot Launches Kung Fu Kicks, While Handlers Attempt to Subdue It
+New York Post
+2.6m 2 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+8:03
+Don't Throw Away Your Old Computer Hard Drive 😱 Billions of People Don't Know This Secret
+Inventor 247
+467k 4 mo ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+1:21
+Atlas Gets a Grip | Boston Dynamics
+Boston Dynamics
+11m 3 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+28:19
+Sir András Schiff: Finding Your Path
+Living the Creative Life
+63k 1 mo ago
+14:10
+Concerto No. 1 for Violin, Strings and Timpani "Esoconcerto": II. Adagio (Live (2016 revised...
+Ezio Bosso
+6k 9 yr ago

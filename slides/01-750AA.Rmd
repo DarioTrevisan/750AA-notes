@@ -1,0 +1,241 @@
+---
+title: "Statistica II (750AA)"
+subtitle: 'Lezione 1'
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "21/09/2026"
+output:
+  beamer_presentation:
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+  - \newcommand{\R}{\mathbb{R}}
+---
+
+
+
+# Introduzione al corso
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r include=FALSE}
+
+miei_colori  = c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499", "#888888")
+```
+
+### Argomenti
+
+0. Richiami di Statistica I (descrittiva, probabilità, test e intervalli)
+1. Clustering
+2. Classificazione
+3. Regressione
+4. Serie storiche 
+
+- L'apprendimento di R è centrale nel corso: installate R ed RStudio <https://posit.co/download/rstudio-desktop/> 
+
+
+
+
+
+----
+
+### Materiale didattico
+
+- MS Team: __750AA 26/27 - STATISTICA II [WIG-LM]__
+
+- Pagina web del corso *<https://web.dm.unipi.it/trevisan/it/courses/750AA.html>*
+
+Troverete:
+
+- Appunti (slides annotate)
+
+- Demo interattive
+
+- R notebooks (codice e commenti)
+
+- Registrazioni delle lezioni (anno scorso)
+
+- Test d'esame 
+
+
+
+
+
+----
+
+
+### Orario lezioni
+
+
+- Lunedì F4 14:30 - 16:30
+
+- Mercoledì B25 8:30 - 11:30 (portate computer/tablet)
+
+
+----
+
+### Ricevimento
+
+
+- Giorno: 
+
+- Orario:
+
+- Comunque su appuntamento, anche su Teams
+
+- Contattatemi __sempre__ via mail o messaggio su Teams.
+
+
+
+----
+
+### Modalità di esame
+
+- __prova teorica__: test scritto con domande sugli argomenti del corso (vero/falso da argomentare brevemente) durata 1 ora.
+
+- __prova pratica__: progetti autonomi di analisi statistica di dati reali, su __almeno due dei tre argomenti principali__ (classificazione, regressione, serie storiche). Vedere foglio di indicazioni generali sulle relazioni.
+
+- Il voto finale tiene conto di entrambe le prove.
+
+
+----
+
+# Statistica descrittiva 
+
+
+### Indicatori di centralità e variabilità
+
+Date osservazioni (un campione statistico) $\{x_i\}_{i=1}^n$ definiamo gli indicatori di centralità:
+
+- moda
+
+- mediana
+
+- media
+
+e gli indicatori di variabilità (o dispersione):
+
+- quantili (quartili, percentili)
+
+- varianza (deviazione standard)
+
+----
+
+### Moda
+
+----
+
+
+### Mediana
+
+----
+
+### Media
+
+----
+
+### Varianza
+
+
+----
+
+### Funzioni di Perdita/Costo/Errore
+
+
+La media $\bar{x}_n$ minimizza il rischio quadratico (MSE)
+$$ \bar{x}_n \in \arg \min_{h \in \mathbb{R} }  \sum_{i=1}^n (x_i - h )^2 $$
+
+- Introduciamo nuove funzioni di perdita/costo/errore $\ell(x; h)$ e **minimizziamo il rischio empirico** (ERM):
+$$ \arg \min_{h \in \mathbb{R}} \sum_{i=1}^n \ell(x_i; h).$$
+
+
+### Errore assoluto
+
+----
+
+### Errore assoluto asimmetrico
+
+
+----
+
+### Errore 0-1
+
+----
+
+### Errore esponenziale assoluto
+
+
+---
+
+### WERMS
+
+![](logos/werms-logo.jpg){#id .class width=30% height=30%}
+
+
+-  Giocate voi! <https://dario-trevisan.shinyapps.io/WERMS/>
+
+- Codice (R shiny) disponibile nel team e nella pagina del corso
+
+##  Dati multivariati 
+
+### Distanze tra punti nello spazio
+
+Nella statistica multivariata si osserva 
+
+ - un campione di $n$ individui (taglia): $x_i$, per $i=1\ldots, n$ 
+ 
+ - e $d$ caratteristiche (features) per ciascun individuo $x_{i,j}$, per $1, \ldots, d$. 
+ 
+Possiamo organizzare i dati in una tabella (*data frame* in R).
+
+----
+
+### Distanze tra punti nello spazio
+
+Confrontare punti nello spazio $\mathbb{R}^d$ è cruciale per l'analisi di dati multivariati. Distanze comuni:
+
+- Euclidea:
+
+- Manhattan ($\ell^1$, taxicab): 
+
+- $\ell^p$ (Minkowski):
+
+- $\ell^\infty$ (del massimo):
+    
+
+----
+    
+### Centroide e Medoide
+
+
+----
+
+
+### Medoids!
+
+![](logos/medoids-logo.jpg){#id .class width=30% height=30%}
+
+
+
+- Giocate voi! <https://dario-trevisan.shinyapps.io/medoids/>
+
+- Codice (R shiny) disponibile nel team e nella pagina del corso
+
+
+
+
+
+
+
+

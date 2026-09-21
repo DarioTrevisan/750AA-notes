@@ -1,0 +1,1097 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "17/11/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 9'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+library(caret)
+library(glmnet)
+library(car)
+library(tidyr)
+
+```
+
+
+# Serie storiche I
+
+## Obiettivi
+
+In questa terza parte del corso, studieremo le serie storiche da un punto di vista statistico.
+
+- Nella lezione di oggi affrontiamo come
+
+  1. visualizzare una serie storica
+
+  2. descrivere le principali componenti di una serie storica (trend, stagionalità, rumore).
+  
+  3. comprendere il concetto di serie ritardata (lagged series) e di autocorrelazione.
+  
+  4. definire i modelli elementari di previsione  (naive, kNN) per serie storiche
+  
+  5. comprendere la struttura di una  **cross-validation temporale**.
+  
+- Riferimenti bibliografici: *Previsione: principi e pratica (III ediz.) Rob J Hyndman e George Athanasopoulos* <https://otexts.com/fppit/>
+
+
+## 1. Definizione di serie storica
+
+- Una **serie storica** (o temporale, in inglese *time series*) è una sequenza di osservazioni (dati) *ordinate nel tempo*:
+  $$ (y_t)_{t=1, \ldots, T} $$
+  a valori in $\R$ o più in generale $\R^d$ (se si ossevano più caratteristiche).
+
+- **Esempi:** dati economici, finanziari, epidemiologici, climatici\ldots
+
+- **Differenza principale** con quanto visto finora: 
+  - i dati usati nel clustering, classificazione, regressione ecc. sono **un campione statistico di variabili indipendenti**
+  - le serie storiche presentano **associazione** (dipendenza) nel tempo
+  - la dipendenza permette di effettuare **previsioni** (nel futuro, nel passato)
+
+## Visualizzazone di serie storiche
+
+Il modo più diretto è un grafico temporale (*time plot* o *line plot*).
+
+```{r message=FALSE}
+library(forecast)
+data("AirPassengers")
+autoplot(AirPassengers, main="Serie AirPassengers")
+```
+
+## Time plot di serie storiche multivariate
+
+
+```{r}
+# plot separato delle quattro serie di indici
+library(reshape2)
+df <- as.data.frame(EuStockMarkets)
+df$Time <- 1:nrow(df)
+df_melt <- melt(df, id.vars = "Time")
+ggplot(df_melt, aes(x = Time, y = value, color = variable)) +
+  geom_line() +
+  facet_wrap(~ variable, scales = "free_y") +
+  labs(title = "Indici azionari europei (1991–1998)", y = "Valore", x = "Tempo") +
+  theme_minimal()
+```
+
+
+----
+
+
+```{r}
+data("EuStockMarkets")
+autoplot(EuStockMarkets, main = "Indici azionari europei (1991–1998)")
+```
+
+## Un altro esempio 
+
+```{r}
+data("nottem")
+autoplot(nottem, main = "Temperatura media mensile a Nottingham (1920–1939)")
+```
+
+## Decomposizione delle serie storiche
+
+Possiamo rappresentare una serie storica $(y_t)_{t}$ come una sovrapposizione di contributi:
+
+ - **Trend** \( (T_t)_t \): andamento di lungo periodo.  
+ - **Stagionalità** \( (S_t)_t \): fluttuazioni regolari entro un periodo 
+ - **Ciclo** \( (C_t)_t \): variazioni lente, non perfettamente periodiche.  
+ - **Componente rimanente (residuo, rumore)** \( (R_t)_t \).
+ 
+- La componente *ciclica* spesso viene inglobata nel rumore o nel trend.
+
+- Idealmente $(R_t)_t$ è **rumore bianco** (*white noise*): i.i.d.\ con media zero e varianza costante (nessuna struttura).
+
+- La decomposizione aiuta a comprendere la struttura della serie e a costruire modelli di previsione.
+
+
+
+## Modelli di decomposizione
+
+Bisogna specificare in che senso i contributi si combinano:
+
+- Decomposizione **additiva:**
+  \[
+  y_t = T_t + S_t + R_t
+  \]
+
+- Decomposizione **moltiplicativa**:
+  \[
+  y_t = T_t \times S_t \times R_t
+  \]
+  
+- Il legame dipende dalla natura della serie (es. variabilità costante o proporzionale ai valori della serie).
+
+- Si può passare al logaritmo per trasformare un modello moltiplicativo in additivo:
+  \[
+  \log(y_t) = \log(T_t) + \log(S_t) + \log(R_t)
+  \]
+  
+
+
+## Esempio: decomposizione additiva o moltiplicativa?
+
+```{r message=FALSE}
+library(forecast)
+data("AirPassengers")
+autoplot(AirPassengers, main="Serie AirPassengers")
+```
+
+
+----
+
+```{r}
+fit <- decompose(AirPassengers, type = "multiplicative")
+autoplot(fit)+ggtitle("Decomposizione moltiplicativa della serie Airpassengers")
+```
+
+----
+
+```{r}
+
+fit <- decompose(AirPassengers, type = "additive")
+autoplot(fit)+ggtitle("Decomposizione additiva della serie Airpassengers")
+```
+
+## Plot stagionali
+
+
+```{r}
+
+ggseasonplot(AirPassengers)
+```
+
+
+----
+
+```{r}
+
+ggseasonplot(nottem)+ggtitle("Temperatura media mensile a Nottingham (1920–1939)")+theme(legend.position = "none") 
+```
+
+## Grafici stagionali di sotto-serie
+
+
+```{r}
+
+ggsubseriesplot(AirPassengers)+ggtitle("Serie Airpassengers, grafico stagionale di sottoserie")
+
+```
+
+
+```{r}
+
+ggsubseriesplot(nottem)+ggtitle("Serie nottem, grafico stagionale di sottoserie")
+
+```
+
+## Diagrammi a nuvola di punti
+
+In presenza di serie storiche multivariate $y_t = (y_{1,t}, y_{2,t}, \ldots, y_{d,t})$ possiamo usare uno scatterplot per visualizzarne le correlazioni.
+
+```{r}
+library(GGally)
+pairs(as.data.frame(EuStockMarkets))
+```
+
+## 2. Serie storica ritardata
+
+Partendo da una serie storica $(y_t)_{t}$ è possibile costruirne altre *ritardandone* i tempi:
+
+$$ (L y)_t = y_{t-1}, \quad (L^2 y)_{t} = y_{t-2} \quad ecc.$$
+
+- Indichamo con $L$ l'operatore di *ritardo* (Lag).
+
+- Estendiamo features di una serie storica includendo un certo numero di sue versioni ritardate (*lagged series*).
+
+- La dipendenza tra la serie e le sue versioni ritardate è alla base della previsione.
+
+- La serie ritardada $L^ky$ è definita solo sui tempi $t \ge  k+1$. 
+
+
+## Lag plots
+
+
+```{r}
+
+gglagplot(AirPassengers, lags="1", geom="point", do.lines=FALSE,seasonal=FALSE)+ggtitle("Lag plot della serie AirPassengers, lag=1")
+
+```
+
+----
+
+```{r}
+gglagplot(nottem, set.lags=1, geom="point", do.lines=FALSE,seasonal=FALSE)+ggtitle("Lag plot della serie nottem, lag=1")
+```
+
+----
+
+```{r}
+gglagplot(EuStockMarkets, set.lags=100, geom="point", do.lines=FALSE,seasonal=FALSE)+ggtitle("Lag plot della serie EuStockMarkets, lag=100")
+```
+
+## Lag plot con stagionalità
+
+
+
+```{r}
+
+gglagplot(AirPassengers, lags="1", geom="point", do.lines=FALSE,seasonal=TRUE)+ggtitle("Lag plot della sottoserie AirPassengers , lag=1")
+
+```
+
+---
+
+```{r}
+
+gglagplot(AirPassengers, lags="1", geom="point", do.lines=TRUE,seasonal=TRUE)+ggtitle("Lag plot della serie AirPassengers , lag=1")
+
+```
+
+----
+
+```{r}
+
+gglagplot(nottem, lags="1", geom="point", do.lines=TRUE,seasonal=TRUE)+ggtitle("Lag plot sottoserie nottem, lag=1")
+
+```
+
+
+
+
+## Autocovarianza e autocorrelazione
+
+Da una serie storica $y=(y_t)$ e la ritardata $L^ky$, $(L^ky)_t = y_{t-k}$, possiamo  calcolarne
+
+- la covarianza campionaria, detta funzione di *autocovarianza*: 
+$$ \operatorname{C}(y)_k =  \cov(y, L^ky ) = \frac{1}{n-k} \sum_{t=k+1}^{n} (y_t - \bar{y})(y_{t-k} - \bar{y}) $$
+- il coefficiente di correlazione, detto funzione di *autocorrelazione*:
+  $$  \operatorname{acf}(y)_k = \cor(y, L^ky ) $$
+  
+- Valori vicini a 1 o -1 indicano una forte dipendenza lineare tra la serie e la sua versione ritardata di $k$ tempi.
+
+- Stagionalità induce autocorrelazioni elevate a lag multipli del periodo.
+
+
+
+---
+
+## Visualizzazione ACF
+
+```{r message=FALSE}
+
+ggAcf(nottem) #, main="Funzione di Autocorrelazione")
+
+```
+
+## Presenza di trend
+
+La presenza di trend può portare a valori elevati di autocorrelazione anche a lag grandi
+
+
+```{r message=FALSE}
+
+ggAcf(AirPassengers) #, main="Funzione di Autocorrelazione")
+
+```
+
+
+## Correlazione incrociata (cross-correlation)
+
+Partendo da serie multivariate $(x_{t}, y_{t})$ possiamo studiare la covarianza e la correlazione tra versioni ritardate delle serie *incrociate*:
+
+- Covarianza incrociata:
+$$ C_{xy}(k) = \operatorname{cov}(x, L^k y)$$
+
+- Correlazione incrociata:
+$$ \operatorname{ccf}_{xy}(k) = \operatorname{corr}(x, L^ky )$$
+
+
+- Evidenza l'associazione fra due serie.
+
+
+## Un esempio
+
+
+
+```{r  message=FALSE}
+
+ggAcf(EuStockMarkets)+ggtitle("Cross-correlazione serie EUStockMarkets") #, main="Funzione di Autocorrelazione")
+
+```
+
+
+##  Trasformazioni elementari per migliorare ACF
+
+- La presenza di trend può portare a valori elevati di autocorrelazione anche a lag grandi.
+
+- Questo potrebbe nascondere eventuali picchi di autocorrelazione ad esempio indicanti il periodo o altre associazioni.
+
+
+
+**Strategie** per *de-trendizzare* la serie storica:
+
+  - Differenziazione
+  
+  - Logaritmo o altre trasformazioni (Box-Cox)
+  
+  - Rimozione trend calcolato fitting di un modello di regressione o tramite media mobile (*prossima lezione*).
+ 
+
+
+## Differenziazione
+
+Definiamo l'operatore di differenza finita $\operatorname{diff} = I - L$, ossia
+  $$
+  \operatorname{diff}(y)_t = y_t - y_{t-1}
+  $$
+  
+- Una (o più) applicazione rimuovono un trend additivo.
+
+- Esempio: $y_t = \beta_0 + \beta_1 t + S_t$ con $S$ stagionalità (periodica)
+$$ \operatorname{diff}(y) = \beta_1 + \operatorname{diff}(S_t)$$
+
+## Esempio
+
+```{r}
+autoplot(diff(nottem), main="Serie storica nottem originale")
+```
+
+----
+
+```{r}
+autoplot(nottem, main="Serie storica nottem (nero) e differenziata (blu)")+
+  autolayer(diff(nottem), series="differenziata", color="blue")
+
+```
+
+
+----
+
+```{r}
+# plot a confronto acf serie originale e differenziata
+
+library(patchwork)
+
+p1 <- ggAcf(nottem)+
+  ggtitle("Funzione di Autocorrelazione della serie nottem originale")
+
+p2 <- ggAcf(diff(nottem), series="differenziata", color="blue")+
+  ggtitle("Funzione di Autocorrelazione della serie nottem differenziata")
+
+p1/p2
+```
+
+-----
+
+```{r}
+autoplot(AirPassengers)+ggtitle("Serie Airpassengers")
+```
+
+---
+
+```{r}
+diff_AP <- diff(AirPassengers)
+autoplot(AirPassengers, main="Serie Air passengers (nera) e differenziata (blu)")+
+    autolayer(diff_AP, series="differenziata", color="blue")
+
+```
+
+----
+
+```{r}
+p1 <- ggAcf(AirPassengers)+
+  ggtitle("Funzione di Autocorrelazione della serie AirPassengers originale")
+
+p2 <- ggAcf(diff(AirPassengers), series="differenziata", color="blue")+
+  ggtitle("Funzione di Autocorrelazione della serie AirPassengers differenziata")
+
+p1/p2
+```
+
+
+
+## Logaritmo e trasformazioni di Box-Cox
+
+Nell'esempio `AirPassengers` la differenza finita ha rimosso il trend ma l'ampiezza delle oscillazioni varia comunque nel tempo. 
+
+- Questo perché una **decomposizione moltiplicativa** è preferibile per questa serie.
+
+- Possiamo quindi **trasformare** la serie originale passando al logaritmo e farne poi la differenza per rimovere il trend:
+$$ \operatorname{diff}(\log(y))_t = \log(y_t) - \log(y_{t-1}) = \log\left(\frac{y_t}{y_{t-1}}\right)$$
+- In termini della serie originale: $y_t \Rightarrow y_t/y_{t-1}$
+
+- Altre trasformazioni utili: **trasformazione di Box-Cox**:
+  $$
+  y_t^{(\lambda)} = \begin{cases}
+  \frac{y_t^\lambda - 1}{\lambda}, & \lambda \neq 0 \\
+  \log(y_t), & \lambda = 0
+  \end{cases}
+  $$
+- $\lambda$ è un (iper-)parametro che può essere scelto (stimato).
+
+
+
+## Un esempio
+
+```{r }
+p1 <- autoplot(log(AirPassengers), main="log- Serie Air passengers (nera) e differenziata (blu)")
+p2 <-autoplot(diff(log(AirPassengers)), series="differenziata", color="blue")
+
+p1/p2
+
+```
+
+
+-----
+
+```{r}
+p1 <- ggAcf(log(AirPassengers))+
+  ggtitle("Funzione di Autocorrelazione della serie log- AirPassengers originale")
+
+p2 <- ggAcf(diff(log(AirPassengers)), series="differenziata", color="blue")+
+  ggtitle("Funzione di Autocorrelazione della serie log- AirPassengers differenziata")
+
+p1/p2
+```
+
+
+## Rimozione del trend tramite fitting
+
+Un'altra strategia per rimuovere il trend è tramite fitting di un modello di regressione lineare (o polinomiale).
+
+- **Esempio:** supponiamo che il trend sia del tipo:
+$$ y_t = \beta_0 + \beta_1 t +S_t + R_t $$
+
+- Si può stimare il trend calcolando la retta di regressione di $y_t$ rispetto a $x_t = t$:
+
+$$ y_t = \beta_{0,OLS}+  \beta_{1, OLS} t + \varepsilon_t := T_t + \varepsilon_t$$
+
+- Si trova quindi la serie de-trendizzata: $y_t -T_t$.
+
+
+## Un esempio
+
+
+```{r }
+time <- 1:length(AirPassengers)
+fit_lm <- lm(AirPassengers ~ time)
+trend_est <- predict(fit_lm)
+trend_est_ts <- ts(trend_est, start=start(AirPassengers), frequency=frequency(AirPassengers))
+autoplot(AirPassengers, main="Serie AirPassengers e trend stimato (lineare)")+
+  autolayer(trend_est_ts, series="Trend stimato", color="red")
+```
+
+----
+
+```{r}
+
+detrend <- AirPassengers-trend_est_ts
+
+p1 <- autoplot(AirPassengers, main="Serie AirPassengers originale (nero) e trend lineare rimosso (blue)")+
+  autolayer(detrend, color="blue")
+
+p2 <- ggAcf(detrend, main="ACF AirPassengers detrendizzata")
+
+p1/p2
+
+```
+
+----
+
+```{r}
+time <- 1:length(AirPassengers)
+fit_lm <- lm(log(AirPassengers) ~ time)
+trend_est <- exp(predict(fit_lm))
+trend_est_ts <- ts(trend_est, start=start(AirPassengers), frequency=frequency(AirPassengers))
+autoplot(AirPassengers, main="Serie AirPassengers e trend stimato (moltiplicativo/esponenziale)")+
+  autolayer(trend_est_ts, series="Trend stimato", color="red")
+```
+
+----
+
+
+```{r}
+
+detrend <- AirPassengers/trend_est_ts
+
+p1 <- autoplot(AirPassengers, main="Serie AirPassengers originale (nero) e trend lineare rimosso (blue)")
+
+p2 <- autoplot(detrend, color="blue", main="Serie detrendizzata (decomposizione moltiplicativa)")
+
+p3<- ggAcf(detrend, main="ACF AirPassengers detrendizzata")
+
+p1/p2/p3
+```
+
+
+## Calcolo componente stagionale e residui
+
+Una volta rimosso il trend e *individuato un periodo* si può procedere alla determinazione della *componente stagionale*.
+
+- Dato il periodo $m$, un metodo consiste nel calcolare la media delle osservazioni corrispondenti a ciascun periodo:
+  $$
+  S_j = \frac{1}{N} \sum_{i=0}^{N-1} y_{j + i m}, \quad j=1, \ldots, m
+  $$
+  dove $N \approx T/m$ è il numero di cicli completi nella serie $(y_t)_{t=1, \ldots, T}$
+  
+
+- Il residuo è definito ponendo $R_t := y_t -T_t -S_{(t \mod m)}$ e si trova la decomposizione (se additiva):
+$$ y_t = T_t + S_{(t \mod m)} + R_t. $$
+
+## Esempi
+
+```{r}
+
+# Load necessary library
+library(dplyr)
+
+# Create a sample time series (e.g., monthly data for 3 years)
+set.seed(42)
+data <- ts(rnorm(36, mean = 10, sd = 2), frequency = 12, start = c(2020, 1))
+
+# Function to compute seasonal component
+compute_seasonal <- function(ts_data) {
+  # Extract the frequency
+  freq <- frequency(ts_data)
+  
+  # Create a data frame with time and values
+  df <- data.frame(time = time(ts_data), value = as.numeric(ts_data))
+  
+  # Calculate the seasonal averages
+  seasonal_avg <- df %>%
+    group_by(season = (time %% 1) * freq) %>%  # Group by seasonal period
+    summarize(seasonal_value = mean(value, na.rm = TRUE)) %>%  # Calculate the mean
+    ungroup() %>%
+    arrange(season)
+  
+  # Create a vector for the seasonal component aligned to the original data
+  seasonal_component <- rep(seasonal_avg$seasonal_value, length.out = length(ts_data))
+  
+  # Return the seasonal component
+  return(ts(seasonal_component, frequency = freq, start = start(ts_data)))
+}
+
+# Compute the seasonal component
+seasonal_part <- compute_seasonal(nottem)
+residuals <- nottem - seasonal_part
+
+p1 <- autoplot(nottem, main="Serie nottem (nero), componente stagionale (rosso), nessun trend rimosso")
+
+p2 <-autoplot(seasonal_part, col="red")
+
+p3 <- ggAcf(residuals, main="ACF residui decomposizione")
+
+p1/p2/p3
+
+```
+
+
+
+## Esempi
+
+```{r}
+time <- 1:length(AirPassengers)
+fit_lm <- lm(log(AirPassengers) ~ time)
+trend_est <- exp(predict(fit_lm))
+trend_est_ts <- ts(trend_est, start=start(AirPassengers), frequency=frequency(AirPassengers))
+p1 <- autoplot(AirPassengers, main="Serie AirPassengers e trend stimato (moltiplicativo/esponenziale)")
+detrend <- AirPassengers/trend_est_ts
+p2 <- autoplot(trend_est_ts, main="Serie AirPassengers: trend (esponenziale)")
+
+seasonal_part <- compute_seasonal(log(detrend))
+
+residuals <- log(AirPassengers) - seasonal_part
+
+p3 <- autoplot(exp(seasonal_part), main="componente stagionale")
+
+
+p4 <- ggAcf(residuals, main="ACF log-residui decomposizione moltiplicativa")
+
+p1/p2/p3
+```
+
+----
+
+```{r}
+
+# plot residui come barre
+
+p4 <- autoplot(residuals, main="log- residui decomposizione moltiplicativa, serie AirPassengers",)
+
+p5 <- ggAcf(residuals, main="ACF log-residui decomposizione moltiplicativa")
+
+p4/p5
+
+```
+
+
+
+## Metodi elementari di previsione
+
+L'obiettivo principale dell'analisi di una serie storica $(y_t)_{t}$ è spesso la *previsione* di valori futuri.
+
+- *Notazione*: indichiamo con $$\hat{y}_{t+h|t} $$ una previsione del valore $y_{t+h}$ (spesso non osservato) usando la serie storica osservata $(y_s)_{s=1, \ldots, t}$. 
+
+- Metodi elementari:
+  - *naïve*: $\hat{y}_{t+h|t} = y_t$ $\rightarrow$ l'ultimo valore osservato
+  - *media*: $\hat{y}_{t+h|t} = \bar{y}_t$ $\rightarrow$ la media dei valori osservati fino a $t$
+  - *naïve stagionale*: $\hat{y}_{t+h|t} = y_{(t+h)-km | t}$ dove $m$ è il periodo e $k$ è il più piccolo naturale tale che $t+h-km \le t$, ossia $k= \lceil h/m \rceil$ $\rightarrow$ l'ulimo valore osservato nella sotto-serie che tiene conto della stagionalità
+  - *drift*: $\hat{y}_{t+h|t} = y_t + h \frac{y_t - y_1}{t-1}$ $\rightarrow$ stima il trend in modo elementare
+  
+
+
+## Esempi
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+# Fit the models
+naive_fit <- naive(AirPassengers, h = 24)
+snaive_fit <- snaive(AirPassengers, h = 24)
+drift_fit <- rwf(AirPassengers, h = 24, drift = TRUE)
+mean_fit <- rep(mean(AirPassengers), 24)
+
+# Create a data frame for plotting the forecasts
+forecast_data <- data.frame(
+  Time = time(naive_fit$mean),
+  Naive = as.numeric(naive_fit$mean),
+  SNaive = as.numeric(snaive_fit$mean),
+  Drift = as.numeric(drift_fit$mean),
+  Mean = mean_fit
+)
+
+# Reshaping the data for ggplot
+library(tidyr)
+forecast_long <- pivot_longer(forecast_data, 
+                               cols = c(Naive, SNaive, Drift, Mean), 
+                               names_to = "Method", 
+                               values_to = "Forecast")
+
+```
+
+```{r}
+# Plotting with ggplot2
+autoplot(AirPassengers) +
+  # autolayer(AirPassengers, aes(y = AirPassengers)) +
+  geom_line(data = forecast_long, aes(x = Time, y = Forecast, color = Method), size = 1) +
+  ggtitle("Previsioni elementari per AirPassengers") +
+  xlab("Anno") +
+  ylab("Numero di passeggeri") +
+  scale_color_manual(values = c("Naive" = "blue", "SNaive" = "red", "Drift" = "green", "Mean" = "purple")) +
+   theme(legend.position = "right") +
+  guides(color = guide_legend(title = "Metodo di previsione"))
+
+```
+
+
+----
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+lnAirPassengers <- log(AirPassengers)
+# Fit the models
+naive_fit <- naive(lnAirPassengers, h = 24)
+snaive_fit <- snaive(lnAirPassengers, h = 24)
+drift_fit <- rwf(lnAirPassengers, h = 24, drift = TRUE)
+mean_fit <- rep(mean(lnAirPassengers), 24)
+
+# Create a data frame for plotting the forecasts
+forecast_data <- data.frame(
+  Time = time(naive_fit$mean),
+  Naive = exp(as.numeric(naive_fit$mean)),
+  SNaive = exp(as.numeric(snaive_fit$mean)),
+  Drift = exp(as.numeric(drift_fit$mean)),
+  Mean = exp(mean_fit)
+)
+
+# Reshaping the data for ggplot
+library(tidyr)
+forecast_long <- pivot_longer(forecast_data, 
+                               cols = c(Naive, SNaive, Drift, Mean), 
+                               names_to = "Method", 
+                               values_to = "Forecast")
+
+
+autoplot(AirPassengers) +
+  # autolayer(AirPassengers, aes(y = AirPassengers)) +
+  geom_line(data = forecast_long, aes(x = Time, y = Forecast, color = Method), size = 1) +
+  ggtitle("Previsioni elementari per AirPassengers (moltiplicativo)") +
+  xlab("Anno") +
+  ylab("Numero di passeggeri") +
+  scale_color_manual(values = c("Naive" = "blue", "SNaive" = "red", "Drift" = "green", "Mean" = "purple")) +
+   theme(legend.position = "right") +
+  guides(color = guide_legend(title = "Metodo di previsione"))
+
+```
+
+----
+
+
+```{r}
+
+
+lnAirPassengers <- nottem
+# Fit the models
+naive_fit <- naive(lnAirPassengers, h = 24)
+snaive_fit <- snaive(lnAirPassengers, h = 24)
+drift_fit <- rwf(lnAirPassengers, h = 24, drift = TRUE)
+mean_fit <- rep(mean(lnAirPassengers), 24)
+
+# Create a data frame for plotting the forecasts
+forecast_data <- data.frame(
+  Time = time(naive_fit$mean),
+  Naive = as.numeric(naive_fit$mean),
+  SNaive = as.numeric(snaive_fit$mean),
+  Drift = as.numeric(drift_fit$mean),
+  Mean = mean_fit
+)
+
+# Reshaping the data for ggplot
+library(tidyr)
+forecast_long <- pivot_longer(forecast_data, 
+                               cols = c(Naive, SNaive, Drift, Mean), 
+                               names_to = "Method", 
+                               values_to = "Forecast")
+
+
+autoplot(nottem) +
+  # autolayer(AirPassengers, aes(y = AirPassengers)) +
+  geom_line(data = forecast_long, aes(x = Time, y = Forecast, color = Method), size = 1) +
+  ggtitle("Previsioni elementari per nottem (moltiplicativo)") +
+  xlab("Anno") +
+  ylab("Temperatura") +
+  scale_color_manual(values = c("Naive" = "blue", "SNaive" = "red", "Drift" = "green", "Mean" = "purple")) +
+   theme(legend.position = "right") +
+  guides(color = guide_legend(title = "Metodo di previsione"))
+
+```
+
+
+## Metodo kNN per serie temporali
+
+Possiamo usare un approccio basato $k$-NN per la previsione di serie temporali.  Parametri:
+
+- $\mathcal{L} \subseteq \cur{1, 2, \ldots,}$: ritardi considerare della serie originale $$(y_{t-\ell})_{\ell \in \mathcal{L}} \in  \R^{L}$$ (vettore di features)
+- $k$: numero di tempi con features più vicine  in $\R^{L}$ da trovare
+
+Dato $t+1$, si determinano i $k$  tempi con caratteristiche più vicine $t_1, \ldots, t_k$ e si pone
+$$ y_{t+1|t} = \frac {y_{t_1}+y_{t_2}+ \ldots, +y_{t_k}}{k}.$$
+
+- Ricerca di pattern simili nel passato.
+- Adatto a serie non lineari o rumorose.
+
+## Esempi
+
+
+```{r}
+library(tsfknn)
+model <- knn_forecasting(AirPassengers, h=2, lags=1:12, k=3, transform = "none")
+autoplot(model)+ggtitle("Previsione kNN con lags [1,12], k=3")
+```
+
+----
+
+```{r}
+library(tsfknn)
+model <- knn_forecasting(AirPassengers, h=1, lags=1:12, k=3, transform = "none")
+autoplot(model, highlight = "neighbours")+ggtitle("Previsione kNN con lags [1,12], k=3")
+```
+
+
+----
+
+```{r}
+model <- knn_forecasting(AirPassengers, h=24, lags=1:12, k=3, transform = "none")
+autoplot(model)+ggtitle("Previsione kNN con lags [1,12], k=3")
+```
+
+-----
+
+```{r}
+model <- knn_forecasting(AirPassengers, h=24, lags=1:12, k=3, transform = "multiplicative")
+autoplot(model)+ggtitle("Previsione kNN con lags [1,12], k=3, con trend moltiplicativo")
+```
+
+----
+
+
+```{r}
+# Initialize a list to store the models and titles
+model_list <- list()
+plot_titles <- list()
+
+# Loop through lag and k values
+for (lag_val in c( 2, 10, 15, 20, 25)) {
+  for (k_val in c(2, 10, 15, 20, 25)) {
+    # Fit the KNN model
+    model <- knn_forecasting(AirPassengers, h=24, lags=1:lag_val, k=k_val, transform="multiplicative")
+    
+    # Store the fitted model and its plot title
+    model_list[[paste(lag_val, k_val)]] <- model
+    plot_titles[[paste(lag_val, k_val)]] <- paste("Lags: [1,", lag_val, "], k =", k_val)
+  }
+}
+
+# Create a base plot for the actual data
+combined_plot <- autoplot(AirPassengers) +
+  ggtitle("Previsioni AirPassengers con kNN al variare di k e massima lag") + 
+  xlab("Tempo") + 
+  ylab("Valore") 
+# Add the forecasts to the plot
+colors <- rainbow(length(model_list))  # Generate a color palette for differentiation
+for (i in seq_along(model_list)) {
+  combined_plot <- combined_plot + 
+    autolayer(model_list[[i]]$prediction, series = plot_titles[[i]], PI = FALSE, color = colors[i])
+}
+
+# Display the combined plot
+print(combined_plot)
+```
+
+
+
+## Una serie storica rumorosa
+
+```{r}
+
+model <- knn_forecasting(EuStockMarkets[,4], h=200, lags=1:3, k=3, transform = "multiplicative")
+autoplot(model)+ggtitle("Previsione EuStockMarket (FTSE) kNN con lags [1,3], k=3")
+
+```
+
+
+-----
+
+
+```{r}
+# calcola previsioni al variare di k e lags
+
+
+# for (lag_val in c(3,5,10)) {
+#   for (k_val in c(3,5,10)) {
+#     model <- knn_forecasting(EuStockMarkets[,4], h=200, lags=1:lag_val, k=k_val, transform = "multiplicative")
+#     plot_title <- paste("Previsione EuStockMarket (FTSE) kNN con lags [1,", lag_val, "], k=", k_val)
+#     print(autoplot(model) + ggtitle(plot_title))
+#   }
+# }
+# singolo plot
+
+
+
+# Initialize a list to store the models and titles
+model_list <- list()
+plot_titles <- list()
+
+# Loop through lag and k values
+for (lag_val in c(3, 5, 10, 15)) {
+  for (k_val in c(3, 5, 10, 15)) {
+    # Fit the KNN model
+    model <- knn_forecasting(EuStockMarkets[,4], h=200, lags=1:lag_val, k=k_val, transform="multiplicative")
+    
+    # Store the fitted model and its plot title
+    model_list[[paste(lag_val, k_val)]] <- model
+    plot_titles[[paste(lag_val, k_val)]] <- paste("Lags: [1,", lag_val, "], k =", k_val)
+  }
+}
+
+# Create a base plot for the actual data
+combined_plot <- autoplot(EuStockMarkets[,4]) +
+  ggtitle("Previsioni EuStockMarket (FTSE) con kNN al variare di k e massima lag") + 
+  xlab("Tempo") + 
+  ylab("Valore") 
+# Add the forecasts to the plot
+colors <- rainbow(length(model_list))  # Generate a color palette for differentiation
+for (i in seq_along(model_list)) {
+  combined_plot <- combined_plot + 
+    autolayer(model_list[[i]]$prediction, series = plot_titles[[i]], PI = FALSE, color = colors[i])
+}
+
+# Display the combined plot
+print(combined_plot)
+
+
+```
+
+
+## Test/Validazione incrociata
+
+**Problema**: nella divisione train/test e nella *cross-validation* per serie storiche non si può distruggere la struttura temporale dei dati.
+
+- Leakage: *non usare osservazioni future nel training set*!
+
+- Strategie corrette:
+  1. Divisione train (80%) + test (20%) dell'intervallo temporale
+  2. Validazione Rolling origin / walk-forward
+  3. Blocked CV (blocchi temporali consecutivi)
+
+- Metriche: MSE, RMSE, MAE\ldots
+
+
+## Train/test
+
+- Si divide la serie storica in due intervalli temporali consecutivi:
+  - Train: $(y_t)_{t=1, \ldots, T_{train}}$
+  - Test: $(y_t)_{t=T_{train}+1, \ldots, T}$
+  
+- Si allena il modello sui dati di train e si valuta la previsione sui dati di test:
+$$ \hat{y}_{T_{train}+1| T_{train}}, \hat{y}_{T_{train}+2| T_{train}}, \ldots, \hat{y}_{T| T_{train}} $$
+- Si calcola la metrica di errore (MSE, MAE...) sul test set:
+$$ \text{MSE} = \frac{1}{T - T_{train}} \sum_{t=T_{train}+1}^{T} (y_t - \hat{y}_{t| T_{train}})^2 $$
+- Semplice ma valuta il modello su un singolo intervallo temporale.
+
+
+## Esempio
+
+```{r}
+library(forecast)
+train_size <- floor(0.8 * length(AirPassengers))
+train_data <- window(AirPassengers, end = c(1958, 12))
+test_data <- window(AirPassengers, start = c(1959, 1))
+model <- snaive(train_data, h = length(test_data))
+forecast_values <- model$mean
+mse <- mean((test_data - forecast_values)^2)
+
+
+autoplot(train_data)+
+    autolayer(test_data)+
+  autolayer(model,PI=FALSE)+ggtitle("AirPassengers: train (nero), test (rosso)  predizione (seasonal naïve, blu)")+theme(legend.position = "none")
+
+```
+
+
+
+## Rolling origin
+
+- Si definisce un insieme di *origini* temporali $t_1 < t_2 < \ldots < t_K$.
+- Per ciascuna origine $t_i$ si allena il modello sui dati fino a $t_i$ e si valuta la previsione su un orizzonte fisso $h$:
+  $$ \hat{y}_{t_i + 1| t_i}, \hat{y}_{t_i + 2| t_i}, \ldots, \hat{y}_{t_i + h| t_i} $$
+- Si calcola la metrica di errore (MSE, MAE...) aggregando su tutte le origini:
+$$ \text{MSE} = \frac{1}{K \cdot h} \sum_{i=1}^{K} \sum_{j=1}^{h} (y_{t_i + j} - \hat{y}_{t_i + j| t_i})^2 $$
+- Consente di valutare la performance del modello su più finestre temporali.
+
+
+## Esempio: confronto CV previsioni elementari 
+
+
+```{r}
+
+library(forecast)
+cv_naive <- tsCV(AirPassengers, forecastfunction = naive, h=24)
+cv_snaive <- tsCV(AirPassengers, forecastfunction = snaive, h=24)
+cv_drift <- tsCV(AirPassengers, forecastfunction = rwf, h=24, drift=TRUE)
+rmse_naive <- sqrt(colMeans(cv_naive^2, na.rm=TRUE))
+rmse_snaive <- sqrt(colMeans(cv_snaive^2, na.rm=TRUE))
+rmse_drift <- sqrt(colMeans(cv_drift^2, na.rm=TRUE))
+horizons <- 1:24
+
+#usa ggplot
+ plot(horizons, rmse_naive, type="o", col="blue", ylim=range(c(rmse_naive, rmse_snaive, rmse_drift)),
+     xlab="Orizzonte di previsione", ylab="RMSE", main="Confronto RMSE CV previsioni elementari (AirPassengers)")
+lines(horizons, rmse_snaive, type="o", col="red")
+lines(horizons, rmse_drift, type="o", col="green")
+legend("topleft", legend=c("Naive", "SNaive", "Drift"), col=c("blue", "red", "green"), lty=1, pch=1)
+```
+
+
+## Esempio: selezione di k e massima lag modello kNN
+
+
+```{r}
+
+library(tsfknn)
+library(forecast)
+
+evaluate_kNN <- function(ts_data, k_values, lag_values, h = 12) {
+  results <- expand.grid(k = k_values, lag = lag_values)
+  results$RMSE <- NA
+  
+  for (i in 1:nrow(results)) {
+    k_val <- results$k[i]
+    lag_val <- results$lag[i]
+    
+    fcast_fun <- function(x, h) {
+      model <- knn_forecasting(
+        x, h = h, lags = 1:lag_val, k = k_val, transform = "none"
+      )
+      
+      pred <- as.numeric(model$prediction)
+      
+      # ---- Costruiamo un oggetto forecast valido ----
+      fc <- list(
+        mean = pred,
+        fitted = NULL,
+        x = x
+      )
+      class(fc) <- "forecast"
+      return(fc)
+    }
+    
+    cv_errors <- tsCV(ts_data, forecastfunction = fcast_fun, h = h)
+    
+    results$RMSE[i] <- sqrt(mean(cv_errors^2, na.rm = TRUE))
+  }
+  
+  return(results)
+}
+
+k_values <- c(2, 5, 10, 12, 15)
+lag_values <- c(2, 5, 10, 12, 15)
+
+cv_results <- evaluate_kNN(AirPassengers, k_values, lag_values, h = 12)
+
+library(ggplot2)
+ggplot(cv_results, aes(x = factor(lag), y = RMSE, color = factor(k))) +
+  geom_point(size = 3) + geom_line(aes(group = k)) +
+  labs(title = "CV Rolling Origin (h=12) per kNN Forecasting (serie AirPassengers)",
+       x = "Numero di lag", y = "RMSE", color = "k") +
+  theme_minimal()
+
+```
+
+
+----
+
+```{r}
+
+
+k_values <- c(2, 10, 20)
+lag_values <- c(2, 10, 20)
+
+cv_results <- evaluate_kNN(EuStockMarkets[,4], k_values, lag_values, h = 10)
+
+ggplot(cv_results, aes(x = factor(lag), y = RMSE, color = factor(k))) +
+  geom_point(size = 3) + geom_line(aes(group = k)) +
+  labs(title = "CV Rolling Origin (h=10) per kNN Forecasting (serie EuStockMarkets FTSE)",
+       x = "Numero di lag", y = "RMSE", color = "k") +
+  theme_minimal()
+
+```
+
+
+

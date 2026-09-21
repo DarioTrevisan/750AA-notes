@@ -1,0 +1,550 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "27/10/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 6'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+```
+
+# Regressione
+
+## Regressione
+
+- **Problema:** dato un insieme di osservazioni
+$$ \{ (x_i, y_i) \}_{i=1, \ldots, n } $$
+dove
+
+  - $x_i\in F$ sono **variabili di input** (fattori di ingresso, regressori, predittori, covariate, variabili esplicative, variabili indipendenti)
+  
+  - $y_i \in C$ sono **variabili di output** (fattori di uscita, risposte,  variabili dipendenti) 
+ 
+- determinare un **modello di regressione**:
+$$ h: F \to C, \quad h(x) \approx y $$ 
+- **Osservazione:** se $C = \cur{-1, 1}$ $\rightarrow$ classificazione (binaria).
+  
+- **Ipotesi:** $F \subseteq \R^d$ e $C = \R^k$  (per semplicità, $k=1$).
+
+## Legame con interpolazione
+
+
+```{r}
+
+# esempio di interpolazione
+set.seed(42)
+n <- 100
+x <- runif(n, 0, 3)
+# sort x
+x <- sort(x)
+y <- sin(x) + rnorm(n, 0, 0.1) 
+df <- data.frame(x = x, y = y)
+ggplot(df, aes(x = x, y = y)) +
+  geom_point() 
+```
+
+- Se $h(x_i) = y_i$ per ogni $i=1, \ldots, n$ $\rightarrow$  **interpolazione**.
+
+
+----
+
+
+```{r}
+
+# esempio di interpolazione esatta
+df <- data.frame(x = x, y = y)
+ggplot(df, aes(x = x, y = y)) +
+  geom_line(colour='blue') +
+  geom_point() 
+
+```
+
+## Esempio con outliers
+
+```{r}
+
+# esempio di interpolazione con outliers
+set.seed(123)
+
+y <- y+ 2*sample(c(-1,0,1), n, replace=TRUE, prob = c(0.02, 0.96, 0.02))
+df <- data.frame(x = x, y = y)
+ggplot(df, aes(x = x, y = y)) +
+  geom_point() 
+```
+
+----
+
+```{r}
+
+# esempio di interpolazione con outliers
+set.seed(123)
+df <- data.frame(x = x, y = y)
+ggplot(df, aes(x = x, y = y)) +
+  geom_line(colour='blue') +
+  geom_point() 
+```
+
+
+## K-NN per regressione
+
+
+- **Idea**: estendiamo KNN per la regressione.
+
+- *Regressione ai $k$-primi vicini*: dato $x \in F \subseteq \R^d$, troviamo i $k$ punti nel *training set*
+$$ i_1(x), i_2(x), \ldots, i_k(x)$$
+con caratteristiche **più vicine** a $x$ e definiamo
+$$ h(x) = \frac{y_{i_1(x)}+ y_{i_2(x)} + \ldots + y_{i_k(x)} }{k}. $$
+
+- **Osservazione:** per $k=1$, $h(x)$ è il valore di output del punto più vicino a $x$.
+
+- Vantaggi (semplicità) e svantaggi (scelta di $k$, curse of dimensionality) come di KNN per classificazione.
+
+
+----
+
+
+```{r}
+# esempio di KNN per regressione usando il dataset precedente
+library(FNN)
+
+k <- 5
+y_pred <- knn.reg(train = as.matrix(df$x), test = as.matrix(x), y = df$y, k = k)$pred
+df_pred <- data.frame(x = x, y = y_pred)
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_line(data = df_pred, aes(x = x, y = y), colour='red')+
+  ggtitle(paste("KNN Regressione con k =", k))
+```
+
+
+## Indicatori di performance
+
+Per la classificazione l'accuratezza è un indicatore di performance:
+
+$$ Acc(h) = \sum_{i} 1_{\cur{h(x_i) = y_i}} $$
+
+Per regressione: quale funzione di perdita (loss) $\ell(h(x),y)$ utilizzare?
+
+- **Errore quadratico medio (MSE)**: loss quadratica
+$$ MSE(h) = \frac{1}{n} \sum_{i=1}^n (h(x_i) - y_i)^2 $$
+Root Mean Squared Error (RMSE) $:=\sqrt{MSE}$.
+
+- **Errore assoluto medio (MAE)**: 
+$$ MAE(h) = \frac{1}{n} \sum_{i=1}^n |h(x_i) - y_i| $$
+
+## Errori di train, validation, test e generalizzazione
+
+Fissata la loss $\ell(h(x),y)$, valgono le *stesse osservazioni della classificazione*: l'obiettivo finale non è minimizzare l'errore sul training set, ma **generalizzare** bene su dati nuovi!
+
+- **Ipotesi**: le osservazioni $(x_i, y_i)$ sono un campione i.i.d. con legge $P(X,Y)$ $\rightarrow$ l'*errore di generalizzazione* (o *rischio*) è
+$$ L(h) := \mathbb{E} [\ell(h(X), Y)] $$
+- L'errore di generalizzazione non è calcolabile (non conosciamo $P(X,Y)$) $\rightarrow$ *errore di test*:
+$$ L_{test}(h) = \frac{1}{m} \sum_{i=1}^m \ell(h(x_i^{test}), y_i^{test}) $$
+
+- Per stime più affidabili $\rightarrow$ schema di *cross-validation* ($k$-fold, L$k$O-CV) sul training set.
+
+
+## Esempio di cross validation sul dataset generato
+```{r}
+set.seed(42)
+library(caret)
+train_control <- trainControl(method="LOOCV", number=5)
+model <- train(y ~ x, data=df, method="knn", trControl=train_control, tuneGrid=data.frame("k"=c(1:10)))
+#print(model)
+# plot dei risultati della cross-validation
+plot(model)
+```
+
+
+## Altri indicatori di performance
+
+Sia la RMSE che la MAE sono indicatori *in scala* (dipendono dall'unità di misura delle variabili di output). Possiamo riscalarli?
+
+
+- **Errore percentuale assoluto medio (MAPE)**:
+$$ MAPE(h) = \frac{1}{n} \sum_{i=1}^n \frac{|h(x_i) - y_i|}{|y_i|} $$
+
+- **R-quadro (coefficiente di determinazione)**:
+$$ R^2(h) = 1 - \frac{\sum_{i=1}^n (h(x_i) - y_i)^2}{\sum_{i=1}^n (y_i - \bar{y})^2} $$
+dove $\bar{y} = \frac{1}{n} \sum_{i=1}^n y_i$.
+
+- **Osservazione:** $R^2$ misura la frazione di varianza spiegata dal modello (massimo $1$, negativo se il modello è peggiore della media).
+
+
+## Decomposizione dell'errore
+
+Cosa succede in $k$-NN per valori di $k$ estremi (troppo grandi/piccoli)?
+
+```{r}
+
+k_1 <- 1 
+y_pred_1 <- knn.reg(train = as.matrix(df$x), test = as.matrix(x), y = df$y, k = k_1)$pred
+k_2 <- 50
+y_pred_2 <- knn.reg(train = as.matrix(df$x), test = as.matrix(x), y = df$y, k = k_2)$pred
+df_pred <- data.frame(x = x, y1 = y_pred_1, y2 = y_pred_2)
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_line(data = df_pred, aes(x = x, y = y1), colour='red')+
+  geom_line(data = df_pred, aes(x = x, y = y2), colour='blue')+
+  ggtitle(paste("KNN Regressione con k =", k_1, "(rosso) e", k_2, " (blu)"))
+
+
+```
+
+
+
+
+
+## Leave-one-out CV error al variare di k
+
+```{r}
+set.seed(42)
+library(caret)
+#train_control <- trainControl(method="LOOCV", number=1)
+model <- train(y ~ x, data=df, method="knn", trControl=train_control, tuneGrid=data.frame("k"=c(1:100)))
+#print(model)
+
+plot(model, col="blue")
+```
+
+## Confronto tra training e CV error
+
+```{r}
+# calcola training error al variare di k
+
+train_error <- numeric(100)
+for (k in 1:100){
+  # calcola le previsioni
+  y_pred <- knn.reg(train = as.matrix(df$x), test = as.matrix(x), y = df$y, k = k)$pred
+  # calcola il RMSE
+  train_error[k] <- sqrt(mean((df$y - y_pred)^2))
+}
+
+# plot dei risultati della cross-validation
+df_error <- data.frame(k = 1:100, train_error = train_error, test_error = model$results$RMSE)
+
+ggplot(df_error, aes(x = k)) +
+  geom_line(aes(y = train_error, colour = "Training Error")) +
+  geom_point(aes(y = train_error, colour = "Training Error"), shape=1) +
+  geom_line(aes(y = test_error, colour = "Test Error")) +
+  geom_point(aes(y = test_error, colour = "Test Error"), shape=1) +
+  ylab("RMSE") +
+  ggtitle("Training e Test Error al variare di k") +
+  scale_colour_manual("", 
+                      breaks = c("Training Error", "Test Error"),
+                      values = c("Training Error"="violet", "Test Error"="blue"))+
+  theme_minimal()
+
+```
+
+
+## Dilemma bias/varianza
+
+- Per $k=1$ (modello molto complesso) l'errore di training è minimo, ma l'errore di test è elevato (*overfitting*).
+
+- Per $k=50$ (modello molto semplice) l'errore di training è elevato, e anche l'errore di test è elevato (*underfitting*).
+
+- Troviamo un valore intermedio di $k$ che minimizza l'errore di test (bias-variance tradeoff).
+
+## Decomposizione dell'errore
+
+Per la perdita quadratica possiamo scrivere una decomposizione generale dell'errore di generalizzazione in tre termini:
+
+$$ L(h) = \underbrace{\text{Bias}^2}_{\text{errore sistematico}} + \underbrace{\text{Varianza}}_{\text{errore da varianza}} + \underbrace{\text{Rumore}}_{\text{errore intrinseco}} $$
+
+- **Bias**$^2$: incapacità del modello di rappresentare la relazione tra input e output.
+- **Varianza**: sensibilità del modello alle variazioni nei dati di training.
+- **Rumore**: intrinseco nei dati, dovuto a fattori non modellati.
+
+## Dimostrazione: preliminari
+
+- **Ipotesi**:
+  - il modello di regressione $h(x) = h(x; D)$ dipende dai dati di training $D = \{(x_i, y_i)\}_{i=1}^n$. 
+  - i dati (train/test) sono variabili aleatorie indipendenti e identicamente distribuite (i.i.d.) con legge $P(X,Y)$.
+  
+  
+- **Lemmi**:
+  1. **Teorema di Pitagora** per variabili aleatorie: se $U$, $V$ sono variabili aleatorie e $U$ è costante conoscendo l'informazione $I$
+$$ \mathbb{E}[(V-U)^2| I] = \mathbb{E}[(V - \mathbb{E}[V|I])^2|I] + (\mathbb{E}[V|I] - U)^2 $$
+  2. **Legge della probabilità totale** per il valor medio: se $V$ è variabile aleatoria e $I$ informazione,
+$$ \mathbb{E}[V] = \mathbb{E}[\mathbb{E}[V|I]] $$
+
+## Passo 1: estrazione del Rumore
+
+
+## Passo 2: decomposizione Bias+Varianza
+
+
+
+----
+
+```{r}
+# Carica le librerie necessarie
+library(ggplot2)
+library(gridExtra)
+
+# Funzione per creare un bersaglio
+create_target <- function(bias, variance) {
+  radius <- c(1, 2, 3, 4)  # Raggi dei cerchi
+  df <- expand.grid(x = seq(-4, 4, length.out = 100), y = seq(-4, 4, length.out = 100))
+  df$dist <- sqrt(df$x^2 + df$y^2)
+  df$target <- cut(df$dist, breaks = c(-Inf, radius), labels = c("Dentro", "Primo cerchio", "Secondo cerchio", "Terzo cerchio"), right = FALSE)
+  
+  # Colori per i cerchi
+  colors <- c("green", "yellow", "orange", "red")
+  
+  ggplot(df, aes(x, y, fill = target)) +
+    geom_raster(interpolate = TRUE) +
+    scale_fill_manual(values = colors, guide = FALSE) +
+    geom_point(aes(x = 0, y = 0), color = "black", size = 3) +  # Punto centrale
+    labs(title = paste("Bias:", bias, "Varianza:", variance), 
+         x = "Predizioni", y = "Reale") +
+    coord_fixed() +
+    theme_void() +
+    theme(plot.title = element_text(hjust = 0.5))
+}
+
+# Crea i 4 bersagli
+target1 <- create_target("Alto", "Alto")    # Alto Bias, Alto Varianza
+target2 <- create_target("Alto", "Basso")   # Alto Bias, Basso Varianza
+target3 <- create_target("Basso", "Alto")   # Basso Bias, Alto Varianza
+target4 <- create_target("Basso", "Basso")  # Basso Bias, Basso Varianza
+
+# Organizza i bersagli in una griglia 2x2
+grid.arrange(target1, target2, target3, target4, ncol = 2)
+```
+
+
+
+## Indicazioni pratiche dalle curve di errore
+
+
+- Se l'errore di training è *basso*, e l'errore di test è *basso* $\rightarrow$ buon modello (modello ben bilanciato).
+
+- Se l'errore di training è **molto basso**, ma l'errore di test è *alto* $\rightarrow$ rischio di overfitting (modello troppo complesso).
+  - ridurre il numero di parametri
+  - aumentare iperparametri di regolarizzazione -- il valore di $k$ in KNN
+  - *bagging*, *dropout*, ecc.
+
+
+- Se l'errore di training è **alto**, e l'errore di test è **alto** $\rightarrow$ underfitting (modello troppo semplice).
+  - aumentare il numero di parametri
+  - ridurre il valore di regolarizzazione -- il valore di $k$ in KNN.
+  - *boosting*
+  
+- **Attenzione:** molto in pratica dipende dal modello utilizzato, ci sono casi che non presentano il dilemma (reti neurali profonde, random forests, ecc.).
+
+
+
+## Modelli parametrici
+
+- $k$-NN per regressione è  *non parametrico*. **Problemi:** 
+
+  - quando la taglia $n$ è grande $\rightarrow$ costi computazionali elevati per fare previsioni
+  
+  - curse of dimensionality (dati sparsi in spazi ad alta dimensione)
+  
+  - difficile intepretazione del modello.
+  
+
+- **Modelli parametrici:** assumiamo che il modello di regressione $h$ appartenga a una famiglia di funzioni parametrizzate da un vettore di parametri $\theta \in \R^p$:
+$$ h(x; \theta), \quad \theta \in \R^p $$
+- Due fasi:
+  1. stima dei parametri (training del modello)
+  2. previsione sui nuovi dati (test del modello)
+  
+
+## Metodo dei minimi quadrati (OLS)
+
+
+Dato un training set, si sceglie il modello di regressione che minimizza l'errore quadratico medio sui dati di training:
+$$ \theta_{OLS} = \arg\min_{\theta \in \R^p} \frac{1}{n} \sum_{i=1}^n (h(x_i; \theta) - y_i)^2 $$
+Per la previsione su un nuovo dato $x$, si usa il modello con i parametri stimati:
+$$ x \mapsto h(x; \theta_{OLS}) $$
+- **Osservazione:** il metodo dei minimi quadrati può essere usato con qualsiasi modello parametrico (lineare, polinomiale, reti neurali, ecc.).
+
+
+## Interpretazione probabilistica del metodo OLS
+
+**Ipotesi:** relazione tra input e output con un termine di rumore additivo (**residuo**) gaussiano:
+$$ Y = h(X; \theta) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2) $$
+
+- Supponendo $\epsilon$, $X$ indipendenti (noti i parametri), dato un training set $D = \{(x_i, y_i)\}_{i=1}^n$ i.i.d.\ la *verosimiglianza* dei parametri $\theta$ è
+
+$$ \begin{split} \mathcal{L}(\theta; D) & = \prod_{i=1}^n p(Y = y_i, X = x_i| \theta) \\
+& = \prod_{i=1}^n p(h(x_i; \theta)+ \epsilon =y_i |X= x_i, \theta) p(X=x_i|\theta) \\
+& = \prod_{i=1}^n \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left( -\frac{(y_i - h(x_i; \theta))^2}{2 \sigma^2} \right) p(X=x_i) \\
+\end{split}$$
+
+- La stima di *massima verosimiglianza* (MLE) dei parametri è
+$$ \theta_{MLE} = \arg\max_{\theta \in \R^p} \mathcal{L}(\theta; D)  = \theta_{OLS}$$
+
+## Problemi del metodo
+
+1. la minimizzazione può essere difficile (non convessa, molti minimi locali, ecc.).
+
+2. rischio di overfitting se modello troppo complesso, come regolarizzare?
+
+3. $h(x;\theta_{OLS})$ è una previsione puntuale, come valutare l'incertezza?
+
+
+- **Una soluzione**:  modello di regressione *lineare*.
+
+
+
+## Modello di regressione lineare
+
+**Definizione**: un modello di regressione parametrico $h(x; \theta)$ è detto **lineare** se è della forma
+$$ h(x; \theta) = \theta_0 + \sum_{j=1}^p \theta_j \phi_j(x) $$
+dove $\phi_j: F \to \R$ sono funzioni *note* (funzioni base, features, trasformazioni delle variabili di input).
+
+- **Attenzione:** il modello è **lineare nei parametri** $\theta_j$, ma le funzioni $\phi_j$ possono essere **non lineari**.
+
+
+## Esempi di modelli di regressione lineare
+
+- modello di regressione polinomiale di grado $p$ in una variabile:
+$$ h(x; \theta) = \theta_0 + \theta_1 x + \theta_2 x^2 + \ldots + \theta_p x^p $$
+- Caso $p=1$ $\rightarrow$ modello di **regressione lineare semplice**.
+
+- modello di regressione lineare multipla in $d$ variabili:
+
+$$ h(x; \theta) = \theta_0 + \sum_{j=1}^d \theta_j x_j $$
+
+- modello di regressione con interazioni tra variabili:
+$$ h(x; \theta) = \theta_0 + \sum_{j=1}^d \theta_j x_j + \sum_{j=1}^d \sum_{k=j+1}^d \theta_{jk} x_j x_k $$
+
+
+## Esempio sul dataset generato: regressione lineare semplice
+
+```{r}
+
+p=1
+
+for (i in 1:length(p)){
+  deg <- p[i]
+  y_model <- lm( y ~ poly(x, deg, raw=TRUE), data = df)
+  
+  # crea il data frame delle predizioni
+  df_pred[i+1] <- predict(y_model, newdata = data.frame(x = x))
+}
+  colnames(df_pred) <- c("x", paste0("y_deg_", p))
+ 
+   # plot del modello per tutti i gradi in un singolo plot
+  
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_line(data = df_pred, aes(x = x, y = y_deg_1), colour='red')+
+  ggtitle("Regressione lineare semplice")
+
+
+```
+
+## Esempio sul dataset generato: regressione polinomiale
+
+
+```{r}
+
+# modello di regressione polinomiale di grado p
+p <- c(1,2, 30)
+
+ df_pred <- data.frame(x = x, y_1 = NA, y_2 = NA, y_3 = NA)
+
+for (i in 1:length(p)){
+  deg <- p[i]
+  y_model <- lm( y ~ poly(x, deg, raw=TRUE), data = df)
+  
+  # crea il data frame delle predizioni
+  df_pred[i+1] <- predict(y_model, newdata = data.frame(x = x))
+}
+  colnames(df_pred) <- c("x", paste0("y_deg_", p))
+ 
+   # plot del modello per tutti i gradi in un singolo plot
+  
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_line(data = df_pred, aes(x = x, y = y_deg_1), colour='red')+
+  geom_line(data = df_pred, aes(x = x, y = y_deg_2), colour='blue')+
+  geom_line(data = df_pred, aes(x = x, y = y_deg_30), colour='violet')+
+  ggtitle("Regressione polinomiale di gradi 1 (rosso), 2 (blu) e 30 (viola)")
+
+```
+
+## Errore di validazione crociata al variare del grado massimo p
+
+
+```{r}
+set.seed(42)
+library(boot)
+
+
+cv_rmse <- sapply(1:10, function(p) {
+  model <- glm(y ~ poly(x, degree = p, raw = TRUE), data = df)
+  cv <- cv.glm(df, model, K = nrow(df))  # LOOCV
+  sqrt(cv$delta[1])
+})
+
+
+# plot
+ggplot(data.frame(degree = 1:10, RMSE = cv_rmse), aes(x = degree, y = RMSE)) +
+  geom_line(colour="blue") +
+  geom_point(shape=1, colour="blue") +
+  ggtitle("LOOCV RMSE al variare del grado del polinomio") +
+  xlab("Grado del polinomio") +
+  ylab("LOOCV RMSE")+
+  theme_minimal()
+
+```
+
+## Interpretazione dei parametri nella regressione lineare semplice
+
+
+- Nel modello di regressione lineare semplice
+$$ h(x; \theta) = \theta_0 + \theta_1 x $$
+
+- il parametro $\theta_0$ è l'*intercetta* (valore di $h(x;\theta)$ per $x=0$).
+- il parametro $\theta_1$ è la *pendenza* (variazione di $h(x; \theta)$ al variare di $x$).
+
+- Entrambe si ricavano dai dati di training tramite il metodo dei minimi quadrati:
+$$ \theta_{OLS, 1} := \operatorname{cor}(x,y) \frac{\sigma_y}{\sigma_x}, \quad \theta_{OLS, 0} := \bar{y} - \theta_1 \bar{x} $$
+- dove $\operatorname{cor}(x,y)$ è la correlazione campionaria tra $x$ e $y$, $\sigma_x$, $\sigma_y$ sono le deviazioni standard campionarie e $\bar{x}$, $\bar{y}$ sono le medie campionarie.
+
+
+## Dimostrazione
+
+**Problema:**
+$$ \min_{\theta_0, \theta_1} \sum_{i=1}^n (y_i - \theta_0 - \theta_1 x_i)^2 = \min_{\theta_0} \min_{\theta_1} \sum_{i=1}^n (y_i - \theta_0 - \theta_1 x_i)^2 $$
+
+- Dato $\theta_1$ $\rightarrow$ $\theta_0$ è la media degli $y_i-\theta-i x_i$
+$$ \rightarrow \quad \theta_0 = \bar{y} - \theta_1 \bar{x} $$
+
+- Per trovare $\theta_1$ imponiamo che la derivata (in $\theta_1$ si annulli:
+$$ 0 = \frac{d}{d \theta_1} \sum_{i=1}^n (y_i - \theta_0 - \theta_1 x_i)^2 = -2 \sum_{i=1}^n (y_i-\theta_0-\theta_1 x_i) x_i$$
+
+
+
+

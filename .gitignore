@@ -1,0 +1,17 @@
+# Quarto build artifacts
+book/_book/
+book/_freeze/
+book/.quarto/
+/.quarto/
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# OS / editor
+.DS_Store
+
+# Claude Code session state
+.claude/

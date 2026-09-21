@@ -1,0 +1,2017 @@
+
+IT
+750AA 2025 11 10 lezione 15
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+140 views  10 Nov 2025
+Collinearità: definizione, indicatori (VIF, condizionamento della matrice di Gram). Riduzione dei modelli: selezione stepwise (indicatori AIC, BIC, t-test). PCA per la regressione (PCR). Regolarizzazione generale, Ridge e LASSO. Intepretazione bayesiana della regolarizzazione.
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:00
+0 seconds
+Beh, perfetto. Allora, oggi continuiamo e terminiamo la regressione. Quello che vogliamo dire sulla regressione.
+0:09
+9 seconds
+Facciamo, come al solito un piccolo ripasso e poi vediamo che che cosa vogliamo fare. Essenzialmente oggi il tema è la riduzione dei modelli di
+0:18
+18 seconds
+regressione, quindi un po' selezione di variabili, riduzione dimensionale e altre possibilità di riduzione, ma vediamo soprattutto di motivare questo problema.
+0:30
+30 seconds
+Eh, innanzitutto ripartiamo dal dal modello lineare, d'accordo? Vi ricordate? Modello lineare di regressione multipla. L'avevamo scritto
+0:38
+38 seconds
+così come una Y, fattore d'uscita che è una combinazione lineare di certe caratteristiche f di x più un certo
+0:46
+46 seconds
+rumore e che abbiamo detto supponiamolo gausiano e indipendente per ogni osservazione. Poi, vi ricordate, proprio
+0:54
+54 seconds
+una settimana fa avevamo fatto il conto della stima dei minimi quadrati e questo per questa stima, per trovare i
+1:02
+1 minute, 2 seconds
+parametri ottimali avevamo invertito una matrice, no? la matrice di gram. Ora, se
+1:08
+1 minute, 8 seconds
+appunto dipende come la eh costruite, ma tendenzialmente le vostre osservazioni X
+1:15
+1 minute, 15 seconds
+o le F di X le in insomma le le impostate in una matrice, no, che ha tante righe, quante le osservazioni.
+1:23
+1 minute, 23 seconds
+Questa matrice di design, a volte si chiama anche così, e a quel punto F trasposto eh f di x dà il la vostra matrice di gram. Ok?
+1:35
+1 minute, 35 seconds
+Eh, aspettate un dunque, no, scusate, è scritta così al
+1:42
+1 minute, 42 seconds
+contrario. Allora, F di X, infatti, eh, ora FX, ora se la scrivo così è perché l'ho
+1:50
+1 minute, 50 seconds
+impostata, appunto, facciamo R, diciamo che avete K o Pature * N, va bene?
+1:56
+1 minute, 56 seconds
+Scritta così, è una matrice P* P, va bene? dove p il numero di caratteristiche. Perdonate, qui sto facendo un po' il il contrario, così
+2:04
+2 minutes, 4 seconds
+avete No, è giusto, scusate, mi confondo io. E f Allora, f di per sé è n righe per pi
+2:11
+2 minutes, 11 seconds
+colonne. F trasposto diventa p * n e quindi è giusto. Questa è una matrice P * P, scusate che a volte alcuni usano
+2:21
+2 minutes, 21 seconds
+convenzioni diverse e P * P. Va bene? Quindi abbiamo detto l'inversione di questa matrice si fa se è invertibile.
+2:32
+2 minutes, 32 seconds
+Ma ovviamente adesso ci poniamo la domanda appunto cosa succede se non è invertibile? Vi ricordate la condizione?
+2:39
+2 minutes, 39 seconds
+ve l'ho detta, ma eh si vede anche eh l'invertibilità ha a che fare con il fatto che alcune di queste caratteristiche siano allineate. In
+2:47
+2 minutes, 47 seconds
+questo senso avete un rango che è troppo basso, se molte di queste si allineano e avete problemi a invertire. Ovviamente
+2:54
+2 minutes, 54 seconds
+eh diciamo in linea teorica è siete proprio sfortunati se non è invertibile, ma il problema vedremo che la difficoltà
+3:01
+3 minutes, 1 second
+è se è quasi invertibile, ok? se molto vicina all'essere non invertibile.
+3:07
+3 minutes, 7 seconds
+Un'altra ipotesi che oggi non discuteremo, ma in realtà è un punto pure importante, è l'ipotesi invece sul sulla gausianità dei residui. Ok?
+3:17
+3 minutes, 17 seconds
+Abbiamo visto anche la volta scorsa e forse mercoledì vediamo anche un test, se volete, di gausianità di residui. La volta scorsa abbiamo disegnato gli
+3:25
+3 minutes, 25 seconds
+istogrammi e così via, però attenti che i calcoli teorici, appunto, che richiedono la gaussianità dei residui
+3:33
+3 minutes, 33 seconds
+dovrebbero essere poi verificate queste gausianità dei residui a posteriori. E un'altra ipotesi che è pure un po' nascosta è il fatto che la varianza sia
+3:41
+3 minutes, 41 seconds
+la stessa per ogni dato x, cioè che la varianza sia una costante. Potrebbe esserci invece una situazione in cui la varianza, se volete, dipende da dalla x
+3:50
+3 minutes, 50 seconds
+che avete osservato, no? Questa sarebbe quella che si chiama eteroschedasticità.
+3:55
+3 minutes, 55 seconds
+Invece l'ipotesi nascosta, cioè nascosta la diciamo, ma è un po' così di comodo, è che sigma quadro sia costante, che la varianza sia un solo parametro costante.
+4:05
+4 minutes, 5 seconds
+Ok? Però ora sull'ipotesi 2 non diciamo molto. Oggi ci concentriamo sulla parte 1, cioè sulla collinearità, ok? sul fatto che G debba essere invertibile.
+4:15
+4 minutes, 15 seconds
+Allora, quindi vedremo un po' come si fa a riconoscere la mancanza o la quasi non invertibilità di G, questa che chiamiamo la collinearità o multicolinearità.
+4:26
+4 minutes, 26 seconds
+E poi vediamo che una strategia per insomma si risolvere poi problemi che nascono con questa multicolinearità è quello di ridurre i modelli, cioè si
+4:35
+4 minutes, 35 seconds
+tratta di togliere alcune variabili in qualche senso. E in effetti un altro modo ci colleghiamo con una una un argomento della prima parte del corso
+4:43
+4 minutes, 43 seconds
+era quello di usare la PCA, l'analisi delle componenti principali, quindi potremmo usare la eh regressione sulle componenti principali. Questo si chiama
+4:52
+4 minutes, 52 seconds
+PCR, che è una combinazione di PCA con la regressione.
+4:58
+4 minutes, 58 seconds
+Poi però vi accenno ad altri metodi per la riduzione dei modelli e anche la cosiddetta regolarizzazione, va bene?
+5:04
+5 minutes, 4 seconds
+Vedremo questi due metodi. Allora, vediamo un po' però qual è il problema.
+5:08
+5 minutes, 8 seconds
+Il problema, dicevamo, è che se ehm la matrice G non è invertibile, cosa significa? Significa che si può mostrare
+5:17
+5 minutes, 17 seconds
+che alcune di queste caratteristiche sono allineate. Ok? Ora, non necessariamente soltanto due sono allineate. Allora, se due
+5:24
+5 minutes, 24 seconds
+caratteristiche, due predittori, due di queste componenti della FX sono allineate, parliamo di collinearità.
+5:32
+5 minutes, 32 seconds
+Ma più in generale il problema che siete in uno spazio di dimensione molto grande potrebbe essere che che ad esempio tre o
+5:40
+5 minutes, 40 seconds
+quattro di queste vanno a finire in un sotto spazio, insomma, avete relazioni di di collinearità più complicate che
+5:49
+5 minutes, 49 seconds
+soltanto due allineate. Ok? Allora, in tal caso, quando avete tre o più di queste feature che si allineano, la chiamiamo multicolinearità, va bene? Poi
+5:58
+5 minutes, 58 seconds
+in generale potete chiamarla collinarità e basta, ma se volete distinguere collinarità riguarda due caratteristiche, multicolinearità due o diciamo tre o più.
+6:08
+6 minutes, 8 seconds
+Va bene? Allora, l'effetto, come dicevamo, è che questa matrice G che dobbiamo andare a invertire risulta difficilmente invertibile. In che senso?
+6:17
+6 minutes, 17 seconds
+in senso numerico, non che sia esattamente non invertibile, non lo vedrete mai, però numericamente risulta
+6:23
+6 minutes, 23 seconds
+un una matrice con determinante piccolo, se volete a quel punto il è difficile da invertire. Allora, quali sono le conseguenze?
+6:33
+6 minutes, 33 seconds
+Se eh vi ricordate come si fa a invertire una matrice, eh in particolare c'è una formula, no, che userebbe il determinante, quindi non dov andare a
+6:41
+6 minutes, 41 seconds
+invertire il determinante. Se il determinante è piccolo, e avrete un determinante a denominatore che vi fa esplodere i coefficienti. Quindi una
+6:49
+6 minutes, 49 seconds
+delle conseguenze è che avete dei numeri grandi da trattare perché avete questo determinante invertito e numericamente
+6:56
+6 minutes, 56 seconds
+vi si creano degli errori. Ora, non è soltanto una questione di eh se volete di numerica, ma il punto è che a quel
+7:04
+7 minutes, 4 seconds
+punto tutti i numeri che avete risultano molto grandi, molto gonfiati, potremmo dire così, ok? Quindi avete gli intervalli di fiducia che diventano
+7:12
+7 minutes, 12 seconds
+molto grandi, avete tanta imprecisione e lo stesso i test che vi daranno poi dei eh dei valori un po' strani, un po'
+7:20
+7 minutes, 20 seconds
+grandi e però eh e questo rende poi a sua volta gli intervalli di fiducia si allargano, tutto diventa meno meno preciso, avete meno sicurezza su quello
+7:28
+7 minutes, 28 seconds
+che state facendo. Ok? Quindi l'effetto è un un effetto numerico, se volete, legato al fatto che la matrice non è facile da invertire, o meglio, è è
+7:37
+7 minutes, 37 seconds
+vicina a essere non invertibile, poi ha delle conseguenze sull'interpretazione e così via. Cioè, l'altra volta abbiamo ragionato parlando di intervalli di fiducia, di test, tutto funzionava bene,
+7:47
+7 minutes, 47 seconds
+però ora vediamo degli esempi concreti con i numeri e cosa sta succedendo.
+7:52
+7 minutes, 52 seconds
+Vediamo ad esempio un caso più semplice possibile che è quello di collinearità, ok? Ne prendiamo due di caratteristiche,
+7:58
+7 minutes, 58 seconds
+chiamiamola X1 e X2 e le facciamo molto simili, ok? Prendiamo X1 che sarà in
+8:06
+8 minutes, 6 seconds
+realtà la campioniamo come una gaussiana e X2 oppure invertito, scegliete prima X2 e poi facciamo che x1 è x2 + delta, ok?
+8:16
+8 minutes, 16 seconds
+Dove dove delta è piccolo, delta è una gaussiana di media 0 e varianza 10^ -2.
+8:23
+8 minutes, 23 seconds
+Vabbè, per un numero piccolo, non vi ho detto quant'è x1, x2 sono gausian standard, ok? Dell'ordine di gausian standard. Quindi abbiamo due componenti
+8:31
+8 minutes, 31 seconds
+molto allineate e poi y prendiamo la una combinazione lineare, quindi sappiamo che siamo esattamente nella situazione
+8:39
+8 minutes, 39 seconds
+del modello di regressione lineare dove epsil è pure un rumore gaussiano.
+8:45
+8 minutes, 45 seconds
+Ok, facciamo 100 osservazioni e vediamo un po' i risultati. Allora, innanzitutto siete in una situazione ottimale. Uno
+8:53
+8 minutes, 53 seconds
+può dire "Andiamo a verificare le ipotesi sui residui, sono gausiane" e tutto torna. Perfetto.
+8:59
+8 minutes, 59 seconds
+E uno va a vedere poi il risultato della summary quando fate lm e date la y in funzione delle x1 x2. Allora, cosa
+9:08
+9 minutes, 8 seconds
+scoprite? Però scoprite, vedete che avete due coefficienti eh stimati per x1 x2, bene?
+9:17
+9 minutes, 17 seconds
+e dei P value eh effettivamente un po' grandini. Ora non sono proprio enormi,
+9:25
+9 minutes, 25 seconds
+però vi danno un senso di eh bassa significatività.
+9:29
+9 minutes, 29 seconds
+Ok? Cosa vorrebbe dire questo? vorrebbe dire che il test, no, in cui avete la mettete l'ipotesi nulla in cui x1 è 0, o
+9:39
+9 minutes, 39 seconds
+meglio forse più x2, in questo caso, eh potete scartare sì l'ipotesi, ma la probabilità, appunto, l'errore di prima specie sarebbe 0.02, quindi non è
+9:48
+9 minutes, 48 seconds
+proprio bassissimo, ok? E e quindi cosa cosa possiamo dire? Non è molto significativa x2. Ora anche x1 però non è così significativa, va bene?
+9:59
+9 minutes, 59 seconds
+e x con 0 intercetta ancora peggio.
+10:01
+10 minutes, 1 second
+Vabbè, in questo caso proprio però non era tanto l'intercetta il nostro problema. Ok? Quindi in effetti uno si
+10:08
+10 minutes, 8 seconds
+sente un po' nella situazione in cui potrebbe scartare qualcuna di queste variabili, ma quale scartare? Ora vedremo.
+10:16
+10 minutes, 16 seconds
+In realtà la la difficoltà è pure un'altra che se ora noi rigiriamo il modello generando dei dati diversi, ok?
+10:24
+10 minutes, 24 seconds
+Fissate bene a mente questi coefficienti. 2,6 2,23.
+10:28
+10 minutes, 28 seconds
+Ok? Andiamo a prendere altri dati generati. Sono gli stessi, cioè non gli stessi dati, ma diciamo ho generato altri dati con le stesse
+10:36
+10 minutes, 36 seconds
+caratteristiche. Il il modello è sempre lo stesso, i coefficienti del modello che sto generando è sempre lo stesso, però generato nuovi dati, vedete, c'è
+10:45
+10 minutes, 45 seconds
+una variabilità 3,9 1,2. Quindi cosa significa? Poi significherebbe che ad esempio fate un Bootstrap, trovate dei
+10:52
+10 minutes, 52 seconds
+parametri che variono molto e degli intervalli di confidenza molto grandi, ok? Avete molta incertezza sui sui vostri parametri. Ora, in questo caso,
+11:00
+11 minutes
+rigenerando i dati, mi direbbe sì che x1 è molto significativo, invece x2 e e
+11:07
+11 minutes, 7 seconds
+l'intercetta posso scartarle. Ok? Quindi c'è una grossa sensibilità ai dati, una grande sensibilità sui dati che sto che
+11:15
+11 minutes, 15 seconds
+sto usando. Questo poi potete accorgervene anche con gli intervalli di fiducia. Ad esempio, se fate Bootstrap uno se ne accorge.
+11:24
+11 minutes, 24 seconds
+E quindi in questa situazione uno cosa vuole fare? In questa situazione uno elimina tranquillamente x2 e dice "Mi tengo soltanto x1". Va bene? In quella
+11:33
+11 minutes, 33 seconds
+situazione precedente è un po' meno chiaro cosa uno debba fare, no? perché entrambi risultano non così significativi. E quindi quale potrebbe
+11:41
+11 minutes, 41 seconds
+essere una conseguenza sbagliata? Una conseguenza sbagliata potrebbe essere di eliminarli entrambi. Ma allora se elimino entrambi ed elimino anche
+11:50
+11 minutes, 50 seconds
+l'intercetta che tanto pure lei non è significativa, sto facendo un test in cui vado a vedere il modello costante e
+11:57
+11 minutes, 57 seconds
+ora non c'è scritto, però il test sul modello costante, vi ricordate? c'era quel test, quel F test, quello invece
+12:05
+12 minutes, 5 seconds
+era significativo, cioè non il modello costante non spiegava bene i dati. Ok?
+12:11
+12 minutes, 11 seconds
+Quindi bisogna stare un po' attenti, ecco, se vogliamo dire ho delle ho delle caratteristiche che posso eliminare perché sono colinari, stiamo un attimo
+12:18
+12 minutes, 18 seconds
+attenti a quali eliminare. Ecco, non eliminiamone troppe in un colpo solo.
+12:24
+12 minutes, 24 seconds
+Ok? Vi anticipo, quindi la soluzione sarà quella di non essere brutali ed eliminare tutto. Faremo dei passaggi un po' più attenti.
+12:33
+12 minutes, 33 seconds
+Allora, vediamo un po' come si fa però a accorgersi ovviamente che sono colineari. Beh, uno se deve vedere la colinearità tra due dati, va
+12:40
+12 minutes, 40 seconds
+semplicemente a vedere il correlogramma, no? Il correlogramma vi misura esattamente la covari, la correlazione e
+12:47
+12 minutes, 47 seconds
+a quel punto cineari vuol dire che c'è una grossa correlazione tra i dati. Ok?
+12:53
+12 minutes, 53 seconds
+Quindi, in questo caso, la X1 è qui, la X2 è qui e quindi la Ecco, anche qui avete la X2 e quindi questa vedete una grossa correlazione tra X1 e X2, ok?
+13:03
+13 minutes, 3 seconds
+Sono dati generati, eh, non è che sia eh strano che sia così, ok? Però nel correlogramma vedete quindi una
+13:09
+13 minutes, 9 seconds
+correlazione tra x1 e x2, eccolo qua, è il coefficiente di correlazione 0.993, vabbè, quindi è una correlazione molto
+13:17
+13 minutes, 17 seconds
+forte. Questo mi dice c'è una collinearità e quindi la G sarà difficilmente invertibile e ho questo questa
+13:25
+13 minutes, 25 seconds
+eh instabilità, se volete dei dei coefficienti.
+13:29
+13 minutes, 29 seconds
+Ok? Qui in questo caso ho messo anche la Y nel correlogramma, però attenti, stiamo soltanto guardando le caratteristiche di ingresso, ok? Quindi
+13:36
+13 minutes, 36 seconds
+la y potevo anche non metterla nel mio correlogramma.
+13:41
+13 minutes, 41 seconds
+Va bene? Però dicevamo, questo riguarda la cinearità, cioè tra due, ma più in generale dicevamo, il problema è più geometrico perché potresti avere tre
+13:50
+13 minutes, 50 seconds
+caratteristiche e appunto o quattro e più e queste vanno a finire in un sottospazio di dimensione più bassa e queste vi rendono poco invertibile la G
+13:58
+13 minutes, 58 seconds
+e così via. Quindi la multicolinearità magari non ve ne accorgete subito guardando il correlogramma perché il correlogramma le guarderebbe a due a
+14:07
+14 minutes, 7 seconds
+due. Ok? Quindi come facciamo ad accorgerci? Cioè, ci sono degli indicatori di collinearità tra tre o più
+14:14
+14 minutes, 14 seconds
+fattori di ingresso, tra più caratteristiche di ingresso. Beh, allora un indicatore che è più, diciamo,
+14:22
+14 minutes, 22 seconds
+numerico, di analisi numerica, riguarda quanto, appunto, sia facile invertire G ed è il cosiddetto numero di
+14:29
+14 minutes, 29 seconds
+condizionamento della matrice G. Allora, questo si indica con K di G. Sta confrontando che cosa? Ora, lì c'è
+14:36
+14 minutes, 36 seconds
+scritta la norma di G. G è una matrice, è una matrice che ha tante righe e tante colonne quante i parametri. Allora, la
+14:44
+14 minutes, 44 seconds
+norma della matrice potete pensarla in tanti modi. In modo più semplice, se non avete mai visto norme di di matrici, operatori, semplicemente pensatela come
+14:52
+14 minutes, 52 seconds
+un grosso vettore e fate la norma come se fosse un vettore nello spazio euclideo. Mettete in linea tutti i vettori. Poi in realtà ci sono altre
+15:00
+15 minutes
+norme più sofisticate. Quindi andate a vedere, insomma, se volete la la dimensione dei coefficienti di G contro che cosa? moltiplicata per la norma dei
+15:09
+15 minutes, 9 seconds
+coefficienti di g^ -1. Ora, se fosse un numero, se g fosse un numero avreste numeratore diviso denominatore aveste 1.
+15:16
+15 minutes, 16 seconds
+Quindi numero di condizionamento 1 sarebbe la situazione ottimale, però in generale potrebbe essere che G, pur
+15:24
+15 minutes, 24 seconds
+avendo coefficienti piccoli, sia tale che non sia invertibile, cioè l'inversa avrebbe dei coefficienti che esplodono,
+15:31
+15 minutes, 31 seconds
+ok? E quindi questo condizionamento vi va a misurare, appunto, più grande è eh tanto più difficile G effettivamente è
+15:38
+15 minutes, 38 seconds
+da invertire, ok? E quindi avete l'instabilità, va bene? Quindi questo numero è è un buon numero che indica appunto la multicolinearità.
+15:48
+15 minutes, 48 seconds
+Ora tendenzialmente non è che ci sia veramente una scala di di valori, però capite il innanzitutto non ha un'unità di misura,
+15:57
+15 minutes, 57 seconds
+no? Perché avete G, la norma di G e la norma di G^ la -1. Se vogliamo proprio attribuire un'unità di misura si semplifica in ogni caso. Quindi è una
+16:05
+16 minutes, 5 seconds
+specie è un numero assoluto che insomma bisogna capire quanto è grande, quando è piccolo. Diciamo per la precisione di macchina e per le situazioni tipiche che
+16:14
+16 minutes, 14 seconds
+uno considera, diciamo, valori intorno al migliaio vuol dire che sono una c'è collinearità, c'è multicolinearità. Va
+16:22
+16 minutes, 22 seconds
+bene? Quindi questo è un'indicazione e potrebbe essere che che in realtà non ci sia culinarità, ma va bene pure valori
+16:31
+16 minutes, 31 seconds
+più, insomma, su quell'ordine, diciamo, è un campanello d'allarme, ci potrebbe essere collinarità.
+16:37
+16 minutes, 37 seconds
+Un indicatore invece più legato alla statistica è questo variance inflation factor, questo indicatore VIIF.
+16:44
+16 minutes, 44 seconds
+Allora, cosa va a fare il VIIF? È eh 1 - RJ². Allora, chi è RJ? r²,
+16:53
+16 minutes, 53 seconds
+innanzitutto, ve lo ricordate che era l'R? L'R era la percentuale di varan di varianza
+16:59
+16 minutes, 59 seconds
+spiegata. Eh, percentuale, diciamo, percentuale di varianza spiegata.
+17:11
+17 minutes, 11 seconds
+Allora, quando parlate di un R qu in un modello di regressione lineare, state guardando eh vabbè sarebbe 1 meno il rapporto tra
+17:21
+17 minutes, 21 seconds
+il min square error e la varianza, no, dei vostri dati. E quello pensavamo come la varianza spiegata dalle nostre
+17:29
+17 minutes, 29 seconds
+caratteristiche. Quello sarebbe la varianza del della Y, però in uscita, del fattore d'uscita. Allora, che cos'è l'RJ?
+17:37
+17 minutes, 37 seconds
+Uno fissa un parametro J e va a fare un modello di regressione in cui cerca di spiegare quella caratteristica J in
+17:45
+17 minutes, 45 seconds
+termini di tutte le altre dei fattori di ingresso eh dell'uscita dimentichiamocene proprio. Ok? Quindi vado a cercare di capire quanto bene i
+17:53
+17 minutes, 53 seconds
+gli altri le altre mie caratteristiche ce la fanno a spiegare la caratteristica J. Ok? E quindi 1 - r², no? È la diciamo
+18:03
+18 minutes, 3 seconds
+se se le altre caratteristiche eh le altre caratteristiche spiegano il 100% avrò 1 - 100%, quindi 1 - 1, avrò 1 su 0
+18:11
+18 minutes, 11 seconds
+e quindi esplode. Ok? Quindi diciamo se questi numeri sono grandi vuol dire che le altre caratteristiche già bastano per
+18:19
+18 minutes, 19 seconds
+spiegare la caratteristica J. Quindi indicatori grandi di questo VIF come del condizionamento indicano che effettivamente c'è multicolinearità. ci
+18:28
+18 minutes, 28 seconds
+potrebbe essere culinarità. Alcune caratteristiche sono già spiegate dalle altre. Va bene? Attenti che il fattore diuscita non è mai incluso in questo in
+18:37
+18 minutes, 37 seconds
+tutto questo discorso. Chi sia la Y non è importante, ok? Sia per il condizionamento che per la vf non ci interessa.
+18:47
+18 minutes, 47 seconds
+Ok. Allora, adesso anche qui cosa vuol dire grande o piccolo? Allora, qui la anche qui si tratta di un numero assoluto, no? perché anche l'R qu è una
+18:55
+18 minutes, 55 seconds
+percentuale di varianza spiegata, quindi non ha unità di misura e quindi diciamo tendenzialmente il suggerimento è che se siete intorno a valori 10 o anche già
+19:04
+19 minutes, 4 seconds
+più grande di 5, vuol dire che c'è che la variabile jà spiegata da altri da
+19:11
+19 minutes, 11 seconds
+dalle altre variabili. Ok? Quindi c'è un'indicazione di multicolinearità non necessariamente da una sola variabile, ma magari da una combinazione di altre
+19:20
+19 minutes, 20 seconds
+variabili. Allora, vediamo un po' in pratica. Facciamo un esempio sempre generato.
+19:26
+19 minutes, 26 seconds
+Allora, prendiamo come prima e delle variabili che generiamo noi e le prendiamo indipendenti e gausiane, va bene? Qu l'ho scritto normali 01.
+19:38
+19 minutes, 38 seconds
+Ok? X1, X2 sono già due caratteristiche, però le prendo indipendenti, quindi doveste pensarle che non abbiano non ci sia collinearità tra queste. E ora
+19:47
+19 minutes, 47 seconds
+queste due vanno a generare un piano, immaginate delle mie osservazioni e quindi prendo la terza che sia colineare, ma che sia multicolineare,
+19:55
+19 minutes, 55 seconds
+cioè faccio ad esempio una, che so la differenza o la somma, cioè faccio qualcosa che sia unes una combinazione lineare di x1 x2, va bene? E poi
+20:03
+20 minutes, 3 seconds
+aggiungo anche un po' di rumore, giusto per non farla esattamente colineare. Va bene? Quindi in questa situazione se uno
+20:09
+20 minutes, 9 seconds
+va a vedere x1 e x2 di per sé saranno a correlazione 0 e invece però quando le
+20:16
+20 minutes, 16 seconds
+vado a prendere insieme entr con entrambe riesco a spiegare bene x3, mentre magari scegliendo solo x1 non riesco a spiegare bene x3, scegliendo
+20:25
+20 minutes, 25 seconds
+solo x2 non riesco a spiegare completamente x3. Ok? Capite? Quindi c'è una c'è una relazione più complicata di fare semplicemente le coppie, va bene?
+20:34
+20 minutes, 34 seconds
+E ovviamente queste sono soltanto le variabili di ingresso. Nell'uscita faccio una combinazione lineare, vabbè, l'ho presa io, ma non è insomma come
+20:42
+20 minutes, 42 seconds
+volete. Tanto non è che ci interessi veramente quale sia la Y. Però di nuovo, in un modello così semplice generato, vediamo un po' di capire cosa succede.
+20:51
+20 minutes, 51 seconds
+Sempre 100 osservazioni. Allora, anche come solito modello generato, quindi non è che i residui ci evidenzino qualcosa,
+21:00
+21 minutes
+quindi queste cose non ve ne accorgete dai residui, i residui sono gausiani, è tutto perfetto. Quello che succede è che invece guardando il summary, no, della
+21:09
+21 minutes, 9 seconds
+del nostro modello, avete le stime, in questo caso avete 4.15 15 - 386. Questi
+21:17
+21 minutes, 17 seconds
+sono i parametri dei coefficienti. E cosa è successo in questo caso? Beh, vabbè, avete una ottima per per
+21:25
+21 minutes, 25 seconds
+intercetta nessun problema. Intercetta è stata scoperta, penso fosse uno, no? L'intercet è stata trovata. Esattamente.
+21:33
+21 minutes, 33 seconds
+Il problema sono gli altri. Vedete che non c'è significatività. gli errori, i nostri intervalli di fiducia vanno a coprire lo zero. Quindi, se io vado a
+21:41
+21 minutes, 41 seconds
+fare il test eh andrò appunto a non posso rifiutare l'ipotesi che sia zero.
+21:47
+21 minutes, 47 seconds
+Quindi, se vado a vedere il test mi dice "Ah, queste non sono significative".
+21:51
+21 minutes, 51 seconds
+Ok, ma ora è stato un po' tagliato, lo vediamo che mercoledì comunque il test, l'F test mi dice "No, no, guarda che queste variabili sono importanti comunque per spiegare il modello." Ok?
+22:00
+22 minutes
+Quindi come si combina queste due cose?
+22:02
+22 minutes, 2 seconds
+Il fatto che di queste tre possiamo buttarne via una, ok? Ma quale andiamo a buttare via? Adesso cerchiamo di capire che metodi usare. Va bene? Eh, va bene.
+22:13
+22 minutes, 13 seconds
+E altra cosa, succede come nel caso precedente, se cambiate i dati, vedete i coefficienti sono completamente diversi,
+22:19
+22 minutes, 19 seconds
+no? X1 adesso è 0.69, X2 è 4 e X3 è 0.28. Quindi, vedete, sono totalmente
+22:28
+22 minutes, 28 seconds
+cambiati. Ho semplicemente generato dati simili e quindi capite bene che c'è una grande variabilità nei nei coefficienti.
+22:36
+22 minutes, 36 seconds
+Quindi difficile attribuire veramente.
+22:38
+22 minutes, 38 seconds
+Vi ricordate il significato di questi coefficienti era se tengo fisso tutti gli altri eh tutti gli altri eh le altre
+22:45
+22 minutes, 45 seconds
+caratteristiche e cambio solo quella, avrò che, ad esempio, se tengo fisse le caratteristiche x1 e x3, allora quando
+22:52
+22 minutes, 52 seconds
+aumento di 1 la variabile la caratteristica x2, allora la y aumenta di 4 e questo me l'ero spiegato bene,
+23:00
+23 minutes
+però capite nell'argomento sto pensando di poter tenere fisse x1, x3, ma se c'è la correlazione tra x1, x2, x3 X3 non è
+23:08
+23 minutes, 8 seconds
+che potete fare veramente questa cosa e tenerle fisse X1, X3 e cambiare la X2 a piacimento, non li vedrete mai quei dati, ok? Quindi le le variabili X1, X2,
+23:17
+23 minutes, 17 seconds
+X3 hanno questa collinearità e c'è una dipendenza, l'abbiamo messa noi apposta per evidenziarlo. Ok? Quindi è difficile
+23:24
+23 minutes, 24 seconds
+spiegare perché i coefficienti sono così e in effetti se uno torna indietro a seconda dei dati che vede può trovare coefficienti diversi. Ma ovviamente un
+23:32
+23 minutes, 32 seconds
+campanello d'allarme ce l'abbiamo perché questi sono non significativi, no? il test ci direbbe appunto attenzione e potrebbe essere zero quel coefficiente.
+23:44
+23 minutes, 44 seconds
+E di nuovo guardando il correlogramma, ora qui eh solito il grigio non lo visualizza sto questo proiettore, però
+23:51
+23 minutes, 51 seconds
+vedendo il correlogramma vedete tra x1 e x2 vedete una nuvola di punti che indica che non c'è correlazione. Ma anche tra
+24:00
+24 minutes
+x1 e x3, sì, c'è correlazione, c'è un po' di correlazione negativa e positiva qui, però non è che sia fortissima, ok?
+24:09
+24 minutes, 9 seconds
+Quindi, invece non è veramente che sono allineati, ok? Quindi un caso di multicolinearità c'è bisogno di tutte queste tre variabili per metterle per metterle
+24:18
+24 minutes, 18 seconds
+insieme, ok?
+24:22
+24 minutes, 22 seconds
+Per scoprire questa collinarità, vediamo cosa dicono i nostri indicatori VIF e e K, no?
+24:29
+24 minutes, 29 seconds
+Allora, dovrebbero essere grandi e in effetti vedete il VIF in questo caso è enorme. Dicevo che valori tipo 10
+24:37
+24 minutes, 37 seconds
+indicano collinearità, in questo caso siete intorno ai 10.000. Quindi qui è proprio situazione in cui uno dice "Ok,
+24:45
+24 minutes, 45 seconds
+qui c'è collinearità". Va bene, quindi cinearità sono valori grandissimi e K, ecco, stranamente invece K non
+24:52
+24 minutes, 52 seconds
+risulta poi così grande, ok? K viene 565. Comunque siamo nell'ordine dei 1000, quindi un indicatore anche questo
+24:59
+24 minutes, 59 seconds
+da dire c'è collinearità, ci ci può stare collinearità.
+25:06
+25 minutes, 6 seconds
+Va bene? Quindi attenti, la multicolinearità la vediamo subito con gli indicatori. Anche la collinearità e la vedete con gli indicatori, con la
+25:14
+25 minutes, 14 seconds
+correlazione un po' meno perché è anche una questione, se volete, grafica a quel punto. E poi la la multicolinearità non non la vedrete, non la vedrete.
+25:25
+25 minutes, 25 seconds
+Ok, allora diciamo che non ci piace questo fenomeno della colinearità per tanti motivi. Il primo motivo dovrebbe essere quello legato all'instabilità di
+25:33
+25 minutes, 33 seconds
+queste stime. Poi c'è anche il discorso che appunto in stabilità si porta l'interpretazione dei coefficienti viene portata un po' via e quindi abbiamo
+25:42
+25 minutes, 42 seconds
+grandi certezza sui nostri sui nostre sulle nostre stime. Ecco, allora come facciamo a ridurre a eliminare questa
+25:49
+25 minutes, 49 seconds
+collinearità? Beh, l'idea è molto semplice, cioè riduciamo il modello selezionando o eliminando alcune
+25:58
+25 minutes, 58 seconds
+variabili correlate. Cioè, se di queste tre abbiamo scoperto che c'è cinearità, multicolinearità, beh, ne sacrifichiamo
+26:05
+26 minutes, 5 seconds
+una o magari ne sacrifichiamo due. Ok, vediamo, ne buttiamo via. Ovviamente bisogna stare un po' attenti perché, appunto, andiamo a semplificare il
+26:12
+26 minutes, 12 seconds
+modello. Semplificando il modello andiamo a introdurre bias possibilmente, no? nella decomposizione byas varianza.
+26:21
+26 minutes, 21 seconds
+Un altro modo di ridurre il modello, di semplificare il modello, ve lo ricordate? Era quello della PCA. Quindi vedremo che possiamo effettuare una PCA
+26:30
+26 minutes, 30 seconds
+sulle caratteristiche di ingresso, ok? A quel punto la chiamiamo PCR, va bene? E quindi un altro modo di ridurre la
+26:38
+26 minutes, 38 seconds
+dimensionalità. un modo un po' diverso che appunto sempre nell'idea però di semplificare il modello è quello che vedremo alla fine di queste ore di applicare questa regolarizzazione, ok?
+26:50
+26 minutes, 50 seconds
+Che è un modo un po' diverso se volete di di regolarizzare il modello, comunque di renderlo più semplice ed eliminare questi questi fenomeni. Allora,
+26:58
+26 minutes, 58 seconds
+cominciamo dal primo che è il più diretto, no? Uno dice "Ho queste variabili, ho queste caratteristiche, ho scoperto che alcune sono colineari, sono allineate, eliminiamole". Ora come
+27:07
+27 minutes, 7 seconds
+facciamo però? Eh, allora, intanto cerchiamo di capire come farlo. Vabbè, motivo di di farlo, chiaramente,
+27:15
+27 minutes, 15 seconds
+dicevamo, per ridurre la colinarità, c'è anche un altro motivo per cui uno vorrebbe farlo e di dire "Ho troppe caratteristiche in ingresso, è difficile
+27:23
+27 minutes, 23 seconds
+interpretare eh appunto un modello così complicato.
+27:27
+27 minutes, 27 seconds
+Se avete 100.000 fattori che spiegano, magari volete ridurle a pochi, no? E non soltanto perché è più semplice, perché magari poi quando dovete fare delle
+27:35
+27 minutes, 35 seconds
+nuove osservazioni dovete raccogliere meno caratteristiche, quindi se avete un modello con meno caratteristiche in ingresso pure pure meglio. Ok? Quindi
+27:44
+27 minutes, 44 seconds
+più facile da interpretare, più facile da implementare. Comunque se volete ci siamo arrivati da tramite la strada della culinarità, ma è una domanda
+27:51
+27 minutes, 51 seconds
+comunque ragionevole. Posso eliminare alcune variabili, posso selezionarne alcune.
+27:57
+27 minutes, 57 seconds
+Eh, allora, come possiamo fare? Vediamo un po'. ci sono almeno due metodi che poi andiamo a implementare in algoritmi iterativi.
+28:08
+28 minutes, 8 seconds
+Allora, uno è quello basandoci sui test di significatività, no? Abbiamo già visto che summary già ci dà il p value
+28:16
+28 minutes, 16 seconds
+relativo al test ipotesi nulla è la il parametro è zero, no? Il parametro corrispondente alla caratteristica J è
+28:23
+28 minutes, 23 seconds
+0. Ok? Quindi questi saranno i test di significatività. ci dicono quanto è significativa una caratteristica, quindi
+28:31
+28 minutes, 31 seconds
+quando possiamo effettivamente mettere a zero quel coefficiente.
+28:37
+28 minutes, 37 seconds
+E poi ci sono altri criteri che andiamo a vedere, questi AC e Bic, IC, BIC, ok?
+28:43
+28 minutes, 43 seconds
+che sono dei criteri che cercano un po' di compensare il fatto che eh quando uno
+28:49
+28 minutes, 49 seconds
+introduce tanti parametri in un modello, quando introduce tanti parametri in un in un modello è chiaro che c'è il
+28:58
+28 minutes, 58 seconds
+rischio dell'overfit, ok? Quindi cercare un po' di compensare con il numero di parametri.
+29:04
+29 minutes, 4 seconds
+Una volta che abbiamo capito un po' questi due indicatori, queste due, insomma, indicatori di di
+29:11
+29 minutes, 11 seconds
+significatività di di prestazione del modello e li implementiamo in procedure.
+29:16
+29 minutes, 16 seconds
+Cioè, cosa facciamo? Uno dice "Ho le mie variabili, posso introdurne di nuove oppure posso rimuoverle una alla volta
+29:25
+29 minutes, 25 seconds
+oppure posso fare passi in avanti, indietro". Ora vediamo questi queste strategie stepwise. Va bene? Comunque andiamo a vedere un pochino, richiamiamo
+29:32
+29 minutes, 32 seconds
+i test. li abbiamo metti l'altra volta, vi ricordate? No. Quindi quei p value che sono indicati nella colonna più a destra cosa indicano? Beh, eh indicano
+29:41
+29 minutes, 41 seconds
+appunto sono il p value di questo test, cioè uno prende il coefficiente beta j e va a prendere l'ipotesi nulla in cui
+29:48
+29 minutes, 48 seconds
+beta j è 0. L'alternativa è beta j diverso da 0.
+29:53
+29 minutes, 53 seconds
+E vi ricordate, abbiamo visto la volta scorsa, se uno va a finire, va a vedere gli intervalli di fiducia, otteneva che
+30:01
+30 minutes, 1 second
+il beta eh era una variabile di student, no, con certi gradi di libertà e quindi alla fine partendo
+30:09
+30 minutes, 9 seconds
+dall'intervallo di fiducia poteva costruire il test, no? La decisione era se lo zero cade nell'intervallo di fiducia, allora vado a scartare, vado a
+30:17
+30 minutes, 17 seconds
+dire eh, scusate, se lo zero cade nell'intervallo di fiducia dirò che è zero, effettivamente. Se invece non cade
+30:25
+30 minutes, 25 seconds
+nell'intervallo di fiducia dirò che è diverso da zero. Ok? Quindi il test era tutto basato su invertire l'idea dell'intervallo di fiducia. Alla fine qual era insomma che numero abbiamo?
+30:37
+30 minutes, 37 seconds
+Abbiamo questo test in cui avete il la stima dei minimi quadrati diviso l'errore standard associato alla
+30:44
+30 minutes, 44 seconds
+variabile che era il residual standard error, quindi che era il min square error sotto radice però non diviso n ma
+30:51
+30 minutes, 51 seconds
+diviso n - p e il componente sulla diagonale della vostra matrice di grammi invertita. Ok? Questa era ed è quello
+30:59
+30 minutes, 59 seconds
+che vedete, vabbè, dopo lo vediamo anche più avanti nella questo dovrebbe essere il T, è quello che trovate nella terza colonna del summary, ok? E questo t
+31:09
+31 minutes, 9 seconds
+sotto l'ipotesi nulla dovrebbe essere una T di student e quindi uno va a vedere appunto la probabilità che questo che questo tgiore di eh che questo t di
+31:18
+31 minutes, 18 seconds
+student sia maggiore di questo TJ in valore assoluto e questo ci dava il p value, ok? Avendo osservato i i valori, questo era il p value del test.
+31:29
+31 minutes, 29 seconds
+Ok? Quindi complessivamente cosa succedeva?
+31:33
+31 minutes, 33 seconds
+No, se il p value era grande, uno dice "Ok, se il p value è grande andrò a rimuovere la la variabile". Ok?
+31:43
+31 minutes, 43 seconds
+Significa che la variabile è poco significativa.
+31:46
+31 minutes, 46 seconds
+Ora una decisione come un'altra, eh, non è che insomma quanto grande? Beh, ad esempio, uno può fissare una soglia, quelle le soglie sono già implementate,
+31:54
+31 minutes, 54 seconds
+se volete, in modo standard in R, ma uno potrebbe avere bisogno di altre soglie, dipende dal tipo di applicazioni che ha.
+32:01
+32 minutes, 1 second
+Allora, il punto è che questa decisione, insomma, di rimuovere una variabile, no?
+32:05
+32 minutes, 5 seconds
+Se il pivglio è grande va bene, potrebbe essere giusta, è basata sul test.
+32:10
+32 minutes, 10 seconds
+Attenti che però eh innanzitutto potrebbe accadere che il pivello sia grande perché il campione è piccolo, quindi ci sono oscillazioni e poi, appunto, c'è il discorso della
+32:18
+32 minutes, 18 seconds
+culinarità. Abbiamo visto prima, no? Se mi baso solo su questa idea, tre variabili avevano più velo grande, le butto via tutte e tre. Ma calma, no, se buttiamo via tutte e tre non va bene.
+32:27
+32 minutes, 27 seconds
+Qui stiamo testando per una singola variabile, ok? Quindi attenti, non essere troppo diretti con questa idea.
+32:34
+32 minutes, 34 seconds
+Pivi o grande, allora la butto via. Ok?
+32:37
+32 minutes, 37 seconds
+Allora, ad esempio, questo è il nel dataset Boston, sempre il solito, no?
+32:42
+32 minutes, 42 seconds
+Avete tutte queste caratteristiche e se andate a vedere i palio, ad esempio, questo è un pivio grande, no?
+32:49
+32 minutes, 49 seconds
+Anche questo è un pivglio grande e altri pivello grandi. Ora vabbè, questo pure un po' più grandino, non proprio grande
+32:55
+32 minutes, 55 seconds
+come gli altri. Ok? E ora più graficamente lo vediamo un po' meglio qui. Ok, ho messo il p value. Attenti,
+33:03
+33 minutes, 3 seconds
+però non è non è il p value, ma è il logaritmo del p value. Qui sto vedendo un po' il il logaritmo del p value, ok?
+33:13
+33 minutes, 13 seconds
+Ehm, comunque, appunto, eh significa appunto che sono quelli più significativi,
+33:20
+33 minutes, 20 seconds
+quindi quelli meno significativi sono quelli di due che avevo identificato prima, ok? Age e index, eccoli qua. Age
+33:29
+33 minutes, 29 seconds
+e indo quelli col piv value grande, sono quelli meno significativi, quelli che andrei a scartare per primo, ok? Se voglio ridurre delle variabili butterei
+33:37
+33 minutes, 37 seconds
+via loro. Però avete visto anche prima, no? che quando c'è collinearità attenti a non buttarle via in un colpo solo, ok?
+33:44
+33 minutes, 44 seconds
+Potrebbe essere che queste due variabili a Ind sono colineari e quindi il p value effettivamente risulta grande, no?
+33:53
+33 minutes, 53 seconds
+Perché in effetti posso buttarne via una, ma l'altra devo tenerla. Quindi attenti a buttare via tutte le variabili quando avete più value grande. Ok?
+34:00
+34 minutes
+Quindi il test lo fate variabile per variabile.
+34:04
+34 minutes, 4 seconds
+Adesso vediamo come implementare. Quindi capite il test ci indica per ciascuna variabile la sua significatività.
+34:11
+34 minutes, 11 seconds
+Ora c'è un altro un altro tipo di criterio che sono invece questi AC e B,
+34:17
+34 minutes, 17 seconds
+cioè e Bic, ok? M e sono dei criteri un po' più sofisticati, se volete, del
+34:24
+34 minutes, 24 seconds
+test. E l'idea qual è? L'idea è di dire il mio modello avrà una certa eh
+34:33
+34 minutes, 33 seconds
+capacità di adeguarsi ai dati, quindi avrò un errore, no, sui dati che sto osservando e sappiamo in effetti che l'errore è più piccolo e tanto più
+34:42
+34 minutes, 42 seconds
+grande sarà la varianza, però so anche che un modello, non voglio un modello troppo complicato, no? Si cercano un po' di recuperare quel quelli quel dilemma tra bias e varianza, no?
+34:54
+34 minutes, 54 seconds
+Eh, allora uno dice, "Ho questa idea che l'errore è un compromesso, se volete, tra varianza e bias. Posso avere un
+35:02
+35 minutes, 2 seconds
+singolo numero che mi dice quanto bene sono collocato in questa in questa curva, se volete, no, tra bias e varianza.
+35:10
+35 minutes, 10 seconds
+Eh, allora ci sono almeno due numeri, ma potete inventarne tantissimi, non è che insomma questi due sono quelli che che vanno più per la maggiore, sono indicatori abbastanza utili.
+35:21
+35 minutes, 21 seconds
+Allora, l'importante è avere un modello, insomma, che sia costruito partendo da una verosimiglianza. E noi abbiamo visto che i minimi quadrati funziona, perché i
+35:28
+35 minutes, 28 seconds
+minimi quadrati è un modello in cui si massimizza la verosimiglianza quando avete gli errori gausiani.
+35:37
+35 minutes, 37 seconds
+Allora, cosa dice? Qual è il il criterio? Insomma, il l'indicatore AIC che è dovuto a questo giapponese AKE
+35:46
+35 minutes, 46 seconds
+information criterion. Allora, IC cosa fa? fa eh due volte p, quindi p è il numero di parametri del vostro modello,
+35:55
+35 minutes, 55 seconds
+quindi avete 2 pi e quindi più parametri avete più cresce questo questo indicatore. E attenzione 2P, quindi
+36:04
+36 minutes, 4 seconds
+cresce il numero di parametri, quindi cresce la complessità, però fate meno due volte anche in questo caso, vabbè, il logaritmo della verosimiglianza.
+36:16
+36 minutes, 16 seconds
+Allora, - logaritmo della verosimiglianza, pensate al caso, no, dei minimi quadrati, è effettivamente l'errore
+36:23
+36 minutes, 23 seconds
+quadratico medio. Ok? Quindi volete un po' compensare eh che cosa? Avete il numero di parametri da un lato,
+36:31
+36 minutes, 31 seconds
+prendendo tanti parametri questo ICbe a crescere. Mh, però d'altra parte prendendo tanti parametri i minimi quadrati andrebbero a diminuire, no?
+36:40
+36 minutes, 40 seconds
+L'errore in min square error andrebbe a diminuire. Quindi state cercando di compensare tra complessità del modello, che è il numero di parametri con invece
+36:47
+36 minutes, 47 seconds
+la qualità dell'adattamento. Ok? Ora qua c'è una cosa che manca, se volete, in questo IC è il numero di dati. Quant'è
+36:56
+36 minutes, 56 seconds
+la taglia dei dati? Allora, si può quindi raffinare un pochino, se volete, un'evoluzione della AC è questo BIC, il
+37:03
+37 minutes, 3 seconds
+Basi Asian Criterium. Questo è importante, diciamo, quando la numerosità del vostro campione è dite
+37:10
+37 minutes, 10 seconds
+potrebbe avere una certa rilevanza, quindi non è tanto importante soltanto quanti parametri ho, ma anche quanti dati ho raccolto. Allora, qual è
+37:19
+37 minutes, 19 seconds
+l'effetto? L'effetto è che invece di moltiplicare semplicemente per due qui moltiplicate per il logaritmo del numero
+37:26
+37 minutes, 26 seconds
+di dati. Ok? Però l'effetto è lo stesso, no? Diciamo che avete fissato 1000 dati, a quel punto avrete sempre logaritmo di 1000 che moltiplica p, quindi più parametri prendete più cresce il BIC.
+37:38
+37 minutes, 38 seconds
+Però d'altra parte l'altro termine andrebbe a diminuire, no? Quindi avete un certo non è non è ovvio, diciamo, che aumentando P aumenti e basta, eh, perché
+37:46
+37 minutes, 46 seconds
+questo va a diminuire. Quindi se cresce p, se p cresce avete che questo il logaritmo diminuisce
+37:54
+37 minutes, 54 seconds
+- log di liminisce, quindi avete un po' un bilanciamento tra tra i due.
+38:02
+38 minutes, 2 seconds
+Ok? Quindi complessivamente cosa cerchiamo? Beh, cerchiamo un modello dove il appunto siccome posso far
+38:10
+38 minutes, 10 seconds
+crescere quanto voglio, no? facendo crescere P arbitrariamente, vorrei un un modello in cui sia piccola questa cosa, dove ho sia un numero piccolo di
+38:17
+38 minutes, 17 seconds
+parametri che un min square error piccolo, un meno log verosimiglianza piccola. Quindi qui la e il BC, attenti,
+38:25
+38 minutes, 25 seconds
+l'idea è di averli più piccoli possibili, ok? E ora Bic, qual è rispetto ad IC? Vedete, tendenzialmente
+38:32
+38 minutes, 32 seconds
+avete più di, insomma, il logaritmo di n magiore di 2, tendenzialmente avete un numero grande di dati, ok? Quindi a quel
+38:40
+38 minutes, 40 seconds
+punto BIC rispetto ad IC va a penalizzare di più, cioè quando avete modelli più complessi con più parametri BIC tende a penalizzarli di più. Ok?
+38:51
+38 minutes, 51 seconds
+Però in generale quindi uno ha questo indicatore, questo indicatore e ma che se ne fa? Ecco, vediamo un po' come si Beh, intanto posso calcolarlo. Vabbè,
+38:59
+38 minutes, 59 seconds
+non è per un singolo modello non è molto interessante perché è un numero, una coppia di numeri, però quello mi serve per confrontare due modelli diversi.
+39:08
+39 minutes, 8 seconds
+Quindi facciamo l'esempio sempre su Boston, no? Se uno prende, vi ricordate la Y era sempre il il valore mediano
+39:18
+39 minutes, 18 seconds
+della casa, ok? Era sempre il valore quanto valeva la casa nel quartiere.
+39:22
+39 minutes, 22 seconds
+Allora, se uso soltanto una variabile, ok, mi aspetto di avere una regressione, ma non sarà magari un ottimo valore di
+39:31
+39 minutes, 31 seconds
+regressione. Quindi avrò il numero di parametri è basso, p = 1,
+39:37
+39 minutes, 37 seconds
+eh ma il ehm il il min square error sarà grande, ok?
+39:44
+39 minutes, 44 seconds
+Quindi la parte - log sarà più grande, ok? Vabbè, ottengo questi numeri, in questo caso specifico, ottengo questi
+39:50
+39 minutes, 50 seconds
+valori. Vedete, sono comunque simili, eh? Vediamo un po' cosa succede se invece prendo due variabili, no? Se
+39:58
+39 minutes, 58 seconds
+prendo due variabili, beh, vedete, sono rimasti più o meno simili, va bene? Ho messo LT e Nox. Cosa succede se prendo tutte le variabili?
+40:08
+40 minutes, 8 seconds
+Beh, prendendo tutte le variabili ho l'IC che è diminuito, va bene? E anche il big che è diminuito. Cosa vuol dire?
+40:14
+40 minutes, 14 seconds
+che includendo tutte le variabili faccio meglio anche tenendo conto del fatto che i parametri sono aumentati. Va bene?
+40:22
+40 minutes, 22 seconds
+D'accordo? Questo è il caso di Boston.
+40:23
+40 minutes, 23 seconds
+Però potrebbe essere che ci siano situazioni in cui prendendo tutte le variabili, magari tantissime di queste variabili non servono a nulla e a quel
+40:30
+40 minutes, 30 seconds
+punto la IC non cioè mi dice "Guarda, meglio non prendere tutte le variabili, prendere soltanto poche". Ok? Quindi
+40:37
+40 minutes, 37 seconds
+questo è un esempio che si realizza nel dataset Boston. E in effetti, quindi in generale la situazione qual è? Ho questi indicatori, sia che usi i test di
+40:46
+40 minutes, 46 seconds
+verosimiglianza e i test di significatività, scusate, o questi indicatori, è bene anche per quanto abbiamo detto
+40:54
+40 minutes, 54 seconds
+sulla collinearità non essere troppo, insomma, diretti e dire "Ok, butto via un sacco di variabili". Cosa si fa?
+41:00
+41 minutes
+Tendenzialmente la la situazione è di fare dei passi e dire "Ok, a ogni passo aggiungo una variabile oppure tolgo una
+41:08
+41 minutes, 8 seconds
+variabile e vedo un po' questi indicatori come si comportano." Ok?
+41:12
+41 minutes, 12 seconds
+Quindi queste procedure sono dette a passi step wise. E cosa si fa? Si aggiunge o si rimuove una variabile?
+41:19
+41 minutes, 19 seconds
+Dipende da dove si inizia. uno può iniziare con nessuna variabile e l'aggiunge un po' alla volta oppure iniziare tutte le variabili e comincia a toglierle una alla volta cercando
+41:27
+41 minutes, 27 seconds
+appunto di minimizzare se volete l'IC e BC oppure se prendete il punto di vista dei test volete massimizzare la
+41:36
+41 minutes, 36 seconds
+significatività dei vostri dei vostri delle vostre caratteristiche o dei coefficienti, diciamo. Allora,
+41:44
+41 minutes, 44 seconds
+facciamo degli esempi, no? Avete la selezione in avanti, significa che partite dal modello senza nessuna caratteristica, solo le costanti, e aggiungete le variabili una alla volta.
+41:55
+41 minutes, 55 seconds
+Adesso facciamo degli esempi. Un'altra possibilità è partire appunto da tutte le variabili e cominciare a toglierle. Eluminazione all'indietro.
+42:03
+42 minutes, 3 seconds
+Tendenzialmente selezione in avanti e quando volete poche poche variabili, no?
+42:06
+42 minutes, 6 seconds
+dice a un certo punto mi fermerò, magari mi fermo io a mano quando voglio e all'indietro invece quando volete escludere alcune variabili e risparmiando magari un po' meno. Ok?
+42:18
+42 minutes, 18 seconds
+E a procedure ovviamente potete anche fare non è detto che sia sempre utile aumentare il numero di variabili, magari avete aggiunto delle variabili e poi
+42:26
+42 minutes, 26 seconds
+volete tornare indietro sui vostri passi e eliminarne di altre. Quindi la procedura, se volete più completa, è quella che fa passi in avanti e passi all'indietro. Si parte magari da un
+42:35
+42 minutes, 35 seconds
+modello intermedio e a quel punto si fanno passi aggiungendo variabili, eliminandone altre, sempre guidati, ad esempio, da dalla volontà di minimizzare
+42:43
+42 minutes, 43 seconds
+l'IC, ad esempio. Ora, cosa può succedere in queste situazioni? Beh, eh intanto è tutto automatico e va molto
+42:50
+42 minutes, 50 seconds
+bene. Ci sono comandi di una riga in R che lo fanno. Ok, qual è il problema? Il problema potrebbe essere che non finite
+42:57
+42 minutes, 57 seconds
+in un minimo globale perché sono procedure un po' euristiche aggiungere, togliere una variabile, non è detto che che riuscite a trovare proprio il
+43:04
+43 minutes, 4 seconds
+modello ottimale, però spesso funziona e insomma non è non è un insomma sono
+43:11
+43 minutes, 11 seconds
+procedure che di solito danno dei risultati soddisfacenti.
+43:15
+43 minutes, 15 seconds
+Ecco, attenti soltanto che in particolare se eh il vostro obiettivo è di massimizzare la significatività,
+43:22
+43 minutes, 22 seconds
+attenti che molto spesso, siccome non l'indicatore di significatività non tiene conto della complessità del vostro modello, c'è il rischio di andare a
+43:30
+43 minutes, 30 seconds
+finire, appunto, di aggiungere tutto e magari state facendo overfitting, aggiungete troppe variabili e andate a
+43:37
+43 minutes, 37 seconds
+finire nella situazione in cui il modello è molto complesso, spiega tutti i dati, però chiaramente non generalizza bene. Ok? Quindi, insomma, queste
+43:46
+43 minutes, 46 seconds
+procedure prendetele e le applichiamo, ma appunto attenti che i problemi di overfit ci possono essere
+43:53
+43 minutes, 53 seconds
+comunque. Ok? Ecco, ad esempio, cosa succede se facciamo sempre nel dataset Boston? Prendiamo una selezione in avanti, step wise tramite i Test.
+44:06
+44 minutes, 6 seconds
+Quindi cosa facciamo? Partiamo dal modello senza nessuna variabile. Andiamo a chiederci se io aggiungo una variabile, qual è il p value? Cioè quanto è significativa questa variabile?
+44:17
+44 minutes, 17 seconds
+E vado a vedere, appunto, devo fare un training per il modello su tutti questi con tutte le possibili variabili. Vado a prendere quella che è il p value eh più
+44:26
+44 minutes, 26 seconds
+piccolo, no? Quella che mi conviene aggiungere, quella più significativa.
+44:29
+44 minutes, 29 seconds
+Cosa risulta? Beh, risulta che allo step 1 devo aggiungere L stat. E questo già mi dà un modello in cui sto spiegando la
+44:37
+44 minutes, 37 seconds
+la mediana, il valore della della casa con lat. Poi mi chiedo, adesso che ho inserito lei, vado in avanti, voglio aggiungere un'altra variabile. Allora,
+44:45
+44 minutes, 45 seconds
+vado a vedere di tutte le variabili quali mi conviene aggiungere. Vado a vedere di nuovo quella che è il p value più piccolo. Attenti che non è il p
+44:53
+44 minutes, 53 seconds
+value però rispetto a al modello senza nulla, cioè devo fare il modello con lstat e RM, lstat e piato, e lstat e
+45:02
+45 minutes, 2 seconds
+diss e così via. E di queste seleziono RM, va bene? Risulta quella più significativa. Poi vado avanti, aggiungo, aggiungo, aggiungo. Alla fine
+45:10
+45 minutes, 10 seconds
+aggiungo anche variabili che non ha non sono molto significative, ok? Indus ha un p value molto grande, ok? Quindi,
+45:20
+45 minutes, 20 seconds
+però avete una procedura iterativa partendo dal modello più semplice che vi dice appunto quali variabili sono via, se volete meno significative, no?
+45:30
+45 minutes, 30 seconds
+Cominciamo da Lstat che risulta molto significativa, rm ratio dis. Poi potete interrompere quando volete. Se il vostro obiettivo è un modello con poche poche variabili interrompete a due o a tre.
+45:40
+45 minutes, 40 seconds
+Ok? È sempre il solito discorso, no, della selezione di dell'iperparametro, no? In questa situazione mi dice "Ma quand'è che veramente il modello mi va
+45:48
+45 minutes, 48 seconds
+bene?". Beh, dipende dalle applicazioni che avrò in mente. Ok? Se voglio qualcosa che sia spiegabile con pochi parametri, mi fermerò a due, tre,
+45:55
+45 minutes, 55 seconds
+insomma. Se voglio invece qualcosa che preveda bene, andrò magari anche più avanti.
+46:01
+46 minutes, 1 second
+Sì, la slide precedente passo tre o qu su Pirao. Ma cioè io sto guardando
+46:10
+46 minutes, 10 seconds
+Instat e Pirazio o Instat e dis non Instat RMo? Cioè ha detto eh no. Allora questo significa che siamo
+46:18
+46 minutes, 18 seconds
+al passo due. Questo è forward. Ogni volta aggiungete una nuova variabile.
+46:21
+46 minutes, 21 seconds
+Allora, vi chiedete, ho già stabilito che il modello deve contenere Lstat e RM. Ok, adesso vado a fare il la
+46:30
+46 minutes, 30 seconds
+regressione lineare aggiungendo tutte le altre una alla volta, vado a aggiungere tutte le altre, aggiungo pi ratio e vedo
+46:36
+46 minutes, 36 seconds
+che in quel modello con lstate rm rato, il p value di pi ratio è 10^ -1. Ok? Poi
+46:43
+46 minutes, 43 seconds
+aggiungo, tolgo P ratio e dico mettiamoci dis e dis viene fuori con un pellio più piccolo che non è necessariamente quello, eh, però
+46:51
+46 minutes, 51 seconds
+risultato più piccolo. Poi aggiungo Nox, poi tolgo Nox e aggiungo aggiungo chess e poi aggiungo black e così via. Quindi
+47:00
+47 minutes
+attenti, lo fate ogni volta aggiungete una nuova variabile mantenendo quella che avete già messo perché è forward.
+47:06
+47 minutes, 6 seconds
+Ok? Scusi, ma il risultato invece come lo decide? Eh eh di nuovo parto dal modello banale con la costante e
+47:14
+47 minutes, 14 seconds
+aggiungo la prima variabile, aggiungo una alla volta le variabili. Ok? Ora è un po' dispendioso eh questa cosa, cioè di di fare ogni volta tutte tutti i training per tutto è un po' dispendioso.
+47:24
+47 minutes, 24 seconds
+Uno poi deve usare delle uristiche, insomma, va bene, non è che siano e comunque non ho la garanzia che sto facendo qualcosa di ottimale. Ad esempio
+47:32
+47 minutes, 32 seconds
+qui, vabbè, qui non sto neanche minimizzando il criterio IC e BIC, sto solo facendo questa cosa tramite il Test. però vi dà almeno un ordinamento e
+47:41
+47 minutes, 41 seconds
+alla fine quali sono le variabili da inserire una alla volta, se volete dire in ordine di significatività e attenti. Il punto è di farlo davvero
+47:50
+47 minutes, 50 seconds
+una alla volta perché appunto se ci sono culinarità ve ne accorgete in questo modo, in qualche qualche senso.
+47:58
+47 minutes, 58 seconds
+Va bene? Vediamo ad esempio una cosa più complicata. Supponiamo di voler invece fare una selezione stepwise avanti e
+48:05
+48 minutes, 5 seconds
+indietro, quindi uso questa metodo both, no? Sia avanti che indietro, cercando di minimizzare il IC, il mio criterio IC.
+48:15
+48 minutes, 15 seconds
+Beh, vabbè, ora questa volta su Boston non è un granché, magari per mercoledì trovo qualcosa di di più interessante.
+48:21
+48 minutes, 21 seconds
+Perché Boston cosa succede? Beh, il primo step, diciamo, si parte con la costante.
+48:29
+48 minutes, 29 seconds
+L'azione non è ovvio che debba aggiungere, però vabbè, partendo dalla costante aggiungerà qualcosa e aggiunge L stat. E vedete che l'IC è diminuito,
+48:38
+48 minutes, 38 seconds
+no? 1008. Poi va a vedere, si chiede che cosa posso fare. Vabbè, al secondo step aggiungerà ancora qualcosa. Aggiunge RM
+48:46
+48 minutes, 46 seconds
+e scende ancora 1,7. Al terzo step, magari potrebbe accadere che uno di questi step di togliere qualche variabile. Ora, in questo caso non c'è
+48:54
+48 minutes, 54 seconds
+da togliere niente, va bene? Però magari riesco a fare per mercoledì un esempio in cui effettivamente fa avanti e indietro, cioè in questo caso sta
+49:02
+49 minutes, 2 seconds
+facendo ancora qualcosa di solo forward, però non l'ho forzato a farlo. Ok?
+49:07
+49 minutes, 7 seconds
+Quindi mano a mano mi sta aggiungendo le variabili. In che modo? Beh, nel modo da diminuire il più possibile la IC a ogni passo. Ok? un po' come prima andava a
+49:16
+49 minutes, 16 seconds
+prendere la più significativa, questa volta cerca di diminuire AC a ogni passo. Va bene? E effettivamente uno va a vedere il grafico dell'AC, non è la
+49:25
+49 minutes, 25 seconds
+stessa cosa. Quello di prima era la significatività, c'era il meno logaritmo del p value, però vedete l'ordine è anche lo stesso. Sono molto confrontabili come metodi. Ok?
+49:36
+49 minutes, 36 seconds
+E facciamo invece un terzo esempio invece che sia backward. Backward cosa si fa? Beh, eh si parte dal modello
+49:44
+49 minutes, 44 seconds
+completo e si comincia a togliere variabili, ok?
+49:48
+49 minutes, 48 seconds
+Cercando di diminuire il questo caso ho fatto col BIC, giusto per fare qualcosa di diverso, senò volete sempre diminuire le ok? Allora, backward, allora, eh,
+49:58
+49 minutes, 58 seconds
+oppure ovviamente lì dovete, nel caso del test dovete togliere quelle col p value più grande, ok? State eliminando
+50:06
+50 minutes, 6 seconds
+variabili. Beh, allora in questo caso si parte dal modello completo che ha questo BIC, poi toglie age, toglie index e poi
+50:17
+50 minutes, 17 seconds
+in realtà termina perché si accorge che non ci sono nuovi step, cioè non riesce a migliorare togliendo nient'altro. Ok?
+50:23
+50 minutes, 23 seconds
+Quindi in questo caso è una termina abbastanza presto e qui vedete il Bic che va a diminuire. Vabbè,
+50:31
+50 minutes, 31 seconds
+non è granché come grafico di nuovo, però quindi potete fare diversi metodi e in ogni caso comunque queste selezioni
+50:39
+50 minutes, 39 seconds
+procedono variabile per variabile, d'accordo? Non cioè si può fare anche versioni in cui cominciate a togliere sottoinsiemi di variabili e così via,
+50:47
+50 minutes, 47 seconds
+però attenti che la collinarità è un po' eh lì sta un po' la complessità, no?
+50:53
+50 minutes, 53 seconds
+appunto che la culinarità potrebbe darvi dei problemi.
+50:58
+50 minutes, 58 seconds
+Ok, va bene. Poi li vedremo un po' meglio anche mercoledì questi comandi per fare questa selezione.
+51:05
+51 minutes, 5 seconds
+E vediamo invece un altro metodo che si collega a quello che abbiamo già visto che è la PCA. Quindi se il nostro obiettivo è comunque ridurre le
+51:13
+51 minutes, 13 seconds
+variabili e togliere la collinearità uno dice in effetti la PCA cosa faceva la PCA? la PC prendeva, no, le mie
+51:22
+51 minutes, 22 seconds
+caratteristiche e ancora non parlavamo di regressione, no, però comunque stavamo cercando delle coordinate in modo tale che diventassero
+51:30
+51 minutes, 30 seconds
+non correlate tra loro. Ok? E in effetti questo ci piacerebbe perché dovrebbe eliminare un po' di cinearità.
+51:38
+51 minutes, 38 seconds
+Quindi la PCA di per sé non è una tecnica legata alla regressione, però traduce che cosa? trasforma variabili in
+51:46
+51 minutes, 46 seconds
+nuove variabili che erano combinazioni, no, con la matrice delle rotazioni che sono tra di loro ortogonali. Quindi, in
+51:53
+51 minutes, 53 seconds
+effetti la PCA può essere forse un buona una buona strategia per eliminare la culinarità. Ovviamente verrà a un
+52:01
+52 minutes, 1 second
+prezzo, ci sarà un prezzo, no, da pagare e innanzit poi, vabbè, qui sto facendo il vecchio screen plot, ve lo ricordate, no? Per selezionare poi quante componenti eh prendere e così via.
+52:11
+52 minutes, 11 seconds
+Questo è sempre sul dataset Boston in questo caso e questo pure è un Bplot, vi ricordo.
+52:19
+52 minutes, 19 seconds
+Ora qui cosa sta facendo? Ecco cosa sto facendo. Sto prendendo la PCA sul dataset Boston, però ho escluso la
+52:27
+52 minutes, 27 seconds
+variabile d'uscita, il fattore d'uscita, perché vi ricordo qui stiamo cercando di ridurre le variabili di ingresso, ok?
+52:34
+52 minutes, 34 seconds
+Quindi l'uscita tenetela sempre fuori da tutto questo discorso oggi, va bene? E quindi mettiamo soltanto le variabili
+52:41
+52 minutes, 41 seconds
+d'ingresso, facciamo la PCA e scopriamo che c'è una prima componente che spiega
+52:47
+52 minutes, 47 seconds
+il 47%, no, della varianza. La seconda componente spiega l'11%. In cui però non ho ancora messo la Y. Eh, la Y non la voglio usare.
+52:58
+52 minutes, 58 seconds
+Ok? Infatti la Y l'ho messa come colore.
+53:01
+53 minutes, 1 second
+Va bene? Quindi se ora non si vede tantissimo, però vedete piuttosto i valori alti, no, di di valori della casa si trovano lì in alto a sinistra,
+53:08
+53 minutes, 8 seconds
+insomma. Quindi l'idea qual è? Usiamo la PCA sulle variabili d'ingresso per ridurre la dimensionalità, eliminare la cinarità e poi faremo la regressione.
+53:21
+53 minutes, 21 seconds
+Ok? Quindi facciamo così, partiamo dalle FI originali, i nostri preditori, le variabili originali, facciamo la PCA su
+53:30
+53 minutes, 30 seconds
+queste e vi ricordate, vabbè, questa notazione. Prendete la matrice della rotazione degli autovettori e prendete
+53:37
+53 minutes, 37 seconds
+soltanto i primi K e a quel punto avete delle nuove caratteristiche, no? delle Z min o uguali di K sono K
+53:45
+53 minutes, 45 seconds
+caratteristiche, dipende da quante volete prenderne e quindi potete fare un modello ridotto automaticamente in cui avete K o K + 1 se ci rimettete l'intercet ehm tra i vostri parametri.
+53:57
+53 minutes, 57 seconds
+Ok?
+53:59
+53 minutes, 59 seconds
+Qual è il vantaggio? Ecco, qual è il vantaggio? Il vantaggio è che immediatamente questo era Boston, sempre Boston, però forse magari mercoledì
+54:08
+54 minutes, 8 seconds
+vediamo anche quello generato. Eh, riducete subito la cinearità, ok? Perché avete immediatamente impostato che siano
+54:15
+54 minutes, 15 seconds
+ortogonali, insomma. Quindi, vedete, la prima componente e la terza componente hanno tutte un livello di significatività molto grande, quindi
+54:23
+54 minutes, 23 seconds
+perfetto. Uno dice "Ho risolto il il mio problema".
+54:29
+54 minutes, 29 seconds
+Quale può essere però un problema con questo metodo?
+54:32
+54 minutes, 32 seconds
+un problema. Eh, vabbè, insomma, abbiamo detto vantaggi ce ne sono molti, no? Che eliminate la collinarità e riducete la
+54:40
+54 minutes, 40 seconds
+dimensionalità e a volte, appunto, automaticamente questo metodo, insomma, vi vi migliora la generalizzazione perché perché state
+54:49
+54 minutes, 49 seconds
+andando a selezionare un modello più semplice, ok? Avete meno varianza e però lo svantaggio quale potrebbe essere? Beh, il primo svantaggio è che
+54:57
+54 minutes, 57 seconds
+avendo preso le caratteristiche originali e le avete ruotate, avete fatto delle combinazioni, a quel punto l'interpretabilità va un po' a a perdersi. Ok?
+55:08
+55 minutes, 8 seconds
+Eà, questo è un po' problema perché a quel punto state dicendo che questa caratteristica che è una combinazione lineare, no, del della caratteristica
+55:18
+55 minutes, 18 seconds
+iniziale delle delle altre due, insomma, non è molto facile da spiegare. Ok? E l'altro svantaggio, se volete che avete
+55:25
+55 minutes, 25 seconds
+la scelta di cap, no, dovete scegliere quante componenti prendere, ma al solito una cross validation vi può aiutare,
+55:32
+55 minutes, 32 seconds
+come facevamo per altri parametri, ad esempio per il KNN.
+55:37
+55 minutes, 37 seconds
+Ecco, l'altra cosa importante che è un po' delicata è questa che la principal component regression, quindi fare la PCA sulle
+55:45
+55 minutes, 45 seconds
+componenti di ingresso, eh proprio non considera la variabile d'uscita. E vi ricordate la PCA cercava
+55:52
+55 minutes, 52 seconds
+le direzioni dove la variabilità era più grande possibile.
+55:56
+55 minutes, 56 seconds
+Quindi a noi invece non è non vogliamo cercare in automatico, cioè potrebbe essere che stiamo cercando qualcosa di sbagliato. Magari fate questo esempio
+56:04
+56 minutes, 4 seconds
+estremo. Una di queste y, cioè la variabile d'uscita, era già inclusa nelle x, ma la sua variabilità era molto
+56:11
+56 minutes, 11 seconds
+piccola, no? Era molto nascosta. Ora è vero che uno dovrebbe riscalare le variabili d'ingresso prima di fare la PCA, però diciamo siccome non la stiamo
+56:20
+56 minutes, 20 seconds
+guardando perché magari aveva varenza piccola, la possiamo perdere, no? Quindi attenti che la PCA applicata direttamente alla regressione potrebbe
+56:28
+56 minutes, 28 seconds
+non funzionare perché proprio elimina dell'informazione che non viene vista per lavanza. Quindi se uno vuole
+56:36
+56 minutes, 36 seconds
+proseguire, diciamo, sull'idea della PCA, può fare questa partialist squares, che è una una specie di versione un po'
+56:43
+56 minutes, 43 seconds
+più sofisticata, noi non la vedremo, della della PCA per la regressione. Va bene? Quindi attenti su questo, però comunque come strategia è buona. Se uno
+56:52
+56 minutes, 52 seconds
+vuole abbattere, avere uno o due variabili, non è proprio così preoccupato dall'interpretabilità. Eh, fare la PC a volte funziona, molto spesso funziona.
+57:03
+57 minutes, 3 seconds
+Va bene? Ecco, allora vediamo invece l'ultima idea e che invece porta molto lontano ed è un'idea molto interessante. Allora, il punto qual era?
+57:15
+57 minutes, 15 seconds
+Abbiamo detto che quando c'è colinearità i parametri sono instabili e se vi ricordate, no, i parametri hanno l'inversa della matrice di gram. Se la
+57:24
+57 minutes, 24 seconds
+matrice di gram non è invertibile o è molto lontano dallessere invertibili, potremmo avere un'esplosione di questi parametri, no? Parametri grandi e poi
+57:32
+57 minutes, 32 seconds
+soprattutto instabili. Vabbè, quella dell'inistabilità è è noiosa. Ecco, allora qual è l'idea? L'idea della regolarizzazione, che è la terza idea,
+57:41
+57 minutes, 41 seconds
+eh, però insomma come ordine di importanza, forse è una delle più importanti, è quella di dire "Beh, metto una limitazione", cioè se i miei
+57:50
+57 minutes, 50 seconds
+parametri, il problema è che stanno scappando è infinito, beh, io forzo e dico "Beh, no, comunque non voglio parametri più grandi di una certa soglia". Ok? Dice, "Vabbè, l'abbiamo
+57:59
+57 minutes, 59 seconds
+immesso noi." In effetti si può introdurre una limitazione, un vincolo sui nostri parametri. Quindi facciamo il minimo
+58:07
+58 minutes, 7 seconds
+dell'errore quadratico medio, ci interessa quello eh del nostro modello, ma aggiungiamo un vincolo. Diciamo che i
+58:15
+58 minutes, 15 seconds
+parametri non li voglio troppo lontani, che so da un parametro obiettivo teta tildopont, li voglio distanti al massimo m. Quindi
+58:24
+58 minutes, 24 seconds
+cosa succede? Il mio obiettivo è di minimizzare, diciamo che avete tetatilde qui e dite questa è la palla di raggio M.
+58:36
+58 minutes, 36 seconds
+Mentre il mio obiettivo sarebbe di trovare il minimo del questo sarebbe il teta ols, no? Dei minimi quadrati,
+58:46
+58 minutes, 46 seconds
+mentre la regol, cioè senza regolarizzazione, senza questa idea del vincolo, andrei a finire qui. In realtà
+58:54
+58 minutes, 54 seconds
+con il vincolo vado a vedere il punto più vicino. Ecco, sarò qui circa perché non posso andare oltre. Ok? Quindi non
+59:02
+59 minutes, 2 seconds
+voglio allontanarmi troppo, non voglio avere parametri che esplodano.
+59:06
+59 minutes, 6 seconds
+Dice, "Vabbè, è un'idea un po' strana, perché dovrei limitarmi dentro una palla di raggio M?" Beh, c'è un'altra cosa interessante che questa idea della
+59:13
+59 minutes, 13 seconds
+palla, io ho disegnato una palla tonda, ma dipende un po' da che tipo di distanza sto usando. Ok? Comunque adesso
+59:20
+59 minutes, 20 seconds
+ci torniamo sul tipo di distanza. per il momento pensatelo così, cioè voglio limitare e voglio evitare esplosioni, quindi limito artificialmente.
+59:29
+59 minutes, 29 seconds
+Un altro modo di vincolare un po' meno esplicito, è quello che si fa di solito in pratica, è quello della penalizzazione.
+59:37
+59 minutes, 37 seconds
+Cosa si fa? Invece di fare il minimo dell'errore quadratico medio, beh, metto un nuovo termine che chiamo penalità.
+59:45
+59 minutes, 45 seconds
+più mi allontano, no, dal tetatilde, più quella distanza, vedete, c'è la norma, insomma, distanza tra il vettore dei
+59:53
+59 minutes, 53 seconds
+parametri e questo teta tilde che potete scegliere come volete. Inizialmente spesso si mette zero quel teta tilde,
+1:00:00
+1 hour
+no? e e più grande è maggiore sarà quel contributo.
+1:00:07
+1 hour, 7 seconds
+Eccolo qua. E quindi più mi allontano, vedete, non è proprio un vincolo diretto che ci si scontra con una barriera, ma più mi allontano più pesa, ok? E lambda
+1:00:16
+1 hour, 16 seconds
+è un parametro da impostare, come questi sono parametri, eh,
+1:00:24
+1 hour, 24 seconds
+e anche il tetaild è un parametro. Ok, sto cercando di fare la stessa cosa, ma in modo meno brutale, cioè meno di dire non ti vai proprio a scontrare con con
+1:00:31
+1 hour, 31 seconds
+il bordo lì, ma più ti allontani sappi che pagherai più prezzo e quindi quando si minimizza tendenzialmente sarò vicino
+1:00:38
+1 hour, 38 seconds
+al tetatilde. Ok? Questo è un un approccio, un'idea che porta molto lontano in realtà perché ci sono tante
+1:00:47
+1 hour, 47 seconds
+possibilità. Una ad esempio è quella di scegliere una distanza. Io qua sto dicendo che ho indicato con una norma,
+1:00:54
+1 hour, 54 seconds
+ma potrebbe essere una distanza. Sapete che abbiamo visto anche la prima lezione, forse ci sono tante distanze.
+1:01:00
+1 hour, 1 minute
+C'è la distanza euclidea, la distanza quella solita nello spazio, in questo caso siamo in dimensione P, ma comunque
+1:01:07
+1 hour, 1 minute, 7 seconds
+la distanza costruita col teorema di Pitagora, no? fate la radice quadrata della somma dei parametri del quadrato e
+1:01:15
+1 hour, 1 minute, 15 seconds
+questa porta alla cosiddetta regolarizzazione ridge. Eh, però ci sono anche altre distanze.
+1:01:21
+1 hour, 1 minute, 21 seconds
+C'è una s una regolarizione molto interessante è la selezione lasso, che in realtà è un acronimo, ma appunto vuol
+1:01:28
+1 hour, 1 minute, 28 seconds
+dire anche il il lazzo, come si dice in Italia, il lazzo, no? E qual è la distanza? Beh, usa una distanza che è
+1:01:37
+1 hour, 1 minute, 37 seconds
+una distanza diversa, no? la distanza L1, quella che chiamavamo distanza di Manattan. Ok? Fate semplicemente la
+1:01:43
+1 hour, 1 minute, 43 seconds
+somma, eh li ho chiamati beta, ma sono i teta, va bene?
+1:01:48
+1 hour, 1 minute, 48 seconds
+Se non state facendo regressione potrebbero essere dei teta qualsiasi. La la somma dei valori assoluti dei teta. Ok?
+1:01:56
+1 hour, 1 minute, 56 seconds
+Adesso vediamo un pochino qual è la differenza tra i due, però tendenzialmente l'approccio si generalizza anche altre distanze. Potete fare anche combinazioni di distanze, fare insomma quello che che vi piace.
+1:02:07
+1 hour, 2 minutes, 7 seconds
+Ovviamente uno deve capire qual è l'effetto di queste di queste quantità.
+1:02:11
+1 hour, 2 minutes, 11 seconds
+Allora, vediamo innanzitutto il caso L2, la regressione Ridge, che è quello più semplice perché perché uno ha la i
+1:02:18
+1 hour, 2 minutes, 18 seconds
+minimi quadrati qui, min square error e poi ha aggiunto un altro termine che è la distanza al quadrato e quindi cosa
+1:02:26
+1 hour, 2 minutes, 26 seconds
+vado a fare? Un altro un'altra somma di quadrati, quindi ho un termine che è quadratico, se sto facendo un modello lineare più un altro termine quadratico,
+1:02:35
+1 hour, 2 minutes, 35 seconds
+quindi è sempre tutto quadratico. Questo ci piace, no? E qual è l'effetto?
+1:02:39
+1 hour, 2 minutes, 39 seconds
+L'effetto è che stiamo mettendo una penalizzazione sulla grandezza dei coefficienti, no? Rato quel disegno di prima. In questo caso la palla,
+1:02:48
+1 hour, 2 minutes, 48 seconds
+la palla di prima l'ho messa nel centrata in origine, teta tilda uguale 0.
+1:02:54
+1 hour, 2 minutes, 54 seconds
+Quindi avete una specie di palla, eccola qui, di di distanza tipica 1 su radice di di lambda, va bene? E state
+1:03:03
+1 hour, 3 minutes, 3 seconds
+tendenzialmente dicendo che volete trovare i parametri dentro questa regione. Ok? Questi sono i vostri spazio dei parametri teta. Vedete, in questo
+1:03:10
+1 hour, 3 minutes, 10 seconds
+caso sono due parametri, teta1, teta 2, ma immaginatelo in dimensione 3 4, insomma, immaginate nella dimensione che preferite. L'idea è non volete andare
+1:03:19
+1 hour, 3 minutes, 19 seconds
+troppo lontano, ok? Questo vi rende i parametri controllati nella loro dimensione, nella loro taglia.
+1:03:27
+1 hour, 3 minutes, 27 seconds
+Eh, vediamo però cosa succede, ad esempio, per i modelli lineari. Per i modelli lineari c'è una formula esplicita e la formula esplicita è la seguente.
+1:03:38
+1 hour, 3 minutes, 38 seconds
+Eh, bisogna fare il conto, non lo facciamo, eh, abbiamo fatto altri conti, ora questo non lo facciamo, ma l'effetto qual è? L'effetto è che è molto simile alla formula esplicita.
+1:03:49
+1 hour, 3 minutes, 49 seconds
+Qua ci vorrebbe il trasposto. Eccolo qui. Qua manca un trasposto.
+1:03:55
+1 hour, 3 minutes, 55 seconds
+È è simile alla formula che avevamo per i minimi quadrati. Ma l'effetto qual è?
+1:04:00
+1 hour, 4 minutes
+Avendo aggiunto la regolarizzazione lambda, eh succede che la g viene sostituita, la solita matrice g di gramma viene sostituita da G più lambda
+1:04:09
+1 hour, 4 minutes, 9 seconds
+identità, cioè vuol dire che sulla sulla diagonale avete aggiunto un lambda. E qual è l'effetto? Beh, l'effetto è che questa gambda volte diidentità diventa automaticamente invertibile, ok?
+1:04:20
+1 hour, 4 minutes, 20 seconds
+Migliora la sua eh il problema dell'invertibilità. In ogni caso risulta invertibile. Ok? Perché l'idea qual è?
+1:04:28
+1 hour, 4 minutes, 28 seconds
+Beh, se non è invertibile, sto andando comunque a cercarmi una, un parametro che sta dentro quella palla, cioè non invertibile porterebbe a scappare a più
+1:04:35
+1 hour, 4 minutes, 35 seconds
+infinito i vari parametri, ma li sto limitando, sto dicendo non potete scapparvate dentro quella palla e quindi automaticamente risulta tutto
+1:04:43
+1 hour, 4 minutes, 43 seconds
+invertibile. Ok? Quindi nella regressione ridge non si insomma se non si selezionano i coefficienti, ma si risolve comunque il problema dell'invertibilità di G.
+1:04:53
+1 hour, 4 minutes, 53 seconds
+Ovviamente risolto un problema se ne crea un altro perché questo lambda, abbiamo detto che è un parametro. Come lo scegliamo? Beh, il solito discorso
+1:05:02
+1 hour, 5 minutes, 2 seconds
+cross validation, va bene? Se uno dice vado nella strada, ho un problema di culinarità, G non è invertibile, voglio
+1:05:09
+1 hour, 5 minutes, 9 seconds
+fare regressione ridge perché mi piace la regressione Grig, ad esempio, ha questa formula esplicita e così via.
+1:05:15
+1 hour, 5 minutes, 15 seconds
+Beh, ora scelgo lambda usando una cross validation.
+1:05:19
+1 hour, 5 minutes, 19 seconds
+Vedremo poi in R si tratta solo di di dare una una riga di comando per fare automaticamente la la cross validation e
+1:05:26
+1 hour, 5 minutes, 26 seconds
+quindi cosa si trova? Vedete, qui c'è il parametro, non si vede benissimo, ma è- logaritmo di lambda. Ok? Quindi, ad
+1:05:34
+1 hour, 5 minutes, 34 seconds
+esempio, qui sta seleziono, no, il il nostro parametro ora e qua numeratore avere l'errore quadratico medio. Ok?
+1:05:46
+1 hour, 5 minutes, 46 seconds
+Quindi sto andando a determinare tramite cross validation quale lambda scegliere in base ai dati che ho osservato.
+1:05:54
+1 hour, 5 minutes, 54 seconds
+E vediamo un po' l'effetto. Ora dopo lo lo rivediamo mercoledì questa cross validation. L'effetto qual è? Che alla fine la selezione dei coefficienti. Va bene? Ora qua c'è scritto sparsa, ma in
+1:06:03
+1 hour, 6 minutes, 3 seconds
+realtà non è così sparsa. Vedete i coefficienti ci sono -0,3. Ora alcuni sono piccolini, eh, non è che alcuni sono abbastanza piccoli.
+1:06:12
+1 hour, 6 minutes, 12 seconds
+Questi sono i coefficienti, quindi come al solito, se ho i coefficienti piccoli posso pensare che siano praticamente nulli. Ok? Magari quindi
+1:06:21
+1 hour, 6 minutes, 21 seconds
+questi potrei dire poi a posteriori vengono selezionati, però vedete non sono effettivamente zero.
+1:06:27
+1 hour, 6 minutes, 27 seconds
+Certo, se vi ricordate qual erano quelli meno significativi, quelli meno significativi mi sembra fossero index e
+1:06:34
+1 hour, 6 minutes, 34 seconds
+age, vedete che comunque sono valori piccoli, però anche altri sono risultati con coefficienti piccoli, eh, tipo tax,
+1:06:42
+1 hour, 6 minutes, 42 seconds
+black, sono risultati molto piccoli, però di per sé non mi ha selezionato i coefficienti, mi ha solo risolto il problema dell'invertibilità. Se volete
+1:06:52
+1 hour, 6 minutes, 52 seconds
+l'altro metodo più interessante è l'asso che invece ha un effetto ancora più marcato perché va a selezionare automaticamente alcuni coefficienti, ok?
+1:07:03
+1 hour, 7 minutes, 3 seconds
+Si può mostrare che effettivamente il minimo andrà a selezionare alcune variabili e non altre. Ok? Questo perché
+1:07:11
+1 hour, 7 minutes, 11 seconds
+vi do un po' la spiegazione un po' euristica. Se uno va a disegnare le palle di questa distanza, questa era
+1:07:20
+1 hour, 7 minutes, 20 seconds
+la norma eh distanza, quella chiamiamo Manattan, no? Vado vado a disegnare l'insieme dei punti che hanno quella distanza uguale o
+1:07:29
+1 hour, 7 minutes, 29 seconds
+minore o uguale di una certa di un certo raggio, beh, ottengo degli dei quadrati, dei cubi. Ok?
+1:07:39
+1 hour, 7 minutes, 39 seconds
+Quindi cosa succede quando vado a cercare di minimizzare? Vado a trovare il mio teta dei minimi, il mio teta OLS,
+1:07:48
+1 hour, 7 minutes, 48 seconds
+cioè vorrei andare lontano fuori da questa palla. Beh, io sono comunque costretto a restare lì dentro. Beh, cercherò di avvicinarmi il più possibile
+1:07:56
+1 hour, 7 minutes, 56 seconds
+restando dentro questa palla. Ma mentre la palla euclidea è bella tonda, qui ho degli angoli, quello che succede è che
+1:08:03
+1 hour, 8 minutes, 3 seconds
+tendenzialmente andrete a finire in un punto che è un angolo. Ok? Quindi questo sarà il teta lasso
+1:08:12
+1 hour, 8 minutes, 12 seconds
+e il teta lasso, vedete, ha se siete in un angolo e quindi a quel punto in un vertice, quindi a quel punto alcune di quelle variabili sono zero. Ora non si
+1:08:20
+1 hour, 8 minutes, 20 seconds
+sa dire a priori quali, chiaramente dipende da insomma da da quando esegue il metodo, però eh è un vantaggio
+1:08:28
+1 hour, 8 minutes, 28 seconds
+rispetto a L2. Ok? Questo, tra l'altro, è stato scoperto, insomma, diciamo, cioè nella statistica è stato scoperto non
+1:08:37
+1 hour, 8 minutes, 37 seconds
+così tanto tempo fa, ma in realtà, appunto, eh la Plus già forse nell'800 consigliava di usare la norma L1 e non
+1:08:46
+1 hour, 8 minutes, 46 seconds
+la norma L2. Non non per questo motivo, però è interessante che sono cose che ritornano poi nei secoli queste. Però qual è lo svantaggio? Lo svantaggio è
+1:08:54
+1 hour, 8 minutes, 54 seconds
+che mentre prima avevo una forma quadratica qui, questo era quadratico e questo era pure quadratico, insomma, una somma di quadrati, ora è una una forma
+1:09:02
+1 hour, 9 minutes, 2 seconds
+diversa. È come se avessi messo un valore assoluto di di teta e quindi non ho una formula esplicita. Ok? Come non c'è una formula esplicita, se volete per
+1:09:11
+1 hour, 9 minutes, 11 seconds
+la mediana, no? la mediana non aveva una formula esplicita e quindi avete un problema non soltanto di determinare il
+1:09:19
+1 hour, 9 minutes, 19 seconds
+lambda, ma anche mi manco le formule esplicite, però comunque con la cross validation un po' di di calcolo numerico si trova. Ok? Quindi di nuovo questo è
+1:09:27
+1 hour, 9 minutes, 27 seconds
+l'effetto di una cross validation, lo vediamo anche mercoledì sempre sul dataset Boston.
+1:09:34
+1 hour, 9 minutes, 34 seconds
+Eh, però ora vediamo cosa è successo quando andiamo a vedere quali sono i parametri, no, selezionati da eh dal
+1:09:42
+1 hour, 9 minutes, 42 seconds
+metodo l'asso, cioè questi sono proprio coefficienti, vediamo che alcuni coefficienti sono proprio messi a zero,
+1:09:49
+1 hour, 9 minutes, 49 seconds
+ok? Indus e age e se vi ricordate sono anche quelli meno significativi,
+1:09:56
+1 hour, 9 minutes, 56 seconds
+ok? Quindi automaticamente questo metodo ha risolto il problema, non ha fatto i suoi giri di significatività e così via.
+1:10:03
+1 hour, 10 minutes, 3 seconds
+automaticamente soltanto introducendo questa palla diversa ha andato a selezionare dei parametri dei coefficienti nulli per i per le
+1:10:12
+1 hour, 10 minutes, 12 seconds
+caratteristiche che non erano significative.
+1:10:15
+1 hour, 10 minutes, 15 seconds
+Va bene? Poi anche altri sono molto piccoli, eh tax vedete molto piccolo, black molto piccolo e così via, però appunto questo è interessante che
+1:10:23
+1 hour, 10 minutes, 23 seconds
+vengono proprio zero. Ok?
+1:10:29
+1 hour, 10 minutes, 29 seconds
+Va bene. E allora, quindi la regolarizzazione è un altro metodo, se volete, per risolvere questo problema dell'inversione e anche per selezionare
+1:10:36
+1 hour, 10 minutes, 36 seconds
+le variabili se uno sceglie l'asso, questo metodo l'asso. Ehm, ora, come si può interpretare questa regolarizzazione? Abbiamo già visto l'interpretazione un po' geometrica. Uno
+1:10:45
+1 hour, 10 minutes, 45 seconds
+dice: "Ok, mi limito a parametri che non vanno troppo lontano, che non escono da una palla". C'è però anche un paio di
+1:10:53
+1 hour, 10 minutes, 53 seconds
+interpretazioni che vi vi voglio spiegare che sono quella variazionale e quello baesiano. Ok? Allora, dal punto di vista variazionale, cosa stiamo
+1:11:01
+1 hour, 11 minutes, 1 second
+facendo? Dal punto di vista variazionale eh sappiamo che si può dimostrare, non l'abbiamo fatto, che la stima dei minimi
+1:11:08
+1 hour, 11 minutes, 8 seconds
+quadrati, se uno fa proprio la stima dei minimi quadrati, quella non introduce bias, ok? Se vi ricordate, l'errore di generalizzazione è bias quadrato più
+1:11:18
+1 hour, 11 minutes, 18 seconds
+varianza, che è appunto come dipende un po' dai miei dati, più rumore. Allora, dal punto di vista di questa decomposizione del rumore i minimi
+1:11:26
+1 hour, 11 minutes, 26 seconds
+quadrati non hanno bias, ok? Sono una stima non distorta, però qual è il problema? che non necessariamente le stime con zero bias sono le migliori,
+1:11:35
+1 hour, 11 minutes, 35 seconds
+perché devo tenere conto anche della varianza e del rumore. Vabbè, il rumore non è che posso farci molto, però la varianza potrebbe essere grande. Quindi, allora, cosa sta facendo la
+1:11:43
+1 hour, 11 minutes, 43 seconds
+regolarizzazione? La regolarizzazione sia Ridge o l'asso si può dimostrare che hanno del bias, ok? Quindi avete
+1:11:50
+1 hour, 11 minutes, 50 seconds
+introdotto un po' di bias, no? avete un po' aumentato quel termine di bias, eh, ma avete forse, insomma, dipende un po'
+1:11:59
+1 hour, 11 minutes, 59 seconds
+da come va la situazione. Tipicamente si va a ridurre un po' la varianza. Ok? È un po' quando avete il parametro K in
+1:12:06
+1 hour, 12 minutes, 6 seconds
+KNN, se scegliete K = 1 avrete sempre avete la varianza massima, ma aumentando
+1:12:13
+1 hour, 12 minutes, 13 seconds
+il K andate a semplificare il modello, a quel punto aumentate il bias, potrebbe essere che il l'errore di generalizzazione diminuisca. Ok?
+1:12:23
+1 hour, 12 minutes, 23 seconds
+Quindi attenti, insomma, questo questo è un punto di vista non è una una scelta così casuale. State sempre giocando col dilemma bias varianza
+1:12:32
+1 hour, 12 minutes, 32 seconds
+e ovviamente sperando di avere l'obiettivo è sempre di avere un errore di generalizzazione piccolo.
+1:12:38
+1 hour, 12 minutes, 38 seconds
+Ok? E l'altro punto di vista, se volete, è baiesiano. Eh, cosa dice? Beh, allora, ricordate, no? la stima dei minimi
+1:12:46
+1 hour, 12 minutes, 46 seconds
+quadrati era una stima di massima verosimiglianza e quindi uno può dire se in generale la
+1:12:54
+1 hour, 12 minutes, 54 seconds
+stima di massima verosimiglianza e è il caso in cui ho soltanto la verosimiglianza e quindi ho a priori o
+1:13:01
+1 hour, 13 minutes, 1 second
+distribuzione uniforme, posso introdurre una distribuzione a priori diversa.
+1:13:06
+1 hour, 13 minutes, 6 seconds
+Quindi se io so qualcosa sui miei parametri posso introdurlo tramite una distribuzione a priori sui parametri.
+1:13:14
+1 hour, 13 minutes, 14 seconds
+Ok? A quel punto non andrò poi a calcolare, se volete, soltanto la stima di massima verosimiglianza, ma terrò conto della distribuzione a priori.
+1:13:23
+1 hour, 13 minutes, 23 seconds
+Quindi la regolarizzazione, qual è l'effetto da questo punto di vista baesiano? È una stima di massimo a posteriori dove però a priori avete
+1:13:31
+1 hour, 13 minutes, 31 seconds
+messo una distribuzione diversa da uniforme. Ok? Vi ricordate in generale la stima di massimo posteriori era
+1:13:38
+1 hour, 13 minutes, 38 seconds
+applicare la formula di bases e quindi avete la probabilità dei vostri parametri a posteriori avendo visto i
+1:13:45
+1 hour, 13 minutes, 45 seconds
+dati, no? a meno di una costante era questo. E quindi eh uno dice se non ho
+1:13:54
+1 hour, 13 minutes, 54 seconds
+nessuna informazione a priori sui parametri, metto uniforme e quindi faccio la stima di massima verosimiglianza, altrimenti se metto una distribuzione non banale ottengo qualcos'altro.
+1:14:04
+1 hour, 14 minutes, 4 seconds
+Allora, vediamo cosa si ottiene. Se voglio ottenere la la ridge regression, quella in cui mettevo la norma L2, cosa
+1:14:12
+1 hour, 14 minutes, 12 seconds
+sto facendo? Beh, sto dicendo che a priori i miei parametri sono distribuiti come una gaussiana, ok? Quindi una
+1:14:19
+1 hour, 14 minutes, 19 seconds
+gaussiana e sto dicendo che sono una gausiana con media zero, ok? E
+1:14:27
+1 hour, 14 minutes, 27 seconds
+e vedete una gaussiana, adesso per essere precisi, media 0 e deviazione standard 1 su √ lambda, no?
+1:14:37
+1 hour, 14 minutes, 37 seconds
+Perché il lambda sta lì a numeratore, ma quindi la deviazione standard sarebbe sigma quad denominatore. Verificate che
+1:14:44
+1 hour, 14 minutes, 44 seconds
+lambda diventa 1 su sigma qu e quindi sigma è 1 su eh √ lambda. Per quello
+1:14:51
+1 hour, 14 minutes, 51 seconds
+disegnavo prima la palla di circa eh raggio 1 su √ lambda. Ok?
+1:14:58
+1 hour, 14 minutes, 58 seconds
+Va bene. Ma le non soltanto rigidge, ma anche l'asso, cioè anche l'asso posso pensarlo come un'altra distribuzione,
+1:15:05
+1 hour, 15 minutes, 5 seconds
+una distribuzione un po' diversa. Com'è fatta questa distribuzione? È una distribuzione del tipo esponenziale di
+1:15:11
+1 hour, 15 minutes, 11 seconds
+men lambda e e c'è la norma L1. La norma L1, questa norma manattan è la somma dei
+1:15:18
+1 hour, 15 minutes, 18 seconds
+vari teta. Quindi sto dicendo che è una distribuzione non gausiana perché le code sono un po' diverse, no? E avete
+1:15:26
+1 hour, 15 minutes, 26 seconds
+una distribuzione, quella che si chiama distribuzione di la plus, appunto perché già la Plus fine 700 proponeva questa
+1:15:33
+1 hour, 15 minutes, 33 seconds
+questo tipo di distribuzione, non le gaussiane. Va bene?
+1:15:37
+1 hour, 15 minutes, 37 seconds
+Ecco, quindi diciamo dal punto di vista baesiano la regolarizzazione potete usarla per dire io so a priori che il parametro sarà circa di queste
+1:15:46
+1 hour, 15 minutes, 46 seconds
+dimensioni, ok? Magari poi non lo sapete, quindi fate anche, insomma, è tutta una cosa che fate per selezionare variabili e così via, però se voi avete
+1:15:54
+1 hour, 15 minutes, 54 seconds
+già della conoscenza a priori sui vostri parametri, tipo sapete che deve essere sparso o sapete che deve avere una certa
+1:16:00
+1 hour, 16 minutes
+dimensione, potete usare da questo punto di vista la regolarizzazione. Ok? Quindi la regolarizzazione non è nient'altro
+1:16:09
+1 hour, 16 minutes, 9 seconds
+che passare dalla stima di massima verosimiglianza a una stima di massimo posteriore in cui inserite delle informazioni in più. Quindi non è così artificiale.
+1:16:18
+1 hour, 16 minutes, 18 seconds
+Ecco, poi appunto uno si può giocare altre distribuzioni. Un modo, ad esempio, se uno fa una combinazione di ridge e l'asso, trova questa che si
+1:16:25
+1 hour, 16 minutes, 25 seconds
+chiama regolarizzazione elastica, elastic net e quindi cerca un po' di di prendere il meglio sia di ridge che di
+1:16:32
+1 hour, 16 minutes, 32 seconds
+che di lasso. Va bene? Allora, beh, oggi siamo stati anche bene nei tempi. Allora, direi che facciamo un riepilogo.
+1:16:42
+1 hour, 16 minutes, 42 seconds
+Quindi, diciamo, in generale uno può partire dai metodi di mini quadrati e se tutto funziona, ad esempio, se non vede
+1:16:48
+1 hour, 16 minutes, 48 seconds
+colinearità, non vede instabilità, allora tranquillamente può usare i metodi mini quadrati ed è a posto. Il
+1:16:56
+1 hour, 16 minutes, 56 seconds
+problema è uno usa questi indicatori VIF, può vedere il numero di ehm
+1:17:04
+1 hour, 17 minutes, 4 seconds
+il numero di condizionamento di K, di G, può vedere la correlazione tra i fattori di ingresso e deve accorgersi, insomma,
+1:17:11
+1 hour, 17 minutes, 11 seconds
+se c'è collinearità, ok? Ma ci se ne accorge anche da dalle dai p value, no, dei dei coefficienti. A quel punto dice
+1:17:18
+1 hour, 17 minutes, 18 seconds
+"Ok, metodo eh così di per sé non mi piace, ci sono queste collinearità oppure voglio comunque ridurre le variabili". Allora, cosa si può fare?
+1:17:27
+1 hour, 17 minutes, 27 seconds
+Primo step, secondo me, consigliato, è di fare la selezione tramite procedura stepwise. Ok? Step wise, fissate un
+1:17:35
+1 hour, 17 minutes, 35 seconds
+criterio, scegliete IC, BIC, insomma, sono comunque più o meno equivalenti, insomma, difficile trovare dei contesti dove uno sia molto meglio performante di
+1:17:44
+1 hour, 17 minutes, 44 seconds
+altri. Tipicamente avrete performance simili e allora potete fare una una selezione stepwise. Ora, se per qualche
+1:17:52
+1 hour, 17 minutes, 52 seconds
+motivo invece preferite o avete la volete ridurre drasticamente le variabili anche al prezzo però di fare opportune rotazioni, quindi perdere un
+1:18:00
+1 hour, 18 minutes
+po' l'interpretabilità, passate alla PCA, d'accordo? PCA vi dà appunto PCR, forse più che PCA,
+1:18:09
+1 hour, 18 minutes, 9 seconds
+là eliminate subito la culinarità. Se il vostro problema, ad esempio, è la è la culinarità, detto questa c'è troppa culinarità, voglio eliminarla, subito
+1:18:18
+1 hour, 18 minutes, 18 seconds
+fate la PCA. Però ovviamente lo svantaggio è che perdete, dicevo, l'interpretabilità, no? e dovete comunque scegliere il cap poi opportuno.
+1:18:26
+1 hour, 18 minutes, 26 seconds
+E va bene. Altri metodi, appunto, questa cosa, secondo me, tra le varie regolarizzazioni, ora, se il vostro obiettivo è solo guadagnare un po' di
+1:18:35
+1 hour, 18 minutes, 35 seconds
+stabilità numerica, usate ridge. Se volete anche selezionare le variabili, usate l'asso, va bene? Se volete passare
+1:18:43
+1 hour, 18 minutes, 43 seconds
+per la regolarizzazione, appunto, questi due metodi sono i primi che doveste provare. Ora, ci sono altre
+1:18:50
+1 hour, 18 minutes, 50 seconds
+tecniche di regolarizzazione anche in più sofisticate in machine learning, diciamo, soprattutto quando non avete
+1:18:58
+1 hour, 18 minutes, 58 seconds
+formule esplicite e quindi quel minimo dovete trovarlo numericamente, però complessivamente si, cioè si riconducono
+1:19:06
+1 hour, 19 minutes, 6 seconds
+tutte questa questa idea, insomma, di stima di massimo a posteriori. Va bene?
+1:19:11
+1 hour, 19 minutes, 11 seconds
+Poi nella pratica per le applicazioni statistiche standard è già tanto se uno usa l'asso. Ecco, l'asso è la tecnica di
+1:19:18
+1 hour, 19 minutes, 18 seconds
+regolarizzazione più più sofisticata, diciamo, a questo livello perché vi permette di selezionare anche delle variabili in modo automatico.
+1:19:27
+1 hour, 19 minutes, 27 seconds
+Va bene? Dai, io direi che abbiamo visto un po' la teoria di questi aspetti.
+1:19:31
+1 hour, 19 minutes, 31 seconds
+Mercoledì vediamo li vediamo un po' in pratica. Ovviamente se tutte le cose vanno bene limitatevi ai minimi quadrati, cioè non c'è motivo di
+1:19:40
+1 hour, 19 minutes, 40 seconds
+introdurre un modello più complicato quando invece funziona già bene. Quindi mercoledì ci vediamo, facciamo anche un po' di ripasso sulla regressione, quindi
+1:19:48
+1 hour, 19 minutes, 48 seconds
+per favore cercate di studiarvi anche un po' quest'ultima parte, così facciamo le solite domandine e insomma si fa un po' di ripasso insieme, non che diventi
+1:19:57
+1 hour, 19 minutes, 57 seconds
+un'altra ehm un'altra ora di lezione. Quindi ci vediamo mercoledì.
+1:20:06
+1 hour, 20 minutes, 6 seconds
+Eh, portate comunque il computer ecco, a questo punto diciamo parte mercoledì, vediamo questi comandi. Cominciate già a
+1:20:14
+1 hour, 20 minutes, 14 seconds
+pensare, anche se ho visto che solo 15 hanno caricato il il primo,
+1:20:21
+1 hour, 20 minutes, 21 seconds
+come si dice, il primo elaborato, il primo progettino. Pensate a trovarvi dei dataset per la regressione. Potete anche
+1:20:29
+1 hour, 20 minutes, 29 seconds
+riutilizzare il dataset che avete usato per la classificazione. Va bene?
+1:20:35
+1 hour, 20 minutes, 35 seconds
+La cosa importante è però che non vi scambiate i dataset tra di voi, ok? Se qualcuno si è trovato il suo dataset e dice "Ah, c'erano tantissime variabili",
+1:20:43
+1 hour, 20 minutes, 43 seconds
+potete anche riutilizzarlo. Va bene? Me lo dite quando fate il vostro report, mi dite "Questo è lo stesso che ho già usato la prima volta per la
+1:20:51
+1 hour, 20 minutes, 51 seconds
+classificazione", però per favore non scambiatevi dataset tra di voi, altrimenti diventa intracciabile la situazione. Ok? D'altra parte nel team
+1:20:59
+1 hour, 20 minutes, 59 seconds
+avete visto, tanti hanno dichiarato, no, le fonti, a quel punto potete andare lì, se vi piaceva qualcosa, magari c'è qualche dataset simile, non serve che
+1:21:07
+1 hour, 21 minutes, 7 seconds
+sia proprio lo stesso. Ok? Quindi pensate pure e iniziate anche a pensare, insomma, al dataset è un problema di
+1:21:15
+1 hour, 21 minutes, 15 seconds
+regressione. Ecco, come solito, cercate di introdurre una motivazione. Il mio obiettivo è spiegare il valore delle case, no, in base a queste altre
+1:21:23
+1 hour, 21 minutes, 23 seconds
+caratteristiche e abbiamo visto situazioni analoghe. Va bene, dai, fermiamoci qui.
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+78 watching
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+Mix
+My Mix
+Relja Lukic, Ezio Bosso, Kristen Bell and more
+4:43
+MENDELSSOHN Violin Concerto in D minor, Finale (Arr Baker)·  Black Dyke Band @jamconcert_uk
+JAM
+10k 3 wk ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+225k 13 hr ago
+New
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+2:13
+Rogue Robot Launches Kung Fu Kicks, While Handlers Attempt to Subdue It
+New York Post
+2.6m 2 mo ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+9:16
+Maiorino Imperdibile! Lancia un Affondo Durissimo Contro la Meloni e la Ridicolizza
+Attualità Politica
+70k 1 mo ago
+8:58
+Martha Argerich, il pianoforte raccontato dal violino - Via dei Matti n.0 del 15/01/2026
+Rai
+21k 8 mo ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+1:13:40
+Le tecniche del comporre - Alessandro Solbiati 09.05.2017
+Fondazione Collegio San Carlo
+30k 9 yr ago
+5:30
+Raimondo Vianello e la valletta ciociara (1968)
+pietromollo
+993k 7 yr ago
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+29:08
+Top 50 FUNNIEST Crashes from Red Bull Soapbox Race
+Red Bull Soapbox
+3.7m 3 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+8:03
+Don't Throw Away Your Old Computer Hard Drive 😱 Billions of People Don't Know This Secret
+Inventor 247
+467k 4 mo ago
+14:14
+Tracking Yuja Wang’s Heartbeats During Her Rachmaninoff Marathon | Carnegie Hall
+Carnegie Hall
+866k 2 yr ago
+4:13
+Pizzicar Galante - Giovanni Battista Gervasio - Sonata // Per Mandolino solo e Basso (Allegro)
+ahproductions
+54k 3 yr ago

@@ -1,0 +1,52 @@
+project:
+  type: book
+
+book:
+  title: "Statistica II — Introduzione alla Statistica Computazionale"
+  subtitle: "Note del corso (750AA)"
+  author: "Dario Trevisan"
+  date: last-modified
+  language: it
+  page-footer:
+    left: "Statistica II (750AA) — note del corso"
+    right: "Costruito con Quarto"
+  chapters:
+    - index.qmd
+    - 01-statistica-descrittiva-e-rischio-empirico.qmd
+    - 02-clustering.qmd
+    - 03-riduzione-dimensionalita-pca.qmd
+    - 04-classificazione-knn.qmd
+    - 05-bayes-naive-bayes-roc.qmd
+    - 06-regressione-knn-bias-varianza.qmd
+    - 07-regressione-lineare-multipla.qmd
+    - 08-collinearita-regolarizzazione.qmd
+    - 09-serie-storiche-decomposizione.qmd
+    - 10-serie-storiche-smoothing-esponenziale.qmd
+    - 11-serie-storiche-arima.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles/custom.scss]
+      dark: [darkly, styles/custom.scss]
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 7
+    fig-height: 4.5
+    fig-align: center
+    mainfont: "Georgia, serif"
+
+execute:
+  freeze: auto
+  warning: false
+  message: false
+
+knitr:
+  opts_chunk:
+    fig.retina: 2
+    dpi: 120

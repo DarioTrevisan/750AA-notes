@@ -1,0 +1,2276 @@
+
+IT
+750AA 2025 10 06 lezione 5
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+252 views  7 Oct 2025
+Riduzione della dimensionalità. Esempi di curse of dimensionality, definizione di varianza, matrice delle covarianze, correlazione, coefficiente di Pearson, componenti principali scores/punteggi, proprietà di covarianza (matrice dei loadings).
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:02
+2 seconds
+Bene, dunque muoviamoci verso la terza lezione di teoria, quindi numero tre, anche se
+0:11
+11 seconds
+abbiamo visto altre altre esercitazioni e l'obiettivo di oggi
+0:19
+19 seconds
+è di studiare tecniche di riduzione di dimensionalità e quindi vediamo qual è il problema.
+0:29
+29 seconds
+Qualcuno forse l'ha già già visto, comunque lo riprendiamo. C'è questo concetto di
+0:36
+36 seconds
+course of dimensionality, di insomma maledizione della dimensionalità.
+0:42
+42 seconds
+Poi cercheremo di capire, prenderemo un punto di vista lineare eh verso il problema, quindi sarà importantissimo il concetto di varianza e covarianza, se
+0:50
+50 seconds
+qualcuno non l'avesse mai visto lo defin lo definiamo.
+0:55
+55 seconds
+Lo definiamo nel caso campionario, poi torneremo parlando anche un attimo di variabili aleatorie e appunto la tecnica principale che
+1:03
+1 minute, 3 seconds
+vogliamo presentare è quella della analisi delle componenti principali. La PCA forse l'avete già vista m nel corsi
+1:11
+1 minute, 11 seconds
+di statistica uno non si fanno queste cose, quindi forse le avete viste in altre contesti. Una tecnica simile, cercheremo di mettere in chiaro qual è
+1:19
+1 minute, 19 seconds
+la differenza, è l'analisi fattoriale esplorativa.
+1:23
+1 minute, 23 seconds
+Sono tecniche che sono molto classiche, nascono un centinaio d'anni fa, anche di più, eh però insomma continuano a avere il loro valore.
+1:32
+1 minute, 32 seconds
+Allora, partiamo un po' dal problema, no? Il problema, qual è? Il problema della Curse of Dimensionality è che
+1:40
+1 minute, 40 seconds
+possiamo raccogliere dei campioni, diciamo, con n osservazioni, quindi taglia N. Quindi per ora n in tutto
+1:48
+1 minute, 48 seconds
+questo lezione, ma anche di solito indica la taglia del nostro campione, quanti individui, quante osservazioni
+1:54
+1 minute, 54 seconds
+abbiamo e poi però per ciascuna individuo abbiamo di caratteristiche, quindi abbiamo un vettore in RD di
+2:03
+2 minutes, 3 seconds
+caratteristiche di features per individuo e appunto le abbiamo organizzate, vi ricordate? macchina R organizziamo in
+2:11
+2 minutes, 11 seconds
+una tabella e cercherò di essere consistente. Qui abbiamo una tabella con n righe e di colonne come avete i data
+2:18
+2 minutes, 18 seconds
+frame di R. Ok? Questo è un po' noioso perché ad esempio se vedete gli appunti di romito e poi per alcune operazioni
+2:26
+2 minutes, 26 seconds
+siccome facciamo trasformazioni lineari vengono al contrario se le pensiamo così, però manteniamoci così siamo consistenti con quello che è accad, ok?
+2:34
+2 minutes, 34 seconds
+Quindi i vettori x delle osservazioni per ogni singolo individuo sono x con i e abbiamo di caratteristiche organizzate
+2:41
+2 minutes, 41 seconds
+come una riga. Ok? Allora, comunque, che cos'è la la course of dimensionality? Eh eh in realtà sono tanti problemi e
+2:50
+2 minutes, 50 seconds
+tendenzialmente sono tutti problemi che intervengono, che compaiono quando il numero di features è grande. Grande in
+2:58
+2 minutes, 58 seconds
+che senso? Beh, a volte grande rispetto c'è un altro parametro in gioco N. Ok?
+3:04
+3 minutes, 4 seconds
+Il numero di osservazioni, comunque pensiamo un po' qualitativamente grande, ok? Quindi abbiamo tante caratteristiche per ogni individuo e magari non troppi individui.
+3:17
+3 minutes, 17 seconds
+Ecco, quindi diciamo se abbiamo tante caratteristiche per ogni individuo, l'idea qual è? e che in queste
+3:24
+3 minutes, 24 seconds
+caratteristiche c'è dell'informazione, no, che dobbiamo in qualche modo estrarre da questi dati e quindi avendo tante tante caratteristiche la densità
+3:32
+3 minutes, 32 seconds
+di informazione per caratteristica va a diminuire, quindi è più difficile estrarre l'informazione da da tutte queste caratteristiche, ok? Quindi uno
+3:40
+3 minutes, 40 seconds
+può sembrare di fare meglio facendo tante caratteristiche, tante misure, ma poi in realtà quello che ottiene un sacco di rumore, no? Quindi il punto è
+3:49
+3 minutes, 49 seconds
+che dobbiamo distinguere il segnale che c'è in queste caratteristiche dal rumore, quello che non ci interessa per la nostra analisi o magari proprio
+3:57
+3 minutes, 57 seconds
+rumore casuale che non insomma non ha natura di è legato al modo in cui abbiamo misurato e così via. Beh, e
+4:03
+4 minutes, 3 seconds
+allora eh dobbiamo avere delle distanze, delle funzioni di loss, di perdita, di costo che tengono conto di questa possibilità, che ci sia rumore nei dati.
+4:14
+4 minutes, 14 seconds
+E il problema principale è che quando uno prende le funzioni di costo, ma anche quella Euclidea, ma quella Manattan, Minkovski generalizza, insomma
+4:22
+4 minutes, 22 seconds
+queste funzioni di costo abbastanza elementari tra per misurare la distanza tra due vettori, eh non sono molto affidabili, cioè non distinguono bene
+4:30
+4 minutes, 30 seconds
+tra segnale e rumore. trattano tutte le componenti allo stesso modo. Qualcuna potrebbe essere rumorosa, qualche qualcun altra meno rumorosa, ma alla
+4:39
+4 minutes, 39 seconds
+fine il rumore, se sono tante tante componenti, ciascuna un po' rumorosa, eh degenera, fa degenerare il nostro
+4:46
+4 minutes, 46 seconds
+segnale. Ok? Allora, vediamo un po' la spiegazione euristica di perché è questa. Perché se il vettore Xi,
+4:53
+4 minutes, 53 seconds
+no, è un vettore riga Xi, j, chiamiamo così, J,
+4:59
+4 minutes, 59 seconds
+e lo andiamo a confrontare con Y I che anche lui, facciamo ad esempio due
+5:06
+5 minutes, 6 seconds
+osservazioni, no? J da 1 a D e D è molto grande. Quando andiamo a fare la norma euclidea,
+5:15
+5 minutes, 15 seconds
+quindi facciamo la norma, facciamo la norma al quadrato del vettore, ok? Cos'è la distanza euclidea? Componente per componente, differenze, somme dei quadrati.
+5:25
+5 minutes, 25 seconds
+Somme dei quadrati x i j - y i j²
+5:33
+5 minutes, 33 seconds
+e sommiamo su j, no? da 1 a D sulle nostre componenti. Qui stiamo confrontando due individui diversi.
+5:39
+5 minutes, 39 seconds
+Allora, qual è il punto? Magari il segnale, facciamo una ristica, il segnale
+5:46
+5 minutes, 46 seconds
+è nelle prime oppure in non sappiamo se sono le prime, è in
+5:53
+5 minutes, 53 seconds
+Koni, magari non sappiamo quali, no? Di queste D sono K, quelli importanti, no? e le
+6:02
+6 minutes, 2 seconds
+altre è tutto rumore, ok? E però il rumore sono le rimanenti
+6:12
+6 minutes, 12 seconds
+e diciamo che c'è un rumore con una quello chiamerebbe intensità sigma quad, una insomma una varianza sigma qu.
+6:19
+6 minutes, 19 seconds
+Quindi cosa succede? Succede che il segnale viene nascosto, quindi la differenza tra le due, sì, c'è il segnale, diciamo la somma
+6:28
+6 minutes, 28 seconds
+sulle, chiamiamolo segnale, più quante volte il rumore sono,
+6:35
+6 minutes, 35 seconds
+diciamo, d - k sigma qu. Quindi se il segnale rimane qualcosa di finito dimensionale, di rilevante per noi, tipo
+6:44
+6 minutes, 44 seconds
+1 2 10 componenti, tutte le altre d potrebbe essere totalmente spazzatura, ma si vanno a sommare al segnale. Quindi
+6:51
+6 minutes, 51 seconds
+avete d - k sigma qu errori che che vi vanno a nascondere, invece qual è il vero segnale, quindi non riuscite più a distinguerlo. È una piccola fluttuazione
+6:59
+6 minutes, 59 seconds
+in un grosso errore. Ok? Eh, allora questo fenomeno, questa non è uristica, non è proprio la spiegazione del
+7:06
+7 minutes, 6 seconds
+fenomeno, però ci dice che, insomma, può accadere, insomma, adesso vediamo anche degli esempi concreti dove può accadere. Facciamo un esempio generato, va bene?
+7:15
+7 minutes, 15 seconds
+Poi se volete mercoledì oppure rigenerateveli con R. Generato, cosa vuol dire? Come abbiamo fatto l'altra volta con i campioni, no, fittizzi.
+7:24
+7 minutes, 24 seconds
+Facciamo così, mettiamo un dataset in cui c'è una prima componente che è -1 oppure 1. Che so, facciamo metà
+7:30
+7 minutes, 30 seconds
+componenti sono -1, metà 1. Questa sarebbe perfetta per i clustering. Dice questa qui già mi distingue bene e poi
+7:37
+7 minutes, 37 seconds
+ho altre caratteristiche, ma immaginate che nel clustering avete già delle classi prefatte per qualcuno vi dà e
+7:44
+7 minutes, 44 seconds
+potete usarle, sono sensate. Però le altre D -1 componenti sono tutte rumore casuale e possiamo fare R norm o R
+7:53
+7 minutes, 53 seconds
+uniforme, insomma, lo generiamo anche non troppo intenso, tipo - 1/2, non so.
+7:57
+7 minutes, 57 seconds
+Quindi è è meno, cioè si vede subito, insomma, sono valori che non sono mai 1 -1, sono due valori un po' più piccoli, 3 -1 3 - 1/2.
+8:08
+8 minutes, 8 seconds
+Eh, cosa succede? Facciamo il clustering con K means qui. Qui andiamo a confrontare le distanze e in teoria c'è
+8:16
+8 minutes, 16 seconds
+la prima distanza che sarà zero se sono nella stessa classe oppure due, no? se sono nel in classi diverse, facciamo la
+8:24
+8 minutes, 24 seconds
+differenza e però ci sono tutto quel resto di rumore, quindi segnale sarebbe 02, benissimo perché mes sarebbe perfetto, ma tutto il resto invece sono quantità rumorose che vanno a oscurarlo.
+8:35
+8 minutes, 35 seconds
+Allora, vediamo cosa succede. Andiamo a fare una tabella di di contingenza.
+8:40
+8 minutes, 40 seconds
+Andiamo a vedere le frequenze, cioè quante volte ci azzecchiamo con la classe giusta, ok? usiamo K means quasi come un in classificatore.
+8:48
+8 minutes, 48 seconds
+Eh, allora vediamo cosa succede. Questi sono i risultati proprio concreti generati. Allora, se abbiamo n osservazioni
+8:56
+8 minutes, 56 seconds
+e dimensione d = 10, quindi 10 osservazioni e ciascuno vettori 10, quindi un vettore una matrice quadrata
+9:04
+9 minutes, 4 seconds
+10 * 10. In effetti vedete che individua esattamente questoo le classi originarie, questi sono i cluster individuati, c' azzecca 100%, insomma K
+9:13
+9 minutes, 13 seconds
+means funziona bene, riconosce che c'è una buona componente dove sono ben separati e gli altri invece è rumore.
+9:21
+9 minutes, 21 seconds
+Cosa succede se però adesso manteniamo 10 individui e 100 osservazioni? Quindi significa che c'è sempre quel segnale lì, ma ci sono 99 segnali rumorosi.
+9:31
+9 minutes, 31 seconds
+Vedete che Keinzo comincia un pochino, insomma, ha comunque ho individuato sono 10 individui, eh, non è che siano,
+9:38
+9 minutes, 38 seconds
+scusate, n = 10 * 2, eh, sono 20 in tutto, 10 + 1 e 10 - 1 sono
+9:47
+9 minutes, 47 seconds
+20 individui. E comunque vedete 8 e 7 sono classificati insieme e altri due tre, quindi ci sono degli errori.
+9:56
+9 minutes, 56 seconds
+Cosa succede se però prendo 1000, no, sto esagerando, eh, 1000 componenti, quindi 999 componenti
+10:04
+10 minutes, 4 seconds
+rumorose, una componente di segnale e sempre 20 individui da classificare.
+10:09
+10 minutes, 9 seconds
+Vedete, ha fatto praticamente 50 e 50, insomma, non riesce più a distinguere chi sta in una classe e chi nell'altra.
+10:16
+10 minutes, 16 seconds
+Ok, quindi vedete il insomma anche Kines, ma in realtà tutti quelli basati sulla
+10:24
+10 minutes, 24 seconds
+distanza, tutte le costruzioni che uno fa basate sull'idea che punti vicini devono avere distanze simili risentono
+10:32
+10 minutes, 32 seconds
+di questo problema. Se la distanza è affetta da tanto rumore, eh non se le nostre caratteristiche sono rumorose, l'algoritmo degenera, si peggiora.
+10:42
+10 minutes, 42 seconds
+E quali sono gli esempi concreti, molto semplici, che hanno dimensionalità elevata? Sono quelli, ad esempio, delle immagini. Però le immagini hanno molte strutture, si riesce a trattarle bene.
+10:53
+10 minutes, 53 seconds
+Altri esempi con dimensionalità elevata, beh, ci possono essere le serie storiche oppure di di multidimensionali
+11:02
+11 minutes, 2 seconds
+oppure anche esempi della biologia. Ora, tipicamente, insomma, dagli esempi industriali non vorrei dire, insomma, mi
+11:10
+11 minutes, 10 seconds
+sembra che la questo problema della dimensionalità elevata non sia un molto presente, però comunque vedremo che abbattere la dimensionalità è sempre
+11:18
+11 minutes, 18 seconds
+utile. Allora, vediamo un esempio in dimensione molto alta. C'è questo dataset Mnist.
+11:26
+11 minutes, 26 seconds
+Allora, questo è un dataset di immagini, è tradizionale, ormai un classico del machine learning e più che della statistica, un po' come Iris, però per
+11:33
+11 minutes, 33 seconds
+il machine learning. Questo. Allora, cosa dice MNIST? Cosa contiene? Sono immagini di cifre scritte a mano.
+11:41
+11 minutes, 41 seconds
+Allora, immagini, sapete, immagini sono pixel, cioè sono dei pixel e ciascun pixel è in scala di grigio, quindi un valore da 0 a 255,
+11:50
+11 minutes, 50 seconds
+quindi 256 eh possibilità.
+11:53
+11 minutes, 53 seconds
+E però quanti sono i pixel? Beh, sono immagini molto piccole, molto sgranate, ora le vediamo. Sono 28* 28 dei quadratini molto piccoli, quindi 784
+12:03
+12 minutes, 3 seconds
+pixel. Qui in effetti questa è la nostra dimensione D 784.
+12:08
+12 minutes, 8 seconds
+Ok? Però capite? Sono già delle immagine. Ora le vediamo. E la cosa interessante è che ciascuna immagine
+12:15
+12 minutes, 15 seconds
+mostra effettivamente la una cifra. Voi in effetti se andate sul dataset già classificato, avete una componente in
+12:23
+12 minutes, 23 seconds
+più che indica la cifra effettivamente scritta. Quindi, se volete, c'è anche il segnale, ho fatto adesso facciamo la stessa cosa che abbiamo fatto sul
+12:31
+12 minutes, 31 seconds
+dataset generato su questo MNIST che ha pure il segnale in cui c'è scritta la cifra effettiva. Beh, allora questo è un esempio delle cifre, cioè vedete sono
+12:40
+12 minutes, 40 seconds
+molto sgranate, non è il proiettore, sono cifre, però bene o male si riconosce quali sono le cifre scritte,
+12:47
+12 minutes, 47 seconds
+se non magari qualcosa di strano, tipo quel cinque lì, insomma, a quanto pare, però 96, insomma, si si riconoscono, ok?
+12:54
+12 minutes, 54 seconds
+Quindi, immaginate, c'è del segnale nell'immagine, ma c'è in realtà un segnale in un singolo pixel, però sono di dimensione molto grande, sono 784 785 se aggiungiamo anche quel pixel.
+13:06
+13 minutes, 6 seconds
+Cosa succede se facciamo il clustering con K means? È un po' simile a quello del dataset generato, un po' meno peggio
+13:13
+13 minutes, 13 seconds
+perché comunque c'è il segnale anche in quei pixel dell'immagine, ma noi stiamo prendendo pixel per pixel, lo trattiamo
+13:20
+13 minutes, 20 seconds
+come un numero, facciamo le differenze tra le due immagini, se volete e andiamo a fare la distanza. Ok? Allora, vediamo
+13:28
+13 minutes, 28 seconds
+un po'. Non ho preso il dataset completo perché è molto grande. Se fate col dataset completo n il numero di individui è molto grande,
+13:36
+13 minutes, 36 seconds
+quindi non siete più in un regime di dimensionalità elevata, se volete non è molto grande relativo a D. Ok? Quindi faccio una cosa molto più semplice.
+13:45
+13 minutes, 45 seconds
+Prendo 100 immagini, comunque più di quello che avevamo fatto prima nel dataset generato, che erano 10 immagini,
+13:52
+13 minutes, 52 seconds
+quindi 100 immagini della cifra 7 e 100 immagini della cifra 5.
+13:58
+13 minutes, 58 seconds
+Allora, qui è un po' scelto ad hoc, è un po' cherry picking volendo, perché sono abbastanza simili 7 e 5. C'è sempre la
+14:06
+14 minutes, 6 seconds
+la sbarra orizzontale in alto. Insomma, insomma, il segno un po' simile. Se fate 100 immagini di 0 e 100 immagini di 1,
+14:13
+14 minutes, 13 seconds
+questo fenomeno non lo vedete, però vedete cosa succede? Che Mist e e K
+14:20
+14 minutes, 20 seconds
+means non ci azzecca completamente. O meglio, vedete, nei cluster individuati
+14:25
+14 minutes, 25 seconds
+c'è un cluster che contiene sia 7 che 5 e però ce ne sono tipo un 20% di di
+14:34
+14 minutes, 34 seconds
+cinque che sono finiti nel cluster di 7 e poi un cluster di puri cinque. Ok?
+14:40
+14 minutes, 40 seconds
+Quindi ha interpretato una un 20% di quei 5 li ha messi nel 7. Ora direte 20%. Beh, 20% se pensate un sistema che
+14:47
+14 minutes, 47 seconds
+deve riconoscere le cifre automaticamente sbaglia il 20% delle volte non è un granché, eh. Ok. Però K means quindi non è un buon algoritmo, se
+14:57
+14 minutes, 57 seconds
+volete, per fare clustering su Mnist, almeno su su questa coppia di cifre 57.
+15:02
+15 minutes, 2 seconds
+Ok? E tenete presente che ho preso c'era anche il Pixel con il con la cifra 5 7, però non è non è riuscito, cioè si è perso in tutto quel in quel rumore.
+15:13
+15 minutes, 13 seconds
+Ok, è chiaro questo?
+15:15
+15 minutes, 15 seconds
+E vediamo solo per curiosità i centri, vi ricordate? Emmenist, nonist produce dei centri, no? che sono i
+15:23
+15 minutes, 23 seconds
+centri del i centroidi del nostro dei singoli cluster. Allora, in effetti i centri sono eh sono anche loro delle
+15:32
+15 minutes, 32 seconds
+immagini volendo perché hanno dimensione giusta 784 e quindi la spezziamo in 28x 28 e possiamo fare un plot. Questo è per
+15:41
+15 minutes, 41 seconds
+mostrarvi che effettivamente Kans ha imparato i centri delle immagini e somigliano un pochino. Uno a un cinque e l'altro è un sette, però non è proprio
+15:48
+15 minutes, 48 seconds
+bellissimo perché è un po' più sfumato, no? Ok? Quindi alcuni alcuni cinque vengono assegnati al cluster di là, quello del set,
+15:57
+15 minutes, 57 seconds
+va bene? E sono effettivamente delle cifre medie. Va bene?
+16:03
+16 minutes, 3 seconds
+Allora, adesso vogliamo affrontare questo problema. Ora, non tanto dicevo necessariamente per abbattere la dimensionalità delle immagini, perché sono dataset che hanno che hanno poi
+16:11
+16 minutes, 11 seconds
+delle tecniche apposite, però in generale uno si può porre il problema, ho che so una ventina di feature e voglio ridurle a due tre perché voglio
+16:19
+16 minutes, 19 seconds
+capire se ci sono poche caratteristiche interessanti e questo e questo mi permetterà anche magari di interpretarle, ok? ci poniamo più
+16:27
+16 minutes, 27 seconds
+nell'ottica di interpretare eh le dimensioni ristrette, ridotte, partendo da un dataset di dimensioni invece più grandi che comunque noi facciamo fatica
+16:35
+16 minutes, 35 seconds
+a interpretare. Allora, per fare questo, il punto di partenza, visto che faremo argomenti di tipo lineare, è quello di
+16:44
+16 minutes, 44 seconds
+partire dalla varianza. Ok? Allora, richiamo cos'è la varianza campionaria, ma già ve lo ricordate, no? Quindi
+16:51
+16 minutes, 51 seconds
+partiamo da un campione univariato, quindi d = 1, quindi n osservazioni, n individui, taglia n, però una singola
+16:59
+16 minutes, 59 seconds
+caratteristica. E vi ricordate la varianza campionaria, forse la cosa più noiosa da ricordarsi è quell' 1 su n -
+17:06
+17 minutes, 6 seconds
+1. Vabbè, però chiamiamolo, prendiamolo così per com'è. e 1 su n - 1 avete la somma della differenza tra la
+17:15
+17 minutes, 15 seconds
+caratteristica xi e la media campionaria, che la media campionaria non l'ho ribadut ribadita, è la media e il centro, se volete, il la media
+17:24
+17 minutes, 24 seconds
+aritmetica delle osservazioni e la differenza l'è elevata al quadrato, eh, attenti. E la deviazione standard invece la radice della varianza campionaria.
+17:34
+17 minutes, 34 seconds
+Ora userò queste lettere VAR e SD di X perché sono gli stessi comandi che dati in R, ok? Così ve li ricordate anche.
+17:43
+17 minutes, 43 seconds
+Ora avevamo già visto prima lezione che la media campionaria che appunto ho ricordato qui è minimizza l'errore quadratico medio. Quindi tra tutte le h
+17:52
+17 minutes, 52 seconds
+i numeri che potete scegliere, se misurate una loss, una perdita, un rischio, che è la somma dei quadrati, delle differenze tra le osservazioni e
+18:00
+18 minutes
+h, eh, allora la media campionaria è il meglio che potete fare ed effettivamente il rischio minimo risulta n - 1 cesso
+18:09
+18 minutes, 9 seconds
+fattore la varianza di x. Ecco, questo risolve il caso unidimensionale, però abbiamo detto come si fa a estendere ora
+18:17
+18 minutes, 17 seconds
+il concetto di varianza a caso multivariato?
+18:20
+18 minutes, 20 seconds
+Perché di media ne abbiamo già parlato e anche di centroide, no? Abbiamo parlato di centroide, medoide anche per costi
+18:27
+18 minutes, 27 seconds
+generali e però in effetti la varianza ha altre proprietà piacevoli, diciamo, che è legato al fatto che è quadratica,
+18:36
+18 minutes, 36 seconds
+quindi magari è qualcosa di speciale rispetto agli altri rischi che possiamo inserire. Ecco, allora, quindi supponiamo adesso che le osservazioni siano di dimensionali, quindi di caratteristiche.
+18:47
+18 minutes, 47 seconds
+E un punto di partenza iniziale che potete fare anche con altre funzioni di di perdita di di costo è di dire beh,
+18:54
+18 minutes, 54 seconds
+prendo una direzione, fisso una direzione V, chiamiamola V, faccio una proiezione,
+19:02
+19 minutes, 2 seconds
+cosa intendo? Ciascuna componente X con I faccio il prodotto scalare con V, ok?
+19:08
+19 minutes, 8 seconds
+Quindi vado a vedere soltanto lungo quella direzione cosa vedo. Che so, potrebbero essere le direzioni della base canonica. La base canonica a volte
+19:16
+19 minutes, 16 seconds
+la indico con e con 1, esempio e con 1 che è la direzione 1
+19:23
+19 minutes, 23 seconds
+no? Allora, quando fate il prodotto scalare Xi e con 1, prendete soltanto Xi1, la prima componente, ok? Quindi
+19:33
+19 minutes, 33 seconds
+avete queste Drezioni canoniche, no, sulla base ortogonale standard di RD, però potete prendere anche altre
+19:41
+19 minutes, 41 seconds
+direzioni. Uno dice magari questa direzione è più interessante che sono la combinazione di due vettori della base.
+19:48
+19 minutes, 48 seconds
+Ecco, allora prese queste direzioni potete fare il prodotto scalare. Notate che piccola osservazione perché magari
+19:55
+19 minutes, 55 seconds
+vi perdete. Xi è un vettore riga, V è un vettore già colonna, quindi le direzioni le penso come vettori colonna e questo è
+20:03
+20 minutes, 3 seconds
+già un prodotto scalare, non serve mettere puntini o bracket. Se se vi piace indicatelo come un puntino, così vi ricordate che è prodotto scalare.
+20:11
+20 minutes, 11 seconds
+Ok? E però in effetti componente per componente andate a fare riga per riga andate a fare questi prodotti scalari. È
+20:18
+20 minutes, 18 seconds
+come prendere la matrice X e fare il prodotto con il vettore a destra. Ok?
+20:24
+20 minutes, 24 seconds
+Questa è la cosa forse più noiosa, ma ora vedremo che i prodotti vanno a destra perché le osservazioni sono delle righe e quindi diciamo proiettiamo
+20:32
+20 minutes, 32 seconds
+ciascun individuo su quella direzione e avremo quindi n scalari, quindi un vettore Rn e a quel punto possiamo dire
+20:40
+20 minutes, 40 seconds
+che la varianza lungo quella direzione è la varianza unidimensionale però di quelle osservazioni. Ok? Come facciamo a
+20:48
+20 minutes, 48 seconds
+scriverla per bene? Facciamo varianza di XV, è 1 su n - 1, va bene la somma.
+20:54
+20 minutes, 54 seconds
+Avete le singole osservazioni lungo quella componente. Potrebbero essere le componenti della base canonica, ma fissate quella. E poi la media
+21:03
+21 minutes, 3 seconds
+campionaria. Dovete togliere la media campionaria.
+21:07
+21 minutes, 7 seconds
+Togliamo la media campionaria lungo quella componente e leviamo al quadrato.
+21:11
+21 minutes, 11 seconds
+Ok? abbiamo questi numeri, la varianza direzionale. Fissate una direzione avete questi numeri. Eh, allora facciamo l'osservazione prima sulla media.
+21:21
+21 minutes, 21 seconds
+Vediamo cosa succede per la media, che è la media XV barrat. Fate la somma su tutte le osservazioni.
+21:30
+21 minutes, 30 seconds
+C'è anche l'uno su N. X con i V.
+21:36
+21 minutes, 36 seconds
+Ok? Adesso qual è il punto? che x con i è un vettore e anche v un vettore, ma cioè è associativo il prodotto di vettori,
+21:44
+21 minutes, 44 seconds
+quindi potete raccogliere 1 su n somma dell x con i, sono operazioni lineari, raccogliamo e facciamo il prodotto con scalare con v.
+21:55
+21 minutes, 55 seconds
+Cosa significa? che abbiamo fatto il vettore, il centro centroide
+22:03
+22 minutes, 3 seconds
+centro centroide per V. Quindi almeno la media la media campionaria è facile, cioè se io sono una direzione posso fare
+22:10
+22 minutes, 10 seconds
+la media delle varie componenti, se mi interessa la media lungo quella direzione faccio il prodotto a scalare tra la media e il vettore che mi
+22:17
+22 minutes, 17 seconds
+interessa della direzione. Cosa succede per la varianza? L'espressione qui in alto è un po' più complicata.
+22:23
+22 minutes, 23 seconds
+Eh, facciamola qui sopra. Qui ho dimenticato un pezzo, corregete. Qua c'è XV. Mh, che abbiamo appena visto. Cosa
+22:30
+22 minutes, 30 seconds
+succede invece per la varianza? Eh, per la varianza c'è questa regola, è quadratica. Vediamo in che senso è quadrata. Esce fuori V sia a destra che a sinistra. Ok, ora vediamo come mai.
+22:43
+22 minutes, 43 seconds
+Ora la varianza di XV.
+22:47
+22 minutes, 47 seconds
+Eh, fatemi mettere n - 1 qui, così non me lo porto dietro tutto il tempo, sennò dividete per n - 1. Allora, cos'è la
+22:55
+22 minutes, 55 seconds
+somma su tutte le osservazioni? Dobbiamo fare x con i v meno la media campionaria
+23:02
+23 minutes, 2 seconds
+che però ho detto che è x bar v eleviamo al quadrato. Ok?
+23:09
+23 minutes, 9 seconds
+Eh, allora sviluppiamo un pochino cosa c'è qui. C'è x con e v
+23:17
+23 minutes, 17 seconds
+al quadrato, no? Poi c'è un - x² v al quadrato
+23:26
+23 minutes, 26 seconds
+o con un più, no? Poi avete men e poi avete x con i v che è un numero x v e
+23:35
+23 minutes, 35 seconds
+poi x bar v x con i v, quindi -2 volte questo, no?
+23:41
+23 minutes, 41 seconds
+Ok? Avete tutte queste espressioni, sviluppate un quadrato, niente di Ok? Adesso eh vediamo un po' cosa succede.
+23:48
+23 minutes, 48 seconds
+Cioè x con i v^li riscriverlo in modo in cui, insomma, si capisca che c'è V. Come dicevo, voglio V a destra e V a
+23:56
+23 minutes, 56 seconds
+sinistra. Allora, come posso fare? Uso questo trucchetto, se volete, insomma, lo scrivo così, come x con i v trasposto X con Iv.
+24:09
+24 minutes, 9 seconds
+Vi ricordate cosa vuol dire trasposto?
+24:11
+24 minutes, 11 seconds
+Trasporre. Avete una matrice, non scambiate righe e colonne, no? Allora, se quello è uno scalare, scambiare righe e colonne non cambia niente. Cioè sempre
+24:20
+24 minutes, 20 seconds
+x con i v è pronto a scalare, quindi è un numero trasporlo non cambia niente, però vi ricordate quando fate la trasposizione si scambiano e fate
+24:28
+24 minutes, 28 seconds
+prodotti si scambia l'ordine. Questa l'avete vista il corso di algebra, speriamo che ve li ricordiate. Quindi ha
+24:35
+24 minutes, 35 seconds
+ve la ricordo qui ha trasposto IJ per una matrice qualsiasi è AJ I. E quando fate a B trasposto, per come vanno le
+24:44
+24 minutes, 44 seconds
+regole, insomma, è B trasposto a trasposto. Quindi cambiate l'ordine delle cose. Qui è importante avere un
+24:52
+24 minutes, 52 seconds
+po' di familiarità con con le matrici e la trasposizione e vedremo anche il teorema spettrale adesso, però, quindi usiamo questa regola. Allora, avete V
+25:00
+25 minutes
+trasposto, X con I trasposto e X con I, va bene? V, attenti, X con I trasposto X con I.
+25:10
+25 minutes, 10 seconds
+Allora, x con i è una riga, se lo trasponete diventa una colonna. Quindi questa è una matrice,
+25:18
+25 minutes, 18 seconds
+se fate i conti, è una matrice D * D, ok? Perché X con i una riga, quindi la la trasponiamo diventa una colonna,
+25:26
+25 minutes, 26 seconds
+quindi è d * 1, quell'altra era 1 * d e diventa d * d. Quindi questa è una bella matrice d * d e ora bisogna fare lo stesso conto su questi altri termini.
+25:35
+25 minutes, 35 seconds
+Eh, anche questo lo scriviamo come trasposto eh per se stesso e e pure qui va bene, non vi annoio perché un po'
+25:42
+25 minutes, 42 seconds
+troppi troppi conti, però alla fine cosa troviamo? è la stessa operazione.
+25:47
+25 minutes, 47 seconds
+Abbiamo somme da 1 a n. V trasposto X con I trasposto X con E
+25:55
+25 minutes, 55 seconds
+meno poi abbiamo X bar eh, scusate sempre V trasposto se non lo raccolgo.
+26:02
+26 minutes, 2 seconds
+Avete X bar trasposto X bar c'è un altro V anche qui, eh,
+26:10
+26 minutes, 10 seconds
+insomma, avete quattro e quest'altro -2 volte.
+26:13
+26 minutes, 13 seconds
+Scriviamolo, scriviamolo in modo diverso. Questo 2 lo scrivo come V trasposto X con D trasposto X V - V
+26:22
+26 minutes, 22 seconds
+trasposto X bar trasposto X con. Ok? Dovete farlo per tutti i termini.
+26:30
+26 minutes, 30 seconds
+Anche lì potete scegliere quale dei due trasporre. Ora vabbè, è un po' algebrica sta cosa, però alla fine cosa si trova?
+26:37
+26 minutes, 37 seconds
+si trova che c'è un V trasposto che moltiplica che possiamo raccogliere e anche un V che possiamo raccogliere, tanto è associativa. Quindi in effetti
+26:46
+26 minutes, 46 seconds
+possiamo scrivere questa cosa come V trasposto qualcosa che chiamiamo varianza di X. Ora vediamo cos'è per V.
+26:55
+26 minutes, 55 seconds
+Ok? Quindi si tratta di raccogliere Allora, abbiamo un'espressione e forse c'è un n - 1 perché non ho non
+27:03
+27 minutes, 3 seconds
+ho ottenuto l' n - 1. Ok? Qui abbiamo un'espressione quadratica, quindi in effetti l'algebra ci dice che possiamo scriverla come V trasposto una matrice
+27:12
+27 minutes, 12 seconds
+D* D perché queste sono tutte matrici d* D, quelle che avete lì dentro e un altro vettore V. Allora, vediamo com'è fatta per bene sta matrice.
+27:21
+27 minutes, 21 seconds
+La matrice varianza di X non la chiamiamo varianza di X, la chiamiamo matrice delle covarianze di X.
+27:29
+27 minutes, 29 seconds
+Ok?
+27:30
+27 minutes, 30 seconds
+difficilmente, cioè il comando in R è var di X, però insomma il lessico insomma il linguaggio in italiano è
+27:39
+27 minutes, 39 seconds
+matrice delle covarianze, ok? Anche covariance matrix anche in inglese, ok?
+27:43
+27 minutes, 43 seconds
+Quindi la chiamiamo matrice delle covarianze campionarie.
+27:47
+27 minutes, 47 seconds
+Allora, quindi raccogliendo per bene i termini viene fuori che c'è un'espressione molto simile a quella che avreste nel caso univariato. Allora,
+27:53
+27 minutes, 53 seconds
+dovete fare 1 su n - 1, la somma su tutti gli individui e ora però vedete x
+28:00
+28 minutes
+con i è questo vettore riga. dovete sottrarre al vettore riga la media campionaria, un altro vettore riga e ora
+28:08
+28 minutes, 8 seconds
+dovete moltiplicarlo, cioè dovremmo fare il quadrato. Attenti che si può fare il quadrato in due modi. O si fa il prodotto scalare o si fa appunto questo
+28:15
+28 minutes, 15 seconds
+prodotto, se volete un prodotto esterno si può chiamare così. Avete trasposto e x con. Attenti che vi dà una matrice
+28:22
+28 minutes, 22 seconds
+questa, eh, perché per come è impostata la cosa x con è un vettore, quindi trasponendo diventa un vettore colonna e
+28:29
+28 minutes, 29 seconds
+poi l'altro vettore riga, quindi è una matrice D per D, poi la vediamo concretamente, ma è più facile farla
+28:36
+28 minutes, 36 seconds
+calcolare al computer che calcolarla noi. Ok? Allora, che proprietà ha questa matrice? Questa matrice ci permette di scrivere la varianza lungo una qualsiasi
+28:44
+28 minutes, 44 seconds
+direzione come eh V trasposto della direzione V che abbiamo scelto, matrice delle var delle covarianze e V. È quella
+28:53
+28 minutes, 53 seconds
+che si chiama in gergo una forma quadratica. In in geometria si chiama così. Allora, quindi è una matrice.
+28:59
+28 minutes, 59 seconds
+Bene, possiamo dire qualcosa di più di questa matrice?
+29:02
+29 minutes, 2 seconds
+Vediamo un po'. È una matrice quadrata, abbiamo detto, perché nasce dalla somma di tutte queste matrici d* d. Quindi la
+29:11
+29 minutes, 11 seconds
+taglia è D* D e D caratteristiche che avete. È una matrice simmetrica, quindi in effetti cos'è? Vuol dire che
+29:18
+29 minutes, 18 seconds
+la sua trasposta è se stessa. Cioè, se prendete lei e trasponete, scambiate righe e colonne,
+29:25
+29 minutes, 25 seconds
+avete la matrice originaria. Come si fa a vedere questo fatto? Ciascuno di quegli addendi, vedete, è scritto come x
+29:34
+29 minutes, 34 seconds
+con i - x bar trasposto per se stesso, no? Quindi ciascuno di questi, se trasponete,
+29:41
+29 minutes, 41 seconds
+se traspongo, quando trasponete dovete scambiare l'ordine e però applicare il trasporto.
+29:49
+29 minutes, 49 seconds
+Il trasposto. Quindi se scambiate l'ordine, quello che è senza trasposto finisce a sinistra e si piglia trasposto e quello a destra ha due volte
+29:56
+29 minutes, 56 seconds
+trasposto, ma fare trasposto e trasposto vi lascia al vettore originario. Quindi, in effetti se traspongo rimane se stesso, rimane uguale.
+30:06
+30 minutes, 6 seconds
+Qui infatti viene fuori, poi lo vediamo nei nei dati che sono matrici simmetriche. Va bene. C'è un'altra
+30:12
+30 minutes, 12 seconds
+proprietà importante da elencare? Sì, questa è importantissima. È una matrice semidefinita positiva. Vi ricordate cosa vuol dire semidefinita positiva?
+30:24
+30 minutes, 24 seconds
+No. Perfetto, adesso lo richiamiamo.
+30:27
+30 minutes, 27 seconds
+Ma vedrete che è molto facile. Allora, una matrice semidefinita positiva, simmetrica, quindi prendiamola già simmetrica.
+30:36
+30 minutes, 36 seconds
+Se vale questo per ogni V, prendete un V qualsiasi,
+30:44
+30 minutes, 44 seconds
+fate questa espressione V trasposto M, chiamiamola Mattice V. Allora questa
+30:51
+30 minutes, 51 seconds
+espressione viene maggiore o uguale di 0. Quindi fate non il proto scalare di V classico ma fate prima ci mettete la
+30:59
+30 minutes, 59 seconds
+matrice M, applicate M a V e fate il prodotto scalare con V. Allora, se questa espressione viene positiva per tutti i V, dite che quella matrice è semidefinita positiva.
+31:11
+31 minutes, 11 seconds
+Beh, allora perché è nel nostro caso è quindi m ora ci mettiamo varianza di di x, eh varianza di x perché viene
+31:18
+31 minutes, 18 seconds
+positiva? Beh, perché torniamo un attimo indietro, cos'era questa espressione?
+31:22
+31 minutes, 22 seconds
+Questa espressione qui è quella che avevamo qui, che è quella che abbiamo detto che è la varianza di x lungo quella direzione, ma la varianza è
+31:31
+31 minutes, 31 seconds
+sempre è sempre alla peggio è zero, ma comunque sempre non negativa, sempre positiva. Ok? Nella realtà viene sempre strettamente positiva, a meno che non
+31:39
+31 minutes, 39 seconds
+abbiate qualche ridondanza, qualche identità strana. Ok? Quindi questa effettivamente
+31:46
+31 minutes, 46 seconds
+rispetta le richieste che si fanno alle matrici semidefinite positive. Ok?
+31:52
+31 minutes, 52 seconds
+attenti che non vuol dire, per chi non si ricorda, non vuol dire che le componenti sono tutte positive, eh, le
+31:59
+31 minutes, 59 seconds
+componenti di questa matrice potrebbero essere anche negative, alcune. Ok?
+32:05
+32 minutes, 5 seconds
+Questo vuol dire invece precisamente questa condizione qui, quindi che è un po' diverso da chiedere che tutte le componenti siano positive. Ok?
+32:15
+32 minutes, 15 seconds
+Ecco, va bene. Allora, questa è una bella matrice. Ora, perché si chiama delle covarianze? Perché se uno va a vedere le componenti,
+32:23
+32 minutes, 23 seconds
+chiama le componenti che appunto possono essere positive o negative, le componenti le chiamiamo covarianze.
+32:28
+32 minutes, 28 seconds
+Quindi fissiamo una coppia di indici, no? I chiamiamole J ed L perché I lo tengo per gli individui. Allora, J.
+32:38
+32 minutes, 38 seconds
+Prendiamo una coppia di indici, facciamo la riga J, colonna L. Andiamo a vedere la componente di questa matrice. Allora,
+32:46
+32 minutes, 46 seconds
+cosa dobbiamo fare? Eh, bisogna tornare a quell'espressione e vedere cosa ci dà.
+32:50
+32 minutes, 50 seconds
+Allora, quell'espressione, se andiamo a prendere esattamente la riga J e la colonna L, troviamo 1 su n - 1, la somma
+32:59
+32 minutes, 59 seconds
+su tutti gli individui e poi abbiamo quel prodotto quel prodotto esterno, quel x trasposto X diventa la componente
+33:09
+33 minutes, 9 seconds
+J dell'osservazione I, dell'individuo I meno la media delle componenti J.
+33:18
+33 minutes, 18 seconds
+per la componente L del sempre dello stesso individuo I meno la media delle componente L. Quindi è una specie di
+33:25
+33 minutes, 25 seconds
+varianza, però invece di fare i quadrati andiamo a confrontare le osservazioni diverse, le feature diverse, la feature J contro la feature L, ok? Le
+33:34
+33 minutes, 34 seconds
+caratteristiche ed è per questo che può venire negativa, ok? Magari in queste situazioni quei termini avranno il loro segno, non ho che non sto facendo dei
+33:43
+33 minutes, 43 seconds
+quadrati, magari avranno dei segni e vedremo gli esempi in cui vengono negative.
+33:48
+33 minutes, 48 seconds
+Anzi, se è negativa, diciamo che la la caratteristica J, la feature J e la feature L sono negativamente correlate.
+33:56
+33 minutes, 56 seconds
+Se invece viene positiva, le chiamiamo positivamente correlate. Se viene proprio zero o diciamo è quasi zero, diciamo che sono non correlate.
+34:06
+34 minutes, 6 seconds
+Va bene? E allora più in generale, in effetti, siccome cioè queste sono direzioni speciali quelle della base iniziale,
+34:14
+34 minutes, 14 seconds
+magari possiamo avere bisogno di scegliere direzioni che sono un po' storte rispetto alla base iniziale. E allora cosa possiamo definire? Guardate,
+34:22
+34 minutes, 22 seconds
+non ci vuole molto perché uno dice, presa una coppia di di direzioni V e W,
+34:29
+34 minutes, 29 seconds
+facciamo la covarianza dei dati proiettati lungo V contro quelli proiettati su W. Quindi la chiamiamo
+34:36
+34 minutes, 36 seconds
+così, COV, che è lo stesso simbolo che avete in R, poi vedremo, tra le osservazioni XV e Xw. Quindi potrebbero
+34:44
+34 minutes, 44 seconds
+essere anche le osservazioni eh componente J e componente L, ma potrebbero essere anche altre direzioni.
+34:50
+34 minutes, 50 seconds
+Vedremo che ci vuole questa flessibilità adesso. Allora, cosa risulta? Beh, in effetti risulta che si tratta di prendere l'espressione che avevamo
+34:58
+34 minutes, 58 seconds
+prima, che era V trasposto varianza V e stavolta invece abbiamo v trasposto varianza di X W. Ok? questa questa
+35:06
+35 minutes, 6 seconds
+espressione, se prendete i vettori della base, prendete il vettore jesimo della base canonica e il vettore limo della
+35:15
+35 minutes, 15 seconds
+base canonica, questa espressione vi dà proprio la componente JL della matrice, ok? Quindi è un'estensione del di
+35:22
+35 minutes, 22 seconds
+prendere le componenti della matrice, questa idea, ok? Quindi questa si chiama covarianza, più in generale tra appunto
+35:30
+35 minutes, 30 seconds
+una coppia di di direzioni di di proiezioni lungo direzioni.
+35:35
+35 minutes, 35 seconds
+Ecco, allora purtroppo per scrivere bene le formule bisogna ancora un pelino estendere, ma dopo non estendiamo più,
+35:42
+35 minutes, 42 seconds
+eh, questo è l'ultimo caso. Cosa succede se invece di prendere una sola direzione o due, ne prendo un bel po'? Perché
+35:50
+35 minutes, 50 seconds
+vedremo che non sempre quando facciamo l'analisi delle componenti principali, una direzione basta o due direzioni, potrebbe essere che tre direzioni siano
+35:59
+35 minutes, 59 seconds
+necessarie, quattro, diventa difficile da visualizzare, però tecnicamente è bene sapere che si può fare. Ok, questo punto non voglio generalizzare per il
+36:07
+36 minutes, 7 seconds
+gusto di fare. Finora abbiamo preso coppie di direzioni, invece qua si può prendere due insiemi di direzioni, chiamiamola V.
+36:16
+36 minutes, 16 seconds
+Quindi prendete K1 direzioni, ci piacciono queste prime K1, che so cinque direzioni in RD e le mettete in una
+36:24
+36 minutes, 24 seconds
+bella matrice, quindi cinque vettori colonna mettete uno accanto all'altro. W prendete altre K2 direzioni, ci
+36:32
+36 minutes, 32 seconds
+piacciono queste altre K2 direzioni, altri sette vettori, magari della base canonica o no. come volete. Ok? E allora
+36:40
+36 minutes, 40 seconds
+cosa succede? Succede che la covarianza, vedete, potete sempre fare il prodotto tra i vostri dati e la direzione, è un'estensione di fare la proiezione
+36:49
+36 minutes, 49 seconds
+lungo quella direzione. State facendo una trasformazione che vi porta eh fai i prodotti scalari con quelle C, con quelle K1 direzioni e lo stesso per XW.
+36:58
+36 minutes, 58 seconds
+fate la proiezione con quelle K2 direzioni e allora avete due dataset trasformati, potete fare la covarianza
+37:06
+37 minutes, 6 seconds
+usando questa formula in alto oppure in senso di matrici è molto più semplice.
+37:11
+37 minutes, 11 seconds
+Fate sempre V trasposto a sinistra per come la convenzione la matrice originaria varianza di X è W. Ok? E la
+37:20
+37 minutes, 20 seconds
+varianza invece del singolo dataset trasformato con una singola Vien fuori che è VT varianza di Xv. Ok? Se volete
+37:29
+37 minutes, 29 seconds
+mettetevi un po' con un po' di pazienza si può vedere che le formule sono queste, insomma, non cioè uno prende le singole covarianze delle componenti di
+37:38
+37 minutes, 38 seconds
+queste matrici e viene fuori che è così che si trasformano. Va bene?
+37:43
+37 minutes, 43 seconds
+Ci sono dubbi su questo? Allora, la covarianza, adesso vedremo il senso anche più tardi con la regressione. Ok?
+37:48
+37 minutes, 48 seconds
+Però ci indica che cosa? Ci indica l'associazione, torniamo alla definizione iniziale, guardiamo soltanto
+37:55
+37 minutes, 55 seconds
+una coppia di coordinate J. ci indica l'associazione tra la feature J e la feature L. In che senso l'associazione?
+38:02
+38 minutes, 2 seconds
+Beh, ad esempio, quando questa quantità è positiva, cosa vuorre dire? Che la maggior parte di quei termini sarà positiva. Quindi, cosa vuol dire? che
+38:11
+38 minutes, 11 seconds
+quando X è un individuo alla feature J che è più grande della media della popolazione, anche la feature L
+38:19
+38 minutes, 19 seconds
+caratteristica L sarà più grande. Oppure oppure potrebbe essere che quando è più piccola della media anche l'altra deve essere più piccola della media. Quindi
+38:28
+38 minutes, 28 seconds
+sta dicendo che ci deve essere una qualche associazione, chiamiamola così, in senso qualitativo per il momento. Poi parleremo di regressione, sarà più
+38:35
+38 minutes, 35 seconds
+preciso. Ok? Però, allora, qualche proprietà di questa
+38:41
+38 minutes, 41 seconds
+quantità che abbiamo introdotto, se non se siete ancora con me, è la bilinearità. Questa la useremo in un
+38:49
+38 minutes, 49 seconds
+attimo, ma non è dopo riprendiamo anche per le variabili aleatorie. Queste sono sempre le quelle campionarie, le varianze di un campione. Allora, uno può
+38:57
+38 minutes, 57 seconds
+prendere delle delle feature, fare delle somme e a quel punto si può chiedere cosa succede. La covarianza della del
+39:04
+39 minutes, 4 seconds
+dataframe in cui ho sommato due colonne, no? Se faccio la somma di due colonne, vado a confrontarla con un'altra colonna Y. Beh, allora viene fuori che la
+39:13
+39 minutes, 13 seconds
+covarianza è bilineare, cioè se la y è la stessa a destra e invece avete fatto solo un'operazione sommando due colonne, avete che basta sommare le covarianze.
+39:22
+39 minutes, 22 seconds
+Molto naturale e lo stesso vale, insomma, è simmetrica eh, la covarianza, l'ho scritto forse siccome la matrice
+39:30
+39 minutes, 30 seconds
+delle varianze simmetriche, avete anche questo che la covarianza tra x e y è uguale alla covarianza tra y e x, è
+39:39
+39 minutes, 39 seconds
+simmetrica. Ok? Quindi l'ho scritta due volte, ma in realtà basterebbe in un lato solo e poi segue
+39:46
+39 minutes, 46 seconds
+chiaramente che nell'altro lato. E allora cosa succede? Succede che la varianza della somma, ve la dico già, poi la rivediamo anche
+39:54
+39 minutes, 54 seconds
+per le variabiliatorie, è la varianza della somma.
+40:00
+40 minutes
+Beh, intanto la varianza della somma è la covarianza tra la quantità e se stessa, eh, perché se vi ricordate la definizione dovete fare
+40:09
+40 minutes, 9 seconds
+la somma degli incrementi di uno per gli incrementi dell'altra feature, però eh se se fate la stessa feature allora avete i quadrati, quindi recuperate la
+40:17
+40 minutes, 17 seconds
+varianza. E allora usando la bilinearità spezzate i quadrati, sviluppate i quadrati come quando si fanno i conti
+40:25
+40 minutes, 25 seconds
+della scuole medie, no? Quindi avete la covarianza tra x e x, la covarianza tra y e y e x' y' e poi avete due volte
+40:33
+40 minutes, 33 seconds
+perché avete i fattori misti, quindi avete due volte la covarianza tra x e x'. Ok? È un po' come la regola di sviluppare il quadrato. Ok?
+40:46
+40 minutes, 46 seconds
+Va bene, questa eh magari un attimo la useremo, ma non è centrale al momento, però ricordatevi che quindi non è vero
+40:54
+40 minutes, 54 seconds
+che la varianza della somma, questo sarà importante, è più importante in probabilità che in statistica, però anche in statistica è importante. La
+41:03
+41 minutes, 3 seconds
+varianza della somma non è la somma delle varianze. È vero per la media, la media delle somme è la somma delle medie, ma le varianze no. Ok? Queste
+41:12
+41 minutes, 12 seconds
+quantità delle varianze hanno un termine in più che sarebbe quel fattore due volte covarianza e quindi potrebbe risultare più piccola se la covarianza è
+41:20
+41 minutes, 20 seconds
+negativa o più grande della somma delle due varianze se la covarianza è positiva. C'è un caso in cui effettivamente sono uguali è quando la
+41:27
+41 minutes, 27 seconds
+covarianza è zero. Quando le varianze le variabili non sono correlate, diciamo se la covarianza è zero, definizione,
+41:35
+41 minutes, 35 seconds
+allora la varianza della somma è la somma delle varianze. Va bene? Ora, se avete qualche ricordo dal corso di statistica 1, queste cose servivano per
+41:42
+41 minutes, 42 seconds
+la legge di grandi numeri eccetera, quindi tenete presente valgono anche nel caso campionario e in più variabili
+41:50
+41 minutes, 50 seconds
+e forse anche questo lo abbiamo detto a statistica 1, ma rivediamolo nel caso campionario.
+41:56
+41 minutes, 56 seconds
+Allora, facciamo un caso semplice e concreto. Prendiamo soltanto due osservazioni x1 e x2. Quindi ogni
+42:03
+42 minutes, 3 seconds
+individuo ha due caratteristiche, peso e altezza.
+42:08
+42 minutes, 8 seconds
+ehm peso numero di scarpe. Va bene, vediamo così. Organizziamo quindi i dati nella nostra varianza, matrice delle covarianze. Allora, cosa contiene?
+42:19
+42 minutes, 19 seconds
+Diciamo la componente IJ contiene la covarianza tra l'osservazione della feature I e la feature j. Quindi abbiamo
+42:26
+42 minutes, 26 seconds
+la varianza di x1 che sarebbe la covarianza tra x1 e x1.
+42:31
+42 minutes, 31 seconds
+sulla diagonale. Poi in basso qui abbiamo la varianza di x2 che è la covarianza tra x2 e x2 e sulla diagonale sono la stessa quantità, però vabbè l'ho
+42:39
+42 minutes, 39 seconds
+scritta solo nell'ordine giusto, ma sono stesso numero. È la covarianza tra x1 e x2. Ok?
+42:47
+42 minutes, 47 seconds
+Allora, dicevamo, questa matrice è simmetrica, poi nei conti esempi concreti la la vediamo che ma la
+42:56
+42 minutes, 56 seconds
+teoria già ci dice che è simmetrica e semidefinita positiva. Ve lo ricordate quel senso che se qualcuno se lo ricordava, gliel'ho ricordato. Allora,
+43:04
+43 minutes, 4 seconds
+c'è un punto importante dall'algebra lineare che dopo useremo anche di più e dice che tutti gli autovalori di questa matrice
+43:12
+43 minutes, 12 seconds
+sono positivi o o nulli e c'è un altro fatto che il determinante di una matrice
+43:20
+43 minutes, 20 seconds
+simmetrica, semidefinita, positiva, il determinante è il prodotto di tutti gli autovalori e in effetti quindi deve essere non negativo. Ok? Questo è un
+43:29
+43 minutes, 29 seconds
+fatto di algebra 1, algebra lineare, chiamatela come volete, insomma. Quindi av una matrice semidefinita positiva, il determinante so già che è negativo e
+43:39
+43 minutes, 39 seconds
+questo mi dà una disuguaglianza, va bene? Mi dice il determinante cos'era?
+43:42
+43 minutes, 42 seconds
+Era la matrice 2* 2. Dovete fare varianza di x1 per varianza di x2 - la l'altra diagonale, no? avete covarianza
+43:50
+43 minutes, 50 seconds
+di x2 x1 per covarianza di x1 x2 che ma è lo stesso termine, quindi la covarianza vi viene al quadrato e quindi avete trovato che c'è questa relazione,
+43:59
+43 minutes, 59 seconds
+quindi non tutte le matrici 2* 2 sono possibili covarianza, eh deve essere vera questa proprietà e questa
+44:08
+44 minutes, 8 seconds
+relazione, se volete passiamo alla radice quadrata.
+44:14
+44 minutes, 14 seconds
+varianza di x1, varianza di x2, covarianza. Qual è la radice quadrata di un numero al quadrato?
+44:23
+44 minutes, 23 seconds
+È il valore assoluto di quel numero che E qui avete le radici delle varianze sono le deviazioni standard.
+44:34
+44 minutes, 34 seconds
+Ok?
+44:37
+44 minutes, 37 seconds
+Allora, questo fatto non ricordo se a statistica uno lo si dimostrava o no, però porta a definire una quantità
+44:44
+44 minutes, 44 seconds
+importante che è quella del titolo della slide che è il cosiddetto coefficiente di correlazione di Pearson, ok?
+44:52
+44 minutes, 52 seconds
+Ed è che quantità è? Attenti, è la covarianza. Oh, cose cov, scusate, troppi troppi coseni ho scritto cov. Ok?
+45:02
+45 minutes, 2 seconds
+Quindi si introduce questa quantità, a volte si indica con rho di x1 x2.
+45:08
+45 minutes, 8 seconds
+Io la scriverò come core di x1 x2 che è il comando di R, va bene? E che cos'è? È la covarianza
+45:18
+45 minutes, 18 seconds
+diviso le deviazioni standard.
+45:23
+45 minutes, 23 seconds
+Ok? Quindi core, attenti a non confondere, covarianza, che è quella che sono le componenti della matrice delle covarianze. Core è
+45:32
+45 minutes, 32 seconds
+questa covarianza riscalata. Dice, "Ma perché devo riscalarla?" Beh, perché così, grazie a questa disuguaglianza che c'è qui in alto, questo è un numero
+45:40
+45 minutes, 40 seconds
+assoluto, diciamo, un numero che non ha un'unità di misura. Se volessimo attribuire delle unità di misura, questo risulterebbe un numero che non ha
+45:47
+45 minutes, 47 seconds
+un'unità di misura ed è sempre compreso tra -1 e 1.
+45:52
+45 minutes, 52 seconds
+Ok? Mentre la covarianza, in effetti avrebbe l'unità di misura del prodotto delle unità di misura della X1 e X2, cioè avrebbe le sue unità di misura.
+46:01
+46 minutes, 1 second
+Quindi se uno misura le cose con un'unità di misura diversa, tipo va in America e misura i gradi, le temperature in modo diverso, le lunghezze in modo diverso, troverebbe matrici delle
+46:09
+46 minutes, 9 seconds
+covarianze completamente diverse, pur misurando gli stessi oggetti, perché ha cambiato semplicemente l'unità di misura. Le correlazioni invece non
+46:17
+46 minutes, 17 seconds
+cambierebbero, ok? Quindi abbiamo le stesse correlazioni degli americani, ma le covarianze cambiano. Ok? Allora, cosa indicano in particolare gli estremi?
+46:28
+46 minutes, 28 seconds
+Quando avete un indicatore è bene capire, no? Vi ricordate che la silhouette cosa voleva dire la silhouette? Era anche lei compresa tra
+46:34
+46 minutes, 34 seconds
+-1 e 1. Valori estremi indicavano una certa proprietà. Cosa succede per la correlazione? Il coefficiente di
+46:41
+46 minutes, 41 seconds
+correlazione di Pearson vale 1 o -1, quindi siamo ai casi estremi, quando c'è
+46:48
+46 minutes, 48 seconds
+una forte relazione associazione lineare. Cosa vogliamo dire? Dopo vedremo parlando di regressione. Ma il
+46:55
+46 minutes, 55 seconds
+punto chiave è che una variabile, una feature si scrive come trasformazione lineare o affine, insomma, quindi una
+47:04
+47 minutes, 4 seconds
+trasformazione semplice, lineare o più a fine, ci mettete una costante dell'altra. Ok? Quindi c'è una relazione
+47:10
+47 minutes, 10 seconds
+lineare. Attenti che qui ho favorito x1 rispetto a x2, ma è una è completamente simmetrico, è come la la covarianza, la
+47:18
+47 minutes, 18 seconds
+correlazione è simmetrica, quindi se è vicino a uno vale anche la relazione opposta, cioè attenti che non è una relazione di causa effetto, pensatela
+47:25
+47 minutes, 25 seconds
+come un'associazione. Potrebbero, ad esempio, avere una terza variabile che è una causa comune di entrambe, ok? però
+47:33
+47 minutes, 33 seconds
+per il momento abbiamo questa quantità che può misurare l'associazione, la correlazione. Quindi, ok. Ok. In soldoni
+47:41
+47 minutes, 41 seconds
+è una relazione lineare. Quanto è valida una relazione lineare tra le due variabili?
+47:47
+47 minutes, 47 seconds
+Allora, eh visto che c'è il comando core, poi vedremo i laboratori, insomma, insomma mercoledì, c'è il comando core
+47:57
+47 minutes, 57 seconds
+anche per un intero dataset, cioè uno vuole semplicemente vedere tutte le possibili correlazioni tra tutte le coppie. Quindi cosa si va a fare? Si va
+48:05
+48 minutes, 5 seconds
+a definire la matrice delle correlazioni, la matrice di correlazione che è correlation matrix. Allora,
+48:12
+48 minutes, 12 seconds
+tecnicamente potrebbe essere utile sapere come com'è fatta, cioè è la matrice che ha sulle diagonali tutti
+48:19
+48 minutes, 19 seconds
+uni, lo vedremo poi anche negli esempi, fuori dalle diagonali, quindi nella componente IJ, ci mettiamo proprio la
+48:27
+48 minutes, 27 seconds
+correlazione coefficiente di correlazione di Pearson tra I e j o tra J ed L, se vi chiamate J ed L. Ok? Eh,
+48:36
+48 minutes, 36 seconds
+come si fa a trovarla algebricamente se io devo spiegarlo a un computer? Beh, allora è molto semplice, si prende la matrice delle covarianze o delle
+48:45
+48 minutes, 45 seconds
+varianze. Eh, scusate, a volte faccio anch'io se in R è lo stesso, eh, se date COV o VAR vi dà la stessa funzione.
+48:52
+48 minutes, 52 seconds
+Quindi, partita dalla matrice delle varianze, cosa dovete fare? Dovete dividere, se volete, per le deviazioni
+49:00
+49 minutes
+standard. Quindi, tecnicamente, però, sono due matrici. Quindi, cosa si fa? si costruisce una matrice diagonale che ha
+49:06
+49 minutes, 6 seconds
+tutte le deviazioni standard, quindi SD di X l'ho indicata così, eh è SD di X1,
+49:15
+49 minutes, 15 seconds
+SD di X2 fino a SD della ultima componente e zero in tutti gli altri casi e dividete. Cosa vuol dire dividete?
+49:24
+49 minutes, 24 seconds
+Cioè moltiplicate per l'inversa. Che è l'inversa? Quando avete una matrice diagonale non non c'è niente, cioè c'è da invertire, ma c'è da invertire solo i
+49:33
+49 minutes, 33 seconds
+termini sulla diagonale. Quindi avete s x1^ -1 e così via. Ah, ovviamente potrebbe accadere, ma nei dati reali non
+49:42
+49 minutes, 42 seconds
+succede mai, che alcune deviazioni standard siano zero. Cosa vuol dire che la deviazione standard è zero? Vuol dire
+49:51
+49 minutes, 51 seconds
+che i dati sono costanti. Quindi una riga, insomma, che non vi dà variabilità, potete proprio anche buttarla via. Ok? Quindi allora abbiamo
+50:00
+50 minutes
+questa operazione a destra e a sinistra, ok? E questo ci dà la matrice di correlazione.
+50:07
+50 minutes, 7 seconds
+Ok? Poi il comando in R, non dovete ricordarvi la formula, eh, basta che vi ricordiate core. Se date core a un data frame vi dà tutta la matrice
+50:14
+50 minutes, 14 seconds
+correlazione in un attimo, va bene? e ve la visualizza anche bene. Poi vedremo anche come visualizzarli poi
+50:22
+50 minutes, 22 seconds
+graficamente questi queste matrici di correlazione con una mappa di calore.
+50:26
+50 minutes, 26 seconds
+Comunque in ogni caso, le componenti saranno sempre numeri tra -1 e 1 e correlazione massima sarà quando è 1 oppure -1. Eh, anche negativa -1 è molto
+50:35
+50 minutes, 35 seconds
+interessante perché vuol dire c'è una relazione lineare molto forte, però diciamo nel senso opposto.
+50:42
+50 minutes, 42 seconds
+Ok? E anche questa è pure simmetrica, semidefinita, positiva e vale sempre uno sulla diagonale. Ecco, questa vale sempre uno sulla diagonale perché perché
+50:51
+50 minutes, 51 seconds
+la correlazione tra una variabile e se stessa è massima e qui vale uno, ok? Nel senso, cioè la c'è una la migliore
+50:58
+50 minutes, 58 seconds
+relazione lineare che potete avere x = x. Ok?
+51:02
+51 minutes, 2 seconds
+E ora è pure simmetrica, bisogna stare un attimo attenti perché questa trasformazione mantiene le matrici simmetriche, ok? quella questa
+51:11
+51 minutes, 11 seconds
+diagonale, quindi avete preso una diagonale, l'avete moltiplicata destra a sinistra, vi mantiene la matrice simmetrica
+51:18
+51 minutes, 18 seconds
+oppure se volete la correlazione simmetrica. Eppure semidefinita positiva rimane semidefinita positiva.
+51:25
+51 minutes, 25 seconds
+Bisognerebbe fare un attimino di di attenzione, ma insomma è preservata. Questa è una buona trasformazione.
+51:32
+51 minutes, 32 seconds
+Ok? E cosa vuol dire poi alla fine in pratica?
+51:37
+51 minutes, 37 seconds
+In pratica possiamo pensare la matrice delle correlazioni anche in un altro modo, cioè non prendiamo le feature e le
+51:44
+51 minutes, 44 seconds
+riscaliamo, facciamo la covarianza e riscaliamo, cioè facciamo le covarianze e le riscaliamo. Questa è la definizione che abbiamo dato. Oppure possiamo prendere
+51:52
+51 minutes, 52 seconds
+direttamente le feature, le trasformiamo, le standardizziamo, le riscaliamo a volte viene anche detto
+51:59
+51 minutes, 59 seconds
+e otteniamo delle nuove feature, delle nuove caratteristiche cosìete standardizzate. Allora, cosa vuol dire?
+52:05
+52 minutes, 5 seconds
+Vuol dire che per ogni caratteristica vado a sottrarre la media. Questo si fa di solito, le centriamo e poi divido per la deviazione standard.
+52:16
+52 minutes, 16 seconds
+Quindi cosa vuol dire? Vuol dire che se io avevo delle unità di misura, beh, sto riportando delle delle unità di misura naturali in cui la media dei miei dati è
+52:25
+52 minutes, 25 seconds
+zero, esattamente e la deviazione standard risulta 1. Ok? Se faccio questo per ciascuna feature, le ho riscalate,
+52:32
+52 minutes, 32 seconds
+le ho standardizzate ed effettivamente poi la varianza di queste nuove feature, il comando di un R
+52:39
+52 minutes, 39 seconds
+è scale, lo vedremo, la varianza o la covarianza delle nuove feature è la correlazione. Ok? Quindi potete pensare
+52:47
+52 minutes, 47 seconds
+in due modi. O prendete le varianze e fate questa trasformazione lì in alto, che forse non vi piace tantissimo,
+52:54
+52 minutes, 54 seconds
+oppure prendete i dati, componente per componente, togliete la media, dividete per la deviazione standard di quella
+53:01
+53 minutes, 1 second
+componente e questi nuovi dati hanno la varianza che è data dalla matrice delle correlazioni. Ok? Questo sarà importante
+53:09
+53 minutes, 9 seconds
+perché ora i la PCA, le tecniche di riduzione dimensionale basate sulla covarianza
+53:17
+53 minutes, 17 seconds
+risentono delle deviazioni standard. Se voi non eh standardizzate i dati, potrebbe essere che alcune alcune
+53:24
+53 minutes, 24 seconds
+dimensioni, alcune caratteristiche siano importanti semplicemente perché hanno un'unità di misura che le fa avere una varianza grande. E noi non vogliamo
+53:32
+53 minutes, 32 seconds
+questo perché, come al solito, potrebbe essere che gli americani hanno misurato unità di misura diversa da da noi e quindi risulta grande, ma è un artificio dell'unità di misura.
+53:42
+53 minutes, 42 seconds
+Allora, come si fa a misurare a visualizzare le le matrici delle correlazioni, non tanto delle covarianze, appunto, si visualizzano le
+53:49
+53 minutes, 49 seconds
+correlazioni. Beh, a volte si può usare dei colori o dei numeri. Ora, siccome è simmetrica la matrice, non sempre è necessario visualizzare tutte le coppie.
+53:59
+53 minutes, 59 seconds
+È un po' stupido fare tutte le coppie perché tanto risulterebbero simmetriche.
+54:03
+54 minutes, 3 seconds
+E quindi qui, ad esempio, usando che so dataset MT Cars, poi vediamo il codice mercoledì si può fare un suo 1000
+54:11
+54 minutes, 11 seconds
+pacchetti e che fanno questi questi grafici, però la cosa importante, ad esempio, si può usare dei colori per indicare le correlazioni, quindi
+54:18
+54 minutes, 18 seconds
+correlazioni positive saranno indicati col rosso, molto negative col blu oppure non correlate col bianco. Quindi vediamo
+54:26
+54 minutes, 26 seconds
+ad esempio nel dataset quello delle automobili scopriamo che ci sono alcune variabili che tra di loro sono correlate
+54:34
+54 minutes, 34 seconds
+negativamente. Ad esempio, ora dispo più cos'era, ma mg MPG era il consumo in
+54:43
+54 minutes, 43 seconds
+italiano sarebbero i chilometri eh per litro.
+54:48
+54 minutes, 48 seconds
+Disp non mi ricordo più cos'è, ma ad esempio c'è il numero di cilindri, no?
+54:53
+54 minutes, 53 seconds
+Quindi cosa vuol dire? che se un'auto ha un numero di cilindri maggiore del numero di cilindri medio, beh,
+55:00
+55 minutes
+tendenzialmente consumerà, no, farà meno km per l rispetto, quindi avrà motore grosso, consuma di più. Altre variabili sono invece correlate positivamente, ok?
+55:11
+55 minutes, 11 seconds
+Horsepower era la potenza del motore è correlata positivamente con il numero di cilindri 0.83. Ok? Questi grafici sono
+55:20
+55 minutes, 20 seconds
+comodi perché potete con un colpo d'occhio capire se ci sono correlazioni interessanti, anche l'intensità del colore, no, vi fa capire qua c'è una
+55:27
+55 minutes, 27 seconds
+correlazione interessante e magari scoprire caratteristiche importanti tra i vostri dati che legano le vostre features, ok? Altre invece non sembrano
+55:36
+55 minutes, 36 seconds
+molto collegate, vedete 0.09, ora non mi ricordo cos'erano queste coppie, ma andatevele a rivedere nel dataset.
+55:43
+55 minutes, 43 seconds
+Vediamo che non sono molto interessanti.
+55:45
+55 minutes, 45 seconds
+Anche questa 0,17 non è una buona correlazione. Ok, va bene. Quindi queste correlazioni sono
+55:53
+55 minutes, 53 seconds
+importantissime e ora in effetti tutto l'obiettivo della riduzione di dimensionalità che vedremo noi è di
+56:01
+56 minutes, 1 second
+estrarre da tutte queste variabili delle variabili fortemente correlate. Ok? Questo vogliamo fare, va bene?
+56:09
+56 minutes, 9 seconds
+Vogliamo ottenere sintetizzare un un dataset magari in cui ci sono tantissime variabili con poche variabili e mettere insieme quelle fortemente correlate. Ok?
+56:20
+56 minutes, 20 seconds
+Questa è l'idea.
+56:22
+56 minutes, 22 seconds
+E allora è una specie di clustering effettivamente sulle dimensioni, però sulle D, no? Vogliamo mettere insieme opportune variabili, dire queste stanno
+56:30
+56 minutes, 30 seconds
+insieme tra di loro, posso ridurre la dimensione e diventa una sola variabile e così via, no? E riduciamo la dimensionalità. Allora, vediamo di formularlo in modo un po' più preciso.
+56:41
+56 minutes, 41 seconds
+Eh, quindi l'obiettivo, vi ricordo, è partiamo da un dataset con ending, taglia n e d feature per individuo e
+56:51
+56 minutes, 51 seconds
+vogliamo trovarne una buona approssimazione. Ok, poi buona dipenderà dal criterio che che vogliamo usare.
+56:58
+56 minutes, 58 seconds
+Allora, questa approssimazione come sarà fatta? Sarà un vettore, un data frame anche lei, no? una matrice n righe sempre e k colonne.
+57:10
+57 minutes, 10 seconds
+Konne con k idealmente molto più piccolo di D. Ok? Poi vediamo come si fa a scegliere K. È un po' come il problema
+57:17
+57 minutes, 17 seconds
+del clustering che vedremo. Allora, due approcci si possono fare, tendenzialmente due, eh poi un problema, una letteratura molto molto ampia, ce ne
+57:26
+57 minutes, 26 seconds
+sono tantissime tecniche per queste cose, non non è non finisce qui la storia della riduzione della dimensionalità.
+57:33
+57 minutes, 33 seconds
+Allora, il primo approccio che vedremo è quello della PCA e l'idea è selezioniamo o proiettiamo, più che selezionare, perché selezionare sembra che scegliamo
+57:42
+57 minutes, 42 seconds
+qualcuna di queste che abbiamo, oppure proiettiamo lungo alcune direzioni e quindi cerchiamo una mappa che dallo spazio delle feature RD mi manda in uno
+57:51
+57 minutes, 51 seconds
+spazio più piccolo RK, ok? È una specie di compressione. Avete il vostro documento che occupa tanto spazio, lo
+57:58
+57 minutes, 58 seconds
+proiettate e diventa uno spazio di dimensione più bassa. Ok?
+58:03
+58 minutes, 3 seconds
+D potrebbe essere, no, la risoluzione dell'immagine, immagine di altissima risoluzione, ma che mi importa? Io voglio solo sapere se è una cifra uno o
+58:10
+58 minutes, 10 seconds
+z0, quindi fa riduciamo in una immagine di dimensione più bassa, ok? Risoluzione più bassa. Quindi questa è la proiezione e sarà la PCA, una di queste tecniche.
+58:20
+58 minutes, 20 seconds
+L'approccio invece duale, se volete diverso, è di dire "Beh, io so che i miei dati sono in uno spazio di
+58:27
+58 minutes, 27 seconds
+dimensione grande, sì, ma magari andranno a occupare una piccola porzione di questo spazio, no? Ad esempio, potrebbero trovarsi su quella che si
+58:36
+58 minutes, 36 seconds
+chiama una una superficie, no? Una curva, magari messa in modo strano, però allora cercherò di parametrizzare.
+58:45
+58 minutes, 45 seconds
+A volte viene detto anche approccio generativo, ok? Quindi avete uno spazio latente, uno spazio nascosto che potete
+58:53
+58 minutes, 53 seconds
+usare per parametrizzare i vostri dati e quindi la mappa dove va? Cioè avete la mappa che genera i dati, quindi parte da
+59:01
+59 minutes, 1 second
+uno spazio di dimensione piccola R^ K, quindi immaginate un'immagine di bassa definizione e invece G è una mappa tra
+59:09
+59 minutes, 9 seconds
+mi porta in uno spazio di altissima definizione, no? Una un'immagine molto molto dettagliata. Ok? Quindi questi
+59:17
+59 minutes, 17 seconds
+sono i due approcci in effetti ultimamente, mentre la PCA appartiene al primo, già ve lo dico qui,
+59:25
+59 minutes, 25 seconds
+abbiamo la PCA che sarà di questo di questo tipo di approccio di proiettivo, diciamo, e la Exploratory Factor
+59:32
+59 minutes, 32 seconds
+Analysis ultimamente vanno di moda soprattutto gli approcci generativi che parametrizzano, ok?
+59:40
+59 minutes, 40 seconds
+Però si possono fare anche altre cose.
+59:42
+59 minutes, 42 seconds
+Si può prendere i due approcci metterli insieme. Ad esempio, uno dice, "Beh, facciamo così, voglio sia proiettare, quindi comprimere che decomprimere". Ok?
+59:54
+59 minutes, 54 seconds
+Questo si chiamano a volte gli autoencoders, va bene? Ci sono approcci che mescolano i due metodi, ok? Quindi, prima comprimete e
+1:00:03
+1 hour, 3 seconds
+poi decomprimete. Quindi, imparate sia a proiettare che a ricostruire e questo può essere utile per tanti aspetti.
+1:00:10
+1 hour, 10 seconds
+Comunque eh la generazione, no? Eh, allora l'idea dopo la vediamo. Il punto è che questi,
+1:00:18
+1 hour, 18 seconds
+mentre immaginatelo, facciamolo con le immagini che è più chiaro, no? Allora, l'idea è che avete uno spazio di di
+1:00:25
+1 hour, 25 seconds
+tratti latenti, di caratteristiche nascoste, ok? di feature nascoste da cui potete selezionare e uno direbbe behoso questa questa feature ad esempio so che
+1:00:34
+1 hour, 34 seconds
+è uno zero, allora ho una mappa che mi porta vicino che mi porta sugli zeri nel blocco degli zeri. Potresti immaginare
+1:00:41
+1 hour, 41 seconds
+così. Ok? Quindi l'idea è che per comprimere i dati usiamo una descrizione più efficiente e dando questa descrizione posso poi ricostruire i
+1:00:49
+1 hour, 49 seconds
+dati. La cosa interessante di questi approcci generativi è che dopo basta uno dice nel momento in cui ho imparato
+1:00:55
+1 hour, 55 seconds
+questa G e sono anche ad esempio i generatori di immagini, no?
+1:01:01
+1 hour, 1 minute, 1 second
+Uno dice "Do la descrizione adesso di qualcosa che non ha ancora visto e vado a generare qualcosa che somiglierà a uno zero, a un uno o all'immagine più
+1:01:08
+1 hour, 1 minute, 8 seconds
+complicata". Ok? Questi approcci sono ormai sono molto più insomma insomma sono più di moda ultimamente. Ok, quelli
+1:01:16
+1 hour, 1 minute, 16 seconds
+un po' di proiezione un po' meno. Ok, però appunto l'idea è appunto sempre di o comprimere, quindi nell approccio di
+1:01:23
+1 hour, 1 minute, 23 seconds
+proiezione comprimete o di ricostruire, ok? Di generare, va bene?
+1:01:29
+1 hour, 1 minute, 29 seconds
+E oppure si possono mettere insieme, dicevo, pure comprimete, decomprimete e sperate di aver ricostruito quello che che avevate. Così, insomma, in un colpo
+1:01:37
+1 hour, 1 minute, 37 seconds
+solo imparate, mettete insieme i due approcci. Però, appunto, per dirvi che non finisce qui la la storia, è molto grande l'ambito della riduzione della
+1:01:45
+1 hour, 1 minute, 45 seconds
+dimensionalità. Allora, quindi noi che tipo di mappe cerchiamo? non cerchiamo di fare eh machine learning, vogliamo
+1:01:53
+1 hour, 1 minute, 53 seconds
+semplicemente fare statistica classica e quindi la mappa più semplice da cui uno può partire è una mappa lineare, ok?
+1:02:00
+1 hour, 2 minutes
+Quindi sia la mappa di proiezione a fine o lineare, insomma per me lineare a fine è la stessa cosa, ok? Oppure la
+1:02:09
+1 hour, 2 minutes, 9 seconds
+mappa di generazione potrebbe essere lineare, ok? Non saranno mappe interessanti, non vi generano le immagini, ehm, non sono modelli
+1:02:18
+1 hour, 2 minutes, 18 seconds
+generativi di immagini o testo, però sono le mappe più semplici, quelle lineari, ok? Però il vantaggio qual è?
+1:02:24
+1 hour, 2 minutes, 24 seconds
+Che poi sono trasformazioni facili, quindi possiamo interpretarle, quindi magari dal punto di vista, insomma, delle performance non saranno il massimo, ma poi guadagniamo qualcosa a livello di interpretabilità.
+1:02:34
+1 hour, 2 minutes, 34 seconds
+Ok? mappe lineari, quindi proiezione o generazione. Vedete, nel caso della proiezione uno prende il
+1:02:41
+1 hour, 2 minutes, 41 seconds
+dato X i tutte le feature e le comprime, ottiene queste z che sarebbero xi u + b, quindi trasformate. Nel caso generativo
+1:02:50
+1 hour, 2 minutes, 50 seconds
+parto da delle z, da questi fattori latenti, questi tratti latenti, parametri nascosti, chiamateli come volete, e poi li grazie a loro trasformo
+1:02:59
+1 hour, 2 minutes, 59 seconds
+e ottengo qualcosa che somiglierà alla mia xi. Ok? Questa è l'idea che questa dovrà assomigliare alla X.
+1:03:06
+1 hour, 3 minutes, 6 seconds
+Va bene? Allora, vediamo un po'. Quindi, la PCA, poi magari mercoledì parliamo dell'altra, di quella, così vi lascio un po' di tempo per digerirvi la la PCA.
+1:03:17
+1 hour, 3 minutes, 17 seconds
+Allora, cominciamo con l'analisi più semplice e dice quanto quanto voglio ridurre la mia dimensionalità. E come
+1:03:26
+1 hour, 3 minutes, 26 seconds
+dicevamo prima di partire tutto quel discorso, spero di non avervi perso sulla varianza, la covarianza, spero che fino al livello di varianza direzionale
+1:03:34
+1 hour, 3 minutes, 34 seconds
+fosse chiaro il discorso. Uno prende una direzione e dico proietto i miei dati su quella direzione, tutte le mie caratteristiche le le comprimo in una
+1:03:42
+1 hour, 3 minutes, 42 seconds
+direzione e userò quindi quella Z, cioè quella sarà la mia proiezione che sto cercando. Ok? Quindi cerchiamo una proiezione, ok?
+1:03:54
+1 hour, 3 minutes, 54 seconds
+fissiamo vettore V una qualche direzione dello spazio RD.
+1:03:59
+1 hour, 3 minutes, 59 seconds
+Ah, osservate finora tutte le feature sono numeri reali, sono solo numerici.
+1:04:03
+1 hour, 4 minutes, 3 seconds
+Eh, se sono caratteristiche qualitative sono dei factor è più complicato. Eh, bisogna in qualche modo caricarli dentro
+1:04:11
+1 hour, 4 minutes, 11 seconds
+dei vettori. Cioè, queste cose funzionano bene se i dati sono numeri, sono già dei vettori. Eh, allora, quindi fissiamo una direzione, attenti,
+1:04:20
+1 hour, 4 minutes, 20 seconds
+direzione vuol dire diverse cose, eh, cioè uno fissa un vettore, avrebbe anche una lunghezza. Quindi per semplicità
+1:04:28
+1 hour, 4 minutes, 28 seconds
+fissiamo che la lunghezza di questo vettore è 1. Ok? Quindi fissiamo una direzione, nel senso che proprio prendiamo un vettore e poi dividiamo per
+1:04:35
+1 hour, 4 minutes, 35 seconds
+la sua norma, fissiamo la norma 1. Ok? E allora però di tutte le direzioni, quali sono le direzioni più interessanti?
+1:04:42
+1 hour, 4 minutes, 42 seconds
+Immaginate, no? Ci saranno delle direzioni o delle componenti in cui i dati risultano molto appiccicati, no?
+1:04:51
+1 hour, 4 minutes, 51 seconds
+Quindi la varianza, la variabilità è piccola. Oppure delle direzioni in cui risultano belli diffusi, belli distribuiti. Ok? Attenti, non è legato
+1:04:59
+1 hour, 4 minutes, 59 seconds
+al fatto che sto facendo il prodotto a scalare con V. V è sempre norma 1, cioè sto proprio esplorando lo spazio, come lanciando un proiettile, vedo proietto,
+1:05:07
+1 hour, 5 minutes, 7 seconds
+vedo i miei dati come si distribuiscono su quella direzione e mi accorgo se ci sono delle direzioni in cui la variabilità è grande e altre in cui è
+1:05:15
+1 hour, 5 minutes, 15 seconds
+piccola. Le direzioni più interessanti, secondo la PCA sono quelle in cui la variabilità è massima, è più grande possibile. Quindi allora, se abbiamo una
+1:05:24
+1 hour, 5 minutes, 24 seconds
+sola direzione da scegliere, andiamo a vedere la varianza lungo quella direzione e cerchiamo quella con la varianza più
+1:05:32
+1 hour, 5 minutes, 32 seconds
+grande. Ok? Andiamo a fare il massimo e andiamo a prendere V1 che è quella direzione che massimizza, ok? Attenti
+1:05:39
+1 hour, 5 minutes, 39 seconds
+che V1 massimizza, ma anche - V1 massimizza, ok? Perché la varianza, cioè la direzione è la stessa alla fine, cioè
+1:05:48
+1 hour, 5 minutes, 48 seconds
+sia che io prenda di là, cioè il verso non è importante, l'importante è individuare la direzione, quindi attenti che la le componenti principali, questa
+1:05:56
+1 hour, 5 minutes, 56 seconds
+che chiamiamo V1 che rende la varianza massima è una direzione, ma anche - V1 andrebbe bene uguale. Ok?
+1:06:06
+1 hour, 6 minutes, 6 seconds
+Eh, però c'è un fatto pure interessante, questa più di geometria che ora non di algebra che non richiamiamo e lo usiamo
+1:06:13
+1 hour, 6 minutes, 13 seconds
+come fatto noto. Quello che succede è che siccome la varianza a questa formula che dicevamo abbiamo già trovato, no, è la varianza direzionale è il prodotto
+1:06:22
+1 hour, 6 minutes, 22 seconds
+scalare tra V e la matrice della varianze applicata a V. Questa espressione particolare ci dice che
+1:06:29
+1 hour, 6 minutes, 29 seconds
+quando andiamo a massimizzare questa varianza non troviamo un vettore a caso, ma troviamo quello che è un autovettore,
+1:06:38
+1 hour, 6 minutes, 38 seconds
+ok? Un autovettore della matrice delle covarianze. E tra l'altro non troviamo neanche un autovettore con un autovalore
+1:06:46
+1 hour, 6 minutes, 46 seconds
+a caso. Vi ricordate cosa sono gli autovettori? ve lo ricordo. Beh, è scritto qua, no? Vuol dire che quando moltiplicate
+1:06:53
+1 hour, 6 minutes, 53 seconds
+il matrice per vettore trovate un multiplo con un certo numero scalare lambda, il vettore stesso. Ok? Quindi
+1:07:01
+1 hour, 7 minutes, 1 second
+applicando il vettore in quella direzione, la matrice a quel vettore, la matrice si comporta come una dilatazione, ok? Mantiene la direzione
+1:07:08
+1 hour, 7 minutes, 8 seconds
+fissata proprio perché è la direzione massima. Ok? Il discorso sarebbe che se spostasse un pochino la direzione eh non sarebbe quella massima, ok? perché
+1:07:17
+1 hour, 7 minutes, 17 seconds
+conviene davvero quella massima a questa proprietà che a quel punto la varianza dilata lungo quella direzione. E l'autovalore, qual è l'autovalore?
+1:07:26
+1 hour, 7 minutes, 26 seconds
+L'autovalore ha pure un significato perché vedete se faccio V1 trasposto
+1:07:34
+1 hour, 7 minutes, 34 seconds
+varianza di X V1 trovo V1 trasposto. Questa varianza di X
+1:07:41
+1 hour, 7 minutes, 41 seconds
+V1 abbiamo detto che è un autovettore, quindi qua faccio lambda 1 V1.
+1:07:47
+1 hour, 7 minutes, 47 seconds
+e quindi trovo lambda 1 che è uno scalare, questo che è V1 trasposto V1.
+1:07:53
+1 hour, 7 minutes, 53 seconds
+V1 trasposto V1 è la norma al quadrato di V1 che fa 1. Abbiamo detto che abbiamo preso direzioni con norma 1 per
+1:08:01
+1 hour, 8 minutes, 1 second
+non e quindi lambda 1. Quindi non soltanto una direzione speciale che è un autovettore, ma so anche dire l'autovalore è un significato preciso, è
+1:08:10
+1 hour, 8 minutes, 10 seconds
+la varianza dei miei dati lungo quella direzione. Ok? Quindi ho cercato proprio i dati con la varianza massima e la
+1:08:17
+1 hour, 8 minutes, 17 seconds
+varianza è l'autovalore massimo, cioè risulta essere il più grande autovalore della matrice delle covarianze.
+1:08:24
+1 hour, 8 minutes, 24 seconds
+Ok?
+1:08:26
+1 hour, 8 minutes, 26 seconds
+Benissimo. Allora, adesso diamo un nome a questa prima componente.
+1:08:31
+1 hour, 8 minutes, 31 seconds
+Questa prima direzione la chiamiamo prima componente principale di x. E già la prima componente principale è interessante perché magari uno vuole
+1:08:39
+1 hour, 8 minutes, 39 seconds
+soltanto Adesso c'è la piccola demo, se vi ho ancora, se siete ancora con con noi la cerchiamo insieme la prima
+1:08:47
+1 hour, 8 minutes, 47 seconds
+componente. Eh, c'è un punto interessante. Proiettare lungo una direzione vi dà la possibilità di poi,
+1:08:54
+1 hour, 8 minutes, 54 seconds
+ad esempio, fare un ranking. Diciamo che avete tanti individui con tante caratteristiche. Io voglio soltanto mettere in ordine il più bravo dal più
+1:09:04
+1 hour, 9 minutes, 4 seconds
+scarso, insomma, un qualche criterio, dato dalle mie caratteristiche che ho raccolto. Allora, proietto lungo la direzione principale. A quel punto sono
+1:09:12
+1 hour, 9 minutes, 12 seconds
+tutti allineati, cioè sono tutti allineati per forza perché li ho li ho proiettati e l'ordine con cui compariranno mi permette di fare un
+1:09:19
+1 hour, 9 minutes, 19 seconds
+ordinamento tra i miei dati. Quindi capite, anche soltanto una direzione può darci qualcosa di interessante da scoprire. Ora, non è sempre l'obiettivo,
+1:09:28
+1 hour, 9 minutes, 28 seconds
+eh, mettere in ordine, fare una classifica, però con una direzione si può fare. Allora, vediamo un po' insieme a occhio se riusciamo a vedere queste
+1:09:37
+1 hour, 9 minutes, 37 seconds
+direzioni principali. Va bene? Allora, scaricatevelo. Non so se funziona più il server lì, comunque.
+1:09:48
+1 hour, 9 minutes, 48 seconds
+Ehm, Sì.
+1:09:54
+1 hour, 9 minutes, 54 seconds
+Dunque, allora, vediamo se c'è viewer. Eccolo qua. Allora, scaricatevi questa demo,
+1:10:03
+1 hour, 10 minutes, 3 seconds
+così a occhio vi fate un po' di agguzzate la vista sulle componenti principali. Ora, in dimensione due c'è poco da visualizzare, cioè sono tutti
+1:10:10
+1 hour, 10 minutes, 10 seconds
+bidimensionali, tanto al massimo potremmo fare qualcosa di tridimensionale, esplorativo, ma facciamo dimensione due. Allora, cosa succede?
+1:10:20
+1 hour, 10 minutes, 20 seconds
+o possiamo generare dei dati, facciamolo noi, ok? Diciamo che i nostri dati hanno
+1:10:27
+1 hour, 10 minutes, 27 seconds
+due caratteristiche, x y, ok? E non voglio fare clustering, voglio trovare
+1:10:35
+1 hour, 10 minutes, 35 seconds
+una retta per cui proiettando su quei dati la variabilità è massima, la varianza è massima. Allora, secondo voi
+1:10:44
+1 hour, 10 minutes, 44 seconds
+facciamo che la retta parte dal centro, ok? Tanto è la direzione che conta, eh, anche se la disegnate più su o più giù non vuol dire nulla. I dati spesso uno
+1:10:51
+1 hour, 10 minutes, 51 seconds
+poi li centra e li standardizza prima di fare la PCA, però in questo caso no, perché altrimenti il gioco diventa noiosissimo. Allora, dove la prenderò
+1:10:59
+1 hour, 10 minutes, 59 seconds
+questa retta per massimizzare la variabilità? Secondo voi la prendo di qua? La prendo primo quadrante, secondo quadrante, terzo quadrante? Datemi voi un consiglio.
+1:11:12
+1 hour, 11 minutes, 12 seconds
+Ma è proprio ovvio, per come li ho disegnati. Vediamo. Facciamo così.
+1:11:16
+1 hour, 11 minutes, 16 seconds
+Allora, quella che ho proposto io è la varianza in questa direzione 0.558 e la principal component è 0.589.
+1:11:26
+1 hour, 11 minutes, 26 seconds
+Allora, vediamo un po' se si sa. Ecco qua. Sì, ci sono andato abbastanza vicino. Facciamo un caso un po' più interessante.
+1:11:35
+1 hour, 11 minutes, 35 seconds
+Il race plot, come mai essere impazzito?
+1:11:37
+1 hour, 11 minutes, 37 seconds
+Ah, perché devo togliere questo? Scusa, la demo non è ancora perfetta. Allora, facciamo un altro caso. Dai, mettiamo dei dati abbastanza allineati.
+1:11:46
+1 hour, 11 minutes, 46 seconds
+già allineati di loro, no? In una direzione tipo questa e poi mettiamo qualcuno lontano.
+1:11:52
+1 hour, 11 minutes, 52 seconds
+Ok? Allora, secondo voi adesso la prima componente principale quale sarà? Che direzione dovrò prendere?
+1:12:04
+1 hour, 12 minutes, 4 seconds
+Primo quadrante, terzo quadrante oppure secondo quarto. Secondo quarto, esatto.
+1:12:11
+1 hour, 12 minutes, 11 seconds
+Vediamo quanto vicini siamo andati.
+1:12:14
+1 hour, 12 minutes, 14 seconds
+Beh, ma siamo bravissimi. Allora, uno dice, "Adesso dopo vi faccio fare il giochino" che non è un poi così ovvio a volte perché c'è una fregatura, però
+1:12:23
+1 hour, 12 minutes, 23 seconds
+diciamo se voglio visualizzare la deviazione standard lungo le varie direzioni, ecco, la vedete con questo?
+1:12:29
+1 hour, 12 minutes, 29 seconds
+Questo sembra un ellisse adesso, ma questo non è un ellisse. Questo stavo facendo per ogni direzione, partendo dal centro e ho disegnato con la distanza,
+1:12:38
+1 hour, 12 minutes, 38 seconds
+insomma, tra il centro e il bordo vi dà la varianza lungo quella direzione e vedete, appunto, che la direzione di varianza massima è proprio questa dov'è
+1:12:46
+1 hour, 12 minutes, 46 seconds
+più larga. Eh, cosa succede? Si può anche visualizzare i dati in un in un un altro modo. Ora qui sono molto simili, uno è un ellisse e l'altro non lo è.
+1:12:55
+1 hour, 12 minutes, 55 seconds
+Vabbè, sembrano molto simili, però potete giocarvi con dei dataset eh, in cui vedete che sono due cose leggermente diverse, ok? Una viene
+1:13:03
+1 hour, 13 minutes, 3 seconds
+sempre unellisse e l'altra ha delle forme anche un po' più strane. Allora, il giochino qual è che vi consiglio?
+1:13:08
+1 hour, 13 minutes, 8 seconds
+provate a farlo. Allora, qui plotta per ragioni di grafica soltanto coppie di di
+1:13:15
+1 hour, 13 minutes, 15 seconds
+componenti da dataset reali. Reali però quelli caricati in R, quindi avete tutto l'help, potete vedervi che dataset sono
+1:13:23
+1 hour, 13 minutes, 23 seconds
+e dovete individuare a occhio, perché questa è la difficoltà, la prima componente principale. Ok? Allora, dove
+1:13:31
+1 hour, 13 minutes, 31 seconds
+impostare la fregatura, leggete bene in piccolo, ci sono le unità di misura, eh, attenti che la variabilità, la varianza
+1:13:40
+1 hour, 13 minutes, 40 seconds
+lungo quella direzione dipenderà anche, no, dalle unità di misura che avete sulla x e sulla Y. attenti perché noi poi nella pratica faremo una
+1:13:47
+1 hour, 13 minutes, 47 seconds
+standardizzazione, quindi avremo sempre, se volete, unità di misura su una scala naturale, sia nella x che nella Y, scala
+1:13:55
+1 hour, 13 minutes, 55 seconds
+media 0 e diversione standard 1. Qui attenti che in certi dataset potrebbe non essere così. Ok, qui adesso io io direi che questa vediamo un po',
+1:14:04
+1 hour, 14 minutes, 4 seconds
+confermiamo la la scelta, vediamo se è andata bene. Beh, sì, non non sono stato bravissimo, mi ha dato 5 su 10, eh vedete che vi dà anche un piccolo
+1:14:12
+1 hour, 14 minutes, 12 seconds
+punteggio, quindi eh cliccate, giocate, insomma, ecco, questo ad esempio che che componente principale avrà.
+1:14:22
+1 hour, 14 minutes, 22 seconds
+Ecco, questo è un caso un po' strano, però può capitare in cui non c'è correlazione.
+1:14:30
+1 hour, 14 minutes, 30 seconds
+Ok? Ora questo, quindi non c'è, i dati sono ben sparpagliati, quindi in effetti qualsiasi direzione sembra andare bene.
+1:14:38
+1 hour, 14 minutes, 38 seconds
+Vediamo se ne prendo una io e cosa mi dirà che ho sbagliato. Vediamo.
+1:14:43
+1 hour, 14 minutes, 43 seconds
+Prendiamo un paio di punti, un punto qua e un punto qua. Confermiamo la scelta.
+1:14:50
+1 hour, 14 minutes, 50 seconds
+Eh, sono stato bravo. Ok, comunque allora giocateci e insomma ce ne sono parecchi perché li campione a caso e compiono anche le coppie di componenti.
+1:15:00
+1 hour, 15 minutes
+Ok, va bene.
+1:15:06
+1 hour, 15 minutes, 6 seconds
+Allora, questo esaurisce la singola componente principale, la prima componente principale. Cerchiamo la direzione in cui la varianza è massima.
+1:15:15
+1 hour, 15 minutes, 15 seconds
+Eh, domanda, ma se poi non mi basta? No, perché se voglio almeno fare un grafico di due componenti, come vado a cercare
+1:15:23
+1 hour, 15 minutes, 23 seconds
+la seconda? Beh, andiamo ricorsivamente e quindi vediamo proprio l'algoritmo completo della PCA. È semplice perché se
+1:15:30
+1 hour, 15 minutes, 30 seconds
+abbiamo già trovato le prime k - 1 componenti principali, chiamiamole V1, V2, V3, VK - 1, quindi partiremo con la
+1:15:39
+1 hour, 15 minutes, 39 seconds
+prima V1, immaginate, ora devo trovare la seconda, come faccio? Allora, ho già trovato quelle precedenti, vado a cercare una nuova direzione, chiamiamola
+1:15:47
+1 hour, 15 minutes, 47 seconds
+VK. Se siamo al passo K, anche questa direzione la prendo con norma 1, ok?
+1:15:54
+1 hour, 15 minutes, 54 seconds
+Cerco soltanto una direzione e farò una richiesta, cioè io voglio trovare alla fine delle una base, una delle nuove coordinate, quindi farò una richiesta
+1:16:03
+1 hour, 16 minutes, 3 seconds
+che siano ortogonale a tutto quello che ho già trovato, ok? E capite? Quindi siete in dimensione due, avete trovato
+1:16:10
+1 hour, 16 minutes, 10 seconds
+la prima, ortogonale, c'è solo lei. Se siete in dimensione tre ancora un po' di scelta c'è. Quindi in generale, insomma, è una richiesta un po' forte questa che
+1:16:17
+1 hour, 16 minutes, 17 seconds
+sia ortogonale a tutte le precedenti e poi tra quelle ortogonali andate di nuovo a massimizzare la varianza
+1:16:25
+1 hour, 16 minutes, 25 seconds
+direzionale. Quindi capite, abbiamo trovato la prima direzione e quella massimizzava la varianza. Adesso quella dobbiamo escluderla, quindi andiamo
+1:16:32
+1 hour, 16 minutes, 32 seconds
+sull'ortogonale e lì cerchiamo di massimizzare la varianza. Poi troveremo anche lei, andremo sull'ortogonale e così via.
+1:16:40
+1 hour, 16 minutes, 40 seconds
+Atenti che se siete in dimensione bassa finite presto, ma in dimensione grande potrebbe avete tanti passi da fare. E in
+1:16:47
+1 hour, 16 minutes, 47 seconds
+effetti cosa succede? Si ripete questo ragionamento. A ogni passo massimizzate la varianza e a ogni passo trovate un autovettore sempre della matrice
+1:16:56
+1 hour, 16 minutes, 56 seconds
+originaria. Cosa succede? Che l'autovalore, che è sempre la varianza, no, lungo quella direzione, l'autovalore via diminuisce. Ok? state trovando una
+1:17:06
+1 hour, 17 minutes, 6 seconds
+successione di autovettori e autovalori che via diventano più piccoli. Attenti che sono sempre tutti comunque non
+1:17:12
+1 hour, 17 minutes, 12 seconds
+negativi perché sono la varianza aveva tutti gli autovettori eh non negativi perché è semidefinita positiva. Ok? E
+1:17:21
+1 hour, 17 minutes, 21 seconds
+quindi così si ripete, si ripete. Poi nella pratica non è questo l'algoritmo che viene implementato, però questo vi vi dà una una procedura che ovviamente
+1:17:30
+1 hour, 17 minutes, 30 seconds
+termina quando avete trovato tanti vettori quanti la dimensione dello spazio originario, ma nella pratica vorreste fermarvi prima, non volete
+1:17:38
+1 hour, 17 minutes, 38 seconds
+trovarli tutti. Ok? Quindi cosa significa? Significa che troviamo una base, una nuova base dello spazio fatta
+1:17:45
+1 hour, 17 minutes, 45 seconds
+da queste componenti principali V1, V2, V3, VK fino a VD. Se andiamo fino alla fine, allora questi vettori sono
+1:17:54
+1 hour, 17 minutes, 54 seconds
+autovettori della varianza ed è una base ortonormale di autovettori. Ok? Questo dimostra un
+1:18:02
+1 hour, 18 minutes, 2 seconds
+teorema. Se uno si facesse di nuovo i conti per questi, questo vi dà una dimostrazione di quello che si chiama teorema spettrale. Ok? Teorema spettrale
+1:18:10
+1 hour, 18 minutes, 10 seconds
+per le matrici simmetriche dice questo che se abbiamo qualsiasi matrice simmetrica, non serve che sia semidefinita positiva, c'è una
+1:18:18
+1 hour, 18 minutes, 18 seconds
+coordinata, ci sono delle coordinate giuste lungo le quali quella matrice diventa diagonale, ok? Questo vuol dire che quelle sono una base di autovettori,
+1:18:26
+1 hour, 18 minutes, 26 seconds
+ok? Questo è forse il fatto più importante di tutta l'algebra lineare che sappia, insomma, è probabilmente il teorema più bello dell'algebra lineare.
+1:18:34
+1 hour, 18 minutes, 34 seconds
+Non so se ve lo come ve lo raccontano, ve lo fate ad algebra lineare, vero? Ma ve lo presenta come un bel teorema o è una cosa di passaggio? Perché spesso
+1:18:41
+1 hour, 18 minutes, 41 seconds
+quando si fa geometria lo lasciano una cosa scontata, invece è un teorema importantissimo, ok? E ha anche applicazioni in statistica, appunto
+1:18:49
+1 hour, 18 minutes, 49 seconds
+questa è un'idea, appunto, di Pearson, mi sembra, comunque di usare il teorema spettrale per ridurre la dimensionalità.
+1:18:57
+1 hour, 18 minutes, 57 seconds
+Allora, vediamo un po' meglio come come che caratteristiche hanno queste componenti principali.
+1:19:03
+1 hour, 19 minutes, 3 seconds
+Allora, dicevamo, se io prendo la covarianza, faccio una proiezione lungo due componenti principali, chiamiamole
+1:19:10
+1 hour, 19 minutes, 10 seconds
+VJ e VK, ok? E vado a fare la covarianza, vi ricordate? C'era quella formula di trasformazione, adesso
+1:19:18
+1 hour, 19 minutes, 18 seconds
+diventano comode quelle formule generali perché allora la VJ esce a sinistra e diventa VJ trasposto. Poi avete la
+1:19:25
+1 hour, 19 minutes, 25 seconds
+matrice della varianza di X e a destra avete VK. Ora però VJ e VK sono autovettori,
+1:19:33
+1 hour, 19 minutes, 33 seconds
+quindi quando fate ad esempio varianza per VK trovate lambda K VK.
+1:19:39
+1 hour, 19 minutes, 39 seconds
+Ho messo a destra lambda K tanto non scalare. E poi avete quindi prodotto scalare standard tra VJ e VK. E questi
+1:19:46
+1 hour, 19 minutes, 46 seconds
+sono zero se avete preso componenti principali diverse, uno perché sono a norma uno se avete la stessa componente.
+1:19:54
+1 hour, 19 minutes, 54 seconds
+E quindi complessivamente la covarianza tra VJ e VK, tra le proiezioni dei nostri dati lungo VJ e lungo VK è se jug
+1:20:03
+1 hour, 20 minutes, 3 seconds
+avete la varianza che è lambda K, altrimenti è zero. Ok? Quindi prendendo componenti diverse i dati risultano proiettando su componenti diverse risultano non correlati. Ok?
+1:20:14
+1 hour, 20 minutes, 14 seconds
+Importantissima questa cosa. Quindi abbiamo separato le correlazioni, cioè le correlazioni sono scomparse, sono svanite.
+1:20:22
+1 hour, 20 minutes, 22 seconds
+Attenti che non abbiamo tolto tutte le possibili associazioni, eh perché ci sono associazioni, legami più, insomma, diversi dalle correlazioni, legami non lineari.
+1:20:32
+1 hour, 20 minutes, 32 seconds
+Allora, se uno vuole scrivere in forma matriciale questa proprietà, che abbiamo detto appunto che le covarianze sono zero se proiettate lungo componenti
+1:20:40
+1 hour, 20 minutes, 40 seconds
+principali diverse, è questa formula qui, cioè la varianza di XV. Quindi
+1:20:47
+1 hour, 20 minutes, 47 seconds
+prendete tutta la base delle principali delle componenti principali, prendetele come colonne di questa matrice V, fate
+1:20:55
+1 hour, 20 minutes, 55 seconds
+la varianza di X trasformata con V, quindi ruotata. Beh, allora la formula dice che dovete fare V trasposto varianza di XV
+1:21:04
+1 hour, 21 minutes, 4 seconds
+e risulta una matrice diagonale, completamente diagonale e sulle diagonali avete gli autovalori.
+1:21:10
+1 hour, 21 minutes, 10 seconds
+Ok? Tendenzialmente gli autovalori sono sempre ordinati in ordine decrescente.
+1:21:15
+1 hour, 21 minutes, 15 seconds
+La prima componente è quella con l'autovalore più grande, la seconda quello il secondo più grande e così via.
+1:21:21
+1 hour, 21 minutes, 21 seconds
+Allora, diciamo quindi per bene com'è questo algoritmo della PCA.
+1:21:26
+1 hour, 21 minutes, 26 seconds
+E vi dicevo il passo zero, questo in realtà è opzionale, però va praticamente
+1:21:33
+1 hour, 21 minutes, 33 seconds
+sempre fatto. Ok? Anzio, attenti che in R effettivamente dipende dal comando che usate, però a volte non
+1:21:41
+1 hour, 21 minutes, 41 seconds
+lo fa in automatico, quindi dovete dirglielo perché altrimenti trovate delle cose senza senso spesso. È di standardizzare i dati, ok? E ripeto, è
+1:21:50
+1 hour, 21 minutes, 50 seconds
+una questione di unità di misura, perché magari le varianze di certe direzioni sono già grandi perché ho usato millimetri invece di usare metri e
+1:21:58
+1 hour, 21 minutes, 58 seconds
+quindi è tutto tutti i numeri sono grandi, invece tutto il resto hanno numeri ragionevoli. Quindi standardizzare i dati è importante, non
+1:22:06
+1 hour, 22 minutes, 6 seconds
+è obbligatorio per la BCA, ma fortemente consigliato. Poi si calcola la matrice delle varianze che poi diventa la matrice delle correlazioni.
+1:22:14
+1 hour, 22 minutes, 14 seconds
+standardizziamo i dati.
+1:22:17
+1 hour, 22 minutes, 17 seconds
+A quel punto si determina la base di questi autovettori usando tecniche di algebra lineare, non insomma non è
+1:22:24
+1 hour, 22 minutes, 24 seconds
+importante come si trova. Si trova questa base ortonormale di autovettori e le ordiniamo in base in ordine
+1:22:32
+1 hour, 22 minutes, 32 seconds
+decrescente di autovalori perché la prima componente è quella con la maggiore varianza, la seconda quella un po' meno e così via. E poi cosa si fa?
+1:22:40
+1 hour, 22 minutes, 40 seconds
+Beh, si sceglie K, si sceglie quante componenti principali vogliamo considerare. Ok? Vogliamo ridurre la dimensionalità a 1, facciamo k = 1.
+1:22:50
+1 hour, 22 minutes, 50 seconds
+Adesso vediamo un attimo di perché la scelta del k è di nuovo problematica, però una volta che abbiamo scelto K,
+1:22:57
+1 hour, 22 minutes, 57 seconds
+allora cosa facciamo? Ci teniamo solo il pezzo, il blocco di quella matrice corrispondente a V1, V2, VK. Prendiamo
+1:23:04
+1 hour, 23 minutes, 4 seconds
+solo i primi k vettori, ok? Quindi una matrice D* K e a quel punto abbiamo la
+1:23:12
+1 hour, 23 minutes, 12 seconds
+nostra proiezione, ok? Se i dati li avete già riscalati, centrati, non c'è una media, quindi semplicemente fate il
+1:23:19
+1 hour, 23 minutes, 19 seconds
+dataset X per la matrice U. Ok? E quindi troviamo delle nuove caratteristiche che sono quelle proiettate, sono delle
+1:23:27
+1 hour, 23 minutes, 27 seconds
+combinazioni con questi pesi dati da dalle V, dalle componenti delle Velle feature originarie. Ne abbiamo meno,
+1:23:36
+1 hour, 23 minutes, 36 seconds
+sono K. Se no scegliamo K, dipende quanto è grande K. E abbiamo queste nuove features. Allora, queste feature
+1:23:43
+1 hour, 23 minutes, 43 seconds
+viene vengono dette a volte scorsi i punteggi, ok? Dellanalisi delle componenti principali. Ok?
+1:23:52
+1 hour, 23 minutes, 52 seconds
+E attenti perché eh c'è un'altra quantità. Ecco, sì, infatti l'ho scritta dopo,
+1:24:00
+1 hour, 24 minutes
+però vabbè, vediamo un attimino come si visualizza poi la vediamo mercoledì con calma. Come si visualizzano queste queste nuove questi scores? Beh,
+1:24:09
+1 hour, 24 minutes, 9 seconds
+semplicemente, invece di plotare i dati su una coppia di coordinate che sono quelle originarie, le coppie di feature originarie, andiamo a fare una eh li
+1:24:18
+1 hour, 24 minutes, 18 seconds
+plotiamo sulle coordinate delle delle prima componente principale o della seconda, oppure della seconda e della terza, della prima, della quinta, non lo
+1:24:26
+1 hour, 24 minutes, 26 seconds
+so. Comunque scegliamo coppie di di coordinate che non sono quelle originali delle feature originali, ma di quelle eh ruotate delle nostre componenti
+1:24:34
+1 hour, 24 minutes, 34 seconds
+principali. Ok? Ad esempio, un modo per visualizzarlo, poi vediamo perché si chiama Bplot, è il Bplot, appunto. E in
+1:24:42
+1 hour, 24 minutes, 42 seconds
+questo caso abbiamo visualizzato il dataset, quello di Iris, però non sul su
+1:24:50
+1 hour, 24 minutes, 50 seconds
+coppie di di componenti, quelle originali, ma sulle prime due componenti principali, ok? abbiamo sull'asse delle x la prima componente principale, quindi
+1:24:58
+1 hour, 24 minutes, 58 seconds
+lungo le x avete la maggiore variabilità che potete vedere nei vostri dati.
+1:25:03
+1 hour, 25 minutes, 3 seconds
+Quindi se se avessi solo la x vedete una grandissima variabilità perché avete questo gruppo qui che va a finire qui in questa zona e quest'altro che va a
+1:25:09
+1 hour, 25 minutes, 9 seconds
+finire qui. E poi sulla y abbiamo la seconda componente principale, quindi tra quelle ortogonali alla prima, quella
+1:25:17
+1 hour, 25 minutes, 17 seconds
+che comunque massimizza la variabilità, la varianza. Ok? Poi vedremo perché si chiama Bplot, però non è soltanto la
+1:25:24
+1 hour, 25 minutes, 24 seconds
+cosa importante, quanto piuttosto le ultime terminologie
+1:25:30
+1 hour, 25 minutes, 30 seconds
+che è quella delle ehm sì della delle matrici dei loadings che
+1:25:37
+1 hour, 25 minutes, 37 seconds
+ora finiamo con questa, va bene? Allora, dicevamo, la PCA ci dice partite dai vostri dati, selezionate K, costruite
+1:25:46
+1 hour, 25 minutes, 46 seconds
+questa vettore, questa matrice con i primi K autovettori e proiettate, quindi fate x * 1. Eh, allora questo significa
+1:25:55
+1 hour, 25 minutes, 55 seconds
+fare x per questa matrice che è d * k perché avete preso soltanto i k autovettori.
+1:26:01
+1 hour, 26 minutes, 1 second
+Allora, cosa succede? Gli scores che proprietà hanno? Beh, tutti gli tutti gli score se uno li prende fino a K = D aveva una matrice diagonale. Beh, lo
+1:26:10
+1 hour, 26 minutes, 10 seconds
+stesso succede se noi prendiamo i primi K, va bene? I primi K score sono variabili comunque non correlate. La
+1:26:18
+1 hour, 26 minutes, 18 seconds
+covarianza è zero. O la varianza degli Z, se uno usa le le regole di trasformazione è diagonale. Ovviamente
+1:26:25
+1 hour, 26 minutes, 25 seconds
+non vedete tutti i lambda 1 e lambda D, vedete solo i primi k perché avete scelto le prime k. Ok?
+1:26:33
+1 hour, 26 minutes, 33 seconds
+Ecco, attenzione che spesso poi si confonde la PCA con la EFA, la la analisi fattoriale. A volte vengono
+1:26:41
+1 hour, 26 minutes, 41 seconds
+chiamati scores gli standardizzati della Z, ok? Quindi chiamiamoli Z cappuccio.
+1:26:48
+1 hour, 26 minutes, 48 seconds
+Cosa significa? Significa che dovete prendere Z, togliere la media, ma la media è zero perché abbiamo già standardizzato all'inizio e dividere per
+1:26:56
+1 hour, 26 minutes, 56 seconds
+la deviazione standard. Ok? Allora, attenti, eh, perché spesso uno può chiamare scorre anche questi c'è un po' di ambiguità, fa venire il mal di testa,
+1:27:04
+1 hour, 27 minutes, 4 seconds
+quindi se se possibile dite esplicitamente cosa state considerando, ok? Che non ci siano ambiguità, soprattutto se fate un mix tra PCA e
+1:27:14
+1 hour, 27 minutes, 14 seconds
+analisi fattoriale. Ok? Quindi attenti che spesso allora gli score si prendono quelli non standardizzati, ok? Questa è
+1:27:21
+1 hour, 27 minutes, 21 seconds
+la la cosa di base, però a volte può essere utile standardizzare gli scorsi.
+1:27:26
+1 hour, 27 minutes, 26 seconds
+Altra cosa importante, se andiamo a vedere le matrici, no, la matrice V, no, la matrice V contiene V1, V2, i primi K
+1:27:36
+1 hour, 27 minutes, 36 seconds
+autovettori VK. Beh, allora se andiamo a vedere la componente ora Lj
+1:27:46
+1 hour, 27 minutes, 46 seconds
+eh vediamo cosa indica, appunto, cosa indica? e indica un po' questa matrice, appunto, anche qui terminologia a volte
+1:27:54
+1 hour, 27 minutes, 54 seconds
+si chiama matrice dei loadings e indica l'associazione è un po' parente della
+1:27:59
+1 hour, 27 minutes, 59 seconds
+correlazione tra lo score ZL e la e la feature originale XJ, la componente J.
+1:28:09
+1 hour, 28 minutes, 9 seconds
+Ok? Perché? Perché se andiamo a fare la covarianza tra X e Z, che è però X proiettato, è
+1:28:17
+1 hour, 28 minutes, 17 seconds
+molto facile l'operazione perché Z è X proiettato, quindi trovate la varianza di X proiettata, cioè moltiplicata a destra per V.
+1:28:25
+1 hour, 28 minutes, 25 seconds
+Però V sono autovalori, V sono autovettori, quindi quando moltiplicate V colonna per colonna per la matrice varra trovate sempre V, quindi trovate
+1:28:34
+1 hour, 28 minutes, 34 seconds
+praticamente V stessa se non moltiplicata per gli autovalori. Quindi trovate questa matrice qui. La prima
+1:28:41
+1 hour, 28 minutes, 41 seconds
+colonna è lambda 1 V2 1, la seconda è lambda 2 V2 fino a lambda k VK. Quindi le covarianze non sono proprio i vostri
+1:28:49
+1 hour, 28 minutes, 49 seconds
+V. attenti, eh, perché a volte ci si ci si confonde, però si può dire che le correlazioni, che sono più interessanti
+1:28:57
+1 hour, 28 minutes, 57 seconds
+sono un multiplo di V. Ok? Quindi quando volete la correlazione, che può essere quello che vi può interessare tra la
+1:29:05
+1 hour, 29 minutes, 5 seconds
+feature originale XJ e quella trasformata, lo score ZL, quindi quella proiettata, questo può essere
+1:29:12
+1 hour, 29 minutes, 12 seconds
+interessante, come correla questa Z che ho trovato con delle variabili che avevo inizialmente? Beh, vedremo poi che serve
+1:29:20
+1 hour, 29 minutes, 20 seconds
+per ricostruire un po' il significato di questi scor Z. Beh, allora la correlazione, se uno si ricorda bene qual era la formula della correlazione e
+1:29:29
+1 hour, 29 minutes, 29 seconds
+si ricorda che la le feature sono già standardizzate, quelle le X, beh, risulta essere la radice di lambda L,
+1:29:37
+1 hour, 29 minutes, 37 seconds
+quindi la deviazione standard della vostra ZL per la VLJ. Ok? Quindi la componente
+1:29:45
+1 hour, 29 minutes, 45 seconds
+L, ora scritta così è un po' vabbè sarebbe la colonna L e eh
+1:29:53
+1 hour, 29 minutes, 53 seconds
+riga J. Attenti che qui è colon Liga.
+1:30:02
+1 hour, 30 minutes, 2 seconds
+Comunque poi nella pratica è difficile confondersi perché l'output di R vi vi mostra bene quali sono le feature, cioè
+1:30:09
+1 hour, 30 minutes, 9 seconds
+vi mette sempre delle etichette sulle righe le colonne. Quindi attenti, magari qui per come è scritta è un po' invertita, no? colonna J e riga L,
+1:30:19
+1 hour, 30 minutes, 19 seconds
+quindi colonna Liga J. Sembrerebbe invece il contrario. Allora, questa matrice, quindi a volte non è lei, cioè c'è un po' di ambiguità. A volte la
+1:30:27
+1 hour, 30 minutes, 27 seconds
+matrice dei loadings è proprio la matrice U, questa V troncata ai primi K, a volte è questa matrice L. Allora,
+1:30:35
+1 hour, 30 minutes, 35 seconds
+nella EFA, nellaanalisi fattoriale è questa quella che si chiama matrice dei loadings. Ok? Però attenti che in PCA a
+1:30:43
+1 hour, 30 minutes, 43 seconds
+volte questa terminologia matrice dei loadings viene da quell'altra teoria.
+1:30:46
+1 hour, 30 minutes, 46 seconds
+Sono due teorie che sono nate un po' indipendentemente, poi sono confluite perché ci sono accorti che c'erano molte similarità e quindi per la analisi
+1:30:54
+1 hour, 30 minutes, 54 seconds
+fattoriale sarà questa la matrice di loadings, ok? Questa L, quella che contiene le correlazioni che ha un po' più significato, insomma, statistico
+1:31:02
+1 hour, 31 minutes, 2 seconds
+interessante perché sono già riscalate tra -1 e 1. Ok?
+1:31:07
+1 hour, 31 minutes, 7 seconds
+Beh, allora, quindi dai, fermiamoci qui, tanto quell'altro lo vediamo nella pratica, direi. Quindi,
+1:31:13
+1 hour, 31 minutes, 13 seconds
+come determinare K lo lasciamo a mercoledì, va bene? Tanto vedrete che
+1:31:21
+1 hour, 31 minutes, 21 seconds
+gli esempi poi sono molto più semplici rispetto al clustering.
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+91 watching
+2:58
+FROZEN 3 (2027) | TEASER TRAILER | Walt Disney Animation (D23)
+SLUURP
+2.5m 1 mo ago
+39:47
+Beethoven - Triple Concerto in C Major, op. 56 | Morgenstern Trio, Casco Phil, Benjamin Haemhouts
+CASCO Phil
+15k 2 mo ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+223k 13 hr ago
+New
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+5:01
+Inventing Spanish - SNL
+Saturday Night Live
+8.3m 11 mo ago
+3:37
+Farewell to HD Atlas
+Boston Dynamics
+4.1m 2 yr ago
+13:44
+Trump IMPLODES After SHUT UP By Carney To His FACE!
+Jack Cocchiarella
+1.9m 1 yr ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+13:24
+Ezio Bosso at Sanremo 2016 CAPTIONED
+tubegiro
+94k 10 yr ago
+5:43
+Gigi Proietti - La pioggia nel pineto (Gabriele D'Annunzio)
+Gigi Proietti Fans
+1.3m 9 yr ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+2:13
+Rogue Robot Launches Kung Fu Kicks, While Handlers Attempt to Subdue It
+New York Post
+2.6m 2 mo ago
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+29:08
+Top 50 FUNNIEST Crashes from Red Bull Soapbox Race
+Red Bull Soapbox
+3.7m 3 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+5:24
+1986: How to Spot the Upper Class | That's Life! | BBC Archive
+BBC Archive
+2.7m 5 mo ago
+41:56
+Rachmaninoff Piano Concerto No. 2. Khatia Buniatishvili's LEGENDARY Performance (Full Concerto)
+RoxBlog Classical Music
+435k 10 mo ago
+57:02
+[4K Live] Chopin Complete Ballades & Liszt Ballade No.2 - Yejin Noh | 쇼팽 발라드 전곡 & 리스트 발라드 2번 - 노예진
+NCM KLASSIK
+234k 5 mo ago
+40:05
+Janine Jansen - Violin Concerto in D major, Op.77 (Brahms)
+B.V.Tokio Ⅱ
+568k 10 yr ago

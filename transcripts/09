@@ -1,0 +1,2356 @@
+
+IT
+750AA 2025 11 17 lezione 17
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+165 views  17 Nov 2025
+Serie storiche (temporali), definizione, visualizzazione, decomposizione additiva e moltiplicativa: trend, stagionalità, resto. Serie ritardata, autocovarianza, autocorrelazione. Differenziazione per eliminare il trend. Stima del trend tramite regressione lineare. Trasformazioni non lineari: log/esponenziale, BoxCox. Modelli elementari di previsione: naive, snaive, media, drift, kNN per serie storiche. Validazione crociata per serie storiche: descrizione del problema, divisione training/test, validazione rolling origin. Esempi (selezione iperparametri di modelli kNN per la previsione).
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:00
+0 seconds
+Ok, allora iniziamo con un paio di annunci.
+0:06
+6 seconds
+Prima di tutto mi scuso che ancora non ho iniziato a vedere le relazioni perché sono eh c'ho parecchia didattica questo
+0:15
+15 seconds
+semestre. E allora l'altra cosa riguarda invece la possibilità di una prova eh
+0:23
+23 seconds
+adesso a dicembre. Allora, ho fatto i conti, cioè il fatto che perdiamo la lezione dell'otto e non aiuta tantissimo perché volevo
+0:30
+30 seconds
+comunque avere un po' di respiro sulla teoria finiamo tranquillamente, soltanto che preferirei riservare il 10
+0:39
+39 seconds
+in cui facciamo forse qualche ultima osservazione su serie storiche se c'è bisogno, magari facciamo il il quiz e
+0:47
+47 seconds
+poi vi do una prova falsa di cioè tipo prova d'esame che sarà e la facciamo lì nell'aula. Ok, però non viene valutata,
+0:55
+55 seconds
+è tipo di autovalutazione. Così voi avete poi una ventina di giorni perché comunque gli appelli sono i primi di gennaio e e vedete avete venite a fare
+1:05
+1 minute, 5 seconds
+la prova vera che è di un'ora. Comunque non è che vi costa tantissima fatica.
+1:09
+1 minute, 9 seconds
+Secondo me è la cosa migliore, perché altrimenti è logisticamente difficile, cioè se fosse capitato qui ci stavate,
+1:17
+1 minute, 17 seconds
+ma farvi stare tutti quell'altra aula e fare la vera prova è complicato perché devo comunque vigilare un minimo che non che non copiate. Ok? Quindi, secondo me,
+1:25
+1 minute, 25 seconds
+la cosa migliore è il finire, come è previsto lezioni il la settimana del 13,
+1:32
+1 minute, 32 seconds
+quindi finiremo giusti, faremo 57 ore o 58, qu facciamo. Quindi ci siamo e il programma è tutto svolto. Semplicemente
+1:41
+1 minute, 41 seconds
+non riusciamo a, cioè, non riesco a incastrarci anche questa prova. Va bene?
+1:46
+1 minute, 46 seconds
+Mi spiace perché comunque è fattibile, ma secondo me, esseno anche il primo anno è meglio non esagerare un po' con con l'idea di anticipare correre. Vi do questa prova.
+1:55
+1 minute, 55 seconds
+Così vedete un po' com'è e siete pronti, poi a gennaio avete le tre occasioni, insomma. Quindi, secondo me, insomma, è un giusto bilanciamento tra quello che
+2:02
+2 minutes, 2 seconds
+riesco a fare anch'io, insomma, oltre eh la settimana dopo eh la settimana dopo voglio riposarmi un attimo anch'io, ok? E quindi non non
+2:11
+2 minutes, 11 seconds
+voglio fare perché dopo a gennaio ho non soltanto le prove vostre, ma ho questi qui, ho anche quelli di matematica, quindi sarà un po' un to the force,
+2:18
+2 minutes, 18 seconds
+quindi evitiamo, dai, facciamo così e mi mi prendo un po' di respiro prima di Natale e non dopo. Va bene, dai, vi
+2:25
+2 minutes, 25 seconds
+chiedo questa questa cosa, dai. Poi magari l'anno prossimo, ora voi siete stati anche un po' un esperimento, l'anno prossimo magari infila tutto più liscio e facciamo anche ste prove a
+2:33
+2 minutes, 33 seconds
+dicembre. Se funziona questo meccanismo, secondo me diventa alla lunga molto sostenibile. Va bene? Allora, dai,
+2:41
+2 minutes, 41 seconds
+vediamo invece l'argomento nuovo. Voi comunque se siete pronti sulla regressione, avete fatto il vostro progettino, siete pronti, potete
+2:49
+2 minutes, 49 seconds
+mandarmelo, altrimenti tenetelo lì un attimino congelato, appena riesco a darvi il feedback sulle serie, sulla classificazione, poi me ne mandate
+2:56
+2 minutes, 56 seconds
+subito uno nuovo, va bene? Però se siete anche tranquilli e credete che vada bene, mandatemi pure anche l'altro, insomma.
+3:03
+3 minutes, 3 seconds
+Allora, parliamo invece del terzo argomento, ma vedrete è qualcosa che si aggiunge ai precedenti, no? Quindi parliamo di serie storiche. Quindi cosa
+3:11
+3 minutes, 11 seconds
+facciamo? Andiamo a studiare le serie storiche o le serie temporali da un punto di vista statistico. Allora, cosa
+3:18
+3 minutes, 18 seconds
+faremo? Beh, sono tre lezioni più le tre, insomma, laboratori DR dove vediamo un po' i comandi in pratica quali sono.
+3:26
+3 minutes, 26 seconds
+E oggi vabbè, introduciamo l'argomento, poi cerchiamo di visualizzare queste serie storiche, queste serie temporali.
+3:34
+3 minutes, 34 seconds
+Descriviamo la decomposizione in trend, stagionalità e resto, quello che rimane rumore, chiamiamolo pure così, e vediamo
+3:43
+3 minutes, 43 seconds
+il concetto di autocorrelazione che è veramente importante per le serie storiche che sarà appunto una correlazione tra la
+3:50
+3 minutes, 50 seconds
+serie e se stessa, ma ritardata, appunto, e poi vediamo con dei modellini molto molto semplici, ok? di previsione,
+3:57
+3 minutes, 57 seconds
+cioè sono proprio si chiamano naive oppure niente a che fare con naive bases e questi KNN si può usare KNN anche in
+4:04
+4 minutes, 4 seconds
+questo caso. Secondo me è simpatico perché alla fine così avete visto KNN in tutte le le salse, così un giorno semmai avrete un ricordo di questo corso, sarà
+4:13
+4 minutes, 13 seconds
+che KNN si può usare per tutto, che non è K means eh. E poi vediamo questo.
+4:19
+4 minutes, 19 seconds
+Concludiamo con questa cross validation, però vediamo cosa succede nella cross validation per le serie temporali.
+4:24
+4 minutes, 24 seconds
+Bisogna stare un attimo attenti, non si può fare in modo semplice come facevamo per la già per la classificazione come
+4:31
+4 minutes, 31 seconds
+poi per la regressione. Allora, di testi sulle serie storiche ce ne sono molti.
+4:36
+4 minutes, 36 seconds
+Io tendenzialmente prendo eh come riferimento questo di Hindman, va bene?
+4:42
+4 minutes, 42 seconds
+E Atanasulos, va bene? Questo è un bel testo, ho visto che è anche tradotto in italiano e usa comandi di R molto aggiornati se prendete l'ultima
+4:50
+4 minutes, 50 seconds
+edizione, quindi se vi interessa, però contiene molto di più di quello che faremo, eh, come al solito, però prendetelo pure come testo, perché mi sembra che non ci siano gli appunti o
+4:59
+4 minutes, 59 seconds
+dispense degli anni precedenti, quindi questa è una parte un po', insomma, dal punto di vista teorico che si richiede
+5:07
+5 minutes, 7 seconds
+qualcosa in più. Allora, se avete tempo vedete quel testo e ci sono diversi esempi oltre a quelli che vediamo qui.
+5:13
+5 minutes, 13 seconds
+Allora, parliamo un po' di serie storica o serie temporale, cosa si intende? Beh, si intende semplicemente una sequenza di osservazioni di una quantità, però nel
+5:23
+5 minutes, 23 seconds
+tempo, ok? Come variano nel tempo, quindi i nostri dati che di solito supponevamo osservazioni xi, yi o,
+5:32
+5 minutes, 32 seconds
+insomma, soltanto xi, se siete so nel clustering eccetera. Beh, ora questa volta cambiamo il nome dell'indice, ma non è soltanto un nome così che cambia,
+5:40
+5 minutes, 40 seconds
+lo chiamiamo y con t e l'indice t viaggia da 1 a t grande e questo sta a significare che abbiamo una nozione di
+5:47
+5 minutes, 47 seconds
+tempo, quindi c'è un ordine, ok? Il tempo è ordinato e appunto abbiamo questa idea di tempo crescente e poi i
+5:56
+5 minutes, 56 seconds
+valori possono essere reali. I valori YT sono dati che sono reali, potrebbero essere [schiarire la voce] anche qualitativi o più in generale possono
+6:04
+6 minutes, 4 seconds
+essere vettoriali se avete serie multivariate.
+6:08
+6 minutes, 8 seconds
+Ok? Quindi il nome in inglese è Time Series, ok? Ricordatevelo perché poi in R sarà abbreviato come TS, va bene? Time
+6:15
+6 minutes, 15 seconds
+Series. In italiano è serie storiche o serie temporali, va bene? Allora, ovviamente tantissimi dati rientrano in questa categoria.
+6:23
+6 minutes, 23 seconds
+Abbiamo visto anche insomma chi ha navigato un po' sul sito ISTAT si accorge che in realtà è più naturale che i dati che gli vengono presentati sono già serie storiche, no? Perché nel tempo
+6:32
+6 minutes, 32 seconds
+uno osserva come cambiano certe quantità, quindi dati economici, finanziari, dati climatici, anche i dati
+6:39
+6 minutes, 39 seconds
+epidemiologici. Vabbè, ad esempio, immaginate, no, quando c'era il Covid tutti, non so se voi avete magari
+6:46
+6 minutes, 46 seconds
+rimosso, ma si vedevano tante di questi dati e ogni giorno venivano presentati, no? Allora, qual è la differenza principale rispetto a tutto quello che
+6:55
+6 minutes, 55 seconds
+abbiamo visto fino adesso? In effetti la differenza è che nel clustering, vabbè, nel clustering non tanto perché non abbiamo mai veramente parlato di
+7:03
+7 minutes, 3 seconds
+modelli, ma nella classificazione, quando in particolare abbiamo parlato di errore di generalizzazione, no? E anche nella regressione
+7:11
+7 minutes, 11 seconds
+il modello di base era che i dati osservati fossero un campione statistico di cosa? di variabili indipendenti.
+7:19
+7 minutes, 19 seconds
+Quindi il punto chiave è l'indipendenza.
+7:22
+7 minutes, 22 seconds
+Ora, per le serie storiche noi non vogliamo l'indipendenza perché il nostro obiettivo
+7:28
+7 minutes, 28 seconds
+sarà di usare la dipendenza nel tempo per poter fare delle previsioni. Ok?
+7:35
+7 minutes, 35 seconds
+L'obiettivo principale, di solito per le serie storiche è di fare previsioni nel futuro o se siete archeologi potete fare previsioni del passato, ok?
+7:44
+7 minutes, 44 seconds
+Tendenzialmente si vuole prevedere qualcosa nel futuro, ok? Noi metteremo tutta l'attenzione nel futuro, va bene?
+7:50
+7 minutes, 50 seconds
+Poi ci sono anche questioni un po' diverse che sono quelle del filtraggio in cui volete capire invece lo stato in cui siete perché le osservazioni sono rumorose, ma noi ci occupiamo soprattutto della previsione, va bene?
+8:01
+8 minutes, 1 second
+Questa parte del corso. Quindi ora il punto quale sarebbe? che se fossero tutte osservazioni indipendenti, eh aver
+8:08
+8 minutes, 8 seconds
+visto mesi, anni, un periodo lunghissimo, non ci non ci direbbe nulla su cosa succede nel futuro, perché l'indipendenza è proprio questa, anche
+8:16
+8 minutes, 16 seconds
+sapere tutto il passato non vi dice nulla sul sul futuro, ok? Quindi, invece, noi vogliamo la dipendenza e
+8:24
+8 minutes, 24 seconds
+però vorremmo in qualche modo misurarla e sfruttarla. Ecco, allora cominciamo a capire innanzitutto come si visualizzano
+8:31
+8 minutes, 31 seconds
+le serie storiche che mentre per i dati, insomma, per i campioni di varie obligatorie uno fa di solito diagrammi a nuvole di punti, tendenzialmente per le
+8:39
+8 minutes, 39 seconds
+serie storiche si usano diagrammi a linea, ok? Time plot o line plot, un grafico temporale in italiano. Quindi
+8:47
+8 minutes, 47 seconds
+cosa si mette sulla scisse? Si mette il tempo. In questo caso è una serie storica, adesso userò un paio di esempi che sono piuttosto standard. Questa è
+8:55
+8 minutes, 55 seconds
+una serie storica, si chiama Air Passengers. Sono il numero di di persone che viaggiano in aereo, in America,
+9:03
+9 minutes, 3 seconds
+tutti gli Stati Uniti credo, ma se parliamo di parecchi anni fa, 1950, 1960. Ok? Allora, cosa facciamo? per
+9:11
+9 minutes, 11 seconds
+ogni mese è registrato il valore del numero totale di passeggeri, non so, in boh, non so, in migliaia di di persone
+9:19
+9 minutes, 19 seconds
+credo. E a quel punto vediamo che al vari mesi avremo dei punti, ma noi li interpoliamo linearmente, usiamo questo grafico a linea. Va bene? Allora, cosa
+9:28
+9 minutes, 28 seconds
+possiamo vedere qui in questo andamento di del numero di passeggeri di passeggeri che viaggia in aereo? Beh, vediamo che
+9:35
+9 minutes, 35 seconds
+c'è un andamento crescente, una funzione che col tempo sta crescendo, ma abbiamo anche delle oscillazioni.
+9:42
+9 minutes, 42 seconds
+Ok, cercheremo di studiare appunto questo andamento crescente. Diremo che c'è un trend, c'è un andamento, un drift, a volte si può chiamare anche
+9:50
+9 minutes, 50 seconds
+così, ma trend è più tipico delle serie storiche e poi abbiamo le oscillazioni, quelle che chiameremo la stagionalità,
+9:57
+9 minutes, 57 seconds
+va bene? Poi in realtà le serie storiche però non sono tutte così. Vediamo un altro esempio. Ci sono le serie storiche della finanza, no? Nella finanza avete
+10:06
+10 minutes, 6 seconds
+gli indici finanziari, i prezzi delle azioni, gli indici di borsa, i prezzi del, insomma, delle anche dei cambi, no,
+10:14
+10 minutes, 14 seconds
+del indici di cambio tra valute, eccetera. Allora, queste che tipo di andamento hanno? Beh, tendenzialmente di solito se le plotate su un periodo
+10:22
+10 minutes, 22 seconds
+abbastanza lungo di tempo, questi sono gli indici azionari principali europei.
+10:27
+10 minutes, 27 seconds
+Purtroppo e anche qui sono piuttosto datati perché sono quelli già precaricati in R, va bene? E abbiamo gli indici, vedete, hanno tutti un andamento
+10:35
+10 minutes, 35 seconds
+crescente. Il valore del tempo è sempre sulle X. Ora sono in un periodo tra eh di 7 anni, vedete che c'è un andamento
+10:43
+10 minutes, 43 seconds
+crescente, però attenti, se andate a vederli questi dati finanziari tendenzialmente su periodi molto più brevi, l'andamento crescente non lo vedete, ok? Quindi, diciamo,
+10:52
+10 minutes, 52 seconds
+scommettendo in borsa, mettendo i propri risparmi in borsa, tendenzialmente si si guadagna, si superano anche investimenti
+11:00
+11 minutes
+cosiddetti più sicuri, però attenti che su periodi medi o piccoli, insomma, ci può essere anche medi, appunto, può esserci un po' di di rischio che sono
+11:08
+11 minutes, 8 seconds
+queste oscillazioni, questo rumore. Qui invece non si vedono le le oscillazioni regolari come erano prima sulla serie
+11:16
+11 minutes, 16 seconds
+dei passeggeri. Va bene, vediamo un altro plot, giusto per fissare un po' di esempi. Beh, ovviamente poi se avete quattro plot che rappresentano tutte le
+11:24
+11 minutes, 24 seconds
+stesse, insomma, sono indici leggermente diversi, però sono di natura simile, allora si possono anche mettere insieme, chiaramente. Invece, un altro esempio
+11:33
+11 minutes, 33 seconds
+che vi voglio mostrare è che studiamo, appunto, in questa lezione è un andamento senza trend, ok? Quindi è un
+11:41
+11 minutes, 41 seconds
+andamento in cui c'è soltanto un'oscillazione, ma vedete l'oscillazione c'è e questa è la temperatura media mensile a
+11:49
+11 minutes, 49 seconds
+Nottingham. Anche qui dati classici, diciamo per una ventina d'anni del 1900.
+11:57
+11 minutes, 57 seconds
+E vedete la temperatura media ha un andamento mensile, quindi attenzione, ogni punto rappresenta un mese, quindi se vedete
+12:05
+12 minutes, 5 seconds
+ciascuna di quelle curve che voi vedete anche a occhio, una specie di di andamento sinosidale, un periodo vi rappresenta un anno e vedete che però
+12:14
+12 minutes, 14 seconds
+c'è un andamento un po' simile a quello di Air Pessengers, ma intanto non c'è il trend, no? Sono più o meno rimane costante, no? Il valore tipico è
+12:22
+12 minutes, 22 seconds
+costante, ma poi vedete anche un po' meglio il rumore, no? ci sono dei non sono esattamente che si non si ripetono esattamente, no? Ci sono a volte degli
+12:29
+12 minutes, 29 seconds
+anni in cui, che so la media è venuta molto bassa, che so se sarà gennaio qui o altri in cui la media era più alta.
+12:36
+12 minutes, 36 seconds
+Quindi qui vediamo un po' più da vicino il rumore, il quello che rimane dopo aver decomposto in trend e stagionalità.
+12:44
+12 minutes, 44 seconds
+Comunque per il momento pensatelo come una semplice visualizzazione di un altro esempio. Ok? Quindi ora ci fissiamo su questi tre esempi, giusto
+12:51
+12 minutes, 51 seconds
+per avere qualcosa di eh concreto di cui parlare. Quindi, allora, vedendo questi tre esempi, abbiamo detto che a volte
+12:58
+12 minutes, 58 seconds
+l'andamento nel tempo presenta una regolarità crescente o decrescente e questo, insomma, su un periodo lungo, pensate appunto alla borsa, no? Quindi
+13:06
+13 minutes, 6 seconds
+su periodo non così breve. E allora possiamo chiamare trend. È un buon ancora un po' ambiguo, eh cosa sia questo trend, no? però chiamiamolo trend
+13:15
+13 minutes, 15 seconds
+per il momento, un andamento di lungo periodo.
+13:19
+13 minutes, 19 seconds
+Poi abbiamo visto che ci sono delle fluttuazioni che si ripetono in modo regolare. Pensate quello delle temperature, ma anche quello dei passeggeri aveva queste fluttuazioni che
+13:28
+13 minutes, 28 seconds
+si ripetevano in modo abbastanza regolare entro un periodo. Quanto deve essere grande un periodo? Dipende da che tipo di serie stiamo valutando. A volte
+13:36
+13 minutes, 36 seconds
+non è neanche chiaro, bisogna stimare quanto deve essere questo periodo.
+13:41
+13 minutes, 41 seconds
+Allora, se diciamo che c'è un ingrediente di questo tipo, in realtà possiamo decidere noi se ci sia o non ci sia, lo chiameremo comunque stagionalità.
+13:50
+13 minutes, 50 seconds
+Poi c'è un andamento che tipicamente in economia è più rilevante ed è qualcosa che è intermedio, se volete, tra trend e
+13:58
+13 minutes, 58 seconds
+stagionalità. Allora, questa volta si chiama un ciclo e eh sono delle variazioni che sono un po' più lente
+14:05
+14 minutes, 5 seconds
+rispetto a a quello che invece chiamate stagionalità.
+14:10
+14 minutes, 10 seconds
+Eh tipo ad esempio ci sono cicli economici, uno dice ogni 20-30 anni ci sono questi cicli con crisi e poi momenti di ripresa e così via. Allora,
+14:18
+14 minutes, 18 seconds
+si può chiamare ciclo. Ora, tendenzialmente nelle nostre decomposizioni questo lo assorbiremo dentro il trend o dentro la
+14:26
+14 minutes, 26 seconds
+stagionalità, ma potrebbe essere in realtà la cosa che che a cui uno interessa, cioè delle variazioni che magari hanno una certa regolarità, ma
+14:34
+14 minutes, 34 seconds
+non esattamente tale da finire nella stagionalità e neanche da dare un trend.
+14:39
+14 minutes, 39 seconds
+Poi, diciamo, nel momento in cui abbiamo detto ci sono queste tre quantità, tutto il resto lo chiameremo
+14:46
+14 minutes, 46 seconds
+residuo, rumore rimanente, ok? Resto, chiamatelo resto, residuo. Ora, non chiamatelo residuo nello stesso modo in cui abbiamo i residui nella regressione.
+14:56
+14 minutes, 56 seconds
+Ok? Potete chiamarlo rumore o o rimanenza, va bene?
+15:02
+15 minutes, 2 seconds
+E come dicevo, appunto, questo ciclo potrebbe finire nel trend ora, in effetti non nella stagionalità se perché
+15:09
+15 minutes, 9 seconds
+dovrebbe avere una periodicità che è più ampia rispetto alla stagionalità, quindi o finisce nel trend o nel o nel residuo, va bene?
+15:17
+15 minutes, 17 seconds
+Però, appunto, tendenzialmente noi non lo vediamo questo, facciamo soltanto trend, stagionalità e residuo nella decomposizione
+15:25
+15 minutes, 25 seconds
+e idealmente diciamo se il trend cattura l'andamento di lungo termine e la stagionalità cattura la periodicità
+15:33
+15 minutes, 33 seconds
+tipica che so di un anno, dipende da da dalla scala su cui stiamo guardando il tempo. E allora il residuo dovrebbe avere tutto quello che rimane, ma non
+15:41
+15 minutes, 41 seconds
+avere più queste strutture. Quindi il residuo dovrebbe avere idealmente in un mondo ideale in cui le serie storiche
+15:48
+15 minutes, 48 seconds
+sono appunto una somma o un qualche altra combinazione di questi termini, il residuo, il nostro obiettivo, sarebbe che il rumore sia cosiddetto bianco. Ok?
+15:58
+15 minutes, 58 seconds
+Il residuo dovrebbe essere quello che si chiama rumore bianco, cioè cosa vuol dire? Vuol dire che non c'è più trend, non c'è più stagionalità, non c'è più
+16:05
+16 minutes, 5 seconds
+struttura e idealmente diciamo che sono un campione questa volta sì di variabili identicamente distribuite a media zero e
+16:14
+16 minutes, 14 seconds
+varianza costante indipendenti, ok? Quindi indipendenti.
+16:22
+16 minutes, 22 seconds
+Indipendenti. Quindi, mentre la serie storica di per sé avrà una qualche dipendenza, l'idea in queste nello
+16:28
+16 minutes, 28 seconds
+studio, nell'analisi è di spezzare la dipendenza in trend, stagionalità e poi dare al residuo tutto il resto. Quello
+16:36
+16 minutes, 36 seconds
+che invece è rumore, qualcosa che non riusciamo a catturare. Ok? Ora questo è un mondo molto ideale. Adesso vediamo cosa succede e come si può trovare
+16:45
+16 minutes, 45 seconds
+queste decomposizioni. Va bene? Però se volete il primo passo, perché poi nel momento in cui avete, no, capito com'è
+16:52
+16 minutes, 52 seconds
+la struttura di questa serie, avete fatto una scelta, avete detto questo è ciclo, questo è trend, questo è stagionalità, poi a quel punto la
+16:59
+16 minutes, 59 seconds
+previsione è più semplice perché volete magari solo prevedere il trend o solo prevedere la stagionalità oppure prevedere tutto insieme. Ok? Quindi la
+17:08
+17 minutes, 8 seconds
+prima parte sicuramente è la visualizzazione e la decomposizione delle serie storiche.
+17:15
+17 minutes, 15 seconds
+Allora, da che ci siamo, specifichiamo alcuni modelli. Non vi dico ancora come li calcoliamo, forse la prossima volta ci concentriamo un po' di più, però per
+17:23
+17 minutes, 23 seconds
+il momento vediamo un po' come si possono definire e eh dopo vediamo qualche tecnica un po' così
+17:32
+17 minutes, 32 seconds
+elementare di calcolo di queste decomposizioni. Comunque tendenzialmente le decomposizioni sono di due natura, cioè di due nature in trend,
+17:39
+17 minutes, 39 seconds
+stagionalità e residuo. o si sceglie una decomposizione cosiddetta additiva. Cosa vuol dire? Che il trend va sommato alla
+17:48
+17 minutes, 48 seconds
+stagionalità che va poi sommato anche al residuo.
+17:53
+17 minutes, 53 seconds
+Oppure una decomposizione moltiplicativa in cui il trend viene moltiplicato per la per la stagionalità che viene moltiplicato
+18:01
+18 minutes, 1 second
+per il residuo. Ok? dice, "Vabbè, non è che siano così diverse, però in realtà, appunto, la scelta già di questo tipo di
+18:10
+18 minutes, 10 seconds
+decomposizione vi può aiutare, ok? E capire bene se una serie è più si presta più a decomposizione additiva piuttosto che moltiplicativa, è già un primo
+18:18
+18 minutes, 18 seconds
+passo, ecco, diciamo così. E adesso vediamo anche in pratica cosa cambia, ok? Se scegliamo una o scegliamo un'altra. Comunque in generale, appunto,
+18:26
+18 minutes, 26 seconds
+il fatto che quando c'è una decomposizione moltiplicativa, come si riconosce tipicamente, è che la
+18:33
+18 minutes, 33 seconds
+stagionalità sta a moltiplicare il trend. Quindi, se avete dei valori ormai molto grandi della serie, la stagionalità è qualcosa che si ripete
+18:41
+18 minutes, 41 seconds
+periodicamente, no? Ma siccome va a moltiplicare questo si ripercuota nel fatto che le oscillazioni aumentano
+18:48
+18 minutes, 48 seconds
+molto di più. Ok? Quindi avete all'inizio magari il valore della serie è piccolo, il trend è un valore basso e quindi vedete piccole oscillazioni.
+18:57
+18 minutes, 57 seconds
+Quando invece il trend è grande avete oscillazioni più grandi. Ok? Quindi questo, se volete è la primo, insomma,
+19:04
+19 minutes, 4 seconds
+campanello d'allarme che vi dice sarà decomposizione additiva o moltiplicativa.
+19:10
+19 minutes, 10 seconds
+Poi, ovviamente non è che sia una grande differenza dal lato matematico perché uno dice semplicemente ho applicato, se
+19:18
+19 minutes, 18 seconds
+voglio vedere la decomposizione moltiplicativa, non sto guardando la vera serie storica, ma sono passato al logaritmo e il logaritmo della serie storica, diciamo, sono tutti positivi.
+19:27
+19 minutes, 27 seconds
+di solito i valori che hanno una decomposizione moltiplicativa. Allora il logaritmo della serie storica diventa logaritmo del trend più logaritmo della stagionalità più logaritmo del residuo.
+19:38
+19 minutes, 38 seconds
+E allora significa che avete fatto una decomposizione additiva sul logaritmo della serie storica. Ok? questa idea di trasformare la serie storica in modo
+19:45
+19 minutes, 45 seconds
+semplice. Adesso vediamo si estende pure un pochino, ma è appunto è una cosa pure di base, cioè non è detto che la scala
+19:53
+19 minutes, 53 seconds
+giusta su cui guardare i vostri dati sia quella che vi viene presentata, no?
+19:57
+19 minutes, 57 seconds
+Abbiamo già visto a volte che per fare la PCA, altre cose si riscalava, si sottraiva la media, a volte anche fare il logaritmo è una trasformazione
+20:06
+20 minutes, 6 seconds
+abbastanza elementare. Quindi cominciamo a vedere questa serie, no? Quella di prima. Allora, sulla base di quello che vi ho detto, intanto un trend lo
+20:14
+20 minutes, 14 seconds
+possiamo vedere, no? Si vede a occhio, dicevo, un andamento crescente, un trend crescente.
+20:21
+20 minutes, 21 seconds
+Adesso però uno si può chiedere, "Va bene, ma cercherò una decomposizione additiva o moltiplicativa?" Ora, non è sbagliato. Adesso vediamo
+20:29
+20 minutes, 29 seconds
+cosa succede portando avanti entrambe le le soluzioni. Però se uno deve dire, piuttosto che fare i conti, vediamo un pochino questa idea delle oscillazioni, no? Le oscillazioni della stagionalità.
+20:40
+20 minutes, 40 seconds
+al all'aumentare, vedete, del valore dei passeggeri aumentano queste oscillazioni.
+20:46
+20 minutes, 46 seconds
+Ok? Questo sono proprio stagionalità di di stagione perché a Natale o sotto questi sono americani, quindi sotto Thanksgiving tutti prendono l'aereo, no?
+20:57
+20 minutes, 57 seconds
+E oppure se se c'è il shutdown, ma non credo che all'epoca ci fosse, nessuno può più prendere l'aereo perché hanno
+21:04
+21 minutes, 4 seconds
+hanno chiuso i voli. Ok? Però vedete, all'aumentare del numero di passeggeri anche l'ampiezza delle oscillazioni aumenta. Quindi qui avete oscillazioni
+21:13
+21 minutes, 13 seconds
+piccole, facciamolo con un altro colore le oscillazioni, no? Qui avete una scala piccola di oscillazione e qui un'oscillazione grande. Ok? Questo è un suggerimento. Questo vi vi dice che sarà una scala moltiplicativa la migliore.
+21:24
+21 minutes, 24 seconds
+Ok? Però vediamo un po' in pratica come si può fare. Allora, innanzitutto in pratica e pratica in R c'è già un paio
+21:31
+21 minutes, 31 seconds
+di comandi decompose e STL, li vedremo più avanti. Quindi per il momento applichiamoli un attimo a sc a scatola chiusa e vediamo cosa succede. Allora,
+21:39
+21 minutes, 39 seconds
+usando quei comandi uno parte dalla serie storica originale che ora è schiacciata lì in alto, però vedete comunque che l'oscillazione aumentano,
+21:46
+21 minutes, 46 seconds
+no, nel tempo. Il trend viene eh scovato, viene trovato automaticamente. Poi vedremo come viene
+21:54
+21 minutes, 54 seconds
+trovato. Questo è il trend, vedete? Una curva crescente.
+21:58
+21 minutes, 58 seconds
+E poi abbiamo la eh stagionalità e vedete la stagionalità ha scoperto questo questo questa stagionalità
+22:05
+22 minutes, 5 seconds
+periodica, questo segnale che si ripete nel tempo, ogni 12 mesi. Si ripete.
+22:11
+22 minutes, 11 seconds
+Quello che rimane alla fine è quello che il resto remainder, il rumore, no? I rumori attenti. Questo sa sono semplicemente grafici a barre, ma vi
+22:20
+22 minutes, 20 seconds
+dice per ogni valore quant'è appunto il vostro valore del rumore. Va bene?
+22:26
+22 minutes, 26 seconds
+Questa è la decomposizione moltiplicativa.
+22:29
+22 minutes, 29 seconds
+Andiamo a vedere però appunto non preoccupiamoci al momento di come è calcolata. Questa invece è la decomposizione addetiva. Ok? Uno dice vabbè la stessa cosa. Cosa è cambiato?
+22:41
+22 minutes, 41 seconds
+Beh, andiamo a vedere bene il rumore. Quindi vi vi porto avanti indietro.
+22:45
+22 minutes, 45 seconds
+Vedete qui è il rumore e di qua abbiamo un altro rumore. Al di là della scala che però appunto una è moltiplicativa e l'altra è additiva. Ok?
+22:57
+22 minutes, 57 seconds
+Eh, vedete appunto scala 1 qua scala 50, però vedete soprattutto insomma una struttura di più che persiste un po' di più nel rumore, nella decomposizione
+23:05
+23 minutes, 5 seconds
+additiva. Vedete? Qui si vede una struttura. Noi idealmente, vedete, qua scompare un po', poi ricompare.
+23:14
+23 minutes, 14 seconds
+Nel caso moltiplicativo c'è ancora, però insomma uno direbbe un po' meno, un po' meno evidente. Certo, entrambi nel rumore c'è ancora un po' di struttura,
+23:21
+23 minutes, 21 seconds
+quindi diciamo non siamo molto soddisfatti.
+23:24
+23 minutes, 24 seconds
+Adesso vedremo anche un po' meglio come valutare la prestazione di della decomposizione e delle
+23:32
+23 minutes, 32 seconds
+e delle previsioni. Va bene?
+23:38
+23 minutes, 38 seconds
+D'accordo? Però per il momento, insomma, diciamo, la decomposizione si può fare in due modi, poi vediamo nei dettagli come vengono calcolate. Un'altro modo di
+23:46
+23 minutes, 46 seconds
+visualizzare, torniamo un po' alla grafica, senza preoccuparci di queste decomposizioni, un altro modo di visualizzare un po' le serie storiche è
+23:54
+23 minutes, 54 seconds
+dire: "Ok, ho questa mia stagionalità, se il mio interesse è soprattutto nella stagionalità e non tanto nel trend, posso fare questi che chiamiamo plot
+24:03
+24 minutes, 3 seconds
+stagionali o seasonal plot." Ok? Allora, questa è sempre la serie dei passeggeri.
+24:08
+24 minutes, 8 seconds
+Cosa si fa in un pro stagionale? Beh, si dilata, se volete, l'asse delle X tenendo soltanto i in questo caso sono i
+24:15
+24 minutes, 15 seconds
+12 valori dei mesi, no? Un periodo qui corrisponde a 12. Se fosse una settimana sarebbero sette. Se fosse un un
+24:23
+24 minutes, 23 seconds
+quadrimestre o un trimestre, dipende, no? Per anno ne avesse un po' meno. E cosa facciamo? Allora, spezziamo, se
+24:31
+24 minutes, 31 seconds
+volete, il nostro line plot, che sarebbe il valore di tutta la serie, al variare degli anni, no? Se volete cominciamo da
+24:39
+24 minutes, 39 seconds
+quello 1949 che sarà quello più basso, questo qui.
+24:43
+24 minutes, 43 seconds
+Poi arrivato qui, beh, passiamo a 1950 che è la curva appena sopra, ok? Li sovrapponiamo in questo modo, 51.
+24:51
+24 minutes, 51 seconds
+Quindi, che effetto ha questo? Beh, ci mostra da un lato se c'è un po' di stagionalità e dall'altro se c'è anche un trend,
+24:58
+24 minutes, 58 seconds
+perché vedete il trend crescente e si è dovuto al fatto che le varie curve stanno salendo piano piano, ok? Solo modo di visualizzare in modo diverso il
+25:06
+25 minutes, 6 seconds
+line plot, ok? Ponendo l'accento sulla stagionalità, se volete.
+25:12
+25 minutes, 12 seconds
+Eh, questo invece è il line, cioè noi il pl seasonal plot per le temperature medie dove non c'era il
+25:21
+25 minutes, 21 seconds
+trend. Quindi cosa vedete? Vedete che per i vari anni, ora ho tolto anche la leggenda perché altrimenti era erano tantissimi, però vedete che per i vari
+25:29
+25 minutes, 29 seconds
+anni più o meno l'andamento è molto simile. Ok? Questo vi dice, tra l'altro che non c'è il trend, vabbè, ma già
+25:35
+25 minutes, 35 seconds
+l'abbiamo visto anche dall plot. Ok, vabbè, questo è un altro grafica per
+25:42
+25 minutes, 42 seconds
+scoprire un pochino la stagionalità, se c'è, senza tanto calcolarla volendo.
+25:48
+25 minutes, 48 seconds
+Ora vediamo una un altro grafico simile, se volete, ma eh Ah, qua ce n'è uno invece che è finito.
+25:57
+25 minutes, 57 seconds
+Va bene, niente. Vabbè, questo dopo me lo metto meglio nei Non ho spezzato la pagina qui. Va bene. Comunque vediamolo in questo caso. Eh, sono i cosiddetti grafici stagionali di sottoserie.
+26:09
+26 minutes, 9 seconds
+Allora, cosa si può fare? Invece di fare i plot e collegare le linee corrispondenti anno per anno, cosa si
+26:17
+26 minutes, 17 seconds
+fa? Beh, i dati sono gli stessi. Avete sempre, ad esempio, i passeggeri di gennaio, però questa volta colleghiamo tutti i passeggeri di gennaio, cioè
+26:25
+26 minutes, 25 seconds
+andiamo a vedere gennaio del primo anno, gennaio del secondo anno, gennaio terzo anno, così via, quarto anno e quinto anno e così via e e li colleghiamo.
+26:32
+26 minutes, 32 seconds
+Quindi avete, se volete, una serie storica solamente relativa alle osservazioni di gennaio, ok? Poi fate lo
+26:39
+26 minutes, 39 seconds
+stesso per febbraio, febbraio vi dà un'altra serie storica, marzo un'altra serie storica, così via. Allora, questo
+26:47
+26 minutes, 47 seconds
+non vi, cioè, se volete è un modo diverso e e la linea blu corrisponde alla media di questa serie storica
+26:54
+26 minutes, 54 seconds
+relativa a gennaio. Ok? Quindi si vede di nuovo, se volete un modo diverso per vedere la stagionalità,
+27:01
+27 minutes, 1 second
+ma comunque vi evidenzia che c'è una un andamento stagionale che è un andamento di questo tipo, ok? Collegando ad esempio le medie [sbuffare]
+27:09
+27 minutes, 9 seconds
+o questi chiamano i grafici stagionali di sottoserie. Ora è importante questa sottoserie, questa subseries sarà importante poi nel calcolo
+27:18
+27 minutes, 18 seconds
+effettivo della stagionalità, ok? Perché noi andando a fare i valori di gennaio e mediandoli tutti, i [schiarire la voce]
+27:25
+27 minutes, 25 seconds
+valori di febbraio e mediandoli tutti e così via, otteniamo proprio dei valori specifici e possiamo usare questi per dare la nostra curva di stagionalità.
+27:35
+27 minutes, 35 seconds
+Questo è un modo per scoprire la stagionalità.
+27:39
+27 minutes, 39 seconds
+Ora, in realtà però questo non si fa subito perché vedete qui c'è un andamento molto crescente, no? Vedete gennaio ha questo andamento comunque
+27:46
+27 minutes, 46 seconds
+crescente, febbraio un andamento crescente perché c'è il trend, no? Il trend uno direbbe prima elimino il trend, poi vedo la stagionalità, quindi
+27:54
+27 minutes, 54 seconds
+l'ordine di solito è questo. Comunque questo si può plotare indipendentemente da da trend o non trend, insomma.
+28:02
+28 minutes, 2 seconds
+Allora, un altro modo di vedere eh possibili, insomma, associazioni e informazioni di una serie storica o in particolare quando avete più di una
+28:10
+28 minutes, 10 seconds
+serie storica è comunque di usare i diagrammi a nuvole di punti, no?
+28:14
+28 minutes, 14 seconds
+Diagrammi a nuvola di punti li abbiamo visti tante volte, no, per le per i dati, ehm, senza una struttura temporale. Beh, ma si può fare lo
+28:22
+28 minutes, 22 seconds
+stesso. Ovviamente uno pensa l'indice T, eh l'ho chiamato T perché lo penso come un tempo, ma perché posso comunque fare
+28:29
+28 minutes, 29 seconds
+plot dei punti e ad esempio in questo caso posso scoprire se ci sono correlazioni positive o negative tra le
+28:37
+28 minutes, 37 seconds
+mie eh diverse serie storiche. In questo caso l'ho fatto ad esempio per le serie, no, quelle lì finanziarie.
+28:43
+28 minutes, 43 seconds
+Vedete, avete i quattro indici finanziari, tutti e quattro avevano questo andamento crescente, quindi ci aspettiamo che ci sia una correlazione
+28:51
+28 minutes, 51 seconds
+positiva, ok? perché sono tutti collegati più o meno allo stesso modo.
+28:55
+28 minutes, 55 seconds
+Se uno avesse avuto un andamento crescente e l'altro invece era decrescente, uno diceva magari c'è un'associazione negativa. Quindi questo è semplicemente uno scatter plot, un
+29:03
+29 minutes, 3 seconds
+diagramma nuvola di punti per, ad esempio, una serie multivariata dove ci sono quattro osservazioni e vedete gli
+29:12
+29 minutes, 12 seconds
+andamenti sono tutti indicano correlazioni positive, va bene?
+29:17
+29 minutes, 17 seconds
+Ok. Poi magari uno fa questo grafico e lo complementa se vuole se vuole capire le correlazioni con un correlogramma. Va bene?
+29:28
+29 minutes, 28 seconds
+Ecco, però in effetti anche se uno non ha una serie storica multivariata, ma solo una osservazione, questa cosa dello scatter plot può
+29:36
+29 minutes, 36 seconds
+essere utile perché perché noi siamo interessati a capire la dipendenza al variare del tempo, no, delle nostre
+29:43
+29 minutes, 43 seconds
+YT. Cioè, vogliamo dire che non sono tra di loro indipendenti, quindi vogliamo scoprire se c'è dipendenza e per scoprire quantificare la dipendenza
+29:51
+29 minutes, 51 seconds
+vogliamo usare la correlazione. Quindi, allora cosa facciamo? Andiamo a fare quella che si chiama la serie storica
+29:58
+29 minutes, 58 seconds
+ritardata, ok? legged in inglese. Quindi prendiamo la serie storica originale
+30:05
+30 minutes, 5 seconds
+e anche se questa ha una sola osservazione, cioè per ogni tempo t avete solo un valore, noi possiamo amplificare, se volete, costruire
+30:12
+30 minutes, 12 seconds
+un'altra serie storica che è è il valore precedente al tempo precedente, quindi chiamiamo L y eh nel libro che vi ho
+30:21
+30 minutes, 21 seconds
+consigliato lo chiamano B y, ma comunque è uguale, va bene? A me sembra che L sia più di solito più tradizionale.
+30:29
+30 minutes, 29 seconds
+L eh semplicemente ritarda di uno l'osservazione, cioè voi siete al tempo t, beh, l è la serie al tempo
+30:37
+30 minutes, 37 seconds
+immediatamente precedente, quindi il valore se siamo a febbraio, no, per la serie dei passeggeri l in febbraio è il numero dei passeggeri di gennaio. Ok?
+30:47
+30 minutes, 47 seconds
+Ovviamente un solo ritardo può essere interessante, ma anche due, perché no?
+30:52
+30 minutes, 52 seconds
+Eh, quindi facciamo L quadrato per dire L * L, no? Applichiamo L, quindi L². O
+30:58
+30 minutes, 58 seconds
+se vogliamo fare un ritardo di 12 mesi, facciamo L^ 12 y in t è = y t - 12.
+31:08
+31 minutes, 8 seconds
+Ok? Quindi fare ritardo può essere utile perché pur partendo da una sola osservazione possiamo ottenere un po'
+31:16
+31 minutes, 16 seconds
+artificiale se volete, ma una serie multivariata, ok? Quindi c'è la singola la vera osservazione e tutti i suoi ritardi fino a una certa scala che
+31:24
+31 minutes, 24 seconds
+scegliamo noi, tipo 12 24, quello che possiamo che pensiamo sia interessante.
+31:30
+31 minutes, 30 seconds
+Ok? Quindi la serie storica ritardata è un modo di espandere, aumentare le caratteristiche di una serie storica.
+31:38
+31 minutes, 38 seconds
+Ok? Quindi possiamo includere, partendo da una serie storica anche a una sola caratteristica, includiamone un certo
+31:46
+31 minutes, 46 seconds
+numero di sue ritardate e otteniamo laged series.
+31:51
+31 minutes, 51 seconds
+E appunto la cosa interessante è che noi vogliamo studiare appunto le correlazioni, le associazioni tra la serie e le sue ritardate per capire cosa
+31:59
+31 minutes, 59 seconds
+succederà nel futuro, no? Se sappiamo che c'è una correlazione positiva tra la serie e la sua immediatamente ritardata,
+32:06
+32 minutes, 6 seconds
+allora sappiamo dire che magari ora avendo osservato solo il primo tempo, possiamo dire qualcosa sul tempo successivo, il tempo futuro. O se c'è
+32:14
+32 minutes, 14 seconds
+una ottima correlazione tra una serie e quella di 12 mesi, 12 valori prima, tipo sono veramente precise, allora sappiamo
+32:21
+32 minutes, 21 seconds
+dire cosa succederà tra un anno, sempre termini di correlazione, non che sia una previsione esatta, deterministica.
+32:29
+32 minutes, 29 seconds
+C'è un piccolo aspetto tecnico che la serie ritardata, non ritardata, ritardata, LKY,
+32:37
+32 minutes, 37 seconds
+è in realtà definita, attenti che ogni volta che fate un ritardo, cioè se voi avete iniziato il tempo 1, avete le
+32:43
+32 minutes, 43 seconds
+osservazioni da 1 fino a t. Se fate siete al tempo uno e ritardate, dovreste avere il tempo zero, no? il tempo
+32:51
+32 minutes, 51 seconds
+immediatamente precedente, ma potreste non averlo. Quindi tecnicamente più volte applicate il ritardo, eh più eh siete in difficoltà con i tempi, no?
+33:00
+33 minutes
+Perché dovete eliminare i primi tempi di osservazione, ok? Quindi non è che potete fare infiniti ritardi, a un certo punto vi avete non avete più le
+33:08
+33 minutes, 8 seconds
+osservazioni. Ok? Tecnicamente i tempi su cui è definita la serie ritardata sono i tempi t mag uguali di k + 1. Se
+33:15
+33 minutes, 15 seconds
+perché se inizialmente y t era da 1 a t, ok? Quindi avreste
+33:23
+33 minutes, 23 seconds
+degli na, ok? avete dei dei valori che mancanti.
+33:28
+33 minutes, 28 seconds
+Beh, però allora nel momento in cui faccio così, mettiamo insieme lo scatter plot e questa idea della serie ritardata, otteniamo un nuovo tipo di
+33:37
+33 minutes, 37 seconds
+plot, se volete, che prima non ci siamo mai posti con le con le variabili, no, con la statistica senza il tempo, perché non c'era questa idea di ritardare.
+33:46
+33 minutes, 46 seconds
+Allora, come si chiamano questi diagrammi a nuvola di punti per la serie e la sua ritardata? Si chiamano la legg plots, ok? plot di ritardo ora in
+33:55
+33 minutes, 55 seconds
+italiano, eh, e traduciamoli così. Quindi, cosa significa? Significa che andiamo a
+34:02
+34 minutes, 2 seconds
+vedere, scusate, vediamo se riesco a farlo vedere bene. Niente. Ok.
+34:09
+34 minutes, 9 seconds
+Sì. Ok. Eccolo qua. Quindi abbiamo sempre la serie dei passeggeri. Ok. E cosa facciamo in questo plot?
+34:18
+34 minutes, 18 seconds
+Prendiamo la serie vera e la sua serie ritardata di 1, la Google 1, ok? E disegniamo le copie di valori. Ok?
+34:28
+34 minutes, 28 seconds
+Allora, questo è semplicemente uno scatter plot, quindi cosa possiamo aspettarci? Beh, se c'è correlazione positiva tra la serie e quella
+34:36
+34 minutes, 36 seconds
+immediatamente precedente, saremo perlopi sul primo terzo quadrante. Se c'è correlazione negativa, saremo secondo quarto, come era sempre stato e
+34:44
+34 minutes, 44 seconds
+come sarà sempre, no? per l'interpretazione grafica della correlazione. Ok? Quindi vediamo, no, che il vario, ora qui è evidenziato anche il tempo, ma non è poi così
+34:52
+34 minutes, 52 seconds
+necessario, ok? Cioè, vedete soprattutto la pendenza. Ok? In questo caso abbiamo un'associazione positiva.
+35:00
+35 minutes
+Cosa succede ad esempio nella serie Notem, quella delle notti di di no, cos'era? Delle temperature medie di
+35:08
+35 minutes, 8 seconds
+Nottingham. Ecco quella lì. Beh, abbiamo comunque, vedete, un'associazione positiva perché tendenzialmente la
+35:15
+35 minutes, 15 seconds
+nuvola di punti è, diciamo, più su primo terzo quadrante, però vedete che è un po' più dispersa, quindi vuol dire che c'è un po' meno associazione, che è un po' meno correlazione.
+35:26
+35 minutes, 26 seconds
+Va bene? Spesso poi si Ecco questa vediamo invece le serie eh ritardate sempre ora con 100 ritardi delle serie.
+35:37
+35 minutes, 37 seconds
+Vabbè, sono quattro perché erano quattro indici, ma se pensate ciascuna guarda la serie la suo singolo indice e cerca di
+35:45
+35 minutes, 45 seconds
+capire solamente se c'è correlazione tra la la l'indice attuale e l'indice a 100 tempi precedenti. Ok? E penso siano i
+35:54
+35 minutes, 54 seconds
+tempi di giorni, no? Non ricordo, mi sembra siano giorni. e vedete questi grafici che comunque indicano che c'è un'associazione positiva, però ad
+36:01
+36 minutes, 1 second
+esempio qui vedete insomma insomma sono degli andamenti sì positivi, ma con una certa con un certo grado di rumore. Va
+36:10
+36 minutes, 10 seconds
+bene? Quindi questa cosa della serie ritardata ci può aiutare graficamente con i lag plots a verificare queste associazioni.
+36:20
+36 minutes, 20 seconds
+Ovviamente poi tutti questi questi grafici si possono combinare. Ad esempio, a me interesserebbe capire se
+36:26
+36 minutes, 26 seconds
+c'è sì associazione ma associazione, ad esempio, tra con un ritardo di 12 mesi, no? Vado a vedere i passeggeri a
+36:34
+36 minutes, 34 seconds
+gennaio e poi quelli del gennaio dell'anno precedente, gennaio dell'anno di due anni precedenti e così via.
+36:39
+36 minutes, 39 seconds
+Quindi si possono mettere insieme l'idea del seasonal plot e del lag plot, cioè cosa si può fare un lag plot con stagionalità.
+36:47
+36 minutes, 47 seconds
+Va bene? Allora, cosa si fa? Ad esempio, questa è la serie dei passeggeri e vediamo ad esempio a gennaio abbiamo praticamente per ogni mese andiamo a
+36:55
+36 minutes, 55 seconds
+fare il lag plot, se volete del o lo scatter plot del della serie ritardata poi con 12 mesi. Però vedete che in ogni
+37:04
+37 minutes, 4 seconds
+caso a parte aggiungere dei colori simpatici abbiamo comunque che c'è una correlazione positiva.
+37:10
+37 minutes, 10 seconds
+Questo perché c'è il trend in realtà. Va bene? E questo vabbè semplicemente lo stesso grafico in cui i valori, i punti
+37:17
+37 minutes, 17 seconds
+sono collegati a seconda del tempo perché abbiamo un concetto di tempo e poi tempo immediatamente successivo.
+37:25
+37 minutes, 25 seconds
+Va bene? Quindi vabbè, questo d la plot con seasonalità mescola un po' di più le cose, però volevo mostrarvi questo. Ad esempio,
+37:32
+37 minutes, 32 seconds
+cosa succede? In questo caso è sempre il lag plot per le sottoserie, no? con le loro stagionalità per la serie senza trend. E vedete che effettivamente
+37:41
+37 minutes, 41 seconds
+questi nuvole di punti, ora le ho collegate con dei dei segmenti, ma in realtà pensatele come piccole nuvole di punti, ciascuna relativa alla sua eh in
+37:50
+37 minutes, 50 seconds
+questo caso al suo mese, no? Vedete che sono un po' localizzate in zone diverse.
+37:55
+37 minutes, 55 seconds
+Ok? Questo ci dice che cosa? Che ciascuna ehm ciascuna ciascun mese potrebbe avere una correlazione diversa.
+38:03
+38 minutes, 3 seconds
+Va bene? Però vabbè, andiamo a vedere.
+38:06
+38 minutes, 6 seconds
+invece come si fa a mettere dei numeri, perché tutti sti grafici poi dipende, possono chiarire, ma anche complicare la situazione. Allora, il nostro obiettivo,
+38:14
+38 minutes, 14 seconds
+dicevamo, è avere la correlazione tra la serie e la sua ritardata.
+38:20
+38 minutes, 20 seconds
+Beh, allora come facciamo? Calcoliamo il coefficiente di correlazione o la covarianza. Allora, questi prendono dei
+38:27
+38 minutes, 27 seconds
+nomi particolari, si chiamano quindi autocovarianza. Se calcoliamo il coefficiente, cioè la funzione di la covarianza tra la serie e la sua
+38:36
+38 minutes, 36 seconds
+ritardata e autocorrelazione, se avete invece il coefficiente di correlazione tra la serie e la sua ritardata. Ok?
+38:44
+38 minutes, 44 seconds
+Quindi partiamo da una serie storica, ne calcoliamo una certa ritardata di un ritardo, l'EG K.
+38:51
+38 minutes, 51 seconds
+A quel punto abbiamo queste osservazioni.
+38:54
+38 minutes, 54 seconds
+Atteni, attenti soltanto a al modo in cui vengono calcolate, perché quando fate la covarianza tra y e l ^ k y
+39:03
+39 minutes, 3 seconds
+allora poi dipende anche R non è che calcolo esattamente questo, però siccome avete n - k osservazioni dovreste fare 1
+39:10
+39 minutes, 10 seconds
+su n - k o forse anche 1 su n - k + 1 o -1, scusate. E poi perché sommate soltanto sulle osservazioni che avete,
+39:19
+39 minutes, 19 seconds
+perché avete l'osservazione yt che andate a confrontare con y t - k perché è come se avesse queste due colonne
+39:27
+39 minutes, 27 seconds
+diverse, una sono le yt e l'altra sono le sue ritardate, ok? E questa si chiama appunto al variare di k abbiamo una funzione di autocovarianza.
+39:36
+39 minutes, 36 seconds
+y barato è la media dell'osservazione.
+39:39
+39 minutes, 39 seconds
+Eh, di solito, appunto, l'autocovarianza non si studia perché, come al solito, la covarianza dipende anche dall'unità di
+39:46
+39 minutes, 46 seconds
+misura della vostra osservazione Y, quindi si passa di solito alla funzione di autocorrelazione che non è nient'altro che il
+39:54
+39 minutes, 54 seconds
+coefficiente di correlazione tra la serie e la sua ritardata, ok? Quindi sarebbe la COV
+40:01
+40 minutes, 1 second
+la CD y K diviso le deviazioni standard SD di Y e SD Y ritardata.
+40:14
+40 minutes, 14 seconds
+Poi ora R non calcola esattamente questo, si può anche verificare, magari mercoledì lo verifichiamo, usa delle delle piccole varianti, ma comunque
+40:22
+40 minutes, 22 seconds
+tendenzialmente l'idea è questa, ok? Non preoccupatevi della formula precisa che calcola R.
+40:28
+40 minutes, 28 seconds
+Allora, il coefficiente di correlazione cosa indicava? Indicava una dipendenza lineare tra una variabile e l'altra. In
+40:36
+40 minutes, 36 seconds
+questo caso, quindi, i valori vicini agli estremi, e gli estremi, vi ricordo, sono 1 ma anche -1, indicavano quindi una forte dipendenza associazione
+40:45
+40 minutes, 45 seconds
+lineare tra la serie e la sua ritardata di K tempi. Quindi cosa può essere utile questo coefficiente di correlazione?
+40:53
+40 minutes, 53 seconds
+Vabbè, vediamo subito che è un utile strumento per confermare o scoprire il periodo di una serie che presenta
+41:00
+41 minutes
+stagionalità. Ok? Magari a occhio si vede, abbiamo una conferma tramite il coefficiente di correlazione. A volte vedremo mercoledì qualcosa, non è così
+41:09
+41 minutes, 9 seconds
+evidente vedendolo che ci sia la stagionalità, ma si può scoprire col coefficiente di correlazione. Va bene?
+41:16
+41 minutes, 16 seconds
+E quindi ehm vediamolo un po' in pratica la stagionalità, appunto, perché la stagionalità perché se avete
+41:25
+41 minutes, 25 seconds
+correlazion, cioè se la serie tende a ripetersi lungo il periodo avrete una forte dipendenza lineare perché avete più o meno la stessa versione della
+41:32
+41 minutes, 32 seconds
+serie e quindi avrete un coefficiente di correlazione molto grande vicino a uno.
+41:37
+41 minutes, 37 seconds
+Allora, vediamo al volo come si visualizzano queste funzioni di autocorrelazione. Di solito si fa un plot di questo tipo, cioè sull'asse
+41:45
+41 minutes, 45 seconds
+delle x si mette il numero di ritardi k e sulle y, sulle ordinate si mette il valore della funzione di autocorrelazione.
+41:53
+41 minutes, 53 seconds
+Allora, cosa indicano quindi queste barre? Queste barre indicano che se il ritardo è k = 1, beh, di solito il
+42:01
+42 minutes, 1 second
+ritardo si parte da 1 perché k = 0 è la serie stessa e la correlazione massima verrebbe 1. Quindi, diciamo, con k = 1 avete una correlazione molto positiva.
+42:11
+42 minutes, 11 seconds
+Ok? torno a 0 pun sarà un 0.7, ok? K = 2, avete già una correlazione
+42:19
+42 minutes, 19 seconds
+che sta diminuendo. K = 3, avete zero correlazione praticamente in questa serie delle temperature.
+42:27
+42 minutes, 27 seconds
+K = 6. Vedete cosa succede con K = 6?
+42:30
+42 minutes, 30 seconds
+Beh, avete esattamente 6 mesi dopo e 6 mesi dopo la la temperatura sarà, diciamo, siamo al picco, insomma, se partiamo d'inverno siamo d'estate,
+42:39
+42 minutes, 39 seconds
+quindi avete una anticorrelazione, cioè siete correlati in senso negativo fortemente, ma in senso negativo. E poi
+42:46
+42 minutes, 46 seconds
+vedete che dopo un anno la serie tendeva a ripetersi, avete un picco, una correlazione molto grande. Ora, cosa
+42:53
+42 minutes, 53 seconds
+indicano queste barre? Allora, a seconda del numero di osservazioni che avete, eh c'è un un intervallo di
+43:02
+43 minutes, 2 seconds
+significatività, va bene? Vediamolo così, senza entrare troppo nei dettagli.
+43:06
+43 minutes, 6 seconds
+Quindi a livello, diciamo, mi sembra sia sempre il 95% eh se se o meglio se cade dentro quella
+43:14
+43 minutes, 14 seconds
+se il valore della correlazione cade, se la barra diciamo cade dentro questa questa intervallo evidenziato dalle due
+43:21
+43 minutes, 21 seconds
+linee blu, potete a tutti gli effetti supporre che sia zero, va bene? Perché comunque si tratta di correlazioni campionarie, no? Quindi ci sarà una
+43:28
+43 minutes, 28 seconds
+certa una certa sicurezza, un intervallo di fiducia e così via. Quindi diciamo questa barra vi indica in base a quante
+43:35
+43 minutes, 35 seconds
+osservazioni avete quando è lecito supporre che sia zero la correlazione.
+43:40
+43 minutes, 40 seconds
+Certo, se trovate proprio zero siete contenti, ma e ora in questo caso tutte le altre sembrano proprio significative. Ok?
+43:49
+43 minutes, 49 seconds
+Vediamo un altro caso. Ecco, questo è un caso interessante perché questa è la serie Air Passengers che a occhio si vede subito che c'è una stagionalità,
+43:57
+43 minutes, 57 seconds
+quindi uno dice beh, ci sarà una forte correlazione tra il segnale e quello tra dopo 12 mesi perché sono comunque dati
+44:05
+44 minutes, 5 seconds
+mensili. Però cosa succede qui? La correlazione è molto positiva sempre perché perché c'è questo trend, no? il
+44:14
+44 minutes, 14 seconds
+trend ha questa tendenza a crescere e quindi quando andate a confrontare la serie con quella eh traslata anche di 12 mesi, ma anche di 23 mesi, tende a
+44:23
+44 minutes, 23 seconds
+somigliarsi perché avete sempre questo andamento crescente. Ok? Quindi dal punto di vista dell'autocorrelazione la presenza di trend vi nasconde un
+44:32
+44 minutes, 32 seconds
+pochino la stagionalità, cioè se voi volete scoprire la stagionalità dovreste prima togliere il trend, ok? Quindi dovesse prima toglierlo perché
+44:41
+44 minutes, 41 seconds
+altrimenti vabbè, in questo caso ancora un pochino si vede a 12 mesi, però non è poi così evidente, no? Questo quando vedete un diagramma così vuol dire che
+44:49
+44 minutes, 49 seconds
+c'è un trend e dovete prima eliminarlo per capire correlazioni su su scale diverse, su valori un po' più fini. Ok?
+44:57
+44 minutes, 57 seconds
+Quindi questo eh, infatti vediamo cosa succede. Beh, ora tra un attimo vediamo cosa succede. Se rimuoviamo il trend
+45:06
+45 minutes, 6 seconds
+vedrete che si ritorna a una situazione simile a quella della delle temperature di di Nottingham.
+45:12
+45 minutes, 12 seconds
+Allora, fino a qui tutto a posto. Quindi l'autocorrelazione misura la covarianza o la correlazione tra la serie e la sua ritardata, quindi della serie con se
+45:21
+45 minutes, 21 seconds
+stessa. Quindi, anche se è univariata, la serie si può definire una una qualche correlazione semplicemente tra la serie
+45:28
+45 minutes, 28 seconds
+e i suoi ritardati. Ovviamente se partite già da una serie multivariata, quindi se avete due ehm due o più osservazioni che cambiano nel tempo, no?
+45:39
+45 minutes, 39 seconds
+Beh, allora potreste fare anche le covarianze tra le due e quindi si e poi mescolare con l'idea della della
+45:46
+45 minutes, 46 seconds
+dell'autocovarianza, quindi si definisce quella che si chiama la cross correlation o la correlazione incrociata. Quindi cosa si fa? si
+45:54
+45 minutes, 54 seconds
+prendono due di queste osservazioni, ad esempio X e Y, due serie storiche, devono essere definite sugli stessi
+46:01
+46 minutes, 1 second
+tempi. A quel punto prendete un ritardo K e andate a fare la covarianza tra la serie storica X e la Y, però ritardata
+46:10
+46 minutes, 10 seconds
+di K. Ok? Questa è la covarianza incrociata.
+46:15
+46 minutes, 15 seconds
+Attenti che poi c'è anche la correlazione incrociata, va bene?
+46:19
+46 minutes, 19 seconds
+attenti soltanto che non è
+46:21
+46 minutes, 21 seconds
+[schiarire la voce]
+46:22
+46 minutes, 22 seconds
+non è simmetrica la situazione, cioè mentre c di XY K la covarianza tra X y
+46:31
+46 minutes, 31 seconds
+ricordatevi la covarianza tra X y era uguale alla covarianza tra Yx.
+46:37
+46 minutes, 37 seconds
+Attenti che qui state guardando invece la serie quando fate la C di XY K, state guardando la X e la versione di Y
+46:45
+46 minutes, 45 seconds
+ritardata di K, ok? Insomma, non è necessario che sia viceversa, ok? Non è
+46:51
+46 minutes, 51 seconds
+simmetrica, non è che il CX y K è = C y XK, ok? Quindi avreste più valori da da
+46:58
+46 minutes, 58 seconds
+poter studiare. Comunque in generale anche questo è un concetto importante e a quel punto state dicendo
+47:06
+47 minutes, 6 seconds
+se ho osservato la la X, per esempio, se la Y due mesi prima aveva un certo valore,
+47:13
+47 minutes, 13 seconds
+qual è cioè che che associazione c'è tra il valore presente della x? Ok? È positivamente correlato, negativamente
+47:20
+47 minutes, 20 seconds
+correlato? Quindi se magari se y può essere un effetto verso la x, magari dite dopo 2 mesi c'è questo effetto, no?
+47:27
+47 minutes, 27 seconds
+Vi dice c'è una correlazione positiva o negativa. Va bene? Quindi evidenzia l'associazione fra due serie anche al
+47:34
+47 minutes, 34 seconds
+variare del tempo tenendo presente ritardi nel tempo, no?
+47:46
+47 minutes, 46 seconds
+Ora noi ci concentreremo perlopi su serie univariate, però appunto tanti di questi modelli che vediamo si estendono facilmente a serie multivariate.
+47:56
+47 minutes, 56 seconds
+Va bene? Allora, aspettate che ecco, vediamo un esempio di autocorrelazione, di cross correlazione
+48:04
+48 minutes, 4 seconds
+tra le serie eh quella lì delle degli andamenti azionari. Ora, qui non c'è
+48:11
+48 minutes, 11 seconds
+tantissimo da vedere. Vedete che c'è tutta questa correlazione, questa fascia m metterlo in carica
+48:21
+48 minutes, 21 seconds
+questa fascia, no? Decrescente perché perché c'è il trend, no? Quindi il trend che era comune a tutte crea
+48:28
+48 minutes, 28 seconds
+un'associazione positiva e d'accordo e questo non è molto sorprendente, appunto, abbiamo visto che c'era anche prima per
+48:36
+48 minutes, 36 seconds
+la serie dei passeggeri. Ecco, ora tendenzialmente tutte queste analisi sulle serie finanziarie non funzionano benissimo, ok? È
+48:44
+48 minutes, 44 seconds
+difficile fare previsioni sui dati finanziari. Scusate qua come mai?
+48:52
+48 minutes, 52 seconds
+E vabbè, però comunque nulla vieta di studiarlo.
+48:57
+48 minutes, 57 seconds
+I dati finanziari risultano molto molto rumorosi.
+49:01
+49 minutes, 1 second
+Allora, vediamo se facciamo per bene la cosa.
+49:07
+49 minutes, 7 seconds
+Ok, allora, vediamo un po' invece il eh come possiamo migliorare la CF, no?
+49:17
+49 minutes, 17 seconds
+Abbiamo detto il trend è già un primo ostacolo a rivelare bene questi picchi di correlazione perché se c'è il trend
+49:25
+49 minutes, 25 seconds
+più o meno le cose sono già positivamente correlate. Avete sempre questo. E allora vogliamo capire come eliminare il trend, no? Come
+49:33
+49 minutes, 33 seconds
+detrendizzare la serie storica. Allora, ci sono abbastanza strategie interessanti, cioè ci sono diverse idee
+49:40
+49 minutes, 40 seconds
+e allora una che vediamo subito è la differenziazione a tempi discreti.
+49:46
+49 minutes, 46 seconds
+Non è complicato, ma il termine sembra strano. Ah, però scusate, qua non si vede. Ok. Come mai? Vediamo.
+49:57
+49 minutes, 57 seconds
+Mh. Sì, non è partito. Perfetto.
+50:05
+50 minutes, 5 seconds
+Sì. Allora, la prima è di differenziare a tempi discreti. La seconda è in realtà, vabbè, di mescolare l'idea del
+50:13
+50 minutes, 13 seconds
+logaritmo e di altre trasformazioni con un fit, una regressione lineare sui
+50:19
+50 minutes, 19 seconds
+tempi. Ok? Oppure la terza, che è un po' nascosta qui, perché la vediamo la prossima volta, è l'idea della media mobile. Ok? Le vedremo tutte e tre.
+50:29
+50 minutes, 29 seconds
+Quindi diciamo la prima è la più semplice, è la differenziazione che pure lei poi vedremo una specie di media mobile. Poi c'è un fit su un modello di regressione lineare unito
+50:38
+50 minutes, 38 seconds
+volendo ai logaritmi o altre trasformazioni.
+50:42
+50 minutes, 42 seconds
+Allora, vediamo un po'. La prima è la più semplice. Vogliamo rimuovere il trend. Allora, qual è il punto di partenza? definiamo una specie di
+50:49
+50 minutes, 49 seconds
+derivata perché se il trend ad esempio, è una funzione lineare, derivandolo nel tempo,
+50:57
+50 minutes, 57 seconds
+ci darà una costante che non non influisce nella correlazione. Allora, siamo a tempi discreti, siamo sempre a tempi discreti e tempi finiti, quindi
+51:04
+51 minutes, 4 seconds
+comeè definita un po' la derivata e diventa una differenziazione finita, cioè fate una differenza finita, prendete la vostra serie originale e sottraete quella ritardata di uno. Ok?
+51:15
+51 minutes, 15 seconds
+Questo è l'operatore di differenza finita. che in R proprio si implementa scrivendo DIF. Ok? E allora una
+51:23
+51 minutes, 23 seconds
+applicazione o anche di più, se una non basta, magari applico due tre volte differenza finita e dovrebbero rimuovere
+51:30
+51 minutes, 30 seconds
+un trend additivo. Perché? Perché ad esempio facciamo l'esempio più semplice.
+51:34
+51 minutes, 34 seconds
+Se la vostro modello è beta0 una costante + beta 1* t, quindi avete una funzione lineare nel tempo, più una
+51:42
+51 minutes, 42 seconds
+stagionalità periodica SDT, senza rumore, senza cose strane, diciamo, questo è solo il trend. Eh, cosa succede se differenzio?
+51:52
+51 minutes, 52 seconds
+Differenziare è come fare una derivata, ok? Quindi lineare e le costanti, differenza delle costanti vi dà zero.
+52:00
+52 minutes
+Differenza delle funzioni lineari nel tempo vi dà solo il coefficiente beta 1 e quindi avete beta 1 e poi avete la differenza della stagionalità.
+52:10
+52 minutes, 10 seconds
+Qual è l'effetto? Quindi che il trend che era lineare è scomparso nella differenza. Oh, se il trend fosse stato quadratico, facciamo due differenze, due
+52:19
+52 minutes, 19 seconds
+differenze l'avrebbero cancellato. Ok? E quindi l'idea è applicate un po' di volte la differenziazione, differenza finita, finché non vedete che il trend è scomparso.
+52:29
+52 minutes, 29 seconds
+Allora, facciamo un esempio. Ah, ecco, la cosa importante è che però eh anche se c'è, cioè non c'è il trend,
+52:38
+52 minutes, 38 seconds
+differenziare spesso non distrugge troppo la struttura. Quindi, vedete, questa è la serie già No, questa non è quella originale, perdonate. Questa è differenziata.
+52:50
+52 minutes, 50 seconds
+Differenziata.
+52:54
+52 minutes, 54 seconds
+Quindi anche se partite dalla serie quella lì notem, quella delle temperature che era già bella periodica, senza trend, una volta che ne fate una
+53:02
+53 minutes, 2 seconds
+prima differenza, sì, diventa un po' più irregolare, vedete, non è più così pulita come prima, però si riconosce comunque una struttura di periodicità,
+53:10
+53 minutes, 10 seconds
+no? Li riconoscete i picchi, vedete qui, no? C'è un picco qui, un picco qui.
+53:14
+53 minutes, 14 seconds
+Quindi questi qui sono ancora portano un po' di memoria di quanto era la periodicità.
+53:21
+53 minutes, 21 seconds
+ovviamente eh si possono confrontare chiaramente e una risulta un po' meno regolare dell'altra, ecco, tendenzialmente perdete in regolarità,
+53:29
+53 minutes, 29 seconds
+ecco, differenziando. Eh però se andate a vedere le funzioni di autocorrelazione, quindi state facendo l'autocorrelazione
+53:37
+53 minutes, 37 seconds
+della serie originale e sotto invece c'è l'autocorrelazione della serie differenziata. Uno dice quanto ho perso di informazione? Beh, vedete, le
+53:46
+53 minutes, 46 seconds
+funzioni di autocorrelazione non sono poi così sensibili.
+53:50
+53 minutes, 50 seconds
+Il trend non c'era prima e non c'è dopo e un pochino è un po' un po' scesa qui.
+53:55
+53 minutes, 55 seconds
+D'accordo? Però vedete il picco qui c'era come c'è adesso, insomma, quindi è mantenuta, insomma, la periodicità viene mantenuta.
+54:03
+54 minutes, 3 seconds
+Vediamo cosa succede se faccio la serie Air Passengers. Vediamo cosa succede se faccio una differenziazione di questa sperando di rimuovere il trend. Allora,
+54:12
+54 minutes, 12 seconds
+questa è quella originale, quando differenziate è quella azzurra sotto, vedete?
+54:19
+54 minutes, 19 seconds
+è scomparso il trend, però è ancora rimasto un po' questo fatto che era moltiplicativo, no? Vedete che sta
+54:26
+54 minutes, 26 seconds
+aumentando, no? Più recente, più negli anni più recenti le oscillazioni sono più grandi, però almeno abbiamo tolto il trend. Vediamo cosa ci dice adesso la
+54:35
+54 minutes, 35 seconds
+l'autocorrelazione. Vedete, sono molto diverse. Lì sopra c'è l'autocorrelazione della serie originale, dove c'è il trend, no, che copre un pochino tutto e
+54:45
+54 minutes, 45 seconds
+invece sotto avete una perfetta autocorrelazione a un anno, no? Vedete questo picco e anche a 2 anni, così via.
+54:53
+54 minutes, 53 seconds
+Qui avete un semplice passaggio e vi ha già ripulito tantissimo l'autocorrelazione. Perché se da un lato dovete argomentare lì sopra che c'è una
+55:01
+55 minutes, 1 second
+forte correlazione a 12 mesi, dice sì, è forte, ma era forte anche a 5 mesi, a 7 mesi, perché proprio 12. Ok, invece qui
+55:08
+55 minutes, 8 seconds
+sotto guardate si vede solo questo piccolo gli altri sono praticamente zero, no? Vabbè, non sono proprio dentro le barre, ma insomma ci siamo vicini.
+55:18
+55 minutes, 18 seconds
+Allora, però Air Passengers funziona, quindi ha funzionato, però c'è un fatto che ancora è rimasto. Vedete che le oscillazioni qui sono piccole, ma poi
+55:27
+55 minutes, 27 seconds
+aumentano perché abbiamo fatto una differenza dei valori e chiaramente erano valori grandi e la differenza è rimasta comunque grande.
+55:36
+55 minutes, 36 seconds
+Allora, quindi come si può fare in queste situazioni se uno vuole ritornare all'idea di decomposizione? c'era l'idea di decomposizione additiva e
+55:44
+55 minutes, 44 seconds
+moltiplicativa, quindi la moltiplicativa abbiamo detto che per questa serie era più efficace perché le oscillazioni aumentano nel tempo. Quindi allora l'idea qual è?
+55:53
+55 minutes, 53 seconds
+Facciamo il logaritmo e poi facciamo la differenza a alla serie trasformata.
+55:59
+55 minutes, 59 seconds
+Quindi, siccome la decomposizione moltiplicativa è più utile e abbiamo detto fare la decomposizione moltiplicativa significa passare un
+56:07
+56 minutes, 7 seconds
+logaritmo, fare la decomposizione additiva. Quindi anche qui allora passiamo al logaritmo, facciamo la differenza e poi torniamo indietro. Ora
+56:16
+56 minutes, 16 seconds
+in pratica, cosa significa? Il logaritmo della differenza è il logaritmo del cooziente, ok?
+56:24
+56 minutes, 24 seconds
+E e quello poi ritornato indietro significa che dalla serie originale cosa vuol dire fare una differenza in senso moltiplicativo? Vuol dire che fate la
+56:31
+56 minutes, 31 seconds
+serie originale diviso la ritardata di 1. Ok? Questa è la differenza in senso moltiplicativo. Allora, vediamo se è un
+56:38
+56 minutes, 38 seconds
+po' meglio. Lasciate stare questo box cox e torniamo un attimo a vedere l'esempio. Eccola qua. Quindi facendo,
+56:45
+56 minutes, 45 seconds
+vedete, Air Pessenger è quella sopra. Se fate la differenza del logaritmo, vedete che adesso le oscillazioni sono più o meno tutte sulla stessa scala, ok?
+56:56
+56 minutes, 56 seconds
+Questo vi aiuta perché, appunto, non avete più questa variabilità dell'ampiezza delle oscillazioni, ma è tutto diventato più controllato, è molto
+57:03
+57 minutes, 3 seconds
+più simile. Ora non è esattamente come quella di di Nottingham, però vedete i periodi si ripetono bene, c'è qualche
+57:11
+57 minutes, 11 seconds
+piccolo oscillazione, ma comunque sono più o meno tutti della stessa scala.
+57:15
+57 minutes, 15 seconds
+Quindi con due semplici operazioni eh logaritmo e eh differenziazione a volte basta veramente poco per e anche
+57:23
+57 minutes, 23 seconds
+quando andate a vedere la in effetti la CF pure leggermente migliorata, vedete alcune sono diventate ancora più piccole queste queste che erano già piccole e avete solo questo singolo picco.
+57:35
+57 minutes, 35 seconds
+Allora, a volte neanche il logaritmo vi sistema tutto quanto, eh? Ci sono serie storiche in cui uno non è non va bene né
+57:42
+57 minutes, 42 seconds
+una decomposizione additiva né moltiplicativa. Allora, ci sono, giusto per dirvi eh perché non si vi paralizzate su queste due, ci sono ad
+57:51
+57 minutes, 51 seconds
+esempio queste trasformazioni di box cox che sono semplicemente, diciamo, polinomiali, di natura più polinomiale, cioè prendete y la serie originale
+58:00
+58 minutes
+elevate alla lambda, togliete 1 e dividete per lambda quando lambda è diverso da 0. Quando lambda tende a zero avete proprio il logaritmo, quindi
+58:08
+58 minutes, 8 seconds
+insomma un po' un'estensione tra eh quando lambda = 1 è semplicemente y non fate nessuna trasformazione, quindi avete una scelta volendo, di una
+58:18
+58 minutes, 18 seconds
+famiglia di trasformazioni e a volte un lambda che non è né necessariamente 0 né
+58:25
+58 minutes, 25 seconds
+né uno può andare meglio, ok? per questo tipo di di trasformazioni. Quindi non fissatevi troppo, eventualmente usate
+58:32
+58 minutes, 32 seconds
+una di queste trasformazioni box, magari vediamo anche il come si poi si applicano quasi in automatico, insomma, in R.
+58:41
+58 minutes, 41 seconds
+Va bene? Allora, diciamo che differenze finite può andare bene, eh, quindi se avete un trend, volete eliminarlo, ad esempio, per scoprire il periodo e così via, differenze finite, va benissimo.
+58:52
+58 minutes, 52 seconds
+Come si può fare altrimenti? Beh, altrimenti noi conosciamo la regressione lineare e in effetti il trend dovrebbe
+58:59
+58 minutes, 59 seconds
+essere una funzione del tempo, magari una funzione un polinomio del tempo o semplicemente una funzione lineare del tempo. E allora perché non facciamo
+59:07
+59 minutes, 7 seconds
+così? Supponiamo che la nostra serie storica y tia una funzione
+59:14
+59 minutes, 14 seconds
+del tipo beta0 + beta1t stagionalità più resto. Ok? Beh, e allora cosa andiamo a
+59:22
+59 minutes, 22 seconds
+fare? Andiamo a fare così, eh. Qua c'è una pezzo mancante. Eccolo qua. Stimiamo il trend che sarebbe questo pezzo qui,
+59:31
+59 minutes, 31 seconds
+come ad esempio in questo caso, una retta di regressione della y d, che è la nostra serie storica, a cui affianchiamo
+59:39
+59 minutes, 39 seconds
+invece una un fattore di ingresso che è xt = t. Ok? Quando fate una regressione, una una regressione lineare, potete scegliere, ad esempio, di di definirlo.
+59:50
+59 minutes, 50 seconds
+Potevamo farlo anche prima, eh, ma non aveva molto senso perché t l'indice che era totalmente arbitrario, no? In questo caso l'indice t ha un significato e
+59:58
+59 minutes, 58 seconds
+quindi lo promuoviamo a una caratteristica, se volete. Quindi avete questo data frame in cui sulla avete una
+1:00:05
+1 hour, 5 seconds
+colonna con i tempi, una colonna con le osservazioni della vostra serie storica e usiamo LM, ok? Facciamo una un modello
+1:00:12
+1 hour, 12 seconds
+di regressione lineare o se vogliamo una retta lineare, altrimenti possiamo fare un polinomiale e così via. A quel punto, quindi, cosa otteniamo? Otteniamo nel
+1:00:20
+1 hour, 20 seconds
+modello di regressione dei coefficienti beta 0 stimati coi minimi quadrati eh beta 1 eh per to.
+1:00:30
+1 hour, 30 seconds
+Quindi il residuo, attenzione, dovrebbe contenere la stagionalità e il resto.
+1:00:36
+1 hour, 36 seconds
+Ok? Però almeno a livello di togliere il trend, se chiamiamo TDT questo qui, possiamo vedere la serie detrendizzata.
+1:00:44
+1 hour, 44 seconds
+Eccolo qui. Non ci vuole tantissimo.
+1:00:46
+1 hour, 46 seconds
+Prende i dati della serie storica, fitta il modello lineare e ottovo una retta di regressione. Va bene?
+1:00:56
+1 hour, 56 seconds
+Ora, quale potrebbe essere il problema, secondo voi?
+1:00:59
+1 hour, 59 seconds
+Se uno fa una retta di regressione e il trend Sì, il trend lo vediamo che è crescente, va bene, però secondo me se
+1:01:09
+1 hour, 1 minute, 9 seconds
+andiamo a vedere negli anni 70, gli anni 80, gli anni 90 retta di regressione, ma piuttosto sta crescendo in modo esponenziale, ok? Perché spesso quando
+1:01:17
+1 hour, 1 minute, 17 seconds
+avete una decomposizione moltiplicativa non soltanto avete che eh la periodicità oscilla e le ampiezze aumentano, ma
+1:01:26
+1 hour, 1 minute, 26 seconds
+spesso il trend è di natura esponenziale, tipo con le con le serie finanziarie, vedevate che c'è una crescita veramente rapida, ok? Quindi se
+1:01:34
+1 hour, 1 minute, 34 seconds
+qui fate una retta di regressione, questa è una funzione lineare e cosa succede? che a un certo punto si separeranno. Quella esponenziale cresce
+1:01:41
+1 hour, 1 minute, 41 seconds
+molto più rapidamente. Ok, quindi va bene, può andare bene come prima cosa di fare una regressione lineare, eh, e
+1:01:49
+1 hour, 1 minute, 49 seconds
+vedete che il trend rimosso, vedete qui, ho rimosso il trend, questa questa curva azzurra qui va molto bene, forse anche
+1:01:56
+1 hour, 1 minute, 56 seconds
+meglio di DIF, nel senso che fare la differenza finita vi aveva un po' trasformato, no, la natura delle oscillazioni, invece vedete lo vedete
+1:02:04
+1 hour, 2 minutes, 4 seconds
+proprio bene. Però vedete i residui qui sono ancora abbastanza grandi rispetto a quello che aveva fatto DIF, però comunque il picco si vede, insomma,
+1:02:13
+1 hour, 2 minutes, 13 seconds
+diciamo se il nostro obiettivo era solo trovare il periodo confermare che c'è una stagionalità l'abbiamo trovato.
+1:02:21
+1 hour, 2 minutes, 21 seconds
+Ecco, come dicevo, può essere più comodo invece fare un se il modello è moltiplicativo, fare un fit con una funzione
+1:02:30
+1 hour, 2 minutes, 30 seconds
+esponenziale. Allora, come si fa? Si prende la serie originale, si fa il logaritmo, si fa la regressione lineare
+1:02:38
+1 hour, 2 minutes, 38 seconds
+sul logaritmo e poi si si riprende l'esponenziale. Questo potete farlo anche per altre funzioni, tipo queste box cox e così via. Ok? Quindi vedete a
+1:02:47
+1 hour, 2 minutes, 47 seconds
+questo punto il trend ora è curvo perché è una curva esponenziale e questo ora non ho i dati, ma sono sono tranquillo che succederà così, cioè negli anni
+1:02:55
+1 hour, 2 minutes, 55 seconds
+successivi questo ehm prevederà meglio l'andamento de dei miei passeggeri, ok? perché c'è una natura esponenziale moltiplicativa.
+1:03:05
+1 hour, 3 minutes, 5 seconds
+Ok? Ce ne rendiamo conto anche guardando i residui, eccolo qua. I residui, beh, insomma, un po' migliorati lo sono. Ora
+1:03:13
+1 hour, 3 minutes, 13 seconds
+bisogrebbe confrontare. In generale direi che DIF funziona meglio, insomma, per rendere una ACF un po' più
+1:03:22
+1 hour, 3 minutes, 22 seconds
+esplicita, però se volete DIF non vi non vi trova il trend. Invece in questo caso avete trovato anche il trend. Poi vedremo, ci
+1:03:30
+1 hour, 3 minutes, 30 seconds
+sono anche altri modi eh di trovare il trend, tipo questa media mobile, eh lo vedremo o la prossima volta o l'ultima,
+1:03:38
+1 hour, 3 minutes, 38 seconds
+forse meglio la prossima. Allora, diciamo però che abbiamo trovato il trend, magari l'abbiamo trovato tramite questa trasformazione non lineare e poi con una regressione lineare e così via.
+1:03:49
+1 hour, 3 minutes, 49 seconds
+Ecco, adesso abbiamo rimosso il trend, possiamo abbiamo individuato un periodo tramite l'autocorrelazione,
+1:03:57
+1 hour, 3 minutes, 57 seconds
+possiamo allora estrarre la componente stagionale perché il nostro obiettivo, se volete, fare questa decomposizione, no? In trend, stagionalità e resto.
+1:04:05
+1 hour, 4 minutes, 5 seconds
+Allora, come si trova la componente stagionale? Beh, si fa la media su, insomma,
+1:04:12
+1 hour, 4 minutes, 12 seconds
+matematica diremo le classi del resto, cioè cosa facciamo? Prendiamo un tempo J, ok? J da 1 a M. Abbiamo M il nostro
+1:04:22
+1 hour, 4 minutes, 22 seconds
+periodo. Questo m = 12, M = 7 se è una settimana, m = 24 se sono le ore e così via o qualcos'altro se abbiamo trovato
+1:04:31
+1 hour, 4 minutes, 31 seconds
+che c'è un altro periodo. Allora, fissato J, andiamo a vedere tutti i tempi che sono multipli interi di questo
+1:04:38
+1 hour, 4 minutes, 38 seconds
+periodo, quindi IM + J, no? andiamo a vedere quelli che corrispondono, che ne so, un anno dopo, 2 anni dopo, 3 anni dopo e così via e andiamo a fare la
+1:04:47
+1 hour, 4 minutes, 47 seconds
+media sulle nostre osservazioni di questi valori. Ok? Quindi, se vi tornate indietro su quel plot
+1:04:54
+1 hour, 4 minutes, 54 seconds
+eh stagionale della sottoserie, state facendo proprio quei valori blu, però abbiamo già rimosso il trend tendenzialmente quando lo facciamo, va
+1:05:02
+1 hour, 5 minutes, 2 seconds
+bene? E quanti ne faremo? Beh, tendenzialmente se avete osservato per un tempo t grande m il vostro periodo, ne avrete un numero n che è il rapporto
+1:05:11
+1 hour, 5 minutes, 11 seconds
+tra t e m. Va bene? Questo poi si calcola anche in automatico, non è che dovete calcolarlo. Ora, a quel punto il
+1:05:19
+1 hour, 5 minutes, 19 seconds
+la stagionalità è questa che è esattamente periodica, la ripetiamo, no?
+1:05:23
+1 hour, 5 minutes, 23 seconds
+Anno dopo anno ripetiamo questa SDJ e a quel punto definiamo il residuo, il resto, quello che rimane come il
+1:05:31
+1 hour, 5 minutes, 31 seconds
+segnale, la vostra serie storica meno il trend - S. Ecco, l'unica attenzione, S è
+1:05:38
+1 hour, 5 minutes, 38 seconds
+definito solo su questi M tempi, quindi dobbiamo ripeterlo. Se volete ripetetelo in modo periodico, ecco. Oppure fate
+1:05:46
+1 hour, 5 minutes, 46 seconds
+così, prendete il vostro tempo, dividete per m, vedete il resto. Il resto sarà un valore, oddio, il resto sarà un valore
+1:05:54
+1 hour, 5 minutes, 54 seconds
+tra 0 ed m - 1. Se viene 0 mettete m, insomma. Quindi avete questi, insomma,
+1:06:00
+1 hour, 6 minutes
+riuscite a capire il il valore che dovete mettere qui della stagionalità. E qui avete la decomposizione additiva.
+1:06:09
+1 hour, 6 minutes, 9 seconds
+Ora, nella decomposizione moltiplicativa eh è molto più, cioè è simile.
+1:06:14
+1 hour, 6 minutes, 14 seconds
+Decomposizione moltiplicativa avreste tdt * s mod m.
+1:06:21
+1 hour, 6 minutes, 21 seconds
+Beh, ora s è calcolato in modo leggermente diverso, eh, dove s è calcolato però facendo i logaritmi,
+1:06:29
+1 hour, 6 minutes, 29 seconds
+ok? Quindi s nel caso moltiplicativo è calcolato con i logaritmi.
+1:06:34
+1 hour, 6 minutes, 34 seconds
+S calcolato come qui, ma con i logaritmi, con log y,
+1:06:42
+1 hour, 6 minutes, 42 seconds
+ok? Perché è tutto un passaggio logaritmo, niente di complicato. Allora, vediamo cosa succede. Quindi, se abbiamo già, beh, notem sono quelle temperature,
+1:06:51
+1 hour, 6 minutes, 51 seconds
+il trend non c'era, diciamo, quindi facciamo la stagionalità. Vedete la mentre la serie originale ha un po' di rumore, insomma, non è esattamente
+1:06:59
+1 hour, 6 minutes, 59 seconds
+periodica, la stagionalità risulta perfettamente periodica, abbiamo costruita così. Quindi ciascun valore è la media, no? Queste saranno le medie di
+1:07:08
+1 hour, 7 minutes, 8 seconds
+gennaio, le medie di febbraio, le medie di marzo, ora vabbè e così via. E i residui è quello che rimane. Ora i
+1:07:15
+1 hour, 7 minutes, 15 seconds
+residui, vedete c'è ancora un po' di correlazione, però tra l'altro vedete non è esattamente a 12 a 12 mesi. Bah,
+1:07:25
+1 hour, 7 minutes, 25 seconds
+comunque, insomma, sono comunque diminuite.
+1:07:29
+1 hour, 7 minutes, 29 seconds
+Andiamo a vedere la serie Air Passenger, la serie dei passeggeri. Vedete, cominciamo la decomposizione. eccetera, serie originale, il trend, quello
+1:07:37
+1 hour, 7 minutes, 37 seconds
+tramite il modello, tramite la regressione, diciamo, esponenziale e poi la componente stagionale che è quella ottenuta rimuovendo il trend, no?
+1:07:46
+1 hour, 7 minutes, 46 seconds
+Mediando, ma rimuovendo anche il trend.
+1:07:48
+1 hour, 7 minutes, 48 seconds
+Tutto ovviamente moltiplicativo questo, moltiplicativo. Poi vediamo meglio i comandi mercoledì. Comunque, giusto per farvi capire che la decomposizione ha questi passaggi.
+1:07:59
+1 hour, 7 minutes, 59 seconds
+Poi a quel punto rimangono i residui. I residui, vedete, stranamente, insomma, non è una decomposizione così efficace
+1:08:07
+1 hour, 8 minutes, 7 seconds
+quella che abbiamo fatto perché, vedete, i residui continuano a mostrare un trend, ok? non grandissimo come quella
+1:08:15
+1 hour, 8 minutes, 15 seconds
+originaria, però continua a mostrare un trend, quindi vuol dire che in effetti c'è stata un po' una decomposizione non del tutto non del tutto precisa.
+1:08:23
+1 hour, 8 minutes, 23 seconds
+Idealmente vorremmo che questi residui non abbiano nessuna correlazione, cioè che qua siamo tutti qua dentro questi questa fascia, invece siamo veramente fuori.
+1:08:33
+1 hour, 8 minutes, 33 seconds
+Va bene? È perché abbiamo fatto una una decomposizione un po' elementare con la ricerca del trend. Ok? Questa cosa del trend esponenziale non è la cosa migliore che uno può fare.
+1:08:44
+1 hour, 8 minutes, 44 seconds
+Beh, va bene dai. Allora, per quanto riguarda la decomposizione, poi vediamo meglio mercoledì i comandi e anche un po' meglio qualche altro
+1:08:52
+1 hour, 8 minutes, 52 seconds
+esempio. Adesso però diciamo che abbiamo decomposto la nostra serie, abbiamo capito che c'è un trend, c'è una stagionalità, va bene, l'abbiamo
+1:09:00
+1 hour, 9 minutes
+analizzata. Vogliamo capire invece come fare le previsioni dei nuovi valori.
+1:09:04
+1 hour, 9 minutes, 4 seconds
+Questo di solito è l'aspetto più interessante.
+1:09:06
+1 hour, 9 minutes, 6 seconds
+Allora, introduciamo una notazione innanzitutto e mi adeguo insomma anche al libro, ma è abbastanza standard. Per
+1:09:15
+1 hour, 9 minutes, 15 seconds
+le previsioni le indichiamo con il cappuccio, cioè la serie storica originale è la Y e ci mettiamo un
+1:09:21
+1 hour, 9 minutes, 21 seconds
+cappuccio sopra e poi indichiamo questa. Eh, va capita bene. Allora, il
+1:09:28
+1 hour, 9 minutes, 28 seconds
+tempo t + h, se vogliamo fare la previsione della serie al tempo t + h, poi mettiamo sbarrato t per indicare
+1:09:36
+1 hour, 9 minutes, 36 seconds
+avendo osservato la serie dal tempo 1 fino al tempo t. Ok? Quest'ultimo qui indica che abbiamo osservato, cioè
+1:09:44
+1 hour, 9 minutes, 44 seconds
+supponiamo, se volete, di avere l'informazione della serie storica dal tempo 1 fino al tempo t. Ok? attenti
+1:09:52
+1 hour, 9 minutes, 52 seconds
+perché t + h potrebbe essere anche un tempo di quelli che avete già osservato.
+1:09:56
+1 hour, 9 minutes, 56 seconds
+Ad esempio, se facciamo una cross validation potrebbe essere questo, ma in generale la notazione indica questo, appunto. Quindi avete tutta la serie
+1:10:05
+1 hour, 10 minutes, 5 seconds
+storica fino al tempo, immaginate, no, di avere tutta la serie storica fino al tempo t piccolo e osservate, fate una previsione del valore della y di t + h,
+1:10:14
+1 hour, 10 minutes, 14 seconds
+cercando di usare al meglio l'informazione che avete, è solo quella.
+1:10:19
+1 hour, 10 minutes, 19 seconds
+Allora, metodi elementari. Allora, si può cominciare con un sacco di metodi eh abbastanza, insomma, troppo elementari,
+1:10:27
+1 hour, 10 minutes, 27 seconds
+però comunque può accadere che in certi contesti basti anche un metodo del genere, quindi ve li elenco perché spesso uno poi va a finire sui modelli
+1:10:34
+1 hour, 10 minutes, 34 seconds
+complicatissimi, ma in realtà può bastare anche questo a volte, cioè mi hanno detto che ci sono state delle tesi che hanno aiutato aziende anche con
+1:10:42
+1 hour, 10 minutes, 42 seconds
+metodi elementari di questo tipo, quindi non schifateli se vedete che può funzionare, perché no. Allora, metodi
+1:10:49
+1 hour, 10 minutes, 49 seconds
+naive. Questo è il metodo naive proprio più semplice di tutti. È y cappuccio t + h sapendo t, cioè quindi quella avendo
+1:10:57
+1 hour, 10 minutes, 57 seconds
+osservato fino al tempo t, beh, usiamo y d t, cioè l'ultimo valore osservato.
+1:11:02
+1 hour, 11 minutes, 2 seconds
+Secondo me questo sarà sempre troppo elementare, però vabbè, è una prima approccio. Altro valore, beh, y al tempo t + h.
+1:11:11
+1 hour, 11 minutes, 11 seconds
+Sapendo y al tempo t, beh, facciamo la media di tutti i valori che abbiamo osservato fino al tempo t. Ok? Perché magari l'ultimo osservato era troppo
+1:11:19
+1 hour, 11 minutes, 19 seconds
+rumoroso, c'era un'oscillazione che non andava bene e mettiamoci la media, poi vediamo che difetti hanno. Eh, comunque vediamo di dare dei nomi. Ecco, questo a
+1:11:28
+1 hour, 11 minutes, 28 seconds
+volte già un po' meglio, è il metodo naive ma stagionale, cioè andate a vedere la sottoserie relativa appunto a a al esempio al mese corrispondente, no?
+1:11:39
+1 hour, 11 minutes, 39 seconds
+Se questa era su sui mesi come prima, gennaio, febbraio e così via, andate a vedere la sottoserie relativa al mese in cui vi trovate e prendete il valore
+1:11:47
+1 hour, 11 minutes, 47 seconds
+della l'ultimo valore di quella sottoserie. Ora in formula è più complicato da scrivere, cioè dovete prendere y al tempo t + h -m.
+1:12:00
+1 hour, 12 minutes
+Qua togliete il t, qua non serve. Dove km che cos'è? dovete togliere un numero di periodi in modo tale da finire da da
+1:12:08
+1 hour, 12 minutes, 8 seconds
+essere il primo che finisce dentro l'intervallo che avete osservato, ok?
+1:12:12
+1 hour, 12 minutes, 12 seconds
+Quindi partite da T + h, sottraete KM in modo da arrivare eh a un valore minore o uguale di tono quelli che avete che
+1:12:20
+1 hour, 12 minutes, 20 seconds
+avete osservato, ok? Praticamente in formule K è h / M in con la parte intera
+1:12:28
+1 hour, 12 minutes, 28 seconds
+superiore. Va bene? Però anche qui ha una riga di comando in R, quindi non è che poi la formula finale, ricordatevi però cosa sta facendo. Ecco, seasonal
+1:12:36
+1 hour, 12 minutes, 36 seconds
+naive, s naive tiene conto della stagionalità. Poi un altro metodo elementare è, vedete il difetto di
+1:12:44
+1 hour, 12 minutes, 44 seconds
+questi tre metodi, Naive, media e naive stagionale, è che lo vediamo adesso anche in pratica, non tengono presente il trend.
+1:12:52
+1 hour, 12 minutes, 52 seconds
+Allora, quindi o avete già tolto il trend e poi lo rimettete nella vostra previsione, oppure se volete fare soltanto una previsione col trend, ma in
+1:12:59
+1 hour, 12 minutes, 59 seconds
+modo elementare, c'è questo metodo drift in cui prendete l'ultimo valore osservato che sarebbe naive, poi
+1:13:08
+1 hour, 13 minutes, 8 seconds
+aggiungete h, quindi la differenza di tempo in avanti che vi interessa e poi stimate, fate y t, l'ultimo valore - y / t - 1.
+1:13:20
+1 hour, 13 minutes, 20 seconds
+Quindi state facendo una stima molto rozza del trend come se fosse una retta, ok? Perché avete l'intervallo delle
+1:13:29
+1 hour, 13 minutes, 29 seconds
+dell'oscillazione dei valori della serie storica diviso l'intervallo temporale, quindi è una un trend lineare, ma molto
+1:13:36
+1 hour, 13 minutes, 36 seconds
+neanche minimi quadrati, proprio proprio un trend molto molto elementare.
+1:13:41
+1 hour, 13 minutes, 41 seconds
+Adesso vediamoli in pratica e vediamo adesso che sono molto elementari. Non è che
+1:13:51
+1 hour, 13 minutes, 51 seconds
+insomma, però può capitare che qualcosa del genere Ecco qua. Allora, vediamo un po'. Questa è la solita serie Air Passengers.
+1:13:59
+1 hour, 13 minutes, 59 seconds
+Allora, le previsioni, dunque, si si distinguono un po' i colori. Quindi il metodo naive è quello blu ed è l'ultimo valore osservato, no? E da qui va bene?
+1:14:12
+1 hour, 14 minutes, 12 seconds
+Vi dà dice la serie stava crescendo naive e mi fermo. Ok, un po' meglio è Seasonal Naive, no? Seasonal naive si
+1:14:19
+1 hour, 14 minutes, 19 seconds
+ricorda che c'è una stagionalità e quindi va a vedere non l'ultimo osservato, ma l'ultimo dell'anno prima.
+1:14:25
+1 hour, 14 minutes, 25 seconds
+Quindi vedete, prende questo periodo e lo replica. Dice "Ok, si si ripete seasonal nave". È comunque naiva
+1:14:33
+1 hour, 14 minutes, 33 seconds
+anche dopo 30-40 anni propone sempre la stessa situazione, eh.
+1:14:39
+1 hour, 14 minutes, 39 seconds
+Min è quello peggiore in questa situazione perché c'è un trend e proprio min darebbe la media di tutti i valori che quindi è più basso. Ma se sappiamo,
+1:14:48
+1 hour, 14 minutes, 48 seconds
+abbiamo visto che c'è un trend perché credere che andrà a diminuire insomma quindi data min è proprio quello che
+1:14:54
+1 hour, 14 minutes, 54 seconds
+insomma è fuori completamente fuori. Eh l'ultimo drift, cancello gli altri. Vedete drift va a stimare, vedete?
+1:15:01
+1 hour, 15 minutes, 1 second
+Riconosce il trend. Ovviamente c'è solo il trend, non c'è la stagionalità, quindi però almeno se ci interessa il trend almeno Drift ha colto qualcosina, insomma.
+1:15:12
+1 hour, 15 minutes, 12 seconds
+Va bene, sono metodi del tutto elementari, però a volte bastano. Ad esempio, vedete season naive su quello notem sembra funzionare abbastanza bene,
+1:15:21
+1 hour, 15 minutes, 21 seconds
+procede, invece naive è un po' troppo esagerato perché le oscillazioni, no, per sono proprio quello che vogliamo cogliere e anche i trend, il drift non
+1:15:30
+1 hour, 15 minutes, 30 seconds
+funzionano bene. Quindi in questo caso min funziona meglio se vogliamo dirla.
+1:15:36
+1 hour, 15 minutes, 36 seconds
+Ecco, vediamo un metodo leggermente più sofisticato e poi capiamo anche un po' come misurare la performance di questi metodi, ma al
+1:15:44
+1 hour, 15 minutes, 44 seconds
+solito sarà la questione della cross validation. Allora, metodo KNN, si può fare anche KNN che vi ricordo KNN andava
+1:15:52
+1 hour, 15 minutes, 52 seconds
+a vedere i K punti più vicini e diceva beh, nel caso della classificazione era facile, faceva un voto e vedeva tra
+1:16:00
+1 hour, 16 minutes
+questi K più vicini qual è la classe di maggioranza. Per la regressione facevo una media sui k punti più vicini. Ora
+1:16:07
+1 hour, 16 minutes, 7 seconds
+vediamo cosa si può fare per la previsione di serie storiche.
+1:16:11
+1 hour, 16 minutes, 11 seconds
+È abbastanza simile la situazione. Il problema è che dobbiamo dire chi sono, cioè in che senso sono vicini i punti.
+1:16:18
+1 hour, 16 minutes, 18 seconds
+Allora, uno può fare questo, sceglie un intervallo di ritardi e dice "La mia serie storica e non è la
+1:16:26
+1 hour, 16 minutes, 26 seconds
+semplice serie storica, ma dicevamo, ma prendo la serie storica, quella ritardata di uno, di due, di tre fino a questo L grande, insomma." con il mio
+1:16:33
+1 hour, 16 minutes, 33 seconds
+insieme di ritardi e così costruisco un vettore di caratteristiche per la mia serie storica. Anzi, a dire vero,
+1:16:41
+1 hour, 16 minutes, 41 seconds
+vedete, noi rimuoviamo perché è una specie di di regressione, quindi andiamo a rimuovere, vedete, nelle caratteristiche abbiamo tolto la serie
+1:16:49
+1 hour, 16 minutes, 49 seconds
+storica originale, cioè il valore y d t l'abbiamo tolto. Quindi andiamo a vedere ritardata di 1, ritardata di 2, 3, fino l.
+1:16:56
+1 hour, 16 minutes, 56 seconds
+A questo punto facciamo la stessa cosa che si fa in KNN per la regressione.
+1:17:01
+1 hour, 17 minutes, 1 second
+Cioè dato un tempo nuovo, ad esempio, vogliamo stimare fare una previsione a un tempo successivo, ma poi si può fare anche due tre k tempi successivi.
+1:17:10
+1 hour, 17 minutes, 10 seconds
+Andiamo a vedere i K tempi che hanno le caratteristiche più vicine e a quel punto, isolati quei K-tempi che
+1:17:17
+1 hour, 17 minutes, 17 seconds
+hanno le caratteristiche più vicine, la mia previsione sarà la media di questi K tempi. Cioè, cosa vuol dire? In pratica stiamo facendo in modo automatizzato
+1:17:26
+1 hour, 17 minutes, 26 seconds
+quella ricerca un po' no di eh di pattern che uno dice beh, se la serie era cresceva poi decresceva, ho già
+1:17:33
+1 hour, 17 minutes, 33 seconds
+visto nel passato K volte questa cosa o qualcosa di simile l'ho vista K a volte vado a fare la previsione che è la media di quello che ho visto nel passato. È la
+1:17:42
+1 hour, 17 minutes, 42 seconds
+stessa cosa che si faceva in KNN con la classificazione, con la regressione, no?
+1:17:45
+1 hour, 17 minutes, 45 seconds
+si va a cercare un po' nella storia passata, in questo caso, il la previsione del futuro. Ok? Quindi se
+1:17:53
+1 hour, 17 minutes, 53 seconds
+ci sono pattern simili verranno utilizzati. Questo è comodo perché a volte non è chiaro cos'è trend, cos'è stagionalità e così via. Questo KNN è
+1:18:02
+1 hour, 18 minutes, 2 seconds
+abbastanza un po' agnostico da questo punto di vista. Può può funzionare male come come bene, insomma. Facciamo un esempio. Allora, prendiamo, beh, qui non
+1:18:11
+1 hour, 18 minutes, 11 seconds
+si vede tantissimo, è solo quel piccolo punto, però vediamo se è aumentato un po'. Eccolo qua. Ad esempio, ho fatto una previsione al
+1:18:20
+1 hour, 18 minutes, 20 seconds
+futuro, un tempo solo futuro. La previsione è questo puntino qui. Ora magari voi non la vedete, eh, però cosa ho fatto? Perché non volevo farvi tutta la serie.
+1:18:28
+1 hour, 18 minutes, 28 seconds
+Voglio mostrarvi cosa significa fare k = 3 e i ritardi sono 1 e 12. Allora, cosa stiamo dicendo? Stiamo dicendo, per
+1:18:36
+1 hour, 18 minutes, 36 seconds
+prevedere il tempo successivo vai a cercare tre situazioni nel passato, eh, per cui in tutto l'anno
+1:18:44
+1 hour, 18 minutes, 44 seconds
+precedente, cioè da 1 a 12, c'era un andamento molto simile a quello che abbiamo attualmente, ok? Cioè, lui va a vedere il tempo dell'anno precedente e
+1:18:54
+1 hour, 18 minutes, 54 seconds
+dice: "Ok, questa caratteristica la riconosco." Quali sono gli anni precedenti passati che hanno una caratteristica simile? Ok? i tempi
+1:19:01
+1 hour, 19 minutes, 1 second
+passati dove ho visto delle caratteristiche simili li va a isolare e poi mi dà la media di quelle tre perché va a cercare K uguale 3. E qua si vede
+1:19:10
+1 hour, 19 minutes, 10 seconds
+perché va a vedere appunto il la previsione è sempre qui, ma se vado a vedere le istanze eccolo qua
+1:19:19
+1 hour, 19 minutes, 19 seconds
+il targets eccolo qua, avete un tempo passato, quindi questo è il tempo è il tempo
+1:19:27
+1 hour, 19 minutes, 27 seconds
+presente, no? a queste tre caratteristiche e lui ha trovato, beh, cioè praticamente l'istante immediatamente precedente,
+1:19:34
+1 hour, 19 minutes, 34 seconds
+un un anno prima e un anno prima e un istante precedente, quindi ha trovato tre situazioni molto simili nel nell'immediato passato volendo, e
+1:19:43
+1 hour, 19 minutes, 43 seconds
+basandoci su quelle tre fa la previsione di cosa succederà nel futuro.
+1:19:48
+1 hour, 19 minutes, 48 seconds
+Ok? Ovviamente si può poi estendere e dire "Ok, questo metodo com'è? e come si com'è rispetto a naiv o tra abbiamo
+1:19:56
+1 hour, 19 minutes, 56 seconds
+fatto 2 anni, no, di previsione. Beh, vedete che in effetti non performa poi così bene perché KNN anche lui soffre un
+1:20:03
+1 hour, 20 minutes, 3 seconds
+po' no del del trend. Cioè se dobbiamo veramente guardare nel passato cosa è
+1:20:10
+1 hour, 20 minutes, 10 seconds
+successo, io nel passato se il mio trend è crescente vedrò soltanto valori più piccoli. Quindi qui non posso accorgermi
+1:20:18
+1 hour, 20 minutes, 18 seconds
+del trend. Ok? KNN ha questo stesso difetto, un po' come season a Naive, naive e così via, però si può aggiustare, insomma, si può aggiungere
+1:20:26
+1 hour, 20 minutes, 26 seconds
+anche in questo caso un po' di trend, ci si aggiunge poi, insomma, si modifica leggermente il modello KNN. Con trend moltiplicativo direi che la previsione
+1:20:35
+1 hour, 20 minutes, 35 seconds
+diventa, m, non dico eccellente, ma insomma abbastanza plausibile, insomma, coglie bene gli aspetti. Quindi KNN non
+1:20:43
+1 hour, 20 minutes, 43 seconds
+è male come modello, eh, però ha un po' un difetto. Ecco, andiamo a vedere subito il difetto che
+1:20:50
+1 hour, 20 minutes, 50 seconds
+KNN, vi ricordo, c'era la scelta di K, adesso un po' ci colleghiamo con la cross validation, cioè, vi ricordate come si faceva a scegliere K? si diceva
+1:20:59
+1 hour, 20 minutes, 59 seconds
+ok, faccio eh distinzione train e test e a quel punto vado a fare una, cioè non lo fate soltanto un colpo solo, fate una
+1:21:07
+1 hour, 21 minutes, 7 seconds
+cross validation e alla fine scegliete il K che vi dà l'errore minore di cross validation. E ora KNN per la per la
+1:21:15
+1 hour, 21 minutes, 15 seconds
+previsione avete non solo il K, cioè quanti esempi passati simili dovete trovare, ma anche le feature, quante
+1:21:23
+1 hour, 21 minutes, 23 seconds
+quanto tempo, quanti ritardi prima dovete considerare, un anno, 2 anni. 3 mesi e così via, no? Quindi avete due
+1:21:30
+1 hour, 21 minutes, 30 seconds
+parametri e dovete fare una cross validation. E qui vi ho fatto soltanto un grafico in cui sto variando un po' a
+1:21:37
+1 hour, 21 minutes, 37 seconds
+caso, se volete, i parametri di K e di massima lag. Vedete, alcune previsioni vanno bene, sembrano andare proprio a
+1:21:44
+1 hour, 21 minutes, 44 seconds
+mimare il nostro andamento della serie, altre sono completamente fuori, no?
+1:21:49
+1 hour, 21 minutes, 49 seconds
+Vedete, questa va giù, questa va completamente su, questa va così, insomma. Quindi attenzione, bisogna anche qui selezionare K e anche quanta
+1:21:56
+1 hour, 21 minutes, 56 seconds
+quanto lag considerare. Quindi, più in generale, c'è il problema di fare una cross validation. Ok? [sbuffare] Ora qui
+1:22:05
+1 hour, 22 minutes, 5 seconds
+in Air Passengers era abbastanza semplice. Se facciamo lo stesso sulle serie rumorose tipo dei degli andamenti finanziari, in realtà KNN, insomma
+1:22:14
+1 hour, 22 minutes, 14 seconds
+comincia a comportarsi male, vedete? Vi dà al variare dei parametri vi dà seri andamenti completamente diversi.
+1:22:20
+1 hour, 22 minutes, 20 seconds
+Qualcuno gli dice che è crescente, qualcuno decrescente e così via. Ok?
+1:22:23
+1 hour, 22 minutes, 23 seconds
+Magari c'è il guru di internet che vi dice "No, questo è il parametro migliore, vedete, ora dovete comperare".
+1:22:29
+1 hour, 22 minutes, 29 seconds
+Invece lui sa che il modello giusto è quello che va giù. Ok? Quindi attenti, dobbiamo capire quale, cioè se abbiamo anche i modelli naiv, i modelli con KNN,
+1:22:38
+1 hour, 22 minutes, 38 seconds
+come si fa a dire quale modello è migliore di un altro?
+1:22:42
+1 hour, 22 minutes, 42 seconds
+E finalmente arriviamo all'ultimo punto di oggi che ci spiega come modificare la validazione crociata, che è un concetto
+1:22:49
+1 hour, 22 minutes, 49 seconds
+che abbiamo già visto già per la classificazione, poi per la regressione.
+1:22:53
+1 hour, 22 minutes, 53 seconds
+Vediamo cosa succede per le serie storiche. Ok? Quindi la prima cosa uno dice divido in train e test, quindi non
+1:23:02
+1 hour, 23 minutes, 2 seconds
+faccio i miei le mie considerazioni sulla serie completa perché non potrò mai capire, cioè o devo aspettare anni, no, per capire se il modello andava bene
+1:23:10
+1 hour, 23 minutes, 10 seconds
+e poi però devo stare anche un po' attento se faccio la cross validation, perché nella cross validation bisogna tenere presente l'andamento temporale,
+1:23:19
+1 hour, 23 minutes, 19 seconds
+cioè io del tempo avrò soltanto accesso al tempo passato e quindi non posso usare osservazioni future se devo
+1:23:27
+1 hour, 23 minutes, 27 seconds
+prevedere futuro. Ok, quindi non posso già usare nel mio nella mia cross validation istanze future
+1:23:36
+1 hour, 23 minutes, 36 seconds
+perché è chiaro, no? Se uno avesse accesso alle istanze future, a quel punto sarebbe ottimo prevedere il futuro. Quindi vediamo un po' come si può fare. Beh, allora la prima cosa e
+1:23:44
+1 hour, 23 minutes, 44 seconds
+consiglio sempre di farla, indipendentemente poi dal fatto che facciate cross validation o no, è dividere sempre in train e testò non
+1:23:53
+1 hour, 23 minutes, 53 seconds
+dividete creando una una selezione casuale, ma semplicemente partizionate 80% della serie, 20% o un'altra
+1:24:02
+1 hour, 24 minutes, 2 seconds
+proporzione se vi può sembrare interessante. Ok?
+1:24:06
+1 hour, 24 minutes, 6 seconds
+Eh, altra cosa però poi è quella la vera e propria cross validation che si fa all'interno del training set è quella
+1:24:12
+1 hour, 24 minutes, 12 seconds
+che adesso vi descrivo come la walk o validazione in avanti o rolling origin. Ok? molto semplice da da spiegare.
+1:24:21
+1 hour, 24 minutes, 21 seconds
+Semplicemente dobbiamo solo fare un po' attenzione quando facciamo la Kefold Cross Validation o la L one out se
+1:24:29
+1 hour, 24 minutes, 29 seconds
+volete, quando però eh dobbiamo tenere conto del tempo. Poi vedremo un altro tipo, se volete di di non tanto di cross validation, ma magari la spieghiamo come
+1:24:37
+1 hour, 24 minutes, 37 seconds
+bagging, che è un modo di sentitizzare nuove serie storiche. Ok? Vedremo magari più avanti un po' come come cambia il
+1:24:44
+1 hour, 24 minutes, 44 seconds
+Bootstrap eh all'interno delle serie storiche.
+1:24:48
+1 hour, 24 minutes, 48 seconds
+Poi però a quel punto, nel momento in cui ho spiegato come si creano, no, questi train e set all'interno della crossazione, poi le
+1:24:56
+1 hour, 24 minutes, 56 seconds
+metriche sono le stesse per la regressione, cioè avete i minimi quadrati, scusate, mi square error, il root min square error, il valore
+1:25:05
+1 hour, 25 minutes, 5 seconds
+assoluto e il maximum absolute value e così via. Insomma, potete scegliere le solite tecniche. Quindi l'unica differenza non è tanto come quando
+1:25:14
+1 hour, 25 minutes, 14 seconds
+abbiamo fatto da da classificazione e regressione, cioè siamo sempre con i dati reali, quindi sono tipo una regressione. Dobbiamo solo stare attenti a come produciamo il train test set, ok?
+1:25:25
+1 hour, 25 minutes, 25 seconds
+Per evitare di usare il futuro quando facciamo questa questo train test.
+1:25:31
+1 hour, 25 minutes, 31 seconds
+Allora, come funziona? Beh, allora la divisione iniziale è molto semplice. Uno prende il train test, prende i valori
+1:25:39
+1 hour, 25 minutes, 39 seconds
+fino a un certo Train e il testo, dal T3 + 1 fino a Te. Ok? E tendenzialmente la proporzione, dicevamo, è 8020.
+1:25:50
+1 hour, 25 minutes, 50 seconds
+Questa è abbastanza buona, insomma, come tipo. Poi cosa si fa? Quando devo voglio validare il modello sul test set, farò
+1:25:59
+1 hour, 25 minutes, 59 seconds
+finta di conoscere solo il training set e poi a quel punto faccio le mie previsioni e vado a fare delle previsioni in modo da avere dei dati di
+1:26:07
+1 hour, 26 minutes, 7 seconds
+tempo futuro rispetto al training set che però rientrano nel test set, così posso confrontarle con quelle che ho veramente. Ok? Quindi molto semplice, si
+1:26:15
+1 hour, 26 minutes, 15 seconds
+prende il modello, magari è KNN, naiv S naiv, vedremo modelli anche più complicati. valutiamo la previsione
+1:26:23
+1 hour, 26 minutes, 23 seconds
+conoscendo soltanto fino al training set, fino al Train e andiamo a fare le previsioni su dei tempi che però sono
+1:26:30
+1 hour, 26 minutes, 30 seconds
+quelli del test e a quel punto abbiamo il confronto. Il confronto lo facciamo anche in quantitativo, potete fare un grafico, ma fate anche un confronto
+1:26:37
+1 hour, 26 minutes, 37 seconds
+quantitativo, fate il mean square error o il mean absolute error e così via. Ok?
+1:26:42
+1 hour, 26 minutes, 42 seconds
+Quindi andate a vedere l'errore tra la vera serie storica e la previsione del modello sul training set.
+1:26:50
+1 hour, 26 minutes, 50 seconds
+Va bene?
+1:26:52
+1 hour, 26 minutes, 52 seconds
+E ovviamente è semplice come cosa, però attenzione, questa non è una cross validation vera e propria, no? perché eh
+1:26:59
+1 hour, 26 minutes, 59 seconds
+è legato agli stessi difetti che avevamo inizialmente anche con la con la classificazione, cioè quando fate una volta questa divisione e una volta la
+1:27:08
+1 hour, 27 minutes, 8 seconds
+valutate, a quel punto dovreste buttare via. Cioè se se le cose non vi piacciono, dovreste ricominciare tutto da capo. Tra l'altro qui è anche più
+1:27:15
+1 hour, 27 minutes, 15 seconds
+complicato perché nel momento in cui le cose eh non vi piacciono avete solo una serie storica tendenzialmente, quindi
+1:27:23
+1 hour, 27 minutes, 23 seconds
+siete un po' spacciati. Ok? Vi ricordate? Non non potete usare molte volte questa divisione in train test con la stessa divisione perché altrimenti è
+1:27:30
+1 hour, 27 minutes, 30 seconds
+che il test diventa parte del training set, ok? Non è qualcosa che non avete visto, ma se entra nel ciclo del della selezione di modelli e così via, state
+1:27:39
+1 hour, 27 minutes, 39 seconds
+imparando anche il test set. Vabbè, però vediamo in pratica cosa succede. Allora, eh questa è la serie storica. Ho tolto
+1:27:46
+1 hour, 27 minutes, 46 seconds
+due periodi, il train test è quello nero. A quel punto avete il test set che è rosso, quindi è la vera serie storica
+1:27:55
+1 hour, 27 minutes, 55 seconds
+adesso indicata in rosso. E poi c'è la predizione di Season na Naive. Ok?
+1:28:00
+1 hour, 28 minutes
+Season na Naive, vi ricordo, aveva questo difetto che non coglieva il trend e in effetti vedete che non lo coglie,
+1:28:08
+1 hour, 28 minutes, 8 seconds
+cioè non lo coglie neanche se facciamo questa divisione tra in test, ok? Quindi avrà un certo errore. Poi di per sé in assoluto l'errore non ci interessa.
+1:28:16
+1 hour, 28 minutes, 16 seconds
+Magari lo usiamo per confrontare modelli diversi.
+1:28:19
+1 hour, 28 minutes, 19 seconds
+Vediamo ad esempio. Ah, non vi ho fatto gli altri modelli. Vabbè, mercoledì magari vediamo gli altri modelli sullo stesso grafico. Ok? Cioè, vedrete poi
+1:28:28
+1 hour, 28 minutes, 28 seconds
+che c'è il naiv e basta. Vi farebbe questo, vi farebbe una bella curva costante e dice "Ma ancora peggio", no?
+1:28:36
+1 hour, 28 minutes, 36 seconds
+e min faceva questo. Quindi, chiaro che a quel punto potete quantificare l'errore, mentre prima, non avendo a disposizione il test set potevamo aspettarci che ci fosse un errore.
+1:28:46
+1 hour, 28 minutes, 46 seconds
+Adesso possiamo anche quantificarlo.
+1:28:50
+1 hour, 28 minutes, 50 seconds
+Va bene, vediamo la la cross validation vera e propria e poi la in pratica la implementiamo mercoledì. Allora, l'idea è di dire
+1:28:58
+1 hour, 28 minutes, 58 seconds
+faccio questa divisione train test, ma la faccio su tutto il mio insieme di tempi. Lo faccio appunto spostando
+1:29:05
+1 hour, 29 minutes, 5 seconds
+l'origine dei tempi, ok? So l'origine, se volete, ehm, potrebbe essere il presente, ok? Il vostro tempo zero.
+1:29:13
+1 hour, 29 minutes, 13 seconds
+Quindi, fissate, è un po' un misto con una con una Kefold cross validation.
+1:29:17
+1 hour, 29 minutes, 17 seconds
+Fissate K di questi tempi, T1, T2, TK, e andate a fare per ogni tempo Ton i
+1:29:24
+1 hour, 29 minutes, 24 seconds
+allenate il modello, quindi dai tempi 0 o 1 fino a Ticon i, quindi questo diventa train.
+1:29:32
+1 hour, 29 minutes, 32 seconds
+andate a fare delle previsioni sui tempi successivi che so fa t con i + h, quindi usate come testo
+1:29:41
+1 hour, 29 minutes, 41 seconds
+qui e ripetete appunto per ogni tempo toni che avete fate questa stessa
+1:29:47
+1 hour, 29 minutes, 47 seconds
+calcolo dell'errore, ok? Quindi avete due eh somme, cioè una relativa alle
+1:29:54
+1 hour, 29 minutes, 54 seconds
+previsioni future e una sulla vostra origine Ticoni. Ok? E quindi alla fine fate una grossa media sui tempi, sul
+1:30:02
+1 hour, 30 minutes, 2 seconds
+numero di previsioni nel futuro e sul numero di origini, ok? È una specie di keyfold
+1:30:10
+1 hour, 30 minutes, 10 seconds
+cross validation, una specie, ok? Perché scegliete il K, il numero di di origine in anticipo, ok? Null nulla vieta di
+1:30:17
+1 hour, 30 minutes, 17 seconds
+farlo su tutti i tempi. Ok? Allora, cosa a cosa può essere utile? Beh, ad esempio, potete confrontare adesso in
+1:30:25
+1 hour, 30 minutes, 25 seconds
+modo un po' più quantitativo rispetto a fare soltanto una volta train e test, e soprattutto lo fate solo sul training set, eh, quindi il test a quel punto lo
+1:30:33
+1 hour, 30 minutes, 33 seconds
+lasciate fuori. Il vero test set tenetelo soltanto verso la fine, quindi a quel punto dentro il training set potete fare tutto quello che volete con questa cross validation. Quindi, ad
+1:30:41
+1 hour, 30 minutes, 41 seconds
+esempio, qui vediamo in pratica ehm l'errore eh il root min square error
+1:30:49
+1 hour, 30 minutes, 49 seconds
+facendo la la questa rolling origin cross validation. Ad esempio, qui ho scelto un k una un h = 5, h = 10. Sto
+1:30:58
+1 hour, 30 minutes, 58 seconds
+guardendo le previsioni a 10 mesi, a 15 mesi, a 20 mesi. Quindi vedete questo è 12 mesi.
+1:31:05
+1 hour, 31 minutes, 5 seconds
+Ok? E allora queste curve cosa mi indicano? Mi indicano che il modello Seasonal Nive, che è quello rosso, eh in realtà non va non va affatto male
+1:31:13
+1 hour, 31 minutes, 13 seconds
+rispetto agli altri, no? Il modello Naive invece è veramente pessimo. Ok.
+1:31:19
+1 hour, 31 minutes, 19 seconds
+Uno invece che funziona abbastanza bene, no? Però soltanto ad acco uguale 12 è quello verde che è quello drift perché
+1:31:26
+1 hour, 31 minutes, 26 seconds
+dopo 12 il la stagionalità, siamo tornati all'inizio dell'anno, quindi la stagionalità non è più un problema, ma è
+1:31:34
+1 hour, 31 minutes, 34 seconds
+il drift il problema. Ok? Quindi questo grafico quantitativamente mi mostra come il modello drift sia un buon modello se
+1:31:42
+1 hour, 31 minutes, 42 seconds
+voglio la previsione a un anno. Il modello Season Naive io tendenzialmente direi che è è un buon modello all'interno dell'anno, perché vedete
+1:31:50
+1 hour, 31 minutes, 50 seconds
+dopo un anno invece c'è il drift che mi fa fa aumentare l'errore e il modello naive tendenzialmente non funziona mai.
+1:31:59
+1 hour, 31 minutes, 59 seconds
+Vabbè, diciamo funziona tanto bene quanto season nave per orizzonte di un anno. Ok? Quindi questo vi dice quale dei tre modelli
+1:32:08
+1 hour, 32 minutes, 8 seconds
+scegliere a seconda del vostro obiettivo, se se la predizione è un anno oppure dentro un periodo, dentro una
+1:32:14
+1 hour, 32 minutes, 14 seconds
+stagionalità o così via. Ultima cosa e però si può usare la cross validation per la selezione di iper parametri come
+1:32:21
+1 hour, 32 minutes, 21 seconds
+questo K, no? In KNN, a dire vero, in KNN abbiamo due parametri, il massimo l'Ag e il K. E ad esempio, se fissate K,
+1:32:30
+1 hour, 32 minutes, 30 seconds
+diciamo che abbiamo K = 2. Vedete questa cross validation vi dice che l'errore è minimo con 12 lag. Quindi, se usate
+1:32:39
+1 hour, 32 minutes, 39 seconds
+soltanto due esempi passati, eh questa cross validation vi dice che dovete scegliere 12 mesi, cosa ragionevole,
+1:32:47
+1 hour, 32 minutes, 47 seconds
+perché così avete un periodo intero e potete stimarlo. Però, ad esempio, vi dice anche che scegliere con 12, ad
+1:32:54
+1 hour, 32 minutes, 54 seconds
+esempio, 15k non è molto utile, cioè cercare troppi esempi, no, simili non vi va bene, vi fa crescere l'errore. Ok?
+1:33:02
+1 hour, 33 minutes, 2 seconds
+Qui in effetti questa cross validation fatta un po' a mano cercando vari K e vari lag vi trova il K e il lag ottimale.
+1:33:12
+1 hour, 33 minutes, 12 seconds
+Ok?
+1:33:14
+1 hour, 33 minutes, 14 seconds
+E ad esempio questo è un altro esempio sulla su quella de degli indici di borsa. Negli indici di borsa sembra evidenziare poca leg, due leg.
+1:33:24
+1 hour, 33 minutes, 24 seconds
+Ok? Vabbè, questo comunque dopo lo vediamo anche mercoledì. Un'altra cross validation la vediamo. Ok. D'accordo.
+1:33:32
+1 hour, 33 minutes, 32 seconds
+Allora, questo, insomma, inizia un po' l'introduzione. Non abbiamo visto ancora modelli sofisticati, ma i concetti di base sono abbastanza questi. Va bene, ci
+1:33:42
+1 hour, 33 minutes, 42 seconds
+vediamo mercoledì. Ci siamo.
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+5:23
+2026 Fields Medal: Hong Wang
+Simons Foundation
+554k 1 mo ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+83 watching
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+225k 13 hr ago
+New
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+8:13
+Chi se ne frega di Jev?
+Salvatore Sanfilippo
+6.3k 3 hr ago
+New
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+16:15
+Travaglio Show! Lancia un Affondo Durissimo Contro La Russa e lo Ridicolizza
+Attualità Politica
+169k 2 wk ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+5:30
+Raimondo Vianello e la valletta ciociara (1968)
+pietromollo
+993k 7 yr ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+7 songs
+Rachmaninoff & Prokofiev: Cello Sonatas
+Yo-Yo Ma, Emanuel Ax • 22 Jul 2026
+View full playlist
+8:03
+Don't Throw Away Your Old Computer Hard Drive 😱 Billions of People Don't Know This Secret
+Inventor 247
+467k 4 mo ago
+8:58
+Martha Argerich, il pianoforte raccontato dal violino - Via dei Matti n.0 del 15/01/2026
+Rai
+21k 8 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+4:13
+Pizzicar Galante - Giovanni Battista Gervasio - Sonata // Per Mandolino solo e Basso (Allegro)
+ahproductions
+54k 3 yr ago
+14:14
+Tracking Yuja Wang’s Heartbeats During Her Rachmaninoff Marathon | Carnegie Hall
+Carnegie Hall
+866k 2 yr ago
+28:19
+Sir András Schiff: Finding Your Path
+Living the Creative Life
+63k 1 mo ago
+28:27
+Mendelssohn: String Quartet No. 2 in A minor, Op. 13
+Leonkoro Quartet and Artists__First
+8k 5 days ago
+New
+20:49
+Intervista a Quarta Repubblica - Giovanni Andrea Zanon
+Giovanni Andrea Zanon
+14k 2 yr ago

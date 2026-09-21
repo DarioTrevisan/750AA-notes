@@ -1,0 +1,550 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "20/10/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 5'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+```
+
+# Formula di Bayes e Classificazione
+
+
+
+## Introduzione alla Formula di Bayes
+
+- **Formula di Bayes**: date variabili aleatorie $X \in F$ *features*, $\theta \in \Theta$ (parametri, *labels*)
+  \[
+  P(\theta |X=x) = \frac{P(\theta) \cdot P(X=x|\theta)}{P(X=x)}
+  \]
+  
+- **Interpretazione**:
+  - \( P(\theta|X=x) \): Probabilità a posteriori del parametro $\theta$, date le caratteristiche \( X=x \).
+  - \( P(X=x|\theta) = \mathcal{L}(\theta; X=x)\): verosimiglianza del parametro $\theta$ relativa alle osservazioni  \( X \).
+  - \( P(\theta) \): Probabilità a priori del parametro.
+  - \( P(X) \): Probabilità marginale delle caratteristiche.
+  
+- **Osservazione**: $P(X)$ è comune a tutti i parametri $\theta$:
+$$ P(\theta |X=x) \propto P(\theta) \mathcal{L}(\theta; X=x ) $$ 
+
+## Stimatori (puntuali)
+
+Data una densità  (es., a posteriori) per $\theta$ possiamo determinarne la *moda*:
+
+- **Stima Massimo a Posteriori (MAP)**:
+  \[
+  \theta_{MAP} := \arg\max_{\theta} P(\theta|X=x) =\arg \max_{\theta} P(\theta) \mathcal{L}(\theta; X=x )
+  \]
+- **Stima di Massima Verosimiglianza (MLE)**:
+  \[
+  \theta_{MLE} := \arg\max_{\theta} P(X=x|\theta) = \arg\max_{\theta} \mathcal{L}(\theta; X=x)
+  \]
+
+- Nella *densità* è rappresentata più informazione rispetto alla stima puntuale.
+
+
+## Esempio 1: Stima del parametro di una Bernoulli  
+
+- **Problema**: Stimare la frazione $\theta \in [0,1]$ di palline rosse in un'urna effettuando *estrazioni con rimpiazzo*.
+
+- **Modello**:
+
+  - $X =$ numero di rosse in $n$ estrazioni
+$$ \mathcal{L}(\theta; X=x) = P(X=x | \theta) = {n \choose x} \theta^x (1-\theta)^{n-x} $$
+  - Densità a priori uniforme $P(\theta) =1$ per $\theta\in [0,1]$ 
+$$ \Rightarrow \theta_{MAP} = \theta_{MLE} = \frac{x}{n}.$$
+
+
+
+## Angry Bayes
+
+![](logos/angry-bayes-logo.jpg){#id .class width="50%" height="50%"}
+
+-   Giocate voi!
+<https://dario-trevisan.shinyapps.io/AngryBayes/>
+
+-   Codice (R shiny) disponibile nel team e nella pagina del corso
+
+
+## Densità beta
+
+- Definiamo in generale $\text{Beta}(\alpha>0, \beta>0)$ una densità continua
+  \[
+  p(\theta) \propto \theta^{\alpha-1} (1-\theta)^{\beta-1}
+  \]
+  
+- *Intepretazione*: \( \alpha-1 \) è il numero di successi e \( \beta-1 \) è il numero di insuccessi.
+
+- La *moda* è $\theta^* = \frac{ \alpha-1}{\beta+\alpha-2}$.
+
+- La *media* è $\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta}$
+
+- La *varianza* è  $\operatorname{Var}(\theta) = \frac{\alpha \beta}{(\alpha+\beta)^2 (\alpha+\beta+1)} \to 0$ se $\alpha+\beta \to \infty$
+
+
+## Esempio.
+
+Densità beta con parametri $\alpha \in \cur{4, 5, 10}$ e $\beta = 2$.
+
+
+```{r}
+
+theta = seq(0,1, by=0.001)
+
+data <- data.frame("theta" = c(), "densità"=c(), "alpha"=c())
+
+alpha = c(4,  5,  10)
+
+for (z in alpha){
+  data <- rbind(data, data.frame( theta, dbeta(theta, z, 2), rep(factor(z), length(theta))) )
+}
+
+colnames(data) <- c("theta", "densità", "alpha")
+
+ggplot(data, aes(x=theta, y=densità, group=alpha, col=alpha))+geom_line(linewidth=2)
+
+
+```
+
+
+## Previsione
+
+- **Problema**: avendo osservato in $n$ estrazioni consecutive $r$ palline rosse e $n-r$ blu, qual è la probabilità che nell' estrazione  successiva si osservino $k$ rosse?
+
+- **Due approcci**:
+  1. **Approssimato**: usiamo la stima puntuale $\theta_{MLE} = r/n$ e quindi
+  $$ P(X=1 | X_n=r) \approx r/n.$$
+  
+  2. *Esatto*: usiamo la legge della probabilità totale (disintegrazione):
+  $$ P(X=1 | X_n=r) = \int_0^1 P(X=1 | \theta, X_n=r) P(\theta | X_n = r) d \theta$$
+  Da cui la **regola di successione di Laplace**: $$P(X=1|X_n=r )=\frac{r+1}{n+2}$$
+  
+  
+  
+## Esempio 2: Media e varianza di una Gaussiana
+
+- **Problema**: Stimare la media e la deviazione standard di una distribuzione gaussiana reale  da osservazioni $(X_i)_{i=1}^n$ indipendenti.
+
+- **Modello**: $\theta = (m, \sigma)$
+  - $\{ X = x \} = \{X_i = x_i\}_{i=1}^n$ 
+$$ \mathcal{L}(\theta; X=x) = P(X=x | \theta) = \prod_{i=1}^n \exp\bra{- \frac 1 2 \sum_{i=1}^n \bra{ \frac{ x_i -m } {\sigma}}^2 } \frac{1}{\sqrt{2 \pi \sigma^2}}. $$
+  - Densità a priori *uniforme* $P(m, \sigma) =\frac{1}{\sigma}$ per $m \in \mathbb{R},\sigma>0$ 
+
+- **Densità a posteriori**:
+  $$
+  P(m, \sigma | X=x) \propto \exp\bra{ - \frac{\bra{m - \bar{x}_n}^2}{2 (\sigma/\sqrt{n})^2} - \frac{ \Var{x}_n^2}{2 (\sigma/\sqrt{n})^2} } \sigma^{-(n+1)}
+  $$
+  
+
+## Stime e previsione
+
+- Stima MLE: $m_{MLE} = \bar{x}_n$, $\sigma^2_{MLE} = \Var{x}_n = \frac 1 n \sum_{i=1}^n (x_i-\bar{x})^2$
+
+- Stima MAP $:m_{MAP} = \bar{x}_n$, $\sigma^2_{MAP} = \frac{n}{n+1} \Var{x}_n$.
+
+- Previsione:
+  1. **Approssimata** (usando stima $MLE$): $$P(X_{n+1}=x_{n+1} | X_1=x_1\ldots, X_n=x_n) = \mathcal{N}(\bar{x}_n, \Var{x}_n)$$
+  2. Bayesiana assumendo $\sigma^2$ noto: $$P(X_{n+1}=x_{n+1} | X_1=x_1\ldots, X_n=x_n) = \mathcal{N}\bra{ \bar{x}_n, \frac{n+1}{n}\sigma^2 }$$
+  3. **Bayesiana esatta**: Student-$t$ con $n-1$ gradi di libertà:
+  $$P(X_{n+1}=x_{n+1}) \propto \bra{ 1 + \frac 1 {n+1} \frac{ (x_{n+1} - \bar{x}_n)^2}{  \Var{x}_n}}^{-n/2}$$
+
+
+
+ 
+## Modelli di classificazione 
+
+- **Modelli Generativi**: \( P(X|C) \)
+  - Esempio: Naive Bayes, LDA e QDA.
+  
+- **Modelli Discriminativi**: \( P(C|X) \)
+  - Esempio: Regressione logistica.
+  
+- La formula di Bayes li collega:
+$$ P(C|X) \propto P(C)P(X|C) $$
+- Classificatore: $h(x) = \arg \max_\ell P(C=\ell| X=x)$
+
+- Si *modellizzano* e poi si *stimano* le probabilità $P(C|X)$, $P(X|C)$ e $P(C)$ a partire dalle osservazioni del *training set*.
+
+
+
+## Modello Naive Bayes
+
+- **Problema:** modellizzare $P(X|C)$ quando $X = (X_j)_{j=1}^d \in \R^d$ con $d$ elevato
+
+- soluzione *idiota* (ma efficace): ipotesi di indipendenza! 
+$$P(X|C) = \prod_{j=1}^d P(X_j|C)$$
+- **Due esempi**:
+  - **Bernoulli Naive Bayes**: per dati binari.
+  - **Gaussian Naive Bayes**: per dati continui.
+  
+
+## Bernoulli Naive Bayes
+
+Supponiamo che ciascuna caratteristica sia *binaria* (es, presente/assente, vero/falso, ecc.).
+
+- Possiamo *modellizzare*: $P(X_j= x_j|C=c) = p(j|c)^{x_j} (1-p(j|c))^{1-x_j}$
+
+- Parametri del modello: $(p(j|c))_{j,c}\in [0,1]^{d\times \sharp C}$, $p(c) = P(C=c) \in [0,1]^{\sharp C}$.
+
+## Bernoulli Naive Bayes: addestramento e previsione
+
+- *Addestramento* (training) tramite stima dei parametri (MAP): $p(c) = n(c)/n$ e
+$$ p(j|c) = \frac{n(j|c)}{n(c)} =  \frac{ \text{num. di oss. con label $c$ e feature $j$ presente } }{\text{num. di oss. con label $c$} } $$
+
+- Si può aggiungere un parametro $\alpha>0$ (prior non uniforme) per evitare $p(j|c) \in \cur{0,1}$:
+$$ p(j|c) = \frac{n(j|c) +\alpha}{n(c)+2\alpha}.$$
+
+- *Classificatore*: dato un test point con caratteristiche $x$ si calcolano le probabilità delle labels:
+$$ P(C=c|X=x) \propto p(c) \prod_{j=1}^d p(j|c)^{x_j} (1-p(j|c))^{1-x_j}$$
+e si pone $h(x) = c$ la *moda*.
+
+
+## Caso binario $C = \cur{-1, 1}$.
+
+- Possiamo usare le *odds*
+$$ \frac{ P(C=+1|X=x) }{ P(C=-1|X=x)} =  \frac{ p(+1) \prod_{j=1}^d p(j|+1)^{x_j} (1-p(j|+1))^{1-x_j} }{p(-1) \prod_{j=1}^d p(j|-1)^{x_j} (1-p(j|-1))^{1-x_j}} $$
+oppure passare alle log-odds (*logits*).
+
+- Funzione di punteggio (**score**) lineare nelle features:
+$$ s(x) := \beta_0 + \sum_{j=1}^d \beta_j x_j $$
+$$ \beta_j := \log( p(j|+1)/p(j|-1)) -\log((1-p(j|+1))/( 1-p(j|-1)))$$
+$$ \beta_0 := \log( p(+1)/p(-1) ) + \sum_{j=1}^d \log((1-p(j|+1))/( 1-p(j|-1)))$$
+- Il classificatore è  $h(x) = \operatorname{sign}( s(x) )$.
+
+
+## Curva ROC
+
+- Dato uno *score* $s: F \to \R$ e una *soglia* (threshold) $t \in \R$ definiamo un classificatore ($C = \cur{-1, 1}$): 
+$$ h_t(x) := \operatorname{sign}(s(x)-t).$$
+- **Proprietà**:
+
+  - $s(x)$ indica $\log$-odds $\rightarrow$ $\operatorname{Odds}(C=1|X=x) > e^t$ per  $h_t(x) = 1$.
+  
+  - $\beta_0$ diventa $\beta_0 -t$ $\rightarrow$  $\operatorname{Odds}(+1) := e^{-1} p(+1)/(p(-1))$
+  
+  - Per $t \to \infty$,  $h_t(x) = -1$ $\rightarrow$ $FPR = 0$, $TPR = 0$
+  
+  - Per $t \to -\infty$, $h_t(x) = +1$ 
+  
+  - Al variare di $t$ la performance di $h_t$ nel piano FPR/TPR definisce la *curva ROC* ( Receiver Operating Characteristic) di $s$ (su un test/validation set).
+
+## Esempio di curva ROC (dataset generato)
+
+
+```{r}
+# Load necessary libraries
+library(e1071)  # For Naive Bayes
+library(naivebayes) # Naive Bayes più flessibile
+library(caret)  # For confusionMatrix
+library(pROC)    # For ROC curve
+library(ggplot2) # For plotting
+library(MedDataSets) # For dataset
+
+# generate a dataset
+
+x1 <- sample( 0:1, size=200, replace=TRUE, prob=c(0.2, 0.9))
+x2 <- sample( 0:1, size=50, replace=TRUE, prob=c(0.4, 0.6))
+y1 <- sample( 0:1, size=200, replace=TRUE, prob=c(0.8, 0.2))
+y2 <- sample( 0:1, size=50, replace=TRUE, prob=c(0.1, 0.9))
+
+data_generated <- data.frame("x" = c(x1, x2), "y"=c(y1, y2), "label"=as.factor(c(rep(-1, 200), rep(1,50))))
+
+# Split the data into training and testing sets
+train_index <- createDataPartition(data_generated$label, p = 0.7, list = FALSE)
+train_set <- data_generated[train_index, ]
+test_set <- data_generated[-train_index, ]
+
+# Train a Naive Bayes model
+#nb_model <- naiveBayes(label ~ ., data = data_generated)
+
+nb_model <- bernoulli_naive_bayes(train_set[, -3], train_set[,3])
+
+# Predict probabilities on the test set
+nb_pred_prob <- predict(nb_model, as.matrix(test_set[,-3]), type = "prob")[, 2]  # Probability of class 1
+
+# Compute the ROC curve
+roc_curve <- roc(test_set$label, nb_pred_prob, auc=TRUE)
+
+roc_data_frame <- data.frame("FPR" = 1-roc_curve$specificities, "TPR"=roc_curve$sensitivities)
+
+# Plot the ROC curve
+ggplot(data=roc_data_frame, aes(x=FPR, y=TPR)) + geom_line(colour="blue")+ geom_segment(aes(x=0, xend=1, y=0, yend=1))+
+  ggtitle("Curva ROC classificatore Naive Bayes (dataset generato)") + xlim(0,1)+ylim(0,1)+
+  xlab("False Positive Rate") +
+  ylab("True Positive Rate") 
+```
+
+
+## Dataset diabetes2_tbl_df {MedDataSets}
+
+```{r}
+
+# Load the diabetes dataset
+diab <- diabetes2_tbl_df
+
+# Set the seed for reproducibility
+set.seed(42)
+
+ggplot(diab, aes(x=treatment, fill =outcome))+geom_bar(position="dodge")
+
+
+```
+
+
+## Dataset  diabetes2_tbl_df {MedDataSets}
+
+```{r}
+# Split the data into training and testing sets
+train_index <- createDataPartition(diab$outcome, p = 0.7, list = FALSE)
+train_set <- diab[train_index, ]
+test_set <- diab[-train_index, ]
+
+# Train a Naive Bayes model
+nb_model <- naiveBayes(outcome ~ ., data = train_set)
+
+# Predict probabilities on the test set
+nb_pred_prob <- predict(nb_model, test_set, type = "raw")[, 2]  # Probability of class 1
+
+# Compute the ROC curve
+roc_curve <- roc(test_set$outcome, nb_pred_prob, auc=TRUE)
+
+
+# Plot the ROC curve
+ggroc(roc_curve, colour="blue", legacy.axes = TRUE, print.thres=TRUE) + geom_segment(aes(x=0, xend=1, y=0, yend=1))+
+  ggtitle("Curva ROC: naive Bayes su dataset diabetes2_tbl_df {MedDataSets}") + xlim(0,1)+ylim(0,1)+
+  xlab("False Positive Rate") +
+  ylab("True Positive Rate") +
+  theme_minimal()
+```
+
+
+## AUC (Area Under the Curve) 
+
+- Più la curva ROC è vicina ai lati sinistro e alto del quadrato $[0,1]^2$, migliore è la *performance* dello stimatore  $h_t$ al variare di $t$ (quindi dello score $s$).
+
+- $\leftrightarrow$ maggiore è l`area sotto la curva ROC
+
+- **Definizione** $AUC(s) := \int_{-\infty}^\infty TPR(t) d FPR(t)$
+
+- **Interpretazione**: $AUC(s) = P(s(X_+)>s(X_-))$ dove $X_+$ è un *positivo reale*, $X_-$ è un *negativo reale* e sono *indipendenti*.
+
+- **Coefficiente di Gini**: $Gini(s) = 2AUC(s)-1$
+
+- Spesso si usa $AUC(s)$ per *confrontare* score diverse (ad esempio con metodi o parametri diversi).
+
+- **Attenzione!** riassumendo la curva con un numero, si perde informazione (esempio: score con curve diverse ma stessa AUC).
+
+
+## Gaussian Naive Bayes
+
+
+Supponiamo che ciascuna caratteristica sia *reale continua*.
+
+- *Modello*: $P(X_j= x_j|C=c) = \exp\bra{ - \frac {(x-m(j|c))^2}{2  \sigma^2(j|c) } } \frac{1}{\sqrt{2 \pi \sigma^2(j|c)}}$
+
+- *Parametri*:medie e varianze $(m(j|c), \sigma^2(j,c))_{j,c}$, a priori $p(c) = P(C=c) \in [0,1]^{\sharp C}$.
+
+- *Addestramento* (training) tramite stima (MAP/MLE): $p(c) = n(c)/n$ e
+$$ m(j|c) = \bar{x}_{j|c}, \quad  \sigma^2(j|c) = \bar{x^2}_{j|c} -(\bar{x}_{j|c})^2,$$
+
+
+- *Classificatore*: dato $x \in F$ si calcolano:
+$$ P(C=c|X=x) \propto p(c) \prod_{j=1}^d \exp\bra{ - \frac {(x_j-m(j|c))^2}{2  \sigma^2(j|c) } } \frac{1}{\sqrt{\sigma^2(j|c)}}$$
+
+
+
+## Caso binario $C = \cur{-1, 1}$.
+
+- $\log$-odds:
+$$ \begin{split} & \log\bra{\frac{P(C=+1|X=x)}{P(C=-1|X=x)} } \\
+& = \beta_0  + \sum_{j=1}^d \frac {(x_j-m(j|-1))^2}{2  \sigma^2(j|-1) } - \frac {(x_j-m(j|+1))^2}{2  \sigma^2(j|+1) } \end{split} $$
+- La funzione di *score* è **quadratica nelle features**:
+$$ s(x) := \beta_0 + \sum_{j=1}^d \beta_j x_j  + \alpha_j x_j^2$$
+- Se $\sigma(j|-1) = \sigma(j|+1)$ $\rightarrow$ $s(x)$ è **lineare** nelle features
+
+- Il classificatore è  $h(x) = \operatorname{sign}( s(x) )$ $\rightarrow$ introdurre una soglia $t$ e porre $h_t(x) = \operatorname{sign}(s(x)-t)$.
+
+
+## Esempio di Gaussian Naive Bayes (iris)
+
+```{r}
+
+# Load the iris dataset
+data(iris)
+# Set the seed for reproducibility
+set.seed(42)
+
+
+# Split the data into training and testing sets
+train_index <- createDataPartition(iris$Species, p = 0.7, list = FALSE)
+train_set <- iris[train_index, ]
+test_set <- iris[-train_index, ]
+
+# Train a Naive Bayes model
+nb_model <- naiveBayes(Species ~ ., data = train_set)
+
+
+# Predict classes on the test set
+nb_pred <- predict(nb_model, test_set, type="class")
+# preduct probabilities on the test set
+# nb_pred_prob <- predict(nb_model, test_set, type="class")
+
+# contingency table (confusion matrix)
+
+print(table( "Reali"=test_set$Species, "Classificati"=nb_pred))
+```
+
+
+## Curva ROC dataset Iris (positivo = versicolor)
+
+```{r}
+
+iris_setosa_not_setosa <- iris
+
+iris_setosa_not_setosa$Species <- as.factor(iris_setosa_not_setosa$Species =="versicolor")
+
+train_index <- createDataPartition(iris_setosa_not_setosa$Species, p = 0.7, list = FALSE)
+train_set <- iris_setosa_not_setosa[train_index, ]
+test_set <- iris_setosa_not_setosa[-train_index, ]
+
+# Train a Naive Bayes model
+nb_model <- gaussian_naive_bayes(train_set[, -5], train_set[, 5])
+
+
+nb_pred_prob <- predict(nb_model, as.matrix(test_set[, -5]), type="prob")[,2]
+
+
+# Compute the ROC curve
+roc_curve <- roc(test_set$Species, nb_pred_prob, auc=TRUE)
+
+
+# Plot the ROC curve
+ggroc(roc_curve, colour="blue", legacy.axes = TRUE, print.thres=TRUE) + geom_segment(aes(x=0, xend=1, y=0, yend=1))+
+  ggtitle("Curva ROC: naive Bayes su dataset Iris (setosa/non setosa) {MedDataSets}") + xlim(0,1)+ylim(0,1)+
+  xlab("False Positive Rate") +
+  ylab("True Positive Rate") +
+  theme_minimal()
+
+```
+
+
+
+## LDA e QDA
+
+- *Modello*: per features $x \in \R^d$, label $c$, 
+$$ p(X = x | c) \propto \exp\bra{ - \frac 1 2 (x -m(c))^T \Sigma(c)^{-1} (x-m(c)) } \frac{1}{\sqrt{ \det(\Sigma(c))}}$$
+- dove $m(c)$ e $\Sigma(c)$ sono da parametri (pure le probabilità a priori $p(c)$).
+
+- **LDA (Linear Discriminant Analysis)**:
+  - tutte le classi con la stessa matrice di covarianza $\Sigma(c) = \Sigma$.
+  
+- **QDA (Quadratic Discriminant Analysis)**:
+  - permette  matrice di covarianza differenti per ciascuna classe.
+  
+## Caso binario $C = \cur{-1,1}$: 
+
+- Modello
+$$  \begin{split} & p( C = c|X=x)  \\
+& \propto p(c) \exp\bra{ - \frac 1 2 (x -m(c))^T \Sigma(c)^{-1} (x-m(c)) } \frac{1}{\sqrt{ (2 \pi)^d \det(\Sigma(c))}}\end{split} $$
+- In QDA: funzione di score **quadratica**
+$$ s(x) = \log\bra{ \frac{ P(C=+1|X=x)}{ P(C=+1|X=x)} } = \beta_0 + \sum_{j=1}^d \beta_j x_j + \sum_{j, k=1}^d \gamma_{j,k} x_j x_k$$
+- In LDA: funzione di score **lineare**
+  $$ s(x) = \log\bra{ \frac{ P(C=+1|X=x)}{ P(C=+1|X=x)} } = \beta_0 + \sum_{j=1}^d \beta_j x_j$$
+  
+
+
+## Stime dei parametri (caso generale)
+
+- Per i vettori di media (MLE): 
+$$ m(c) = \frac 1 {n(c)} \sum_{i: \ell_i =c} x_i$$
+
+- Per la matrice di covarianza (MLE):
+  - Caso LDA:
+  $$ \Sigma_{MLE} = \frac 1 n \sum_{c} \sum_{i: \ell_i = c} (x_i-m(c))(x_i-m(c))^T $$
+  - Caso QDA:
+  $$ \Sigma(c) = \frac 1 {n(c)} \sum_{i: \ell_i = c} (x_i-m(c))(x_i-m(c))^T$$
+  
+- **Attenzione:**  ci sono anche altri criteri per la stima (Fisher)
+
+
+## Regressione Logistica
+
+Consideriamo prima il caso *binario* $C = \cur{-1, +1}$. 
+
+- Modello **discriminativo** con score **lineare**
+$$ \begin{split} s(x) & = \log \bra{ \frac{ P(C = +1|X=x) }{P(C=-1|X=x)} }\\
+& := \beta_0 + \sum_{j=1}^d \beta_j x_j= \beta x\end{split} $$
+- Probabilità 
+  - $P(C=+1|X=x) = \frac{ \exp\bra{ \beta x} }{ 1+ \exp\bra{ \beta x} }$
+  - $P(C=-1|X=x) = \frac{ 1 }{ 1+ \exp\bra{ \beta x} }$
+
+## Verosimiglianza regressione logistica
+
+- Per indipendenza:
+$$ \begin{split} \mathcal{L}((\beta_j)_{j=0}^d ; (x_i, \ell_i)_{i=1, \ldots, n}) & = \prod_{i=1}^n P(X=x_i| C=\ell_i) \\
+& = \frac{ \exp\bra{ \beta \sum_{i: \ell_i = 1} x} }{ \prod_{i=1}^n (1+ \exp\bra{ \beta x_i}) } \end{split} $$
+- Per determinare $\beta_{MLE}$ si usano metodi di **ottimizzazione numerica** (la funzione $\mathcal{L}$ è convessa in $\beta$)
+
+
+
+## Regressione Logistica: Caso Multi-Classe
+
+Si possono utilizzare diverse strategie *euristiche*:
+
+1. **One-vs-All  (One-vs-Rest)**:
+   - Per ogni label \( c \), si addestra un classificatore binario \( h_c\) che distingue  \( c \) da tutte le altre con parametri $(\beta(c)_j)_{j=0}^d$
+   - Per $x \in F$, si confrontano le probabilità (o gli scores) di ciascuna label:
+     $$
+     h(x) \in \arg \max_{c} \beta(c) x
+     $$
+
+2. **One-vs-One**:
+  - Per ogni coppia di labels $c, \ell$ si addestra un classificatore binario $h_{c,\ell}$ che distingue $c$ da $\ell$.
+  - Per classificare $x\in F$, ciascun classificatore **esprime un voto** $h_{c,\ell}(x) \in \cur{c, \ell}$
+  - si pone $h(x):=$ la label che riceve più voti.
+  
+
+## Regressione softmax
+   
+- Generalizzare la regressione logistica a multi-classe usando la fuzione *softmax* per convertire i punteggi in probabilità.
+  
+- Per ogni classe $c$, si introducono parametri $\beta(c)$.
+   
+- La funzione *softmax* è definita come:
+     $$
+     P(C=c|X=x) = \frac{\exp(\beta(c) x)}{\sum_{\ell} \exp(\beta(\ell) x)}
+     $$
+     
+- Si ottimizzano i parametri tramite MLE (numericamente)
+
+-  permette di trattare direttamente più classi senza la necessità di addestrare classificatori separati.
+
+
+
+
+

@@ -1,0 +1,2161 @@
+
+IT
+750AA 2025 12 01 lezione 21
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+130 views  1 Dec 2025
+Processi stocastici, funzioni teoriche di media e autocovarianza/correlazione. Stazionarietà dei processi stocastici, operazione di differenziazione per migliorare la stazionarietà, test di stazionarietà. ACF campionaria come stimatore della ACF teorica nel caso di processi stazionari. Media mobile, definizione e applicazione nella decomposizione classica. Modelli (S)ARIMA, definizione generale, funzione di autocorrelazione (differenza tra AR e MA), stima dei parametri, previzione, selezione del modello (automatica). Validazione crociata e confronto delle performance tra modelli.
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:05
+5 seconds
+Va bene, iniziamo puntuali, dai, così andiamo avanti. Quindi oggi vediamo la fine
+0:12
+12 seconds
+della teoria sui processi stocastici, eh sulle serie storiche, scusate. E in effetti oggi ci colleghiamo a una
+0:20
+20 seconds
+classe di modelli che richiedono un po' più di teoria, però vedremo anche poi alla fine che un po' di di ricompensa
+0:29
+29 seconds
+c'è perché sono molti più modelli, molta più flessibilità e in particolare sono, diciamo, inquadrati come processi
+0:37
+37 seconds
+stocastici. Ora così vi do anche la definizione di cos'è questa cosa. mai vi servisse qualcuno parla in questi termini, potete dialogare con chi si
+0:46
+46 seconds
+occupa di processi. Allora, poi vedremo un concetto importantissimo che sta alla base di di questi modelli che adesso andremo a definire, ma il concetto è
+0:55
+55 seconds
+quello di stazionarietà, di un processo e cercheremo di dare anche il senso.
+1:02
+1 minute, 2 seconds
+Poi, appunto, ci colleghiamo e finalmente completiamo la parte sulla decomposizione che era, insomma, della prima lezione sulle serie storiche.
+1:09
+1 minute, 9 seconds
+Abamo detto che c'è questa decomposizione, il trend, stagionalità e d' errori e come si estrae il trend vi ho detto è una media mobile e ora
+1:17
+1 minute, 17 seconds
+vediamo veramente com'è definita e completiamo, insomma, quella parte sulla decomposizione, almeno quella classica.
+1:25
+1 minute, 25 seconds
+E infine vediamo appunto questi modelli che si chiamano modelli arima eventualmente con la S, se volete la stagionalità e vediamo alcune proprietà,
+1:34
+1 minute, 34 seconds
+va bene? Quindi sono quattro punti molto importanti, diciamo, quello più importante sicuramente è i modelli ma poi per le applicazioni. Va bene?
+1:44
+1 minute, 44 seconds
+Allora, vediamo un po' di motivare questa idea dei processi stocastici cosa sono? Cioè uno parte da una serie storica, abbiamo detto le osservazioni
+1:53
+1 minute, 53 seconds
+nel tempo y d, chiamiamole tamo sempre detto, ok, ci sono queste
+2:00
+2 minutes
+osservazioni, non possiamo supporre che siano osservazioni indipendenti e non abbiamo in realtà finora supposto molto
+2:08
+2 minutes, 8 seconds
+su quale sia l'origine, quale sia, se volete, un modello probabilistico per queste osservazioni. Quello che abbiamo
+2:15
+2 minutes, 15 seconds
+fatto in effetti l'ultima lezione è di dire sì gli errori di delle previsioni o gli errori anche sul training set se
+2:23
+2 minutes, 23 seconds
+volete, no, tra la previsione e quel dato effettivamente osservato devono essere eh osservazioni indipendenti e
+2:31
+2 minutes, 31 seconds
+questo perché? Perché così tiravamo fuori la stima dei minimi quadrati che è una stima di massima grossimiglianza.
+2:38
+2 minutes, 38 seconds
+Ok? Però in effetti, se ci pensate, anche la volta scorsa con gli ETS, questi modelli abbastanza sofisticati, non abbiamo detto come, qual è la legge
+2:47
+2 minutes, 47 seconds
+con che tipo di variabili aleatorie che ci sono dietro che generano dei y, abbiamo detto soltanto gli errori perché perché non possiamo sicuramente dire che
+2:56
+2 minutes, 56 seconds
+anche le y sono variabili indipendenti, altrimenti non ci sarebbe la struttura nel tempo e non potremmo fare previsioni ragionevole. Ecco, vedete così. E
+3:05
+3 minutes, 5 seconds
+allora, quindi, mentre nella regressione o nella classificazione l'ipotesi di base che di solito faceva partire tutto
+3:13
+3 minutes, 13 seconds
+era che ve lo ricordo che le coppie Y, che è l'etichetta o il fattore diuscita X, fattore di ingresso, le
+3:20
+3 minutes, 20 seconds
+caratteristiche siano in realtà tutte osservazioni indipendenti e identicamente distribuite con una qualche distribuzione che non conosciamo
+3:28
+3 minutes, 28 seconds
+tendenzialmente e nel nelle serie storiche questo sarebbe un po' troppo, quindi Quindi quello che si fa e si dice, beh, saranno
+3:37
+3 minutes, 37 seconds
+comunque delle variabili aleatorie y grande, le promuoviamo, no?
+3:42
+3 minutes, 42 seconds
+Viabiliatorie, usiamo la lettera grande, però non diciamo che, cioè, in generale non richiediamo che siano un campione,
+3:50
+3 minutes, 50 seconds
+che il campione sarebbero varie indipendenti e identicamente distribuite. Invece, diciamo soltanto una collezione di variabili aleatorie,
+3:58
+3 minutes, 58 seconds
+eh nel nostro caso valori realiamo serie storiche semplici, altri sarebbero valori vettoriali. se avete serie storiche multiple e quindi l'indice è un
+4:07
+4 minutes, 7 seconds
+tempo e non facciamo l'ipotesi dell'indipendenza, ok? Senza ipotesi di indipendenza. Lo scrivo qua, senza
+4:15
+4 minutes, 15 seconds
+ipotesi di indipendenza. Questa è la differenza che ha che magari i residui, gli errori
+4:23
+4 minutes, 23 seconds
+vorremo si potrebbe chiedere che sono indipendenti, ma sicuramente le y non vogliamo richiedere, ok? E quindi
+4:31
+4 minutes, 31 seconds
+chiamiamo processo stocastico un una collezione di variabile un po' più generale, no, rispetto a un campione di taglia N. Se pensate alla taglia come i
+4:39
+4 minutes, 39 seconds
+tempi, non è detto che debbano essere eh indipendenti. Poi in particolare uno si accorge che tra i vari tra le varie
+4:48
+4 minutes, 48 seconds
+variabili aleatorie, l'abbiamo già fatto in altre occasioni, le variabili gaussiane sono quelle più più semplici con cui lavorare e allora uno chiama un
+4:57
+4 minutes, 57 seconds
+un processo gausiano se le variabili sono gausiane. Ok? Poi può fare anche altri processi, altre serie storiche che non sono gausiane, ma sicuramente le
+5:05
+5 minutes, 5 seconds
+gausiane sono un bel una bella classe dove fermarsi e fare un po' di di osservazione. Ok?
+5:14
+5 minutes, 14 seconds
+Ecco, allora, stabilito che quindi promuoviamo, no, diciamo le Y, le nostre osservazioni della serie storica sono
+5:21
+5 minutes, 21 seconds
+realizzazioni di queste variabatorie e possiamo definire le tante quantità che sono la controparte teorica di quello che poi uno va a osservare in pratica.
+5:30
+5 minutes, 30 seconds
+Allora, dato un processo stocastico, uno chiama la media teorica del processo e
+5:38
+5 minutes, 38 seconds
+il valor medio. Certo, il valore medio potrebbe dipendere dal tempo e quindi chiama funzione di media la funzione che
+5:45
+5 minutes, 45 seconds
+a ogni tempo associa la media teorica mdt. Quindi, in generale, attenzione, la funzione di media potrebbe dipendere dal tempo. Se avete un trend crescente, uno
+5:54
+5 minutes, 54 seconds
+vorrebbe che la media cresca insieme al trend, ad esempio.
+5:59
+5 minutes, 59 seconds
+E similmente uno può definire l'autocovarianza, vi ricordate? Si può parlare di covarianza campionaria, ma
+6:06
+6 minutes, 6 seconds
+anche di covarianza teorica tra due variabili relatorie e quindi uno definisce l'autocovarianza teorica, quella che è la covarianza teorica tra
+6:15
+6 minutes, 15 seconds
+le due Ys e YT, ovviamente da tempi anche generali, quindi per ogni coppia
+6:22
+6 minutes, 22 seconds
+di tempi anche S = T ha una covarianza teorica.
+6:26
+6 minutes, 26 seconds
+Poi ovviamente tutte queste saranno quantità che uno può modellizzare oppure può stimare dal dai dati. Ok? Quindi
+6:35
+6 minutes, 35 seconds
+attenti, dopo vediamo il collegamento con quelle effettivamente stimate dai dati.
+6:41
+6 minutes, 41 seconds
+E infine, appunto, è sempre comodo, oltre alla covarianza, studiare la correlazione, no? Quindi la correlazione
+6:49
+6 minutes, 49 seconds
+sarebbe al numeratore avete la covarianza, ma dividete per le deviazioni standard. Quindi attente la notazione, diciamo, classica è di usare
+6:57
+6 minutes, 57 seconds
+sempre il Rho per la il coefficiente di correlazione, ma questa volta per ogni coppia di tempi avete a numeratore la
+7:05
+7 minutes, 5 seconds
+covarianza tra y s e yt e a denominatore le due deviazioni standard che sono la radice quadrata della covarianza tra ys
+7:15
+7 minutes, 15 seconds
+e ys quindi la varianza al tempo s e la varianza al tempo va bene? Queste ovviamente sono tutte quantità teoriche
+7:23
+7 minutes, 23 seconds
+che uno può modellizzare e ecco importante, ecco, forse notare questo che vi ricordate le gausiane,
+7:30
+7 minutes, 30 seconds
+anche le gausiane, cominciamo da quelle più semplici, sono quelle reali, basta per definirle basta specificare la funzione di media e la funzione di
+7:37
+7 minutes, 37 seconds
+varianza. Se poi avete una un vettore gausiano, avete più di una componente, dovete anche specificare le covarianze
+7:46
+7 minutes, 46 seconds
+e in generale, quindi se uno vuole specificare un processo daiano, un modello che sia un processo dausiano, basterà specificare la funzione di
+7:54
+7 minutes, 54 seconds
+media, quindi per ogni tempo t diciamo qual è la media o se volete un modo per generare la media e poi però anche la
+8:02
+8 minutes, 2 seconds
+funzione di autocovarianza per ogni coppia di tempi dovete dire qual è la correlazione.
+8:07
+8 minutes, 7 seconds
+E specificato questo, se vi interessano dei processi gausiani avete finito, cioè perché tutte le altre proprietà che vi
+8:14
+8 minutes, 14 seconds
+potrebbero interessare sono completamente determinate, ok? Perché le gausiane sono molto rigide, basta specificare solo queste due cose.
+8:24
+8 minutes, 24 seconds
+Ovviamente specificare oppure stimare dalla da dai dati.
+8:31
+8 minutes, 31 seconds
+Allora, diciamo questa è un po' la la situazione generale e vedremo adesso i modelli Arima sono effettivamente modelli di questo tipo in cui uno può
+8:38
+8 minutes, 38 seconds
+descriverli. Ora la descrizione faremo una descrizione un po' simile a quella dei dei modelli ETS, va bene? cercheremo di dare
+8:47
+8 minutes, 47 seconds
+delle equazioni, però in realtà uno potrebbe descriverli soltanto dicendo qual è la media e qual è la covarianza, va bene? Perché sono modelli
+8:56
+8 minutes, 56 seconds
+allora c'è un concetto invece ancora generale, ma molto importante anche per gli ARIMA che è quello di processo
+9:03
+9 minutes, 3 seconds
+stazionario. Perché qual è il punto? Ehm beh, ora vi do la definizione, poi discutiamo qual è il significato di
+9:09
+9 minutes, 9 seconds
+questo. Va bene? Abbiamo detto che un processo eh ha questa funzione di media e questa funzione di autocovarianza.
+9:19
+9 minutes, 19 seconds
+Eh diciamo che è stazionario se la media la media teorica è costante, ok? Quindi diciamo che per ogni t
+9:27
+9 minutes, 27 seconds
+abbiamo una mu di t, una e una mu, diciamo un valore costante nel tempo.
+9:34
+9 minutes, 34 seconds
+E attenzione ora, chiedere che anche la la covarianza sia costante è un po' troppo. Quello che chiediamo è che la
+9:39
+9 minutes, 39 seconds
+covarianza tra due tempi diversi, S t non dipenda separatamente dai tempi, ma solo dall'intervallo di tempo che è
+9:48
+9 minutes, 48 seconds
+trascorso. Ok? Quindi la notazione, appunto, si usa sempre la stessa C, però attenti, la scrivo un po' più esplicitamente.
+9:57
+9 minutes, 57 seconds
+È la covarianza tra 0 e t - s, anche il valore assoluto, diciamo, che dipende da qual è il più grande. Quindi cosa vuol
+10:05
+10 minutes, 5 seconds
+dire? Vuol dire che appunto le le proprietà di media, la media è costante, quindi tipicamente avrete un valore sempre, quindi rimuovete il trend,
+10:13
+10 minutes, 13 seconds
+diciamo, ma anche le correlazioni non dipendono effettivamente dai due tempi separatamente, ma solo dal tempo che è trascorso tra le due osservazioni.
+10:24
+10 minutes, 24 seconds
+Ok? Questa è la definizione e eh se avete un processo stazionario la funzione di autocovarianza
+10:33
+10 minutes, 33 seconds
+stazionaria in questo caso si semplifica, no? Perché potete chiamare Cho scritto sopra. Allora, le notazioni sono molteplici, eh, a volte si usa C,
+10:42
+10 minutes, 42 seconds
+io preferisco usare C, ma in altri testi, nel libro che vi ho indicato, mi sembra che li indichi con H. Dunque, diciamo, a seconda del dell'orizzonte
+10:50
+10 minutes, 50 seconds
+del dell'intervallo di tempo che specifichiamo H, avete la covarianza tra il processo al tempo tesso al tempo t +
+10:59
+10 minutes, 59 seconds
+h. Questo non dipenderà dal tempo specifico in cui osservate la vostra situazione, ma dipende solo dall'intervallo di tempo che è trascorso. Ok?
+11:09
+11 minutes, 9 seconds
+Ecco, questa sarà in realtà un'ipotesi importantissima perché permette di collegare le quantità teoriche con quelle empiriche, quelle effettivamente
+11:17
+11 minutes, 17 seconds
+osservate. Ok? Se siete fuori da questa situazione eh non potete in realtà, cioè non c'è la garanzia che quello che è andate a osservare si colleghi con quello che che è vero in teoria. Ok?
+11:29
+11 minutes, 29 seconds
+Allora, intuitivamente cosa vuol dire questa cosa? Vuol dire che la media non cambia nel tempo, la covarianza dipende solo dai dall'intervallo temporale. Vuol
+11:37
+11 minutes, 37 seconds
+dire che comunque fissiamo, diciamo, l'origine dei tempi. Fissiamo che l'origine è oggi oppure un mese fa oppure tra un anno. Se il processo è
+11:45
+11 minutes, 45 seconds
+veramente stazionario, le proprietà statistiche e le distribuzioni non cambiano. Ok? Cioè è una specie di invarianza
+11:54
+11 minutes, 54 seconds
+delle traslazioni nel tempo che se voi traslate il tempo avanti di un anno, di una settimana o di due giorni non cambieranno. Le proprietà statistiche sono sempre le stesse. Le medie sono le
+12:02
+12 minutes, 2 seconds
+stesse. Le convarianze sì dipendono dai tempi ma solo da quanto tempo è trascorso. Ok?
+12:09
+12 minutes, 9 seconds
+Ecco, questo però appunto dice una cosa importante. Un processo sarà stazionario e vedremo che gli ARMA cioè bisogna in un certo senso arrivare ai processi
+12:17
+12 minutes, 17 seconds
+stazionari. Eh, il trend non è ammesso e la stagionalità pure non è ammessa. Ok?
+12:22
+12 minutes, 22 seconds
+Perché se avete proprio un comportamento stazionario e stagionale Esatto, no?
+12:27
+12 minutes, 27 seconds
+Pensate e a quel punto effettivamente dipende, cioè se voi vi spostate nel tempo esattamente in un periodo, allora
+12:35
+12 minutes, 35 seconds
+sì, le proprietà statistiche non cambieranno. Ma ad esempio se vi spostate, immaginate di avere il periodo, che so, ricordate la sede
+12:42
+12 minutes, 42 seconds
+retorica del dell'andamento del del sole, no? Se spostate di 24 ore avete la stessa cosa, ma se spostate di 12 l'origine dei tempi vedete tutt'altro.
+12:52
+12 minutes, 52 seconds
+Qui diciamo trend e stagionalità, almeno così per le serie eh per almeno intuitivamente diciamo non sono permessi
+13:01
+13 minutes, 1 second
+per un processo stazionario. Ok? Quindi in effetti quello che rimane in un processo stazionario è di modellizzare
+13:07
+13 minutes, 7 seconds
+le correlazioni nel nei residui, negli errori. Diciamo uno potrebbe rimuovere il trend, rimuovere in qualche senso la
+13:15
+13 minutes, 15 seconds
+stagionalità e poi dovrebbe ottenere qualcosa di stazionario. Va bene? Quello cos'è che rimane? Quindi il rumore. A dire il vero in effetti c'era anche
+13:23
+13 minutes, 23 seconds
+un'altra componente che ho un po' trascurato perché non è così ben finita, no? c'è questa componente ciclica che è qualcosa che sta un po' a metà tra un
+13:31
+13 minutes, 31 seconds
+trend e una stagionalità che però non ha un andamento così così chiaro e quindi questo potrebbe essere anch'esso una
+13:39
+13 minutes, 39 seconds
+parte ammessa nella stagionalità. Va bene? Ecco, allora vediamo un attimo graficamente, eh. Ah, no, vabbè, c'è
+13:47
+13 minutes, 47 seconds
+un'altra slide. Mh, vediamo un attimo, scusate, vediamo se qua cominci No, niente. Va bene, rivediamo dopo. Ok, dopo facciamo qualche
+13:56
+13 minutes, 56 seconds
+a occhio, cerchiamo di capire se un processo può essere stazionario o no.
+14:00
+14 minutes
+Eh, per il momento però vi do questo risultato teorico che è importante, va bene? Allora, se avete una serie storica
+14:07
+14 minutes, 7 seconds
+y dt e volete collegarla con un processo stocastico, volete dire questo proviene in realtà da delle
+14:16
+14 minutes, 16 seconds
+variabili da e dice queste sono osservazioni di un processo stocastico.
+14:21
+14 minutes, 21 seconds
+Allora, l'unica cosa che sapete calcolare essenzialmente è la funzione di autocovarianza sui dati, quella campionaria, quella calcolata con la funzione ACF che abbiamo visto già in R.
+14:33
+14 minutes, 33 seconds
+Ora ACF, vabbè, di per sé calcola l'autocorrelazione, però diciamo potete anche impostare che calcoli l'autocovarianza, che è questa questa quantità qui, ok? A meno di forse
+14:42
+14 minutes, 42 seconds
+piccoli aggiustamenti. Comunque è eh una media di cosa? del prodotto tra il il
+14:51
+14 minutes, 51 seconds
+residuo, se volete, di la differenza tra l'osservazione al tempo t e la media e l'osservazione del non al tempo t, ma al
+14:58
+14 minutes, 58 seconds
+tempo ritardato, cioè t - h e e la media, perché se fate sempre quando fate una covarianza, volete sempre togliere
+15:05
+15 minutes, 5 seconds
+la media. Ok? Allora, questa quantità che è l'unica che effettivamente avete a disposizione quando parlate di di dati,
+15:13
+15 minutes, 13 seconds
+no, di una serie storica, non è certamente quella teorica. Però cosa si può dimostrare? Se vi ricordate un po' il corso di statistica 1, di statistica
+15:22
+15 minutes, 22 seconds
+1, si può dimostrare che questo è uno stimatore, beh, dimostrare, cioè si può dire che è uno stimatore della quantità teorica e
+15:32
+15 minutes, 32 seconds
+la cosa interessante è che è uno stimatore non distorto.
+15:36
+15 minutes, 36 seconds
+Quindi cosa vuol dire? Vu dire che se fate il valor medio di questo tipicamente vi darà il risultato giusto, non c'è un bias
+15:45
+15 minutes, 45 seconds
+e eh in realtà potete più interessante per noi è anche consistente che non sempre, ma con ipotesi minime, quando
+15:52
+15 minutes, 52 seconds
+andate per tempi molto grandi, tenete fisso il l'intervallo di leg H, avete un uno stimatore consistente, ok? vuol dire
+16:01
+16 minutes, 1 second
+che converge la quantità teorica che vuol stimare e questo vi dà una garanzia, vi dice che sì, se il processo è stazionario,
+16:08
+16 minutes, 8 seconds
+queste quantità che calcoliamo in pratica sono delle stime buone di quello che che dovremmo avere in teoria, [schiarire la voce] ok? Quindi c'è un c'è un c'è una corrispondenza tra la
+16:16
+16 minutes, 16 seconds
+teoria e l'osservazione. Ecco, va bene. E vabbè, questa appunto come dicevamo, però è è semplicemente l'
+16:25
+16 minutes, 25 seconds
+l'auto l'autocovarianza la la covarianza campionaria tra la serie e la sua ritardata. Ok, stare un attimo attenti
+16:32
+16 minutes, 32 seconds
+perché queste medie non sono proprio è la media su tutto, non la media su sulla finestra
+16:38
+16 minutes, 38 seconds
+ehm diciamo relativa, ma ma va bene. E ovviamente potete poi stimare anche l'autocorrelazione che è quella che vi
+16:46
+16 minutes, 46 seconds
+dà il comando ACF. Vi ricordate? ACF di in R vi calcola in realtà la correlazione già normalizzata in modo tale da avere valori tra 0 tra -1 e 1.
+16:58
+16 minutes, 58 seconds
+Ok? Quindi la stazionarità, questa è la cosa importante, il processo stazionario. Eh, attenti che se non è stazionario in realtà si può mostrare
+17:06
+17 minutes, 6 seconds
+facilmente, ad esempio, se c'è già un trend, mentre il trend, diciamo, facciamo finta che ci sia un processo y
+17:13
+17 minutes, 13 seconds
+d = t, quindi avete un trend lineare chiarissimo, però se è deterministico e
+17:20
+17 minutes, 20 seconds
+cioè y t = t, la covarianza sarà sempre zero. Invece se fate l'autocorrelazione dal lato empirico, vedete un grafico
+17:29
+17 minutes, 29 seconds
+abbanda perché c'è una grossa correlazione tra quello che osservate.
+17:32
+17 minutes, 32 seconds
+Gli attenti la stazionarietà è chiave per collegare il mondo teorico con quello delle delle osservazioni.
+17:43
+17 minutes, 43 seconds
+E allora però in pratica cosa succede?
+17:45
+17 minutes, 45 seconds
+Vi ricordate le serie che abbiamo sempre visto in realtà non sono stazionarie, cioè c'è un trend, c'è una stagionalità e allora come si fa a togliere un po'
+17:54
+17 minutes, 54 seconds
+insomma a renderle un po' più stazionarie? Beh, è la stessa cosa che avevamo fatto già all'epoca in modo un po' intuitivo per rimuovere questa banda sulla funzione ACF, no? Vi ricordate?
+18:04
+18 minutes, 4 seconds
+Per stimare un po' il periodo abbiamo detto beh, magari un pochino si vede, ma se differenziate vedete dei picchi più
+18:10
+18 minutes, 10 seconds
+chiari. Ok, questo è vero. E in realtà è un'operazione quella di differenziare, vi ricordate le differenze finite era la serie meno la sua ritardata.
+18:22
+18 minutes, 22 seconds
+Questa è un'operazione che aiuta la stazionalità, ok? Perché rimuove il trend, eh non rimuove la stagionalità, a dire il vero se lo fate in questo modo,
+18:30
+18 minutes, 30 seconds
+ma almeno il trend un pochino lo rimuove, no? Perché se avete un trend lineare differenziando diventa una costante e se è esponenziale è un po' meno, no?
+18:40
+18 minutes, 40 seconds
+Però vabbè, dopo casomai si fanno trasformazioni non lineari e si si ritorna a un trend lineare.
+18:48
+18 minutes, 48 seconds
+Ecco, si può dimostrare, non lo non lo vediamo, però in effetti la la differenziazione, passare a una differenza finita preserva la
+18:55
+18 minutes, 55 seconds
+stazionarietà. Quindi qual è la cosa interessante? Se la serie proveniva da un processo stazionario, differenziandola ancora proviene da un
+19:03
+19 minutes, 3 seconds
+processo stazionario. Ok? Quindi almeno non distrugge la stazionalità, ma in generale migliora addirittura. Ok?
+19:10
+19 minutes, 10 seconds
+perché rimuove il trend, rimuove i trend lineari. Se differenziate due volte, eh no, eh togliete il trend quadratico. Se
+19:18
+19 minutes, 18 seconds
+differenziate tre volte togliete un trend cubico. Ok? Quindi magari uno dice differenziato un po' di volte riesco a rimuovere il trend.
+19:27
+19 minutes, 27 seconds
+Eh, la stagionalità in effetti rimarrebbe e se fate un numero abbastanza piccolo di derivate, però se volete togliere la
+19:36
+19 minutes, 36 seconds
+stagionalità potete anche fare una differenziazione stagionale. Cosa vuol dire? Fate la serie meno la serie non al tempo prima, ma a un periodo prima.
+19:46
+19 minutes, 46 seconds
+Quindi diciamo che avete la serie che ha una frequenza 12 e fate la differenza.
+19:50
+19 minutes, 50 seconds
+Volete togliere in un certo senso la stagionalità, da allora fate lei meno il valore 12. tempi prima, 12 mesi prima.
+19:58
+19 minutes, 58 seconds
+Ok? Quindi questa è la un altro processo che può essere utile allo stesso senso, cioè allo stesso modo non distrugge la
+20:06
+20 minutes, 6 seconds
+stazionalità se eravate già stazionari e in generale migliora la stazionalità.
+20:11
+20 minutes, 11 seconds
+Ok? Quindi ricordatevi che sono due operazioni che saranno importanti anche per gli ARIM i processi dopo, ma vediamole in pratica. Allora, secondo
+20:18
+20 minutes, 18 seconds
+voi questo proc questa serie è proviene da un processo stazionario?
+20:24
+20 minutes, 24 seconds
+Eh, chiaramente uno dice no perché c'è un trend crescente. Se c'è un trend crescente la media qui sembrerebbe crescere. Ok? D'altra parte c'è anche la
+20:32
+20 minutes, 32 seconds
+stagionalità, abbiamo studiato tante volte questa serie di esempio. Quindi questa di per sé non sarà stazionaria, ok? Non ci sembra almeno che sia
+20:40
+20 minutes, 40 seconds
+stazionaria. È difficile, è un po' un'ipotesi, no? La la stazionalità non è che potete è come dire questi lanci di moneta, no? Vi do una sequenza di lanci
+20:49
+20 minutes, 49 seconds
+rosso blu rosso rosso blu. Sono lanci di una moneta, di lanci di monete indipendenti. Eh, insomma, calpiamo
+20:57
+20 minutes, 57 seconds
+dirlo a occhio, no? Certo, potremmo fare delle ipotesi e verificare con dei testi. Oppure vi do degli esiti di
+21:05
+21 minutes, 5 seconds
+estrazioni da un'urna, no? Vi dico e esce una pallina rossa, esce una pallina blu, esce una pallina blu e così via. Mi sapete dire se sono estrazioni
+21:13
+21 minutes, 13 seconds
+indipendenti o no? Soltanto vedendo gli esiti? insomma bisogna fare delle ipotesi e poi si usa un test per per a supporto. Ora, in questo caso, per le
+21:22
+21 minutes, 22 seconds
+serie storiche, se vedete un trend evidente, una una stazionalità evidente, non s non siete nell'ipotesi di
+21:29
+21 minutes, 29 seconds
+stazionalità, ok? E quindi, diciamo, non siamo contenti, differenziamo, no?
+21:33
+21 minutes, 33 seconds
+Questo l'abbiamo già fatto la volta scorsa e differenziamo o due volte fa mi sa, no? Quindi differenziando eh beh, questa è una serie moltiplicativa,
+21:41
+21 minutes, 41 seconds
+l'abbiamo già visto la volta la prima volta. E attenti, quando fate solo la differenziazione, rimuovete il trend lineare. Però cosa è
+21:50
+21 minutes, 50 seconds
+rimasto? È rimasto che la eh la varianza dipende dal tempo, no? La variabilità aumenta il crescere del tempo. Questo
+21:58
+21 minutes, 58 seconds
+era perché era un modello moltiplicativo, no, nel linguaggio.
+22:01
+22 minutes, 1 second
+Quindi anche questa uno direbbe no, questa non mi sembra stazionaria. Ok? a essere proprio stretto, dice questa non
+22:09
+22 minutes, 9 seconds
+è ancora una serie stazionaria, cioè la varianza se fosse stazionario, ecco, segnatevelo questo, un piccolo fatto importante,
+22:17
+22 minutes, 17 seconds
+la varianza, se fosse un processo veramente stazionario, sarebbe la covarianza tra se stesso
+22:27
+22 minutes, 27 seconds
+e quindi sarebbe uguale alla covarianza al tempo zero perché è CDSS, cs uguale a CS - s che è uguale C di 0.
+22:38
+22 minutes, 38 seconds
+Se avete un processo stazionario e vedete questa questo andamento in cui la la variabilità cresce, questo sta dicendo che la varianza sembra indicare
+22:46
+22 minutes, 46 seconds
+almeno che la varianza stia crescendo e questo è in contrasto con la stazionalità. Quindi se io dovessi essere abbastanza
+22:53
+22 minutes, 53 seconds
+duro direi no, questo questo non è stazionario, no? Perché c'è questo andamento della varianza che cresce.
+22:59
+22 minutes, 59 seconds
+Allora dice beh, facciamo un'altra derivata. Cioè quando Allora, se se non sapete cosa fare, diciamo faccio un'altra differenzia, ora vedete che è
+23:06
+23 minutes, 6 seconds
+un po' meno chiaro, no, che la varianza stia crescendo, ok? Quindi differenziata due volte questo non potrebbe Ora è vero che c'è ancora un po' un andamento crescente, ma è già migliorato un po'.
+23:17
+23 minutes, 17 seconds
+Ok, quindi questo potrebbe essere stazionario.
+23:22
+23 minutes, 22 seconds
+Cosa succede se facciamo una differenziazione stagionale? Invece questa era una serie con periodo 12 e a quel punto cosa facciamo? Prendiamo il
+23:31
+23 minutes, 31 seconds
+valore meno quello di 12 mesi prima. Il risultato è questa serie storica qui. Ok? Questa è una serie stazionaria o no?
+23:41
+23 minutes, 41 seconds
+Di nuovo? Boh. Allora, trend poco poco se ce n'è, insomma, perché vedete i valori sono comunque lì. Ehm, quindi
+23:50
+23 minutes, 50 seconds
+sembrerebbe, insomma, almeno a occhio, sembrerebbe stazionare. Ok.
+23:56
+23 minutes, 56 seconds
+Cosa succede se facciamo, diciamo che non ci piaceva quella, possiamo anche combinare, no? Facciamo una derivata stagionale, una differenziazione
+24:03
+24 minutes, 3 seconds
+stagionale e anche poi sopra un'altra differenziazione, tanto comoda, no?
+24:07
+24 minutes, 7 seconds
+Potete fare derivate nell'ordine che volete. E a quel punto risulta questa questa è una serie sembrerebbe stagionale, cioè scusate, sembrerebbe
+24:15
+24 minutes, 15 seconds
+stazionaria. Abbiamo tolto più o meno più o meno tutto. Ok?
+24:20
+24 minutes, 20 seconds
+Certo, però ci lascia un po' perplessi questa cosa. Ma allora c'è un criterio chiaro per capire se un processo è stazionario oppure no. Qui esempio posso
+24:28
+24 minutes, 28 seconds
+fare la cosa più semplice che abbiamo già fatto la prima lezione. Fate prima il logaritmo e poi fate la differenziazione attenti
+24:37
+24 minutes, 37 seconds
+che appunto non sempre la cosa giusta è fare solo derivate un po' da stupidi, cioè guardate il vostro segnale e vedete se è moltiplicativo passate al
+24:46
+24 minutes, 46 seconds
+logaritmo, ok? e a quel punto diventa additivo, quindi oppure se è più complicato c'erano quelle trasformazioni
+24:52
+24 minutes, 52 seconds
+di eh intermedie, tipo una potenza, fat una radice e così via. Comunque vedete, in questo caso questo sembra già più
+25:00
+25 minutes
+stazionaria, anche se c'è comunque una stagionalità perché vedete questi picchi si riproducono. Allora, diciamo qui ci
+25:07
+25 minutes, 7 seconds
+manca un criterio, no, per capire quando possiamo dire che è stazionario o no, perché altrimenti andiamo sempre a occhio ed è difficile da capire. Allora,
+25:15
+25 minutes, 15 seconds
+fortunatamente ci sono tanti metodi, ci sono tanti test di stazionarità, cioè, qual è l'idea? Se il processo è
+25:23
+25 minutes, 23 seconds
+stazionario, eh, allora deve succedere qualcosa, no?
+25:29
+25 minutes, 29 seconds
+Beh, allora, innanzitutto, graficamente potete farlo, però capite, no? C'è un po' diquità, quegli altri vi ho detto io qual è stazionario quale com'è. In alcuni casi siamo tutti d'accordo, in
+25:37
+25 minutes, 37 seconds
+altri un po' meno e quindi è meglio oltre all'ispezione grafica affiancare un test statistico. Fortunatamente poi
+25:44
+25 minutes, 44 seconds
+vedremo anche mercoledì i comandi sono abbastanza semplici, quindi uno li fa ed è, anzi sono quasi automatizzati. Però
+25:53
+25 minutes, 53 seconds
+l'idea qual è? Se il processo è stazionario, diciamo la cosa più semplice è questa, no? Uno fa un'ipotesi nulla di stazionarità, dice "Se il
+26:01
+26 minutes, 1 second
+processo è stazionario, allora vado a cercare un evento, vado a cercare una qualche situazione che si deve realizzare." Ok? Se vedo che questa
+26:10
+26 minutes, 10 seconds
+cosa eh beh si realizza, a quel punto accetterò il fatto che è stazionario, altrimenti se vedo che non si realizza,
+26:19
+26 minutes, 19 seconds
+vado a rifiutare l'ipotesi nulla e dirò che non è stazionario. Ok? Quindi usate in questo senso. Attenti che altri test
+26:26
+26 minutes, 26 seconds
+mettono come ipotesi nulla qualcosa che invece è il contrario, cioè fa un ipotesi di nulla di non stazionalità.
+26:33
+26 minutes, 33 seconds
+Quindi attenzione, quindi in ogni caso se volete affidarvi a un test andate a leggervi bene qual è l'ipotesi nulla.
+26:39
+26 minutes, 39 seconds
+Cosempio c'è questo test KPSS, lo vediamo anche mercoledì in azione, ma qua vi do il quindi se l'ipotesi nulla è
+26:49
+26 minutes, 49 seconds
+che sia stazionario leggete a quel punto un p value basso.
+26:54
+26 minutes, 54 seconds
+Basso quanto? Eh, dipende da da chiaramente la la soglia, insomma, comunque un pellio basso vi dirà che
+27:02
+27 minutes, 2 seconds
+potete scartare l'ipotesi nulla e a quel punto avete una serie non stazionaria.
+27:08
+27 minutes, 8 seconds
+attenti che per come vanno le cose invece ci sono test che vanno all'opposto, cioè che mettono come ipotesi nulla il fatto non proprio il fatto che non sia stazionario, ma
+27:16
+27 minutes, 16 seconds
+insomma qualcosa di molto simile. Quindi ci sono questi altri test PP ADF in cui l'ipotesi nulla è praticamente buona approssimazione che non sia stazionario.
+27:27
+27 minutes, 27 seconds
+Ok? Quindi a quel punto tetti quando avete il pellu basso rifiutate l'ipotesi nulla. Ricordatevi sempre a quel punto
+27:34
+27 minutes, 34 seconds
+la serie se rifiutate che non sia stazionaria diventa che è stazionaria.
+27:39
+27 minutes, 39 seconds
+Ok? Quindi attenti a a quale test e cosa vuol dire più meglio, eh, come [schiarire la voce] si legge?
+27:44
+27 minutes, 44 seconds
+Ok? Quindi in generale diciamo uno perché ne vuole tanti poi anche di test perché capite che un po' cioè più test ho più come quelli di gausianità, no?
+27:53
+27 minutes, 53 seconds
+Più posso essere sicuro, tranquillo, che sia stazionario o non stazionario, no?
+27:56
+27 minutes, 56 seconds
+Avevo solo un test, magari quello lì ha sbagliato, invece altri due, tre test mi possono che guardano aspetti diversi mi possono aiutare.
+28:06
+28 minutes, 6 seconds
+Ma qua cosa dite? A quel punto se il test uno o più test mi indicano che non siamo ancora stagionari, applicate un'altra
+28:14
+28 minutes, 14 seconds
+differenziazione, una differenziazione stagionale e andiamo avanti finché, diciamo, i test non o i vari test non ci
+28:21
+28 minutes, 21 seconds
+confermano, non ci indicano, diciamo, la stazionalità. Ok.
+28:26
+28 minutes, 26 seconds
+Quindi, in pratica, come fase preliminare che poi ci porterà i modelli ARIMA, perché i modelli Arima tendenzialmente dovrebbero essere sono
+28:35
+28 minutes, 35 seconds
+fatti bene per i processi stazionari, c'è questa parte iniziale, volendo farla per bene. Ok, quindi vediamo un attimino
+28:43
+28 minutes, 43 seconds
+cosa dicono i test. Facciamo esempio il KPSS e il e l'altro PP. Va bene? Allora,
+28:50
+28 minutes, 50 seconds
+cosa dicono? Partiamo dalla serie originale, quella di El Passengers. Qui eravamo tutti d'accordo che non fosse stazionaria, spero che avete questo
+28:59
+28 minutes, 59 seconds
+andamento crescente. E in effetti vedete il p value qui è piccolo. Ora i comandi di R non vi danno esattamente il palio,
+29:07
+29 minutes, 7 seconds
+vi danno un'approssimazione del pivio, vi dà solo, insomma, l'ordine di grandezza del pivo. E qui un pivio piccolo, quindi scartiamo l'ipotesi
+29:15
+29 minutes, 15 seconds
+nulla, non è stazionario. Senti che l'altro l'altro l'altro invece dà un piv value, diciamo 10% è abbastanza grande come p value e quindi siete in una
+29:24
+29 minutes, 24 seconds
+situazione non stazionale. Ok? Cosa succede se facciamo una una sola differenziazione? Beh, con una sola differenziazione
+29:33
+29 minutes, 33 seconds
+eh in realtà il test, cioè passa entrambi i test, nel senso che abbiamo
+29:40
+29 minutes, 40 seconds
+stazionarietà, che ok? Diciamo il primo non scarta l'ipotesi nulla, avete un value grande e il secondo invece scarta
+29:49
+29 minutes, 49 seconds
+l'ipotesi nulla e quindi andate a cadere nell'alternativa che è stazionate.
+29:53
+29 minutes, 53 seconds
+Però vedete ad esempio il test vabbè anche a quel punto anche differenziato due volte siamo con le stazionarie. Se fate la differenziazione stagionale, vi
+30:02
+30 minutes, 2 seconds
+ricordate che era quello, ve lo rimostro così ce l'avete.
+30:08
+30 minutes, 8 seconds
+Eccola qua. Questa era quella stagionale.
+30:11
+30 minutes, 11 seconds
+Ora questa è una situazione un po' intermedia, interessante e infatti il test,
+30:20
+30 minutes, 20 seconds
+uno dei test vi direbbe che non è stazionario, ok? Diciamo se è sotto il 5%.
+30:29
+30 minutes, 29 seconds
+E invece l'altro vi dice che è stazionario, quindi vedete non sempre i test vanno tutti d'accordo, vanno a confrontare cose leggermente diverse.
+30:37
+30 minutes, 37 seconds
+Ovviamente vabbè più più differenziamo meglio è. Poi stazionario, insomma, quindi tendenzialmente più di più derivate fate più finite nella
+30:46
+30 minutes, 46 seconds
+stazionarietà, però attenti, state rimuovendo un po' di più di informazioni. Quindi l'idea uno vorrebbe faccio un po' di differenziazioni finché se voglio arrivare a una situazione stazionaria, ma non troppe, ok?
+30:56
+30 minutes, 56 seconds
+altrimenti avete buttato via troppo. Ok.
+31:04
+31 minutes, 4 seconds
+Ok. Questo per quanto riguarda la stazionarietà e adesso andiamo a vedere come
+31:12
+31 minutes, 12 seconds
+andiamo a completare ecco il discorso sulla decomposizione, no? Vi ricordate la prima lezione sulle serie storiche abbiamo cominciato dicendo vogliamo
+31:19
+31 minutes, 19 seconds
+identificare un trend, una stagionalità e un residuo, un errore, un resto. Ok?
+31:27
+31 minutes, 27 seconds
+Allora, vi ricordate la decomposizione più semplice, senza entrare nei discorsi moltiplicativi, additivi, era di appunto scrivere la vostra serie storica come un
+31:34
+31 minutes, 34 seconds
+trend, stagionalità ed errore sommandoli. Poi se moltiplicativa si mescolava non moltiplicate. [sbuffare]
+31:42
+31 minutes, 42 seconds
+Allora, poi abbiamo già detto, questa era la cosa facile, quando avete estratto il trend, quindi la comporente, l'andamento crescente, l'andamento,
+31:49
+31 minutes, 49 seconds
+insomma, eh di massima il vostro il vostro trend, come si faceva a estrarre la parte la parte stagionale? Beh,
+31:57
+31 minutes, 57 seconds
+allora si andavano a vedere la sottoserie stagionale, quindi a multipli interi del periodo, diciamo ogni 12, no, nel caso di prima di passengers e si
+32:06
+32 minutes, 6 seconds
+faceva la media, che questa è la decomposizione più semplice, come dice, voglio una cosa periodica e quindi prendo tutte le mie osservazioni a
+32:13
+32 minutes, 13 seconds
+multipli di 12 e medio su quello, quindi vado tutti la media di gennaio, la media di febbraio, la media di marzo e così via. Ok? E questo ci dà la componente
+32:22
+32 minutes, 22 seconds
+stagionale, ma dopo aver estratto il trend, ok? Quindi, come si fa? Invece, vedete, il trend c'è, dobbiamo toglierlo. Ok?
+32:32
+32 minutes, 32 seconds
+Eh, cosa succede invece prima? Cioè, come facciamo a estrarre il trend?
+32:37
+32 minutes, 37 seconds
+[sbuffare]
+32:37
+32 minutes, 37 seconds
+Allora, questo l'abbiamo lasciato un pochino in sospeso e adesso vediamo almeno un metodo di estrazione, in realtà ce ne sono diversi, è il metodo
+32:46
+32 minutes, 46 seconds
+della media mobile. Va bene? Quindi allora completiamo il discorso perché una volta che avremo estratto il trend, estraiamo la stagionalità, questo lo fa
+32:54
+32 minutes, 54 seconds
+il comando decompose in automatico, non serve che lo lo sappiate, però estraete trend di stagionalità e poi tutto quello che è rimasto lo chiamate errore residuo
+33:01
+33 minutes, 1 second
+e sperabilmente dovrebbe essere, se fosse rumore bianco gaussiano, cioè variabili indipendenti,
+33:08
+33 minutes, 8 seconds
+ottimo, altrimenti sarà magari qualcosa che possiamo modizzare con un'arrima, va bene? Qualcosa di stazionario, speremo.
+33:16
+33 minutes, 16 seconds
+Va bene, andiamo a vedere un po' eh com'è fatta invece questa media mobile.
+33:20
+33 minutes, 20 seconds
+Cosa vuol dire estrarre il trend con una media mobile. La media mobile è un concetto molto semplice, cioè uno prende
+33:27
+33 minutes, 27 seconds
+un tempo t e al posto di vedere il valore della serie storica su in quel tempo fa una media nell'intorno. Allora,
+33:35
+33 minutes, 35 seconds
+in generale la più semplice è fare una media mobile centrata, cioè prendete sia tempi precedenti che tempi successivi.
+33:43
+33 minutes, 43 seconds
+E di che lunghezza? Beh, scegliete voi.
+33:46
+33 minutes, 46 seconds
+Più più lungo sarà l'intervallo di tempo su cui mediate, più diciamo più cancellazioni ci saranno. Però attenti,
+33:54
+33 minutes, 54 seconds
+se mediate troppo, alla fine sostituite tutto con la media di tutte le vostre osservazioni. Quindi l'idea è cercare una media mobile su una finestra non troppo grande né troppo piccola.
+34:04
+34 minutes, 4 seconds
+E perché? Perché mediando, ecco, questa è la formula, no? Al tempo t avete la media di tutte le osservazioni.
+34:12
+34 minutes, 12 seconds
+Eh beh, allora qua da - q a eh cioè al tempo t - scriviamola bene. Quindi avete
+34:19
+34 minutes, 19 seconds
+y di il tempo t, poi avete t - 1, t - 2
+34:24
+34 minutes, 24 seconds
+fino a t - q e poi t + 1, t + 2 fino al tempo t + q.
+34:33
+34 minutes, 33 seconds
+Quindi avete le vostre osservazioni, cosa andate a fare? Andate a mediare tutti questi valori. Ok? Se vi interessa
+34:42
+34 minutes, 42 seconds
+il tempo Q, mettiate su questi. Se andate adesso al tempo T + 1, andate a spostare questa finestra su cui mediate a destra di uno. Andate avanti così. E
+34:51
+34 minutes, 51 seconds
+ovviamente, appunto, la formula è quella lì sopra, non è non è molto interessante, ma qual è l'effetto?
+34:57
+34 minutes, 57 seconds
+L'effetto, se volete, è quello di un filtro eh passa basso, cioè cosa vuol dire che le le frequen le alte frequenze vengono uccise, cioè le le quantità che
+35:05
+35 minutes, 5 seconds
+oscillano troppo rapidamente mediandole scompaiono e invece quelle a bassa frequenza e che sarebbe il nostro trend
+35:13
+35 minutes, 13 seconds
+o il ciclo, insomma qualcosa che comunque si muove più lentamente e rimangono. Ok?
+35:21
+35 minutes, 21 seconds
+E allora questa è una media mobile semplice e centrata. Ovviamente a quel punto uno può dire se ho la serie storica posso dire che il trend è la
+35:28
+35 minutes, 28 seconds
+media mobile di quale lunghezza? Eh, allora bisogna stare un po' attenti. Di per sé nel comando decompose, che è la
+35:37
+35 minutes, 37 seconds
+decomposizione classica, eh la lunghezza è la periodicità, cioè usate un periodo prima, un periodo dopo. Ok? Quindi, ad
+35:45
+35 minutes, 45 seconds
+esempio, se la serie storica è di 12 mesi, avete un anno prima e un anno dopo. Va bene?
+35:52
+35 minutes, 52 seconds
+E nulla vieta però di fare altre medie moduli, non è che sia sia vietato.
+35:57
+35 minutes, 57 seconds
+Quindi, ad esempio, vedete qui, se prendete la serie storica dei passeggeri, la solita, la media mobile,
+36:04
+36 minutes, 4 seconds
+vedete cosa fa? Eh, stima, lascia un po' di All'inizio non potete farlo, non potete stimare qui, qui non c'è nulla perché non avete abbastanza osservazioni
+36:13
+36 minutes, 13 seconds
+prima, però appena passato un anno potete fare la media tra il primo anno e l'anno successivo e vi dà quel valore della curva rossa che spostando mano a
+36:22
+36 minutes, 22 seconds
+mano che andate verso i tempi più recenti cresce, quindi cattura il trend.
+36:27
+36 minutes, 27 seconds
+Attenti, cosa succede alla fine? E alla fine, di nuovo, se andate troppo in là, non avete, siccome una media centrata, non avete anche quello che succede nel
+36:35
+36 minutes, 35 seconds
+futuro, no? Dopo dopo avete i dati fino al 1961, quindi vi fermate al 1960
+36:42
+36 minutes, 42 seconds
+o forse, vabbè, avete i dati fino al 62, ma vi fermate prima. Ok, quindi la situazione è questa. Allora,
+36:51
+36 minutes, 51 seconds
+la media mobile classica quella del comando decompose è questa. Poi ci sono altri comandi che estraggono il trend con interpolazioni un po' un po' più
+37:00
+37 minutes
+sofisticate, però questa, diciamo, è la media mobile classica e vedete lo stima abbastanza bene. Allora, in questo caso il Decomposer vi dà questa media mobile.
+37:08
+37 minutes, 8 seconds
+Questa era la serie quella senza trend e vedete effettivamente ehm diciamo è cioè la stima del trend sembra un po'
+37:17
+37 minutes, 17 seconds
+rumorosa, però comunque coglie un po' queste oscillazioni che avete sul eh sul sulla vostra perché state facendo la
+37:25
+37 minutes, 25 seconds
+media solo su un periodo. Se facessimo la media su due o tre alla fine scomparirebbero anche quei bene?
+37:33
+37 minutes, 33 seconds
+Beh, d'accordo. Quindi la media mobile è abbastanza semplice, si applica a tutti, tutte le vostre serie tranquillamente.
+37:40
+37 minutes, 40 seconds
+Quindi il comando decompose che sia rumorosa periodica, ma potete applicarlo. Ehm, ecco, però attenti, la media di decompose è quella più semplice
+37:49
+37 minutes, 49 seconds
+possibile, no? I pesi sono tutti uguali, la finestra è simmetrica, eh, come dicevo, è centrata, termine tecnico è centrata, quindi fate una media sia nel passato che nel futuro.
+37:59
+37 minutes, 59 seconds
+Ovviamente nulla vieta di fare media più generali. Allora, se vogliamo proprio chiamarla media, sarà bene che sia una
+38:07
+38 minutes, 7 seconds
+combinazione con dei pesi, no? Io potrei fare una combinazione, no, eh, una
+38:15
+38 minutes, 15 seconds
+media, che so degli ultimi tre, ad esempio, soltanto su una finestra sinistra o soltanto con dei pesi opportuni. Seè una media, allora i pesi
+38:24
+38 minutes, 24 seconds
+W non sono necessariamente tutti uguali, una media pesata e in particolare
+38:32
+38 minutes, 32 seconds
+e però se volete proprio chiamarla media dovrebbero essere positivi e sommare a uno.
+38:38
+38 minutes, 38 seconds
+Questa se volete proprio essere stretti con la col termine meglio che ma insomma dovrebbero essere positivi e somma uno.
+38:44
+38 minutes, 44 seconds
+In realtà più in generale uno fa una cosiddetta un filtro più generale non necessariamente si insomma può si può chiamare anche media mobile qualcosa che
+38:53
+38 minutes, 53 seconds
+è un filtro più generale, insomma non necessariamente somma uno e non negativa. Per esempio, la cosa più semplice uno può pensare è
+39:01
+39 minutes, 1 second
+questa. A me non piace tanto che la media mobile simmetrica si fermi un periodo prima e quindi vorrei usare soltanto le osservazioni del passato.
+39:10
+39 minutes, 10 seconds
+Quindi piuttosto sacrifico il fatto che per i primi 2 anni non o per il primo anno non posso avere una stima, ma poi uso una una media soltanto sull'ultimo
+39:19
+39 minutes, 19 seconds
+periodo, però nel passato. Allora, vediamo cosa succede. Questa è una media mobile sinistra se usate solo il passato
+39:25
+39 minutes, 25 seconds
+e quindi avete 1 su Q + 1 per diciamo le Q osservazioni passate e quella attuale.
+39:33
+39 minutes, 33 seconds
+E a quel punto vedete l'andamento è molto simile e però vedete l'effetto qual è che la media sinistra arriva fino
+39:41
+39 minutes, 41 seconds
+all'ultima osservazione. Ok? Quindi il comando decomposer non lo fa così, ma appunto l'altro comando era STL, fa una
+39:48
+39 minutes, 48 seconds
+cosa un po' più simile a questa, cioè vi dà un andamento, un trend su tutte stimato su tutte le osservazioni. Non fa una media mobile quello, ma comunque
+39:56
+39 minutes, 56 seconds
+siamo in quest'ottica, insomma, di di risolvere un po' questa cosa di decomposto.
+40:02
+40 minutes, 2 seconds
+Ok, dai. Allora, adesso veniamo alla parte più eh intensa finora. Abbiamo scherzato, no? Allora,
+40:10
+40 minutes, 10 seconds
+eh vogliamo usare questa idea della media mobile per avere introdurre una nuova classe di di modelli che estende un po' i modelli ETS e i modelli quelli
+40:19
+40 minutes, 19 seconds
+proprio naive che abbiamo visto la prima volta. Ok? Allora, questi modelli si chiamano arima e hanno in realtà, adesso vedremo la
+40:28
+40 minutes, 28 seconds
+definizione, non è complicatissima, però eh si possono descrivere in tanti modi, cioè in un paio di modi. Adesso
+40:37
+40 minutes, 37 seconds
+cercheremo di definirli con il punto di vista simile a quello di ETS, così avrete un po' una situazione ehm facile
+40:44
+40 minutes, 44 seconds
+da confrontare. Però il punto chiave degli arima è che mettono l'accento, intanto, sono cosiddetti modelli a processi stocastici, cioè uno va quindi
+40:53
+40 minutes, 53 seconds
+a definire, va a supporre che ci siano delle variabili, modellizziamo direttamente la nostra serie storica come variabile relatoria.
+41:02
+41 minutes, 2 seconds
+E poi l'altra il punto chiave è che perlopiù diciamo ci si concentra sul caso stazionario, ok? Oppure se non è
+41:10
+41 minutes, 10 seconds
+stazionario, facciamo quello che dicevamo prima, si fanno un po' di differenziazioni finché non si cade nella situazione stazionaria. Ok?
+41:18
+41 minutes, 18 seconds
+Allora, per descrivere gli arima, siccome sono processi stocastici, si potrebbe usare il punto di vista della
+41:25
+41 minutes, 25 seconds
+media e della covarianza, sono processi gaussiani, però eh quindi sarebbe un punto di vista sull'autocorrelazione. Sono processi
+41:32
+41 minutes, 32 seconds
+gausiani con una certa media e autocovarianza. In realtà, come dicevo, appunto, è più simile forse anche nello
+41:39
+41 minutes, 39 seconds
+spirito agli ETS, a quelli Old Winters, eh descriveremo i processi in termini di la Y come funzione delle osservazioni
+41:49
+41 minutes, 49 seconds
+passate, dei residui passati, un po' come abbiamo fatto con Old Winters. Ok?
+41:54
+41 minutes, 54 seconds
+Quindi partiamo dal punto di vista uno e poi otterremo come conseguenza il punto di vista due, va bene? cerchiamo di capire come sono fatte le correlazioni.
+42:03
+42 minutes, 3 seconds
+Uno potrebbe fare anche il viceversa, non è non è vietato.
+42:08
+42 minutes, 8 seconds
+Eh, allora, quindi partiamo da questo punto di vista. Come in ETS, cosa vogliamo dire? Vogliamo dire che le osservazioni Y al tempo tono ecco
+42:16
+42 minutes, 16 seconds
+rispetto a ETS gli AriMas sono un po' più rigidi o anche più semplici da questo punto di vista. Usiamo solo combinazioni lineari di cosa?
+42:27
+42 minutes, 27 seconds
+combinazione significa somme e di coefficienti con costanti, quindi parametri che vanno a moltiplicare le
+42:35
+42 minutes, 35 seconds
+osservazioni precedenti, oppure i residui, va bene? Gli errori di previsione passati. Quindi abbiamo,
+42:44
+42 minutes, 44 seconds
+insomma, da questo punto di vista gli ARIMA sono, se volete descriverli in modo molto rapido, stiamo dicendo che ogni Y di T,
+42:53
+42 minutes, 53 seconds
+ogni valore è in realtà, se volete, una versione un po' più sofisticata di SES o
+43:00
+43 minutes
+winters, ma solo additivo. Quindi vogliamo dire che avremo un coefficiente alfa. Beh, chiamiamoli teta 1 yt - 1 + t2 yt - 2 fino a un certo punto.
+43:12
+43 minutes, 12 seconds
+Poi però possiamo usare anche i residui e chiamiamolo, boh, eh, f1 - 1 + f2 ε t
+43:22
+43 minutes, 22 seconds
+- 2, così, insomma, fino a un certo ordine. Ok?
+43:27
+43 minutes, 27 seconds
+Ecco, queste sono effettivamente le equazioni che vedremo per Yarima. Adesso però vogliamo organizzarle un po' un po' meglio per capire un po' la struttura di
+43:34
+43 minutes, 34 seconds
+questi di questi modelli, ok? Però in generale sono modelli di questo tipo lineari, mentre ETS vi per insomma vi
+43:42
+43 minutes, 42 seconds
+permette di fare combinazioni moltiplicative e quindi uscire dal mondo lineare. In realtà sono modelli lineari nei nei nei
+43:49
+43 minutes, 49 seconds
+parametri. Ok? I parametri che sono questi qui, che ora daremo altri nomi, in realtà entrano in modo lineare,
+43:59
+43 minutes, 59 seconds
+d'accordo? E vabbè, c'è anche l'errore di previsione attuale. Allora, l'ipotesi base come in ETS è che questi epsilon,
+44:06
+44 minutes, 6 seconds
+questi residui, questi errori sono un processo molto semplice, cioè sono indipendenti, gaussiane,
+44:13
+44 minutes, 13 seconds
+centrate con una varianza costante, che questo è il rumore bianco, si chiama anche rumore bianco, appunto. E questo ci permetterà poi di usare i metodi di
+44:22
+44 minutes, 22 seconds
+minimi quadrati, però di per sé non diremo che la y è un un processo di variabili indipendenti, non sono
+44:30
+44 minutes, 30 seconds
+indipendenti. Quindi, allora cominciamo dal dal modello più cioè arima è un acronimo, vi dicevo, di autoreggressivo
+44:38
+44 minutes, 38 seconds
+integrato e media mobile. Quindi AR è qualcosa, la I sta a indicare qualcos'altro e ma sta a indicare qualcos'altro. Quindi descriviamo adesso
+44:46
+44 minutes, 46 seconds
+separatamente i tre pezzetti e poi li mettiamo insieme. Ok? Allora, cosa vuol dire autoregressivo?
+44:52
+44 minutes, 52 seconds
+Eh, questa, se volete, è un l'estensione dell'idea del modello SES. Quello lì è un'altra estensione, se volete, del
+45:01
+45 minutes, 1 second
+modello SES, mentre Old Winters va in una certa direzione, ARIMA o AR va in un'altra. Cioè l'idea è
+45:08
+45 minutes, 8 seconds
+che il modello autoregressivo non è nient'altro che un modello in cui eh il fattore d'uscita, che è la nostra
+45:16
+45 minutes, 16 seconds
+serie storica al tempo t è una regressione lineare su non soltanto sull'ultimo tempo, ma su tempi
+45:24
+45 minutes, 24 seconds
+precedenti. Ok? Quindi avete una regressione lineare, un modello lineare, quindi avete i parametri alfa 1, alfa 2
+45:31
+45 minutes, 31 seconds
+fino alfa p e le caratteristiche di ingresso sono le serie ritardate.
+45:38
+45 minutes, 38 seconds
+Forse se ci pensate anche in quando abbiamo fatto KNN, cioè stiamo usando le serie ritardate per fare una previsione
+45:45
+45 minutes, 45 seconds
+della serie futura e qui stiamo usando la regressione, il modello di regressione per per far parte ovviamente poi ci mettiamo anche un residuo, un
+45:52
+45 minutes, 52 seconds
+errore che è sempre il rumore bianco, cioè sono variabili indipendenti a media zero varianza sigma 4.
+46:00
+46 minutes
+Ok? Allora, se vi ricordate c'era questo operatore L che era un po' in ritardo
+46:07
+46 minutes, 7 seconds
+e possiamo scrivere, vedete questa questa scrittura lì in alto usando un polinomio DL perché guardate
+46:15
+46 minutes, 15 seconds
+eh PDL, chiamate PDL questo, ok? Allora, cosa vuol dire fare PDL di una y della nostra serie storica?
+46:24
+46 minutes, 24 seconds
+Beh, vuol dire fare il primo è 1 * L, quindi avete, diciamo, al tempo t avete y d t, poi avete - alfa 1,
+46:34
+46 minutes, 34 seconds
+però ritardato di 1, quindi è t - 1. Poi avete - alfa 2, quindi - alfa 2 y
+46:41
+46 minutes, 41 seconds
+ritardato di 2 perché c'è un l², quindi t - 2 e fino a - alfa p y^ t - p.
+46:50
+46 minutes, 50 seconds
+Ora, perché non insegni meno? Perché nel modello avevo messo le y a destra e quindi se volete portare tutte le y a sinistra chiaramente dovete cambiare il
+46:58
+46 minutes, 58 seconds
+segno. Ok? Quindi la scrittura compatta è di questi modelli autoregressivi è che c'è un polinomio
+47:04
+47 minutes, 4 seconds
+nei ritardi i cui coefficienti sono dei parametri che dovremmo andare a stimare che applicati alla y mi danno il
+47:11
+47 minutes, 11 seconds
+residuo, il verrore bianco l'errore, insomma, il rumore bianco.
+47:19
+47 minutes, 19 seconds
+Il polinomio in realtà ha un significato, ha un'importanza perché cioè non sempre questi modelli sono stazionali, d'accordo? Se vi ho detto
+47:27
+47 minutes, 27 seconds
+gli Arima sono puntano molto sulla stazionarità. In realtà non tutti i coefficienti vanno bene, alfa 1, alfa P
+47:34
+47 minutes, 34 seconds
+e si può mostrare che il modello è stazionario solo quando gli zeri di questo polinomio sono
+47:42
+47 minutes, 42 seconds
+abbastanza lontani dall'origine. Ok? Gli zeri del polinomio dov avere modulo maggiore di 1. Zeri complessi, eh il
+47:49
+47 minutes, 49 seconds
+polinomio sempre degli zeri, ma non necessariamente sono reali, ma l'importante è che siamo abbastanza lontani dall'origine, da zero. Allora,
+47:56
+47 minutes, 56 seconds
+in quel caso però, diciamo, se è soddisfatto avete un modello stazionario.
+48:02
+48 minutes, 2 seconds
+E qual è il legame? Beh, legame detto all'inizio, cioè se guardate bene nel caso di ordine 1 avete l'equazione y d è
+48:10
+48 minutes, 10 seconds
+ug y t - 1. Avete solo un parametro più il residuo y d t. Ok?
+48:21
+48 minutes, 21 seconds
+Quindi potreste pensarla così, diciamo, questo è il livello, no? Andate a rivedervi le equazioni del livello e dell'errore, vedrete che alla fine
+48:30
+48 minutes, 30 seconds
+potete inquadrare autoregressivo di ordine 1 ETS o un SES, insomma, tutto additivo, però niente di moltiplicativo.
+48:41
+48 minutes, 41 seconds
+Beh, allora, come sono fatte in pratica le traiettorie di questi processi autoreggressivi? Eh, sono abbastanza rumorose, cioè sono stazionarie, diciamo, se trovate la situazione
+48:50
+48 minutes, 50 seconds
+stazionaria. Questa è una R1 simulato, non vi dico il parametro alfa qual è.
+48:55
+48 minutes, 55 seconds
+però avete una un andamento molto molto irregolare. Eh, cosa succede se aumentate l'ordine di autoregressione?
+49:03
+49 minutes, 3 seconds
+State dicendo che il valore al tempo t è una una media, pensatela come una media dei valori dei due valori precedenti più
+49:11
+49 minutes, 11 seconds
+un errore, no? Quindi più aumenta l'ordine più in un certo senso si può pensare che diventi un po' più regolare il il modello. Ok?
+49:20
+49 minutes, 20 seconds
+Ehm, però questo è solo un pezzo, ok? I modelli arima sfruttano anche una parte cosiddetta media mobile. Allora, media
+49:30
+49 minutes, 30 seconds
+mobile in che senso? Ora vi vi do la definizione. La media mobile non è proprio necessariamente la media
+49:36
+49 minutes, 36 seconds
+mobile quella del comando decompose, se volete è un'estensione e in cui ammettiamo anche pesi negativi,
+49:44
+49 minutes, 44 seconds
+ad esempio. Quindi, diciamo, un modello a media mobile, che modello è? è un modello in cui questa volta il valore
+49:51
+49 minutes, 51 seconds
+della y della nostro osservazione è, vedete, una media dei residui eh dei
+50:00
+50 minutes
+di questi errori, di questi rumori. Dal punto di vista, se volete, dei filtri, avete un segnale che è il rumore
+50:08
+50 minutes, 8 seconds
+bianco inizialmente e fate una media mobile su quel rumore bianco, ok? Quindi state un po' mediando il rumore totalmente bianco, quello in cui non c'è nessuna struttura.
+50:19
+50 minutes, 19 seconds
+Ora, anche di per sé il modello solo a media mobile non va un granché bene, cioè poi vedrete che alla fine bisogna bilanciare tra tipicamente avete
+50:26
+50 minutes, 26 seconds
+contributi sia autoregressivi che a media. Comunque, volendo fare lo stesso gioco, uno può dire "Ok, quel membro di destra è già a destra e c'è l'epsil, poi
+50:35
+50 minutes, 35 seconds
+c'è beta 1 ritardo di 1 e quindi lo scrivo in modo compatto come beta 1 * L più poi ci sarà beta 2 un altro
+50:44
+50 minutes, 44 seconds
+parametro per L qu e e quindi lo aggiungo e fino a un beta Q per un ritardo di ordine Q. Quindi, se chiamate
+50:52
+50 minutes, 52 seconds
+Q, diciamo, questo polinomio formale in in L, state dicendo che il vostro Y, il vostro processo, la vostra serie storica
+51:00
+51 minutes
+è qdl applicato al rumore bianco.
+51:05
+51 minutes, 5 seconds
+Allora, cosa succede? In questo caso il processo è sempre stazionario, va bene?
+51:11
+51 minutes, 11 seconds
+Non ci sono condizioni e sempre stazionario.
+51:15
+51 minutes, 15 seconds
+E com'è fatto? Beh, guardandolo uno direbbe abbastanza simile al non si vedono grosse differenze, diciamo, autoregressivo, dice "Ma come faccio a
+51:24
+51 minutes, 24 seconds
+occhio a distingu"? Infatti vedremo dopo che che la funzione di autocorrelazione può aiutare a rivelare che tipo di modello abbiamo a che fare. Ok? Però in
+51:32
+51 minutes, 32 seconds
+generale, diciamo, anche qui eh più aumenta l'ordine più sembrerebbe un po' più regolare la la traiettoria.
+51:41
+51 minutes, 41 seconds
+Pensate, poi dipende da che coefficienti mettete anche dietro.
+51:45
+51 minutes, 45 seconds
+Ecco, allora vediamo un po'. In generale, come si ci si definisce l'arima? Allora, l'arima cerca di mettere insieme la parte autoregressiva
+51:51
+51 minutes, 51 seconds
+con la parte media mobile, ma anche una parte di derivata, di differenziazione, perché l'idea qual è? Parto dal mio dal
+51:59
+51 minutes, 59 seconds
+mio processo iniziale, se non è stazionario comincio a fare un po' di differenzia, quante ne farò? Ne faccio di, ok? Faccio
+52:08
+52 minutes, 8 seconds
+di differenziazioni e a quel punto arriva una situazione in cui spererei di essere stazionario e quindi diciamo che chiamiamo x quello
+52:17
+52 minutes, 17 seconds
+che ho ottenuto dopo aver fatto di differenzia se volete questo è una scrittura un po' compatta per dire hai fatto
+52:26
+52 minutes, 26 seconds
+differenziazione di volte immaginate di dare diff di dif di volte chiamate x quello che tenete. Allora, quello che
+52:33
+52 minutes, 33 seconds
+deve rimanere è una parte autoreggressiva, che è questa parte qui, più una parte a media mobile. Ok, mettiamo insieme tutto.
+52:45
+52 minutes, 45 seconds
+Ok? In senso additivo, vedete, tutto tutto sommato, ok? Non è particolarmente complicato. Dal punto di vista delle funzioni stiamo sommando questi vari
+52:53
+52 minutes, 53 seconds
+blocchetti, ok? E allora le ipotesi sono che i modelli, quelli siano parametri. Alfa I e beta J sono parametri che dovremmo
+53:01
+53 minutes, 1 second
+stimare. Eh, gli ordini P e Q potrebbero essere diversi in generale e quello che rimane il residuo, il modello dice il
+53:10
+53 minutes, 10 seconds
+rumore, scusate, il rumore dt, questo che indichiamo come d è sempre negli arima rumore bianco gaussiano, cioè quello sono senza strutture, sono
+53:18
+53 minutes, 18 seconds
+variabili indipendenti gausiane a varianza sigma quadro e media 0.
+53:23
+53 minutes, 23 seconds
+Notazione compatta. Beh, allora se PDL applicato a X era PDL quello di prima, quello con 1 - gli alfa i l^ I. Poi però
+53:32
+53 minutes, 32 seconds
+attenti, la X era una derivata, insomma, era identità - l elevato all d, cioè perché dobbiamo fare di volte questa
+53:40
+53 minutes, 40 seconds
+differenziazione applicato a Y. Quindi questo, se volete è PDL X. Ok?
+53:48
+53 minutes, 48 seconds
+Qui perché ho portato tutte le X a sinistra e le X mi sono ricordato che identità - L^ D Y e a destra avete come prima VL.
+53:57
+53 minutes, 57 seconds
+Ok? Quindi avete questa notazione un po' compatta, però in realtà nei nel codice R non non si vede, insomma, è più per lo
+54:05
+54 minutes, 5 seconds
+studio, per ricordarci un po' com'è fatta. Allora, si può dire quando è stazionario o modello Arima? Allora, il
+54:12
+54 minutes, 12 seconds
+punto è che la differenziazione D vi serve per arrivare alla stazionarietà.
+54:17
+54 minutes, 17 seconds
+Quindi, allora, la stazionarietà ce l'avete di partenza se non dovete differenziarla, quindi se D uguale a 0.
+54:25
+54 minutes, 25 seconds
+Se D invece è maggiore di 0 avete la stazionalità e la condizione attenti, però anche se D uguale 0 gli ari ma con
+54:33
+54 minutes, 33 seconds
+di zero differenziazioni sono stazionarie perché c'era quel discorso de del polinomio PDL, va bene? Quando le
+54:40
+54 minutes, 40 seconds
+radici di PDL, gli zeri del polinomio PDL sono lontani, sono fuori dal disco unitario, allora potete dire che è stazionario, va bene?
+54:51
+54 minutes, 51 seconds
+Poi alla fine vedremo che il punto chiave sarà di selezionare il modello.
+54:56
+54 minutes, 56 seconds
+Eh, quindi stavo dicendo che in pratica dobbiamo fare abbastanza differenziazioni per arrivare al caso stazionario e poi usiamo dei coefficienti alfa per fare una parte
+55:05
+55 minutes, 5 seconds
+autoreggressiva e dei coefficienti beta per colorare un po' il rumore. Se invece di avere un rumore bianco ci mettiamo una struttura un po' più complicata.
+55:14
+55 minutes, 14 seconds
+Va bene? Allora, questa è è la definizione generale, però non perdetevi troppo nel nella costruzione generale.
+55:22
+55 minutes, 22 seconds
+In realtà poi questi ordine P, D e Q sono piccolini per per serie tipiche realistiche, ok? Ad esempio, come fatta una serie Arima 010?
+55:34
+55 minutes, 34 seconds
+Questa è una serie che facendo una differenziazione arriviamo ad avere il rumore bianco e la situazione è questa.
+55:42
+55 minutes, 42 seconds
+Questa è una traiettoria simulata è quella che si chiama anche una passeggiata aleatoria che è una random walk. Perché cosa vuol dire? Vuol dire
+55:49
+55 minutes, 49 seconds
+che la sua derivata è data da sua derivata discreta, le differenze è data da un segnale senza correlazione. Quindi
+55:56
+55 minutes, 56 seconds
+ricostruendola vorrebbe dire che l'integrale, [schiarire la voce] cioè sommando i vari contributi, eh sono dei passi. se volete che sono totalmente
+56:05
+56 minutes, 5 seconds
+casuali e quindi la traiettoria, vedete, a volte sembra esibire del trend, ma in realtà, appunto, cioè è un trend nel
+56:14
+56 minutes, 14 seconds
+senso che non è stazionaria questa, però poi a volte viene compensato da andamenti decrescenti. Una serie molto oscillante. Modelli di questo tipo sono
+56:21
+56 minutes, 21 seconds
+quelli che si usano spesso per l'andamento, ad esempio, delle azioni, cioè i modelli proprio iniziali, diciamo
+56:28
+56 minutes, 28 seconds
+150 anni fa, 120 anni fa si usavano per l'andamento dei prezzi azionari, ok?
+56:33
+56 minutes, 33 seconds
+Anche meno, anche 40 anni fa, però adesso si è un po' evoluta la situazione. Ok? Quindi è una serie che non è stazionaria,
+56:42
+56 minutes, 42 seconds
+non stazionaria, almeno cioè da dal punto di vista teorico non lo è. Poi magari se avete una traiettoria specifica e lo date in
+56:50
+56 minutes, 50 seconds
+passo a un test, quello vi dice "Sì, guarda, è stazionaria perché è andata così". Ok, ma non è in genere dal punto di vista teorico non lo è.
+57:00
+57 minutes
+Ecco, vediamo un po' cosa succede se faccio un'arima un po' più complicato.
+57:03
+57 minutes, 3 seconds
+Abbiamo 2 1 2. Cosa vuol dire? Vuol dire che differenziando [schiarire la voce] una volta arriva un modello, un processo
+57:10
+57 minutes, 10 seconds
+in cui ho due termini di autoreggressione e il e anche due termini di media mobile. i parametri, quindi sono quattro
+57:18
+57 minutes, 18 seconds
+e vedete rispetto a prima la serie ho usato lo stesso, ho usato proprio lo stesso, insomma queste sono serie pseudo
+57:26
+57 minutes, 26 seconds
+casuali, sono generate, però ho usato lo stesso modello per generare e vedete si somigliano, ma una è diventata un po' più liscia rispetto all'altra. Guardate.
+57:37
+57 minutes, 37 seconds
+Cioè l'andamento principale è comunque dominato dalla parte di uno, no, del della differenziazione, però vedete è diventato un po' più liscia.
+57:46
+57 minutes, 46 seconds
+tendenzialmente aumentando l'ordine aumenta un po' anche la regolarità di questi di questi processi.
+57:53
+57 minutes, 53 seconds
+Ecco, questo ancora però potrebbe non bastare, purtroppo. Eh, allora, nella pratica differenziare, l'abbiamo già visto prima, no? Differenziare soltanto
+58:02
+58 minutes, 2 seconds
+di una volta, due volte, tre volte potrebbe non aiutarvi alla per la parte stagionale. Cioè, sulla componente
+58:09
+58 minutes, 9 seconds
+stagionale il trucco qual è? e di dire differenzio di un periodo, cioè vado a vedere la sottoserie relativa ai
+58:16
+58 minutes, 16 seconds
+periodi, quindi vado a vedere 12 mesi prima, vado a vedere so 7 giorni prima, no? Se avete il
+58:23
+58 minutes, 23 seconds
+periodo, quindi diciamo se avere una stagionalità di periodo S e qual è l'idea? I modelli Arima forse
+58:31
+58 minutes, 31 seconds
+forse non tengono conto della stagionalità e sarà bene aggiungere qualcosa che tenga conto artificialmente della della stagionalità. Quindi andiamo a fare i modelli arima stagionali.
+58:41
+58 minutes, 41 seconds
+E l'idea è di dire, ok, oltre a una parte autoreggressiva, media mobile e differenziazione relativa al, insomma,
+58:50
+58 minutes, 50 seconds
+alle frequenze uno di di passi 1 2 3, andiamo a fare qualcosa che sia multiplo dei periodi, quindi andiamo a aggiungere
+58:57
+58 minutes, 57 seconds
+ulteriori coefficienti e nella pratica questo è molto utile perché altrimenti non riuscite a cogliere la stagionalità.
+59:04
+59 minutes, 4 seconds
+aggiungete polinomi con nuovi coefficienti, non gli stessi di però che hanno un comportamento simile. Quindi
+59:11
+59 minutes, 11 seconds
+avete un polinomi chiamiamolo P grande, però che è valutato in L^ S, quindi andate a vedere multipli interi del periodo e Qande che andate a mettere
+59:20
+59 minutes, 20 seconds
+invece su una parte a media mobile sempre valutati in L^ S. Quindi e ovviamente anche le differenziazioni stagionali potete farne un certo numero, chiamiamo di grande. Ok?
+59:32
+59 minutes, 32 seconds
+Quindi se mettete insieme tutte queste queste cose, avete la notazione compatta è molto utile perché altrimenti sarebbe una formula infinita qui a scrivere tutto. Quindi avete la serie originale.
+59:43
+59 minutes, 43 seconds
+Come la leggiamo? Facciamo un po' di derivate diciamo di di ordine uno e quindi la facciamo di piccolo volte, ok?
+59:51
+59 minutes, 51 seconds
+Perché magari così togliamo il trend.
+59:54
+59 minutes, 54 seconds
+Poi cerchiamo di togliere la stagionalità facendo di grande volte solo una notazione e di grande potrebbe essere più piccola che di di piccolo, eh
+1:00:01
+1 hour, 1 second
+insomma un altro numero di volte per togliere un po' la stagionalità e poi usiamo un polinomio piccolo sui
+1:00:09
+1 hour, 9 seconds
+ritardi per avere una parte autoreggressiva, ma eventualmente andiamo a vedere una regressione anche sui sulle stagionalità passate, ok?
+1:00:16
+1 hour, 16 seconds
+Usiamo anche più grande di LDS, ok? Quindi, ad esempio, potreste vedere, facciamo un esempio concreto,
+1:00:26
+1 hour, 26 seconds
+è lo stesso anche di qua, è lo stesso anche per il rumore. Potete farlo dall'altro lato. Facciamo [sbuffare] un esempio concreto. Facciamo un eh
+1:00:36
+1 hour, 36 seconds
+beh, prendiamo d grande uguale d pic 0 e mettiamo q = q pic
+1:00:44
+1 hour, 44 seconds
+0, cioè quindi nessun ordine di eh di media mobile, ma mettiamo ad esempio
+1:00:50
+1 hour, 50 seconds
+grande di L^ S = 1 - alfa 1 o chiamiamolo chiamiamolo alfa barrato
+1:01:00
+1 hour, 1 minute
+L^ S o A, chiamiamolo A. Ecco a^ s e pi pic l 1 - alfa l. Ok? Cosa vuol dire? In
+1:01:09
+1 hour, 1 minute, 9 seconds
+pratica vuol dire che fate eh la vostra serie y dovevamo applicare 1 - alfa l, quindi fate y t - alfa y t - 1.
+1:01:22
+1 hour, 1 minute, 22 seconds
+A questa però non basta ancora. Dobbiamo applicare ora l'altro polinomio più grande. Quindi avete lei meno eh non ho detto quant'è S, facciamo che S = 12.
+1:01:32
+1 hour, 1 minute, 32 seconds
+Ok?
+1:01:33
+1 hour, 1 minute, 33 seconds
+Quindi dobbiamo prendere questa e sottrarre a volte la stessa cosa però con t - 12 - alfa yt - 12.
+1:01:44
+1 hour, 1 minute, 44 seconds
+Ok?
+1:01:48
+1 hour, 1 minute, 48 seconds
+D'accordo? Quindi avete questo uguale a che cosa? rumore bianco t che concretamente vedete si sviluppa tutto.
+1:01:58
+1 hour, 1 minute, 58 seconds
+Ora in effetti guardando bene i coefficienti, vedete, mentre prima avevamo PDL era lineare nei
+1:02:05
+1 hour, 2 minutes, 5 seconds
+coefficienti, adesso avete A ed alfa, avete un po' perso la linearità, ma non è perché avete comunque il termine a* alfa.
+1:02:15
+1 hour, 2 minutes, 15 seconds
+Va bene? Quindi concretamente, quindi l'idea è chiara, dobbiamo aggiungere oltre al modello anche, cioè oltre anche ai ritardi semplici, quelli ritardi sul
+1:02:23
+1 hour, 2 minutes, 23 seconds
+terievo, la notazione diventa un po' più complicata. Quindi avete P, D e Q che sono gli ordini di quanto andate nella regressione e quante volte differenziate
+1:02:32
+1 hour, 2 minutes, 32 seconds
+e quante volte fate media mobile, ma anche P grande, D, Qande che sono quelli sul periodo e poi infine la notazione indica sempre un S, vi indica il periodo
+1:02:40
+1 hour, 2 minutes, 40 seconds
+su cui state lavorando. Ok? Questi sono gli arima stagionali e sono quelli più, insomma, più versatili perché poi in pratica uno ha trend stagionalità e
+1:02:49
+1 hour, 2 minutes, 49 seconds
+rumore sempre spia. Quindi vediamo ad esempio comeè fatto un'arriva stagionale piuttosto semplice. Prendiamo arima 101,
+1:02:58
+1 hour, 2 minutes, 58 seconds
+ma mettiamoci anche una differenziazione stagionale.
+1:03:02
+1 hour, 3 minutes, 2 seconds
+Quindi abbiamo 01 e il periodo è 12, tutto simulato, eh, quindi vedete in effetti questa si vede anche qui nel
+1:03:10
+1 hour, 3 minutes, 10 seconds
+picco, no? avete, cioè, ora non è proprio sempre, però c'è un po' di periodicità, una qualche stagionalità
+1:03:18
+1 hour, 3 minutes, 18 seconds
+comincia a esserci, ok? Quindi sembra che il modello riesca a catturare una qualche forma di stagionalità
+1:03:26
+1 hour, 3 minutes, 26 seconds
+o al momento non nessuno, cioè io adesso in certe situazioni funziona meglio gli ETS, poi veniamo alla fine del confronto. Eh, ora cosa possiamo dire
+1:03:35
+1 hour, 3 minutes, 35 seconds
+degli Arima? la funzione, cioè diciamo così, abbiamo descritto la parte modellistica
+1:03:42
+1 hour, 3 minutes, 42 seconds
+di equazioni. E adesso la domanda è fissati questi modelli, sono modelli gausiani, si può verificare
+1:03:50
+1 hour, 3 minutes, 50 seconds
+e basta descriverli anche tram si può anche descriverli tramite funzioni di media e funzioni di covarianza o di autocorrelazione. Allora, la media
+1:03:59
+1 hour, 3 minutes, 59 seconds
+teoricamente di solito si mettono tutti a media zero, però nella pratica conviene gestirsi anche un parametro di media più generale, che quindi quando
+1:04:08
+1 hour, 4 minutes, 8 seconds
+vedete magari vedremo mercoledì quando stimiamo i parametri si stima anche un parametro di media spesso. Però, concentrandoci sulla funzione di
+1:04:16
+1 hour, 4 minutes, 16 seconds
+autocorrelazione è chiaro che eh fissato un'arma, togliamo la stagionalità, va bene, torniamo a PDQ e basta, avremo dei
+1:04:24
+1 hour, 4 minutes, 24 seconds
+parametri, se avete anche la stagionalità avete anche i parametri di stagionalità e comunque l'autocorrelazione dipenderà dai dai parametri e da quante differenziazioni abbiamo fatto.
+1:04:35
+1 hour, 4 minutes, 35 seconds
+Va bene? Allora, cosa si può dimostrare?
+1:04:37
+1 hour, 4 minutes, 37 seconds
+Si può mostrare che ci sono delle equazioni ricorsive che si chiamano equazioni di Walker.
+1:04:44
+1 hour, 4 minutes, 44 seconds
+Per cui potete dire la funzione gamma, questa era la la gamma di K, quella
+1:04:50
+1 hour, 4 minutes, 50 seconds
+teorica, è ricorsivamente funzione delle gamma eh ritardate, no?
+1:04:57
+1 hour, 4 minutes, 57 seconds
+Avete la correlazione a la K è la somma di alfa i che sono proprio i coefficienti qui dell'autoreggressione per c k -. Ok?
+1:05:09
+1 hour, 5 minutes, 9 seconds
+Quindi, come c'è l'autoreggressione a livello di equazione, c'è autoreggressione anche a livello delle correlazioni.
+1:05:16
+1 hour, 5 minutes, 16 seconds
+Allora, queste equazioni funziona in realtà se se il lag è abbastanza grande, va bene?
+1:05:23
+1 hour, 5 minutes, 23 seconds
+Sì, se il lag è abbastanza grande è vero. Dopo vediamo cosa succede. Quindi cosa succede? Succede che e qua, scusate, se D e aspettate che qua se D è
+1:05:32
+1 hour, 5 minutes, 32 seconds
+uguale a 0, questa me la dimentico sempre senza differenziazione, eh.
+1:05:39
+1 hour, 5 minutes, 39 seconds
+Ecco, allora l'effetto qual è? L'effetto è che se avete un modello sola media mobile, eh, ve ne potete ve ne potete proprio
+1:05:48
+1 hour, 5 minutes, 48 seconds
+accorgere graficamente guardando la funzione di autocorrelazione, perché quello che succede è che se è solo la media mobile dopo, insomma, se la media
+1:05:56
+1 hour, 5 minutes, 56 seconds
+mobile è fino a a Q di ordine Q, dopo Q le correlazioni crollano, quindi avete delle correlazioni che poi improvvisamente diventano zero. Se
+1:06:05
+1 hour, 6 minutes, 5 seconds
+invece, partendo da questa equazione si può mostrare che se invece avete solo la parte autoreggressiva, allora le correlazioni non diventano mai immediatamente zero, ma decadono.
+1:06:15
+1 hour, 6 minutes, 15 seconds
+Decadono esponenzialmente, quindi poi nella pratica vanno a zero, ma anche abbastanza rapidamente. Ok? Ora più in generale, però quando avete un modello
+1:06:24
+1 hour, 6 minutes, 24 seconds
+ARMA P0Q avete un si mescolano un po' questi due effetti, quindi è difficile a occhio distinguere, però diciamo se uno
+1:06:31
+1 hour, 6 minutes, 31 seconds
+qualitativamente vuole dire è più un modello media mobile o più un modello autoregressivo, può andare a vedere la funzione di autocorrelazione e vedere se
+1:06:39
+1 hour, 6 minutes, 39 seconds
+decade esponenzialmente avete un modello autoregressivo, se diventa zero immediatamente dite questa è una media modalità
+1:06:47
+1 hour, 6 minutes, 47 seconds
+avrete sempre qualcosa di intermedio, quindi è difficile. non siete mai in queste situazioni, però vediamo in pratica. Esempio, questa è una serie autoregressiva di ordine 1 e qua sotto c'è la sua funzione di autocorrelazione.
+1:06:59
+1 hour, 6 minutes, 59 seconds
+Vedete, c'è un decadimento, in realtà prosegue, poi alla fine c'è un po' di rumore, quindi non è che necessariamente
+1:07:06
+1 hour, 7 minutes, 6 seconds
+dentro quella fascia potete pensare che sia a zero. Ok? Quindi, anche se la correlazione, vedete, è a zero per la 1
+1:07:14
+1 hour, 7 minutes, 14 seconds
+2 3 4, siete sempre lontani da zero, poi lag 5 già potete dire che è zero.
+1:07:21
+1 hour, 7 minutes, 21 seconds
+Comunque avete solo un parametro, questo è un autore regressivo di ordine 1. Ok?
+1:07:27
+1 hour, 7 minutes, 27 seconds
+Eh, stessa cosa succede per modelli autoregressivi più complicati. Questo è un autogressivo di ordine 3. Vedete?
+1:07:34
+1 hour, 7 minutes, 34 seconds
+tende a zero. Ok, c'è un po' però un sono tre parametri eh che descrivono questa funzione di autocorrelazione che
+1:07:41
+1 hour, 7 minutes, 41 seconds
+comunque tende a zero. Cosa succede per un modello a media mobile? Media mobile è la situazione più drastica. Ora qui avete un media mobile di ordine 1 e
+1:07:50
+1 hour, 7 minutes, 50 seconds
+vedete che per l'ag uguale 1 avete un valore, un picco e poi immediatamente diventa zero. Ok?
+1:07:58
+1 hour, 7 minutes, 58 seconds
+che per il rumore bianco se fosse media mobile di ordine zero qui non sto mostrando l'agg uguale 0, quindi questo non c'è mai, avete proprio che è tutto zero, ok?
+1:08:10
+1 hour, 8 minutes, 10 seconds
+E però se fate un media mobile di ordine maggiore, ad esempio ordine 4, vedete proprio quattro picchi e poi diventa zero. Vedete un andamento diverso rispetto a quello degli autoregressivi.
+1:08:20
+1 hour, 8 minutes, 20 seconds
+Quindi magari a occhio le traiettorie possono sembrare simili, ma in realtà dalla la funzione di autocorrelazione vi scopre queste queste differenze. Ok?
+1:08:29
+1 hour, 8 minutes, 29 seconds
+Cosa succede se facciamo cose più complicate? un'arrima 204. Vedete, avete un andamento qui. Uno direbbe, eh,
+1:08:37
+1 hour, 8 minutes, 37 seconds
+sembrerebbe autoregressivo. Se guardo solo la CF, non so che un'arrima 24, io direi autoregressivo. Qui l'autoreggressivo perché avete questo
+1:08:45
+1 hour, 8 minutes, 45 seconds
+andamento decrescente, esponenziale e va bene.
+1:08:52
+1 hour, 8 minutes, 52 seconds
+Ecco, e la stagionalità pure è importante perché, ad esempio, vedete ehm la un modello seasonal arima, quindi
+1:09:00
+1 hour, 9 minutes
+stagionalità con ordine uno di differenziazione stagionale, avete l'autocorrelazione che ha un picco effettivamente intorno alla
+1:09:08
+1 hour, 9 minutes, 8 seconds
+stagionalità, ok? Dovrebbe essere 12, l'ho simulato con 12.
+1:09:12
+1 hour, 9 minutes, 12 seconds
+Quindi questo, se volete, vi mostra anche che quello quel modello simulato la stagionalità c'è, è comparsa e la vediamo anche nel nel picco dell'autocorrelazione.
+1:09:24
+1 hour, 9 minutes, 24 seconds
+Va bene? Quindi abbiamo detto le autocorrelazioni ci sono, si potrebbe in realtà descrivere gli arima solo con le autocorrelazioni, ma se volete, appunto,
+1:09:33
+1 hour, 9 minutes, 33 seconds
+punto di vista di di in cui descriviamo queste equazioni ricorsive è forse più naturale. Ehm, allora, però si pone
+1:09:40
+1 hour, 9 minutes, 40 seconds
+comunque il problema di stimare i parametri. Ora diciamo che abbiamo deciso che vogliamo lavorare con gli Arima. Abbiamo le nostre osservazioni
+1:09:48
+1 hour, 9 minutes, 48 seconds
+e abbiamo fissato l'ordine. Eh, attenti che l'ordine pure insomma uno dice "Ho fatto di differenziazioni e sono arrivato a una situazione che mi sembra
+1:09:56
+1 hour, 9 minutes, 56 seconds
+stazionaria". Diciamo che voglio usare, che so due parametri di autoreggressione e quattro di media mobile. Avrò questi sei parametri da stimare. Come li stimo?
+1:10:08
+1 hour, 10 minutes, 8 seconds
+Ok, allora vediamo due approcci. Il primo che sempre dovete sempre avere in mente alla fine funziona sempre stima di
+1:10:15
+1 hour, 10 minutes, 15 seconds
+minimi quadrati e massima verosimiglianza, no? Eh, prendete i residui, gli d, dovete estrarli
+1:10:25
+1 hour, 10 minutes, 25 seconds
+dall'equazione, poi questo è fatto in automatico e e cercate gli alfa e beta che minimizzano la somma di dei residui al quadrato. Questa va sempre bene, è
+1:10:33
+1 hour, 10 minutes, 33 seconds
+sempre una stima di massima verosimiglianza, quindi assolutamente approccio consigliato. E in effetti è quello che fa il comando Arima. Avete
+1:10:42
+1 hour, 10 minutes, 42 seconds
+dopo lo vediamo mercoledì. Uno scrive arima gli dà la serie storica in ingresso e ah no, bisogna dargli l'ordine, gli deve dire quanti PD e Q e
+1:10:50
+1 hour, 10 minutes, 50 seconds
+poi stima i coefficienti. Ok? E c'è un altro approccio che secondo me vale la pena di menzionare, altrimenti sembra che si faccia sempre tutto solo con la
+1:10:59
+1 hour, 10 minutes, 59 seconds
+massima grosimiglianza, eh è di usare quelle equazione di Yle Walker. Allora, se vi interessa in particolare solo un modello
+1:11:06
+1 hour, 11 minutes, 6 seconds
+autoregressivo, uno può impostare, in realtà eh vabbè, facciamo nel caso autoregressivo, può
+1:11:13
+1 hour, 11 minutes, 13 seconds
+stimare gli alfa in modo tale che valgano approssimativamente le equazioni di du Walker, perché cosa fa? Stima le
+1:11:21
+1 hour, 11 minutes, 21 seconds
+autocorrelazioni, come abbiamo fatto prima, no, dai dati e a quel punto cerca gli alfa in modo tale che eh valgano
+1:11:29
+1 hour, 11 minutes, 29 seconds
+circa approssimativamente l'equazione di 2 V. Miete questo è un approccio un po' diverso rispetto alla massima grossimiglianza
+1:11:36
+1 hour, 11 minutes, 36 seconds
+che si può è già anche implementato in R è il comando arima AR autoregressivo, scusate, solo per l'autore reegressivo
+1:11:43
+1 hour, 11 minutes, 43 seconds
+in realtà funziona bene questo metodo e io ho il Walker. Ok, poi in realtà in pratica non cambia molto. Guardate sulla
+1:11:52
+1 hour, 11 minutes, 52 seconds
+serie dei il log e il passengers, ok? uno fa la differenza, fa una derivata
+1:11:59
+1 hour, 11 minutes, 59 seconds
+per togliere il trend. Eh, così dicevamo, siamo quasi stazionari.
+1:12:04
+1 hour, 12 minutes, 4 seconds
+Allora, ho solo un parametro perché uso ARMA 1 0, quindi avete solo un parametro alfa.
+1:12:10
+1 hour, 12 minutes, 10 seconds
+Vedete, se usate massima verosimiglianza il parametro è 0.19967 19967 se usate Walker 1.9975 insomma alla fine sono molto simili come come metodo, ok?
+1:12:22
+1 hour, 12 minutes, 22 seconds
+Non è che mi viene da consigliarne Arima di per sé usa massima verosimiglianza.
+1:12:30
+1 hour, 12 minutes, 30 seconds
+Quindi diciamo stimati i parametri è sempre il solito procedimento. Adesso le previsioni come le facciamo? Come abbiamo fatto in ETS, no? abbiamo le equazioni ricorsive, portiamole avanti.
+1:12:39
+1 hour, 12 minutes, 39 seconds
+Cioè, vogliamo una previsione a orizzonte temporale h. Diciamo che t grande è l'ultima cosa che abbiamo osservato. Beh, allora nostra serie
+1:12:49
+1 hour, 12 minutes, 49 seconds
+storica prevista al tempo t + h, diciamo, conoscendo t, siamo un po' più precisi, uno porta
+1:12:57
+1 hour, 12 minutes, 57 seconds
+avanti passo dopo passo, usa le previsioni precedenti, conoscendo t i coefficienti stimati, quindi prosegue,
+1:13:06
+1 hour, 13 minutes, 6 seconds
+insomma, con l'equazione di corsiva e l'unica domanda è i residui, ok? gli errori futuri, queste sono futuri.
+1:13:12
+1 hour, 13 minutes, 12 seconds
+Allora, per la previsione puntuale li mettete a zero, quindi andate soltanto avanti con con la ricorsione degli alfa,
+1:13:20
+1 hour, 13 minutes, 20 seconds
+va bene? E ovviamente se uno vuole avere gli intervalli di fiducia però deve capire anche come sono fatti questi residui, ok?
+1:13:29
+1 hour, 13 minutes, 29 seconds
+Quindi per la previsione puntuale avrete semplicemente da proseguire con la con la parte se volete soltanto
+1:13:35
+1 hour, 13 minutes, 35 seconds
+autoregressiva e ovviamente la la cosa più cè più importante, insomma, se volete fare una previsione
+1:13:43
+1 hour, 13 minutes, 43 seconds
+statistica ed è bene non limitarsi alla previsione puntuale, allora potete avere anche l'incertezza e ora non lo vediamo, ma come per gli
+1:13:52
+1 hour, 13 minutes, 52 seconds
+ETS, come per tanti modelli, gli ARIMA sono abbastanza doci e si riesce a fare una da avere degli intervalli di
+1:14:00
+1 hour, 14 minutes
+previsione parametrici, ok? Quindi potete fare le stime incertezza con intervalli di previsione parametrici,
+1:14:09
+1 hour, 14 minutes, 9 seconds
+sono già implementati, non vediamo neanche le formule, oppure vi ricordo c'è sempre l'alternativa di usare Bootstrap sui residui, ok? Quindi l'idea
+1:14:17
+1 hour, 14 minutes, 17 seconds
+qual è? che invece di metterci e cappuccio li mettete a zero. Se volete usare Bootstrap prendete i residui di delle serie dei valori che avete già
+1:14:25
+1 hour, 14 minutes, 25 seconds
+osservato e li campionate a caso e a quel punto avete delle serie delle previsioni disturbate e provando
+1:14:33
+1 hour, 14 minutes, 33 seconds
+simulandone tante alla fine avete un intervallo di previsione. Fate i quantili campionari su quello che che
+1:14:40
+1 hour, 14 minutes, 40 seconds
+avete simulato. Ok? Allora, in pratica vediamo come funziona. Sembra un po' deludente all'inizio. Ok, questa è un'arrima AR1
+1:14:49
+1 hour, 14 minutes, 49 seconds
+e ho fatto la serie differenziata e ho messo la previsione puntuale. Non so se si vede, è questo valore qui e vedete
+1:14:56
+1 hour, 14 minutes, 56 seconds
+che va zero abbastanza, cioè va zero, va al valor medio, sì, perché qua c'ha ci mette in automatico una media che non è necessariamente zero. Però vedete anche
+1:15:04
+1 hour, 15 minutes, 4 seconds
+gli intervalli di previsione. Gli intervalli di previsione cgono bene l'ampiezza tipica della set. Ora questo [schiarire la voce] è AR1, un modello molto semplice, è sempre un modello tipo
+1:15:13
+1 hour, 15 minutes, 13 seconds
+SES, quindi non è che farà molto meglio Arima a questo livello, eh, però vabbè, questo sugli intervalli di previsione
+1:15:22
+1 hour, 15 minutes, 22 seconds
+Bootstrap sono praticamente equivalenti, ma abbiamo già visto in altre situazioni, non è che sono molto distanti.
+1:15:29
+1 hour, 15 minutes, 29 seconds
+Ovviamente ora tutto è è predisposto, sappiamo stimare i parametri, tutto bene, ma adesso il punto grosso se volete degli anime è questo. Come si fa
+1:15:38
+1 hour, 15 minutes, 38 seconds
+a scegliere l'ordine di differenziazione, l'ordine anche di differenziazione stagionale, scegliere l'ordine P, l'ordine Q e l'ordine P
+1:15:47
+1 hour, 15 minutes, 47 seconds
+grande e Qande quelli stagionali. Come si fa a selezionare questo modello? Qual è il miglior modello? È il solito problema dei degli iper parametri, no?
+1:15:55
+1 hour, 15 minutes, 55 seconds
+Vi ricordate? Abbiamo già visto quando parlavamo di KNN, quando parlavamo di ora K means non tanto, ma quando abbiamo cominciato a fare problemi di
+1:16:03
+1 hour, 16 minutes, 3 seconds
+classificazione, regressione c'è sempre il solito tradeoff, no? Cioè posso mettere molti parametri, ma attenzione,
+1:16:10
+1 hour, 16 minutes, 10 seconds
+mettendo molti parametri aumenterà possibilmente potrebbe aumentare la varianza. Con pochi parametri invece
+1:16:17
+1 hour, 16 minutes, 17 seconds
+potrei aumentare il bias. Ok? E quindi l'idea è eh beh, l'idea in realtà si può
+1:16:25
+1 hour, 16 minutes, 25 seconds
+si può declinare in due modi, no? O usate degli indicatori, i soliti indicatori di informazione,
+1:16:33
+1 hour, 16 minutes, 33 seconds
+quindi che valgono quando avete stime di massima verosimiglianza. Quindi avete i vari indicatori di di informazione eh
+1:16:40
+1 hour, 16 minutes, 40 seconds
+che però appunto sono sempre i soliti, oppure fate la validazione crociata, perché ricordatevi se l'obiettivo è la
+1:16:47
+1 hour, 16 minutes, 47 seconds
+previsione non vi interessa tanto quanto bene è stato andando sul training set, ma quanto dovreste andare su su un possibile test set che sarebbe il futuro
+1:16:56
+1 hour, 16 minutes, 56 seconds
+e quindi fate la cross validation e attenti che per le serie storiche la cross validation si fa sempre mantenendo l'ordine temporale, quella che si chiama
+1:17:04
+1 hour, 17 minutes, 4 seconds
+rolling origin, no? abbiamo già fatta anche per altri modelli più semplici.
+1:17:09
+1 hour, 17 minutes, 9 seconds
+Eh, allora, fortunatamente, eh, appunto, perché vi racconto tutti gli Ari, ma perché la teoria è carina da raccontare,
+1:17:16
+1 hour, 17 minutes, 16 seconds
+ma poi i comandi R sono già tutti belli implementati, quindi anche qui la selezione del modello è una riga di di codice, cioè il modello, la funzione auto.
+1:17:26
+1 hour, 17 minutes, 26 seconds
+vi dà la serie storica in ingresso, potete limitare dei range in cui potete trovare i vostri parametri, ma tendenzialmente vi si seleziona in modo
+1:17:34
+1 hour, 17 minutes, 34 seconds
+automatico usando criteri informativi, va bene? Usando, eh minimizzando, cercando di minimizzare gli indicatori qui.
+1:17:45
+1 hour, 17 minutes, 45 seconds
+Eh sì, si può anche decidere il modo in cui fare la ricerca, va bene? Però la cosa
+1:17:53
+1 hour, 17 minutes, 53 seconds
+importante, appunto, è che eh uno dopo che ha trovato il modello vada almeno a o a confrontare con
+1:18:00
+1 hour, 18 minutes
+modelli simili o quantomeno a leggere gli indicatori che che riceve. Ok?
+1:18:05
+1 hour, 18 minutes, 5 seconds
+Quindi allora supponiamo ho dato al logaritmo di Air Passengers, gli ho dato direttamente autoari, poi lo vediamo anche mercoledì in pratica. Che modello
+1:18:14
+1 hour, 18 minutes, 14 seconds
+mi ha selezionato? Vedete? Mi ha selezionato un'arrima in cui non c'è la parte autoreggressiva, mentre io magari potevo metterci autoregressiva, invece
+1:18:22
+1 hour, 18 minutes, 22 seconds
+metto zero autoregressiva, una parte una differenziazione eh al tempo precedente e una
+1:18:29
+1 hour, 18 minutes, 29 seconds
+differenziazione all'anno precedente, quindi avete uno e uno e poi avete due
+1:18:35
+1 hour, 18 minutes, 35 seconds
+parti di media mobile, media mobile eh semplice, diciamo, e media mobile stagionale. Ok? Perché c'è anche la
+1:18:43
+1 hour, 18 minutes, 43 seconds
+parte stagionale di media mobile, ok? I coefficienti dove sono? Beh, i coefficienti sono qua. Avete un coefficiente di media mobile e un coefficiente di media mobile stagionale.
+1:18:54
+1 hour, 18 minutes, 54 seconds
+Ricordatevi, queste sono sempre stime puntuali, come per regressione, oltre la stima puntuale è bene avere un un
+1:19:01
+1 hour, 19 minutes, 1 second
+intervallo di fiducia per i coefficienti. E qui è indicato un errore standard, ok? interpretate allo stesso modo come abbiamo fatto per la
+1:19:08
+1 hour, 19 minutes, 8 seconds
+regressione. Quindi volete se volete 1 2 3 diviazioni standard siete comunque dentro siete lontani da zero, quindi quei coefficienti sono indicativi, ok?
+1:19:18
+1 hour, 19 minutes, 18 seconds
+Sono significativi.
+1:19:20
+1 hour, 19 minutes, 20 seconds
+Vabbè, poi avete i vari indicatori e Bic eccetera. Vabbè, quelli sono stati usati da dal modello da autoari per
+1:19:28
+1 hour, 19 minutes, 28 seconds
+ottimizzare, per scegliere quali sono gli ordini giusti. Altra cosa importante sono vedere gli errori sul trading set.
+1:19:35
+1 hour, 19 minutes, 35 seconds
+Quindi sul training set avete un per esempio se usate una un root min square error di 0.35. Ora di per sé non è molto
+1:19:44
+1 hour, 19 minutes, 44 seconds
+indicativo, ma se adesso andiamo a verificarlo confrontandolo con altri modelli, possiamo capire se la performance sul training set è migliore o peggiore.
+1:19:54
+1 hour, 19 minutes, 54 seconds
+Andiamo a vedere eh beh, sì, prima di vedere la performance andiamo a vedere un po' la previsione,
+1:20:01
+1 hour, 20 minutes, 1 second
+in effetti. Allora, vedete, l'arima aveva due parametri e vedete ha fatto
+1:20:08
+1 hour, 20 minutes, 8 seconds
+direi un un buon lavoro. Ora non qui non ho messo non ho fatto una una validazione, cioè sto semplicemente facendo la previsione, ma non ho la
+1:20:16
+1 hour, 20 minutes, 16 seconds
+serie storica lì per confrontarla, però vedendolo sembra cogliere bene l'andamento di di crescita. Attenzione, sono sempre
+1:20:24
+1 hour, 20 minutes, 24 seconds
+modelli additivi, ok? Io poi l'ho rimesso, no, col Sì. No, poi è già il logaritmo. Sono io
+1:20:31
+1 hour, 20 minutes, 31 seconds
+che l'ho trasformato al logaritmo. Eh, attenti che questo è un piccolo, insomma, difetto degli ari, ma è tutto additivo, quindi quando avete serie
+1:20:40
+1 hour, 20 minutes, 40 seconds
+moltiplicative trasformate col logaritmo. Ok? Però vedete coglie bene il trend e la stagionalità con solo i
+1:20:47
+1 hour, 20 minutes, 47 seconds
+due parametri, ok? Quindi, diciamo, siamo abbastanza soddisfatti. Ovviamente uno dice, "Adesso abbiamo tanti modelli,
+1:20:55
+1 hour, 20 minutes, 55 seconds
+abbiamo quelli naive, quelli più semplici del mondo, abbiamo gli ETS e abbiamo gli ARIMA. Come faccio a confrontarli? Ognuno ha le sue nature
+1:21:03
+1 hour, 21 minutes, 3 seconds
+diverse, però gli indicatori di performance li possiamo calcolare.
+1:21:08
+1 hour, 21 minutes, 8 seconds
+Allora, cosa potete fare? Potete vedere la performance sul training set, però attenti perché quella potrebbe essere
+1:21:16
+1 hour, 21 minutes, 16 seconds
+anche troppo bassa se siete in situazione di no, di overfit.
+1:21:22
+1 hour, 21 minutes, 22 seconds
+E quello che più importa sarebbe la performance sul sul testation.
+1:21:29
+1 hour, 21 minutes, 29 seconds
+Qui andiamo a vedere in pratica cosa è successo qui. E log air passengers, quella ho portato un attimo fa. Allora, il metodo naive stagionale, giusto per
+1:21:37
+1 hour, 21 minutes, 37 seconds
+non essere proprio troppo naive, era quello che prendeva, no, la la media dell'ultimo periodo e la replicava, ok?
+1:21:45
+1 hour, 21 minutes, 45 seconds
+Senza neanche preoccuparsi del trend. E vedete sul training setma in un certo modo, diciamo, peggiore di tutti gli
+1:21:52
+1 hour, 21 minutes, 52 seconds
+altri. Ok? D'altra parte è un modello, insomma, naive, non è che possiamo aspettarci molto. Ora di cross
+1:22:00
+1 hour, 22 minutes
+validation, quindi sull'ipotetico test set, no, fatto questa validazione rolling origin facendo questa validazione cruciata non performa tanto
+1:22:09
+1 hour, 22 minutes, 9 seconds
+diverso rispetto al al trading set. Ok? Eh, invece cosa succede per ETS? ETS.
+1:22:17
+1 hour, 22 minutes, 17 seconds
+Qui ho scelto moltiplicativo, additivo, moltiplicativo. Il trend è additivo ora perché eh abbiamo fatto il logaritmo e
+1:22:25
+1 hour, 22 minutes, 25 seconds
+non l'ho neanche scelto io questo MAM, è quello che ha scelto in automatico con col modello ETS, vi ricordo, cioè vi seleziono automaticamente un insomma il
+1:22:34
+1 hour, 22 minutes, 34 seconds
+modello. Cosa succede? Vedete il sul training set il residuo, il routmin square error è molto piccolo, quindi se
+1:22:42
+1 hour, 22 minutes, 42 seconds
+uno usasse come indicatore di performance soltanto sul training set questo sarebbe il vincitore. Ok? Avete
+1:22:49
+1 hour, 22 minutes, 49 seconds
+0.07 rispetto a S naive è incredibilmente più piccolo, ma anche rispetto ad ARIMA, no? 0.035.
+1:22:57
+1 hour, 22 minutes, 57 seconds
+Però cosa succede a livello di cross validation, di validazione, quando andiamo a vedere come performa, tipicamente, no, facendo una previsione
+1:23:06
+1 hour, 23 minutes, 6 seconds
+futura su qualcosa che non ha visto, in effetti non siamo così performanti, no?
+1:23:12
+1 hour, 23 minutes, 12 seconds
+Avete qualcosa che non è molto lontano da il season nab un po' sorprendente.
+1:23:18
+1 hour, 23 minutes, 18 seconds
+Invece Arima, vedete, Arima con questo ordine che ha scelto lui in automatico sul training set, ok, sembra essere
+1:23:26
+1 hour, 23 minutes, 26 seconds
+peggiore, no? cinque volte peggiore, ma in realtà quando andate a vedere sulla cross validation è meglio. Quindi se dovete portare a casa una cosa, insomma
+1:23:35
+1 hour, 23 minutes, 35 seconds
+non accontentatevi di fare l'errore su trading set perché c'è sempre il rischio dell'overfeit. Ok? Ora ETS anche lui ha
+1:23:43
+1 hour, 23 minutes, 43 seconds
+pochi parametri, quindi insomma non è che dovrebbe fare overfit in modo così così insomma evidente, però alla fine è
+1:23:51
+1 hour, 23 minutes, 51 seconds
+meglio giudicare confrontando train e test o train e cross validation. In questo caso uno dice a rima sembra il migliore. In effetti quando fate la
+1:23:59
+1 hour, 23 minutes, 59 seconds
+validazione crociata, il cross validation ricordo potete fare questi plot in cui andate a vedere anche l'errore a una certo orizzonte di
+1:24:07
+1 hour, 24 minutes, 7 seconds
+previsione. Ora la prima lezione avevamo visto soltanto Season a Naive e Naive insomma e Season Naive era il migliore,
+1:24:15
+1 hour, 24 minutes, 15 seconds
+vi ricordo la prima lezione di serie storiche. E ora cosa è successo? Che season nave è il peggiore. Abbiamo visto
+1:24:22
+1 hour, 24 minutes, 22 seconds
+qualcosa di più. Eh, vedete, però ETS in realtà eh dopo se uno va a un orizzonte di 20 insomma non sembra performare
+1:24:31
+1 hour, 24 minutes, 31 seconds
+bene, cioè season performa come season naiv essenzialmente. Invece arima effettivamente mi ha preso una casa, non è che ho
+1:24:38
+1 hour, 24 minutes, 38 seconds
+selezionato tante serie, dopo mercoledì vediamo qualcos'altro. Ci sono anche situazioni in cui Arima non riesce a cogliere bene la situazione, però quindi
+1:24:47
+1 hour, 24 minutes, 47 seconds
+vi fornisce uno strumento, modello abbastanza flessibile che funziona bene in pratica.
+1:24:53
+1 hour, 24 minutes, 53 seconds
+Ma giusto per riassumere, quindi ETS non è che dovete buttare via ETS e Old Winters, ok? Hanno ognuno i pregi e loro
+1:25:01
+1 hour, 25 minutes, 1 second
+difetti. Allora, il problema, secondo me, di arima è che eh il problema più grosso è quello della della non
+1:25:08
+1 hour, 25 minutes, 8 seconds
+linearità, cioè il modello arima fa soltanto combinazioni lineari e quindi tendenzialmente quando avete una serie
+1:25:15
+1 hour, 25 minutes, 15 seconds
+che è moltiplicativa, mentre ts, basta dire m, fai il modello moltiplicativo, arima si trova un po' in difficoltà, ok?
+1:25:23
+1 hour, 25 minutes, 23 seconds
+soprattutto se avete situazioni in cui non è ovvio che passare al logaritmo perché magari avete un trend lineare, una stagionalità moltiplicativa, no? è
+1:25:32
+1 hour, 25 minutes, 32 seconds
+un trend additivo e quindi ETS su questo è abbastanza flessibile. Arri fate il logaritmo di tutto o non lo fate, insomma, siete un po' fregati su quello.
+1:25:41
+1 hour, 25 minutes, 41 seconds
+Quindi dovendo confrontare questi due metodi, poi ETS era abbastanza semplice alla fine e quindi interpretabile, cioè
+1:25:48
+1 hour, 25 minutes, 48 seconds
+avevate parametro di, beh, volendo aggiungere c'era anche il parametro quello lì del damping sul trend, ma avevate un parametro per il livello, uno
+1:25:57
+1 hour, 25 minutes, 57 seconds
+per il trend o due per il trend e uno per la stagionalità, quindi quattro parametri.
+1:26:02
+1 hour, 26 minutes, 2 seconds
+Aria, volendo potete avere molti parametri, quindi attenzione, tanti parametri sono reti neurali, ma comunque
+1:26:10
+1 hour, 26 minutes, 10 seconds
+avete un numero tali di parametri che è difficile interpretare bene qual è il ruolo di ciascuno. Ok?
+1:26:17
+1 hour, 26 minutes, 17 seconds
+E invece, appunto, ETS, ecco, appunto, l'altro vantaggio, forse, sto parlando male degli ARIMA, proprio perché ne
+1:26:24
+1 hour, 26 minutes, 24 seconds
+abbiamo parlato bene finora, cioè l'altro problema di di Arima è che il trend e la stagionalità scompaiono, cioè
+1:26:32
+1 hour, 26 minutes, 32 seconds
+vanno cancellate tramite differenzia, poi vengono ricostruite, cioè vedete il integrando, cioè cancellando la
+1:26:39
+1 hour, 26 minutes, 39 seconds
+differenziazione, guadagnate una funzione lineare, una funzione polinomiale e così via. Però invece in NTS è già tutto esplicito, poi voi dite voglio modellizzare il trend, voglio
+1:26:48
+1 hour, 26 minutes, 48 seconds
+modellizzare la stagionalità e quindi risulta molto più più facile, più interpretabile.
+1:26:54
+1 hour, 26 minutes, 54 seconds
+Ok? Beh, quindi tendenzialmente, insomma, la gli hanno i loro vantaggi, in termini di performance si può
+1:27:02
+1 hour, 27 minutes, 2 seconds
+migliorare, ma non sempre vanno necessariamente meglio degli ETS. Anzi, cercheremo magari mercoledì facciamo
+1:27:09
+1 hour, 27 minutes, 9 seconds
+qualcosina per mettere alla prova i modelli ARIMA. Ehm ecco, se cercate di venire mercoledì,
+1:27:16
+1 hour, 27 minutes, 16 seconds
+facciamo anche un po' di ripasso di tutta la teoria con domandine e quindi cercate di venire.
+1:27:24
+1 hour, 27 minutes, 24 seconds
+Lunedì non facciamo lezione, vi ricordo che è festa e mercoledì invece facciamo, ma dicevamo, facciamo una prova di esempio di prova scritta, no? Di test.
+1:27:36
+1 hour, 27 minutes, 36 seconds
+Poi abbiamo 3 ore, quindi magari o si fa ancora ripasso o si corregge per bene la prova, questa prova scritta, insomma, cerchiamo di Io direi venite mercoledì,
+1:27:45
+1 hour, 27 minutes, 45 seconds
+facciamo l'ultimo notebook, l'ultimo laboratorio e poi ci vediamo anche il mercoledì successivo. Va bene?
+1:27:54
+1 hour, 27 minutes, 54 seconds
+Dai, allora terminiamo qui.
+5:23
+2026 Fields Medal: Hong Wang
+Simons Foundation
+554k 1 mo ago
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+39:47
+Beethoven - Triple Concerto in C Major, op. 56 | Morgenstern Trio, Casco Phil, Benjamin Haemhouts
+CASCO Phil
+15k 2 mo ago
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+Mix
+My Mix
+Relja Lukic, Ezio Bosso, Kristen Bell and more
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+225k 13 hr ago
+New
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+81 watching
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+13:24
+Ezio Bosso at Sanremo 2016 CAPTIONED
+tubegiro
+94k 10 yr ago
+19:51
+Shuttle Columbia Disaster | Flight Director Communications Loop
+Shuttlesource
+2.5m 2 yr ago
+9:16
+Maiorino Imperdibile! Lancia un Affondo Durissimo Contro la Meloni e la Ridicolizza
+Attualità Politica
+70k 1 mo ago
+1:18
+Spot's On It
+Boston Dynamics
+3.6m 5 yr ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+5:24
+1986: How to Spot the Upper Class | That's Life! | BBC Archive
+BBC Archive
+2.7m 5 mo ago
+3 songs
+Beethoven: Piano Concerto No.5
+Krystian Zimerman, Wiener Philharmoniker, Leonard Bernstein • 22 Jul 2026
+View full playlist
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+8:03
+Don't Throw Away Your Old Computer Hard Drive 😱 Billions of People Don't Know This Secret
+Inventor 247
+467k 4 mo ago
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+2:55
+Do You Love Me?
+Boston Dynamics
+42m 5 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+16:15
+Travaglio Show! Lancia un Affondo Durissimo Contro La Russa e lo Ridicolizza
+Attualità Politica
+169k 2 wk ago
+5:30
+Raimondo Vianello e la valletta ciociara (1968)
+pietromollo
+993k 7 yr ago

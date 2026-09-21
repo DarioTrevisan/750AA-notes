@@ -1,0 +1,562 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "06/10/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: no
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 3'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE) 
+```
+
+
+
+```{r include = FALSE}
+# Load necessary libraries
+library("Rtsne")
+library("ggplot2")
+library("dplyr")
+library("gridExtra")
+library("dslabs")
+library("rio")
+```
+# Riduzione della dimensionalità 
+
+## Obiettivi della lezione
+- Concetto di __Curse of Dimensionality__
+- Varianza e covarianza __campionarie__
+- PCA (Analisi delle Componenti Principali)
+- EFA (Analisi Fattoriale Esplorativa)
+
+
+## Curse of Dimensionality
+
+- Supponiamo di aver raccolto un campione $\{x_i\}_{i=1, \ldots, n}$ dove ciascuna $x_i \in \mathbb{R}^d$ ($d$ caratteristiche/features per individuo).
+
+- Organizziamo in una matrice (_dataframe_ in R):
+$$ x \in \mathbb{R}^{n \times d}$$
+
+- La **Curse of Dimensionality** si riferisce alle problematiche che sorgono quando il numero di features $d$ è grande.
+
+
+- Se $d \gg 1$, la *densità dell'informazione nei dati* diminuisce, rendendo difficile l'analisi. 
+
+- In particolare le distanze tipiche (Euclidea, Minkowski ecc.) non distinguono il *segnale* dal *rumore*.
+
+
+
+## Spiegazione euristica
+
+
+
+## Esempio generato
+
+- La prima componente indica una classe $-1$ o $1$ 
+
+- Le altre $d-1$ componenti contengono rumore casuale in $[-1/2, 1/2]$
+
+- Eseguiamo clustering con $k$-means
+
+- Confrontiamo con la classe indicata
+
+---
+
+```{r}
+n <- 10
+eps <- 1/2
+for(d in c(10, 100, 1000)){
+
+class = c(rep(0, n), rep(1,n))
+
+dataset <- data.frame("classe" = class)
+for(i in 1:d){
+  dataset <- cbind(dataset, runif(2*n, -eps, eps))
+}
+
+
+dataset$kmeans <- kmeans(dataset, 2)$cluster
+
+print(paste("Taglia n = ", n, ", dimensione d = ", d))
+print(table("cluster individuati" =dataset$kmeans, "classi originarie" = class))
+print("")
+}
+```
+
+## Esempio  MNIST
+
+Il dataset MNIST contiene immagini di cifre scritte a mano:
+
+- in scala di grigio (valori da 0 a 255)
+
+- ciascuna composta da 28*28 = 784 pixels
+
+- e una componente che indica la cifra effettivamente scritta.
+
+
+---
+
+
+```{r}
+#mnist_full <- read_mnist()
+#mnist_data_frame <- data.frame( "images" = mnist_full$test$images, "labels" = mnist_full$test$labels)
+#export(mnist_data_frame, "datasets/mnist.csv")
+mnist_data_frame <- import("datasets/mnist.csv")
+
+plot_digit <- function(image, label) {
+  image_matrix <- matrix(as.numeric(image), nrow = 28, ncol = 28, byrow = TRUE)
+  ggplot() + 
+    geom_raster(aes(x = rep(28:1, each = 28), y = rep(1:28, times = 28), fill = as.vector(image_matrix))) +
+    scale_fill_gradient(name=NULL, low = "black", high = "white", guide = NULL) +
+    theme_void() +
+    labs(title = paste("Label:", label))
+}
+
+# Create a list of plots
+plots <- lapply(1:12, function(i) {
+plot_digit(rev(mnist_data_frame[i,-785]), mnist_data_frame[i,785])
+})
+
+# Arrange plots in a grid
+grid.arrange(grobs = plots, nrow = 3)
+
+```
+
+## CLustering con k-means
+
+Consideriamo un sottoinsieme di MNIST contenente 
+
+- $100$ immagini della cifra $7$
+- $100$ immagini della cifra $5$
+
+- e applichiamo k-means.
+
+```{r}
+
+n = 100
+mnist_seven <- mnist_data_frame[mnist_data_frame$labels==7, ]
+mnist_fives <- mnist_data_frame[mnist_data_frame$labels==5, ]
+
+mnist_selected <- rbind(mnist_seven[1:n, ], mnist_fives[1:n, ])
+
+
+mnist_kmeans <- kmeans(mnist_selected, 2)
+
+print(table("cluster individuati" = mnist_kmeans$cluster, "classi originarie" = mnist_selected$labels))
+
+```
+
+
+----
+
+Plottiamo i centri trovati: riconosciamo delle _cifre medie_.
+
+```{r}
+
+grid.arrange(grobs = c( plot_digit(rev(mnist_kmeans$centers[1, -785]), "Centroide cluster 1"), plot_digit(rev(mnist_kmeans$centers[2, -785]), "Centroide cluster 2")), nrow=1)
+
+```
+
+
+## Varianza  campionaria
+
+- La varianza di un campione **univariato** $x = \{x_i\}_{i=1, \ldots, n} \subseteq \mathbb{R}$ è
+$$ \operatorname{var}(x) =  \frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})^2 \quad \operatorname{sd}(x) = \sqrt{\operatorname{var}(x)},$$
+- La media campionaria $\bar{x} = \frac 1 n \sum_{i=1}^n x_i$ minimizza il MSE:
+$$ \bar{x} \in \arg \min_{h\in \mathbb{R}} \sum_{i=1}^n (x_i - h)^2$$
+- Il rischio minimo è $(n-1)\operatorname{var}(x)$.
+
+- **Problema**: estendere la varianza nel caso multivariato $x_i \in \mathbb{R}^d$.
+
+
+## Varianza direzionale
+
+Dato un campione multivariato $x = (x_i)_{i=1,\ldots, n} \in \mathbb{R}^{n \times d}$
+
+- consideriamo la sua _proiezione_ lungo una direzione $v \in \mathbb{R}^d$
+$$ (x_i v)_{i=1, \ldots, n} = x v \in \mathbb{R}^{n}.$$
+- la varianza (campionaria) direzionale è
+$$ \operatorname{var}(xv) =  \frac 1 {n-1} \sum_{i=1}^n (x_i v - \overline{x v})^2 \ge 0$$
+
+## Matrice delle covarianze
+
+- Vale
+$$ \overline{xv } = \bar{x}, \quad \operatorname{var}(xv) = v^T \operatorname{var}(x) v$$
+
+- dove la **matrice delle covarianze** campionarie è 
+$$ \operatorname{var}(x) = \frac {1}{n-1} \sum_{i=1}^n (x_i-\bar{x})^T (x_i-\bar{x}) \in \mathbb{R}^{d \times d}.$$
+
+- $\operatorname{var}(x)$ è una matrice 
+
+    - *quadrata* di taglia $d\times d$
+    -  simmetrica
+    - semidefinita positiva.
+
+## Covarianza
+
+Per $j$, $\ell \in \{1,\ldots, d\}$, la componente $\operatorname{var}(x)_{j,\ell}$ è
+$$ \operatorname{var}(x)_{j,\ell} = \frac 1 {n-1} \sum_{i=1}^n (x_{i,j}-\bar{x_j}) (x_{i,\ell}-\bar{x_\ell}) =: \operatorname{cov}(x_j, x_\ell).$$
+
+- Se $v = e_j$, $w = e_\ell \in \mathbb{R}^d$ (vettori di base canonica) troviamo $x v = x_j$, $x w = x_\ell$. 
+
+- Dati $v$, $w \in \mathbb{R}^d$, definiamo
+$$ \operatorname{cov}(xv, xw) := v^T \operatorname{var}(x) w=\frac 1 {n-1} \sum_{i=1}^n (x_{i}v-\bar{x}v) (x_{i}w-\bar{x}w).$$
+
+- Più in generale, se $V \in \mathbb{R}^{d \times k_1}$, $W \in \mathbb{R}^{d \times k_2}$, si pone
+$$ \operatorname{cov}(xV, xW) = V^T \operatorname{var}(x) W \in \mathbb{R}^{k_1 \times k_2},\quad  \operatorname{var}(xV) = V^T \operatorname{var}(x) V.$$
+
+## Bilinearità della covarianza
+
+- La covarianza è *bilineare*:
+$$ \operatorname{cov}(x+x', y) = \operatorname{cov}(x, y) + \operatorname{cov}(x', y)$$
+$$ \operatorname{cov}(x, y+y') = \operatorname{cov}(x, y) + \operatorname{cov}(x, y')$$
+- Ne segue la regola per la *varianza della somma*:
+$$  \operatorname{var}(x+x') =\operatorname{var}(x)+\operatorname{var}(x') + 2 \operatorname{cov}(x,x'). $$
+- Se $x$, $x'$ **non sono correlate** $\operatorname{cov}(x, x') = 0$ allora
+$$ \operatorname{var}(x+x') =\operatorname{var}(x)+\operatorname{var}(x') $$
+
+## Coefficiente di correlazione di Pearson
+
+Consideriamo il caso $d=2$,  $x= (x_1, x_2)$:
+
+$$ \operatorname{var}(x) = \left( \begin{array}{ll} \operatorname{var}(x_1) &  \operatorname{cov}(x_1, x_2) \\
+ \operatorname{cov}(x_2, x_1) & \operatorname{var}(x_2) \end{array} \right) $$
+
+- La matrice è semidefinita positiva $\Rightarrow$ $\det( \operatorname{var}(x) ) \ge 0$:
+$$ \operatorname{var}(x_1) \operatorname{var}(x_2) \ge  \operatorname{cov}(x_1, x_2)^2 $$
+
+- Definiamo il **coefficiente di correlazione**:
+$$ \operatorname{cor}(x_1, x_2) := \frac{ \operatorname{cov}(x_1, x_2)}{\operatorname{sd}(x_1) \operatorname{sd}(x_2)} \in [-1, 1]$$
+
+- Valori estremi (vicini a $1$ o $-1$) indicano una _forte relazione lineare_ tra $x_1$ e $x_2$: 
+$$ x_1 \approx x_2 a + b$$
+
+
+## Matrice di correlazione
+
+- Per $d$ generale definiamo la **matrice di correlazione**
+$$ \operatorname{cor}(x) = \operatorname{SD}(x)^{-1} \operatorname{cov}(x) \operatorname{SD}(x)^{-1} \in \mathbb{R}^{d\times d}$$
+dove $SD(x)$ è una matrice _diagonale_ contenente le deviazioni standard delle singole features:
+$$ SD(x)_{jj} = \operatorname{sd}(x_j).$$
+
+- Vale $\operatorname{cor}(x)_{j, \ell} = \operatorname{cor}(x_j, x_\ell) \in [-1,1]$.
+
+- la matrice di correlazione è pure simmetrica, semidefinita positiva e vale sempre $1$ sulla diagonale.
+
+- La matrice di correlazione è uguale alla matrice di covarianza delle features **standardizzate** (riscalate):
+$$  \operatorname{scale}(x) := (x-\bar{x}) SD(x)^{-1} \quad \Rightarrow \quad \operatorname{cov}(\operatorname{scale}(x) ) = \operatorname{cor}(x)$$
+
+
+## Correlation heatmap (mappa di calore)
+
+
+Esempio: per il dataset ``mtcars``:
+```{r fig.height=4, fig.width=4}
+library("ggcorrplot")
+ggcorrplot(cor(mtcars[1:7]), hc.order = TRUE, type = "lower",
+   lab = TRUE)
+
+```
+
+
+## Riduzione della dimensionalità
+
+**Obiettivo**: dato $x \in \mathbb{R}^{n \times d}$, trovarne una _buona approssimazione_ $z \in \mathbb{R}^{n \times k}$ con $k \ll d$.
+
+- Due approcci:
+  
+  - Selezione/**proiezione** delle features: $$\Pi: \mathbb{R}^{d} \to \mathbb{R}^{k}, \quad z_i = \Pi(x_i)$$
+  - **Generazione**/parametrizzazione (spazio latente): $$g: \mathbb{R}^k \to \mathbb{R}^d, \quad x_i \approx g(z_i)$$
+
+- Si possono anche combinare (*autoencoders*): 
+$$ \Pi: \mathbb{R}^{d} \to \mathbb{R}^{k}, g: \mathbb{R}^{k} \to \mathbb{R}^{d}, \quad  g\circ \Pi(x_i) \approx x_i$$
+
+- Ci limitiamo a mappe *lineari*: 
+$$ \Pi(x_i) = x_i U+b, \quad g(z_i) = z_i L + \varepsilon$$
+
+## Analisi delle componenti principali (PCA)
+
+Consideriamo il caso $k=1$.
+
+- cerchiamo una proiezione $\Pi(x_i) = x_i v$ dove $v \in \mathbb{R}^d$ con $\|v\|=1$
+- determiniamo $v$ $\rightarrow$ la varianza direzionale sia *massima*:
+$$ v_1 \in \arg \max_{\|v|| = 1} \operatorname{var}( x v) $$
+- Poiché $\operatorname{var}( x v) = v^T \operatorname{var}( x ) v$, abbiamo che  $v_1$ è *autovettore* di $\operatorname{var}( x)$ con *autovalore* $\lambda_1$ (massimo):
+$$ \operatorname{var}( x ) v_1 = \lambda_1 v_1, \quad \Rightarrow \quad  \operatorname{var}( x v_1)= \lambda_1.$$
+- La direzione $v_1$ è detta **prima componente principale** di $x$.
+
+
+## Ms PCA-Man
+
+![](logos/pca_man-logo.jpg){#id .class width="50%" height="50%"}
+
+-   Giocate voi!
+    <https://dario-trevisan.shinyapps.io/MsPCAMan/>
+
+-   Codice (R shiny) disponibile nel team e nella pagina del corso
+
+
+## Caso generale
+
+Procediamo *ricorsivamente*: avendo già trovate le prime $k-1$ **componenti principali** $v_1, v_2, \ldots, v_{k-1}$, cerchiamo 
+$$ v_k \in \mathbb{R}^d $$
+con $\|v_k\| =1$ che sia _ortogonale_ a tutte le precedenti: 
+$$ v_j^T v_k = 0\quad \forall j<k$$
+e tale che
+$$ v_k \in \arg \max_{v:\,  v_j^T v = 0 \, \forall j <k} \operatorname{var}( x v).$$
+
+- Si ha che $v_k$ è autovettore di $\operatorname{var}(x)$ con autovalore $\lambda_k$:
+$$ \lambda_1 =\operatorname{var}(x v_1) \ge \lambda_2 \ldots \ge \lambda_k = \operatorname{var}(x v_k).$$
+
+## Teorema spettrale
+
+La procedura termina a $k=d$: 
+
+- si trova una **base ortonormale** di $\mathbb{R}^d$ da componenti principali.
+
+- I vettori $(v_j)_{j=1, \ldots, d}$ sono *autovettori* di $\operatorname{var}(x)$.
+
+- Questo dimostra il (già noto) *teorema spettrale* per matrici simmetriche. 
+
+- Vale 
+$$ \operatorname{cov}(xv_j, xv_k) = v_j^T \operatorname{var}(x)v_k = v_j^T v_k \lambda_k =  \begin{cases} \lambda _k & \text{se $j = k$}\\
+0 & \text{altrimenti.}\end{cases}$$
+
+- In forma matriciale $V = (v_1, v_2, \ldots, v_d)$ (colonne della matrice):
+$$ \operatorname{var}(xV) = V^T \operatorname{var}(x) V = \Lambda.$$
+dove $\Lambda$ è diagonale.
+
+## Algoritmo PCA:
+
+- **standardizzare i dati** $x \leftarrow \operatorname{scale}(x)$
+
+- calcolare la matrice $\operatorname{var}(x)=\operatorname{cor}(x)$
+
+- determinare una base ortonormale $V =(v_1, \ldots, v_d)$ di autovettori (**componenti principali**) con rispettivi autovalori decrescenti
+$$ \lambda_1 \ge \lambda_2 \ge \ldots \ge \lambda_d \ge 0$$
+- **scegliere** $1 \le k \le d$ e porre $U = V_{\le k} := (v_1, \ldots, v_k) \in \mathbb{R}^{d \times k}$ la matrice delle prime $k$ componenti principali
+
+- proiettare: $z :=  x U$ sono nuove features dette **scores** (punteggi):
+$$ z_{i,\ell} = \sum_{j=1}^d x_{i,j} v_{\ell, j} \quad i=1,\ldots, n, \ell =1, \ldots, k$$
+
+## Biplot
+
+```{r}
+# Caricamento delle librerie necessarie
+library(ggplot2)
+library(ggfortify)
+
+# Eseguiamo la PCA sul dataset iris escludiamo la colonna 'species'
+pca_result <- prcomp(iris[-5], scale. = TRUE)  
+
+# Creiamo il biplot
+autoplot(pca_result, data = iris, colour = 'Species', 
+         loadings = TRUE, loadings.label = TRUE, 
+         loadings.label.size = 3, 
+         main = "Biplot del Dataset iris") +
+  labs(color = "Specie")
+```
+
+```{r eval=FALSE, include=FALSE}
+# Caricamento delle librerie necessarie
+library(ggplot2)
+library(ggbiplot)
+
+# Eseguiamo la PCA sul dataset mtcars
+pca_result <- prcomp(mtcars[, -1], scale. = TRUE)  # Escludiamo la colonna 'car names'
+
+# Creiamo il biplot
+#autoplot(pca_result, data = mtcars, colour = 'cyl', 
+#         loadings = TRUE, loadings.label = TRUE, 
+#         loadings.label.size = 3, 
+#         main = "Biplot del Dataset mtcars") +
+#  labs(color = "Numero di Cilindri")
+ggbiplot(pca_result, obs.scale = 1, var.scale = 1,
+  groups = "cyl", ellipse = FALSE, circle = FALSE, point.size = 3, labels=row.names(mtcars), labels.size = 2, scale = 1) +
+  scale_color_discrete(name = '') +
+  theme(legend.direction = 'horizontal', legend.position = 'top')
+
+```
+
+
+## Covarianze features/scores, matrice dei loadings
+
+Partendo da $z = x U = x V_{\le k}$,
+
+- gli scores $z$ sono *non correlati*:
+$$ \operatorname{var}(z) =V_{\le k}^T  \operatorname{var}(x)  V_{\le k} = \Lambda_{\le k}$$
+- **Osservazione**: $\hat{z} := z \Lambda_{\le k}^{-1/2}= x V_{\le k} \Lambda_{\le k}^{-1/2}$ sono standardizzate ma non provengono più da componenti principali!
+
+- Ciascuna $v_{\ell, j}$ indica l'*associazione* tra $z_\ell$ e $x_j$:
+$$  \operatorname{cov}(x, z) =  \operatorname{var}(x)  V_{\le k} = \Lambda_{\le k} V_{\le k} = (\lambda_1 v_1, \lambda_2 v_2 \ldots, \lambda_k v_k)$$
+- $x$ è standardizzato $\rightarrow$ $\operatorname{sd}(x_j)=1$:
+$$\operatorname{cor}(x_j,z_\ell) = \frac{ \lambda_\ell v_{\ell, j}}{\sqrt{\lambda_\ell }} =   \sqrt{ \lambda_\ell} v_{\ell, j} = L_{\ell, j}$$
+- In PCA a volte la matrice $V_{\le k}$ è detta *matrice dei loadings*, mentre in EFA questa è $L = \sqrt{\Lambda_{\le k}} V_{\le k}^T \in \mathbb{R}^{k \times d}$.
+
+## Criteri per determinare $k$
+
+Come per il clustering, non c'è un numero *giusto* di componenti principali da selezionare: dipende dalla applicazione (intepretabilità, applicabilità di algoritmi, ecc.)
+
+Vediamo alcuni criteri:
+
+- **Scree plot**: è *metodo elbow* applicato al grafico che che mostra gli autovalori delle componenti principali in ordine decrescente.
+
+- **Criterio di Kaiser**: selezionare solo le componenti con autovalori $>1$.
+
+---
+
+  
+```{r}
+# Esempio di Scree Plot
+library(ggplot2)
+
+# Simuliamo un dataset
+#set.seed(123)
+#data <- matrix(rnorm(100), nrow=10)
+
+# oppure usiamo mtcars
+
+data<- mtcars
+
+# Eseguiamo la PCA
+pca_result <- prcomp(data, scale. = TRUE)
+
+# Creiamo uno Scree Plot
+scree_data <- data.frame(PC = 1:length(pca_result$sdev), Variance = pca_result$sdev^2)
+ggplot(scree_data, aes(x = PC, y = Variance)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Scree Plot: dataset mtcars", x = "Componenti Principali", y = "Autovalori")+
+  scale_x_continuous(label = ~ scales::comma(.x, accuracy = 1))
+```
+
+
+## Criterio della varianza cumulata
+-  Calcolare la percentuale cumulativa della varianza *spiegata* dalle componenti principali.
+-  Scegliere il numero di componenti che spiegano una percentuale predeterminata di varianza (es. $95\%$).
+
+```{r fig.height=5}
+# plottiamo la percentuale di varianza cumulativa
+
+cum_var <- data.frame(PC = 1:length(pca_result$sdev), Variance = cumsum(pca_result$sdev^2)/sum(pca_result$sdev^2))
+
+ggplot(cum_var, aes(x = PC, y = Variance)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Varianza cumulata: dataset mtcars", x = "Componenti Principali", y = "percentuale di varianza")+
+  scale_x_continuous(label = ~ scales::comma(.x, accuracy = 1)) +
+  geom_hline(yintercept = 0.95, linetype="dashed",  color = "red", size=1)
+
+```
+
+
+
+## Dalla PCA all'analisi fattoriale esplorativa (EFA)
+
+Nella PCA abbiamo *proiettato*
+$$ z = x U, \quad U = V_{\le k}$$
+
+- cerchiamo un modello *generativo*:
+$$ x = z L + \varepsilon$$
+
+- *Terminologia*:
+  1. $z$ $\leftarrow$ fattori (variabili latenti),
+  2. $L$ $\leftarrow$ matrice dei loadings (saturazioni) dei fattori 
+  3. $\varepsilon$ $\leftarrow$ errori o residui
+  
+- Nel caso $k=d$, possiamo invertire $U^{-1} = V^T$  e troviamo esattamente
+$$ x = z V^T$$
+
+- **Problema**: come fare se $k< d$?
+
+---
+$$ x = z V^T$$
+
+- Decomponiamo  $V = (V_{\le k}, V_{>k})$.
+
+- Decomponiamo $$(z_{\le k}, z_{>k}) = (xV_{\le k}, x V_{>k})$$ troviamo
+$$  x = (z_{\le k}, z_{>k}) (V_{\le k}, V_{>k})^T = z_{\le k} V_{\le k}^T + z_{>k} V_{>k}^T = z L + \varepsilon$$
+- Se definiamo i fattori, loadings ed errori
+$$ z := z_{\le k} \Lambda_{\le k}^{-1/2}, \quad L :=  \Lambda_{\le k}^{1/2} V_{\le k}^T, \quad \varepsilon := z_{>k} V_{>k}^T = x V_{>k}V_{>k}^T$$
+
+## Proprietà della EFA mediante PCA
+
+La decomposizione $x= zL + \varepsilon$ è tale che
+
+- $\operatorname{var}(z) = I_{k\times k}$
+
+- $\operatorname{cov}(z, \varepsilon) = \operatorname{cov}(z_{\le k} \Lambda_{\le k}^{-1/2}, z_{>k} V_{>k}^T)  =0_{k \times d}$
+
+- $\operatorname{var}(\varepsilon) = \operatorname{var}(z_{>k} V_{>k}^T, z_{>k} V_{>k}^T) = V_{>k} \Lambda_{> k} V_{>k}^T$
+
+- $\operatorname{cov}(z, x) = \operatorname{cov}( z, zL + \varepsilon)= L$
+
+- Inoltre minimizza un rischio empirico:
+$$  L_{PCA} \in \arg \min_{L} \sum_{i=1}^n \min_{z_i \in \mathbb{R}^{k}, \|z_i\|=1} \| x_i - z_i L \|^2 $$
+
+## Definizione precisa di EFA
+
+La rappresentazione $x= zL +\varepsilon$ trovata tramite PCA *non* è propriamente quella dell'analisi fattoriale esplorativa.
+
+- Si richiede per la  EFA:
+
+  - $\operatorname{var}(z) = I_{k \times k}$
+  
+  - $\operatorname{cov}(z, \varepsilon) = 0_{k \times d}$
+  
+  - $\operatorname{var}(\varepsilon)= \Psi \in \mathbb{R}^{d \times d}$ **diagonale**: gli *errori* di features diverse sono *non correlati*
+  
+
+- **Non** si richiede che le features $x$ siano standardizzate (ma si possono centrare lavorando con $x- \bar{x}$). Vale comunque 
+$$ L = \operatorname{cov}(z, x)$$
+
+
+
+
+## Equazione fondamentale della EFA
+
+Partendo dalle ipotesi della EFA troviamo l'equazione matriciale
+$$ \operatorname{var}(x) = \operatorname{var}(zL+\varepsilon) = L^T L + \Psi.$$
+
+- sono $d(d+1)/2$ equazioni *non lineari* in $kd+d$ incognite.
+
+- In *pratica* si trovano soluzioni approssimate ammettendo $\Psi$ non esattamente diagonale (come ad esempio quella trovata con la PCA).
+
+- **Definizioni**: Per ciascuna feature $x_j$, $j=1, \ldots, d$:
+
+  - $\operatorname{var}{\varepsilon_j}=\Psi_{jj}$ è detta _unicità_ (uniqueness) 
+  
+  - $\operatorname{var}(x_j) - \operatorname{var}(\varepsilon_j) = \sum_{\ell=1}^k L_{\ell,j}^2$ è detta _comunalità_ (communality)
+
+## Rotazioni 
+
+Trovata una rappresentazione EFA: $x = zL +\varepsilon$, ve ne sono *infinite altre* (matematicamente) equivalenti.
+
+- Data una matrice ortogonale (rotazione) $R \in \mathbb{R}^{k\times k}$, $R^T R = I_{k\times k}$ trasformiamo i fattori e i loadings
+$$ \hat{z} := z R \quad \hat{L} := R^T L$$
+
+- continuano  a valere: $x = \hat{z} \hat{L} +\varepsilon$ e
+$$ \operatorname{var}(\hat{z}) = R^T \operatorname{var}(z) R = R^T R = I_{k \times k} $$
+
+- Per agevolare l'**interpretazione** dei fattori come *caratteristiche latenti* cerchiamo una $R$ in modo che i fattori ruotate $R^T L$ siano una **matrice sparsa** (con tanti $0$). Ci sono diversi **criteri**: *varimax*, _quartimax_....
+

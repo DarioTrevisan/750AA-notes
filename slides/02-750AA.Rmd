@@ -1,0 +1,319 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "29/09/2025"
+output:
+  slidy_presentation:
+    incremental: yes
+  beamer_presentation:
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 2'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+  - \newcommand{\R}{\mathbb{R}}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r include=FALSE}
+
+miei_colori  = c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499", "#888888")
+```
+
+
+## Richiami dalla lezione 1
+
+-   Interpretazione variazionale (ERM) degli indicatori di centralità
+
+-   Distanze multidimensionali
+
+
+
+----
+
+## Centroide e Medoide
+
+------------------------------------------------------------------------
+
+## Medoids!
+
+![](logos/medoids-logo.jpg){#id .class width="50%" height="50%"}
+
+-   Giocate voi!
+    <https://dario-trevisan.shinyapps.io/medoids/>
+
+-   Codice (R shiny) disponibile nel team e nella pagina del corso
+
+----
+
+# Clustering
+
+----
+
+## Introduzione al clustering
+
+**Obiettivo del clustering**
+
+-   Raggruppare i dati $\{x_i\}_{i=1\ldots, n}$ in gruppi simili:
+
+    -   in un certo numero $k$ di gruppi disgiunti (cluster) $(C_j)_{j=1\ldots, k}$:
+    $$ \{x_i\}_{i=1, \ldots, n} = \bigcup_{j=1}^k C_j$$
+
+    -   minimizzando la **variabilità** all'interno di ciascun cluster.
+
+-   **Applicazioni**: marketing, medicina, logistica\ldots  $\rightarrow$ classificazione (imputation)
+
+------------------------------------------------------------------------
+
+## Problemi principali
+
+-   Quale nozione di similarità?
+    (scelta del costo)
+
+-   Quanti clusters?
+    (*iperparametro* k)
+
+-   Come calcolare i cluster?
+    (algoritmi)
+
+------------------------------------------------------------------------
+
+
+## Metodi di clustering
+
+- Non-gerarchici
+
+  - K-means
+  - PAM
+  
+- Gerarchici
+
+  - Agglomerativo (AGNES)
+  - Divisivo (DIANA)
+
+---
+
+## K-means
+
+**ERM**: minimizzare il *Within Clusters Sum of Squares* (inerzia):
+
+$$ WCSS( (C_j)_{j=1}^k) = \sum_{j=1}^k \sum_{x_i \in C_j} \| x_i - c_j \|^2$$
+dove $c_j$ è il centroide (media) del cluster $C_j$:
+
+$$ c_j := \frac{1}{\sharp C_j} \sum_{x_i \in C_j} x_i.$$ 
+
+
+
+------------------------------------------------------------------------
+
+## Algoritmo di Lloyd
+
+Il problema è molto difficile da risolvere esattamente (NP-hard) 
+
+- I cluster ottimali sono tali che ogni osservazione osservazione $x_i$ viene assegnata al centroide $c_j$ più vicino.
+
+- Questo suggerisce un **algoritmo iterativo**:
+
+0.  Inizializzazione: scegliere $k$ centroidi casualmente.
+1.  Assegnazione: ogni punto dati viene assegnato al cluster con il centroide più vicino.
+2.  Aggiornamento: i centroidi vengono ricalcolati come la media dei punti assegnati. Ripetere 1-2 fino alla convergenza.
+
+------------------------------------------------------------------------
+
+
+- **Vantaggi**: 
+  - Semplice da implementare 
+  - Veloce anche per dataset di grandi dimensioni.
+  - Si aggiorna facilmente per nuove osservazioni.
+
+- **Svantaggi**:
+  - Necessità di specificare $k$.
+  - Sensibile agli outlier.
+  - Risultato dipende dall'inizializzazione.
+  - **Curse of dimensionality**
+
+
+---
+
+## K-medoids PAM (Partitioning Around Medoids)
+
+Simile a K-means, ma utilizza medoidi invece della media:
+
+$$ WCR( (C_j)_{j=1}^k) = \sum_{j=1}^k \sum_{x_i \in C_j} \ell(x_i, c_j)$$
+
+dove $c_j$ è il medoide del cluster $C_j$ e $\ell(x,c)$ è una funzione di costo.
+
+
+----
+       
+- Vantaggi:
+
+    - Utile se la media non ha significato
+    - Maggiore robustezza agli outlier rispetto a $k$-means
+    - Distanze/costi più generali (anche categorici, $k$-modes)
+
+- Svantaggi:
+    - Algoritmi generalmente più lenti
+    - **Curse of dimensionality**
+
+
+---
+
+
+## Metodi gerarchici (HCA)
+- **Definizione**: tecniche di clustering che costruiscono una *gerarchia di cluster*.
+
+    - agglomerativi (bottom-up) 
+    - divisivi (top-down).
+    
+    
+- **Vantaggi**: Non richiede il numero di cluster in anticipo e fornisce una gerarchia completa.
+
+---
+
+## Dendrogramma
+- **Descrizione**: rappresentazione della gerarchia dei cluster mediante un *grafo ad albero*. Ogni ramo rappresenta un cluster e la lunghezza del ramo indica la distanza tra i cluster uniti.
+
+- **Interpretazione**: 
+  - I punti di fusione mostrano a quale distanza i cluster vengono uniti.
+  - Consente di visualizzare il numero di cluster a un certo livello di similarità.
+  
+## Metodi agglomerativi (AGNES)
+- **Descrizione**: "AGglomerative NESting" (AGNES) inizia con ogni punto come un cluster e fonde iterativamente i cluster più simili tramite un *criterio di collegamento* (linkage criterion):
+    - minimum
+    - maximum/complete 
+    - average
+
+- **Algoritmo**:
+  1. Calcola la matrice delle similarità tra tutti i cluster
+  2. Unisci i due cluster più vicini.
+  3. Aggiorna la matrice delle distanze.
+  4. Ripeti fino a ottenere un singolo cluster che contiene tutti i punti.
+
+
+
+## Metodi divisivi (DIANA)
+- **Descrizione**: "DIvisive ANAlysis" (DIANA) inizia con un unico cluster che contiene tutti i punti e divide iterativamente in sottogruppi.
+
+- **Procedure**:
+  1. Identifica il cluster da dividere: quello con *diametro* maggiore
+  2. Divide il cluster in due cluster distinti partendo dal punto più *dissimile* dagli altri e associandogli i punti più *simili* ad esso che ai rimanenti.
+  3. Ripete fino a quando ogni punto è in un cluster individuale o fino a un numero desiderato di cluster.
+
+
+## Selezione del numero di clusters
+
+
+In tutti i metodi rimane la domanda: come determinare $k$? 
+
+- In breve: *Non c'è un $k$ "giusto", dipende dall'utilizzo che si farà dei cluster trovati!*
+
+- Questo porta all'esistenza di svariati *criteri* per la selezione di $k$. Discutiamo:
+  
+  1. Elbow (gomito)
+  
+  2. Indice di Dunn
+  
+  3. Silhouette 
+  
+---
+
+## Elbow
+
+- Il metodo del _gomito_ consiste nel confrontare le inerzie $WCSS_k$ ottimali per diversi valori di $k$:
+
+    - al crescere di $k$ la $WCSS_k$ diminuisce
+    
+    - si cerca il punto $k_{elbow}$ dove l'incremento $WCSS_{k}-WCSS_{k+1}$ _comincia a diminuire_.
+    
+- **Intuizione**: separando _veri_ cluster si ottiene un maggior incremento nella $WCSS$!
+    
+- **Problemi**: 
+
+    - non è ben definito il punto di gomito
+    
+    - dataset molto diversi danno grafici simili
+
+---
+
+## Indice di Dunn
+
+-  Misura la qualità del clustering confrontando la *distanza minima tra i cluster* con la distanza massima (*diametro*) all'interno dello stesso cluster.
+
+- **Definizioni**: dato un cluster $(C_j)_{j=1, \ldots, k}$, poste
+  $$ \operatorname{diametro}(C_j) := \max_{x,y \in C_j}\|x-y\|, \quad  \operatorname{distanza}(C_i, C_j) := \min_{x\in C_i, y \in C_j} \|x-y\|$$
+  definiamo
+  $$
+  \operatorname{DunnIndex} ((C_j)_{j=1, \ldots, k}) := \frac{\min_{i \neq j} \operatorname{distanza}(C_i, C_j)}{\max_i \operatorname{diametro}(C_k)}
+  $$
+
+- **Interpretazione**: Un indice di Dunn più alto indica cluster più separati e ben definiti. Valori più alti sono preferibili.
+
+
+---
+
+## Silhouette
+
+- Misura quanto un punto $x$ è simile a quelli del proprio cluster $C_j$ rispetto ai cluster vicini. Viene calcolata per ogni punto e poi viene fatta una media.
+
+- **Definitioni**: dato $x \in C_j$, 
+    $$ \textit{(adesione)} \quad a(x) := \frac{1}{\sharp C_j -1} \sum_{y \in C_j, y\neq x} \|x-y \|$$
+    $$ \textit{(separazione)}\quad  b(x) := \min_{u \neq j} \frac{1}{\sharp C_u} \sum_{y \in C_u} \| x - y\| $$
+    $$ \textit{(silhouette)} \quad s(x) = \frac{b(x)-a(x)}{\max(a(x),b(x))} \in [-1, 1]$$ 
+
+----
+
+$$ \textit{(silhouette)} \quad s(x) = \frac{b(x)-a(x)}{\max(a(x),b(x))} \in [-1, 1]$$ 
+
+    
+- Silhouette media per il cluster $C_i$:  
+$$ s(C_i): = \frac{1}{\sharp C_i} \sum_{x \in C_i} s(x)$$
+
+- __Silhouette media__ (score): 
+$$s( (C_i)_{i=1, \ldots, k}) = \frac{1}{k}\sum_{i=1}^k s(C_i) $$
+
+
+---
+
+  $$ \textit{(silhouette)} \quad s(x) = \frac{b(x)-a(x)}{\max(a(x),b(x))} \in [-1, 1]$$ 
+
+
+- **Interpretazione**: 
+  - $s(x) \approx 1$ $\rightarrow$ $x$ è ben assegnati al suo cluster.
+  - $s(x) \approx 0$ $\rightarrow$ $x$ è vicino al _bordo_ dei cluster.
+  - $s(x) <0$  $\rightarrow$ $x$ potrebbe essere assegnato al cluster sbagliato.
+  
+  
+- Valori di Silhouette media (score) :
+  - $s >0.7$ clustering _forte_
+  - $0.5<s < 0.7$ clustering _buono_
+  - $s>0.25$ clustering _debole_
+  
+- Attenzione alla **curse of dimensionality**!
+
+
+
+
+## Final Clustering
+
+![](logos/final-clustering-logo.jpg){#id .class width="50%" height="50%"}
+
+-   Giocate voi!
+  <https://dario-trevisan.shinyapps.io/FinalClustering/>
+  
+-   Codice (R shiny) disponibile nel team e nella pagina del corso
+  

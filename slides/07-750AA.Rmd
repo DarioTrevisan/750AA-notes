@@ -1,0 +1,990 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "3/11/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 7'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+```
+
+
+# Regressione lineare multipla
+
+## Richiami della lezione precedente
+
+- Regressione come previsione di un fattore di uscita \( y \) a partire da uno di ingresso \( x \)
+
+- **Indicatori di performance:**  MSE, RMSE, MAP, \( R^2 \)
+
+- **k-Nearest Neighbors (k-NN)** per la regressione $\rightarrow$ non parametrico
+
+- **Modelli parametrici:** $h(x) =h(x; \theta)$
+
+- **Minimi quadrati (OLS)**: $\theta_{OLS} \in \arg \min_\theta \sum_{i} (y_i - h(x_i;\theta))^2$
+
+- **Stima OLS per la regressione semplice:** $h(x) = \beta_0 + \beta_1 x$
+  \[
+  \beta_{OLS, 1} = \cor(x,y)\frac{\operatorname{sd}(y)}{\operatorname{sd}(x)}, \quad
+  \beta_{OLS, 0} = \bar{y} - \beta_{OLS, 1} \bar{x}
+  \]
+
+## Un esempio (generato)
+
+```{r}
+set.seed(42)
+n <- 100
+x <- rt(n, df=10)
+# sort x
+y <- 4*x+3 + rt(n,df=5) # rumore pesante
+df <- data.frame(x = x, y = y)
+ggplot(df, aes(x = x, y = y)) +
+  geom_point() 
+```
+
+----
+
+```{r}
+# calcola retta di regressione e plot
+
+y_model <- lm( y ~ ., data = df)
+
+  
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_abline(slope = y_model$coefficients[2], intercept = y_model$coefficients[1], colour='red')+
+  ggtitle("Regressione lineare semplice")
+```
+
+
+## Modello lineare 
+
+Forma più generale di modello lineare 
+\[
+h(x; \beta) = \phi_1(x)\beta_1 + \phi_2(x)\beta_2 + \cdots + \phi_p(x) \beta_{p}
+\]
+
+- Scrittura **compatta**: 
+$$\begin{split} \Phi(x) &= (\phi_i(x))_{i=1\ldots, p} \in \R^p \quad \text{(vettore riga)}\\
+ \beta & = (\beta_1, \ldots, \beta_p) \in \R^p \quad  \text{(vettore colonna)}
+ \end{split}$$
+
+- Modello $h(x; \beta) = \Phi(x) \beta$
+
+- Residuo $\varepsilon := y -h(x; \beta)$
+
+- **Esempi:**
+  - lineare semplice, $\Phi(x) = (1, x)$, $x \in \R$, $\rightarrow$ $p=2$
+  - polinomiale: $\Phi(x) = (1, x, x^2, \ldots, x^{q})$, $x \in \R$, $p=q+1$,
+  - multipla lineare $\Phi(x) = (1, x_1, \ldots, x_d)$, $p = d+1$.
+  
+
+  
+## Notazione matriciale
+
+- Training set $\{ (x_i, y_i)\}_{i=1, \ldots n}$: notazione *matriciale*
+\[
+ \bm{ y} := \begin{bmatrix} 
+ y_1 \\
+ \vdots \\
+ y_n
+\end{bmatrix} \in \R^{n}
+\quad \Phi(\bm{x}) :=  
+\begin{bmatrix}
+\phi_1(x_1) & \phi_2(x_1) & \dots &   \phi_p(x_1) \\
+\vdots & \vdots & & \vdots\\
+\phi_1(x_n) & \phi_2(x_n) & \dots &\phi_p(x_n) 
+\end{bmatrix} \in \R^{n \times p}
+\]
+
+- Vettore dei **residui** (sul training set):
+$$ \bm{\varepsilon} := \bm{ y} - \Phi(\bm{x}).$$
+
+
+
+## Metodo dei minimi quadrati
+
+- **Obiettivo**: minimizzare la somma dei quadrati dei residui
+$$ \beta_{OLS} \in \arg \min_{\beta} \sum_{i=1}^n (y_i - \Phi(x_i) \beta)^2$$
+
+- **Formula esplicita**: matrice di **Gram** $G := \Phi(\bm{x})^T \Phi(\bm{x})$
+$$ \beta_{OLS} = G^{-1} \Phi(\bm{x})^T \bm{y} $$
+
+- **Osservazione:** $G$ *non* è invertibile $\leftrightarrow$ $p>n$ oppure le colonne di $\Phi(\bm{x})$ sono linearmente dipendenti (collinearità)
+
+- Se $G$ non è invertibile $\rightarrow$ metodi di regolarizzazione (prossima lezione).
+
+## Dimostrazione
+
+**Notazione semplificata**: $\Phi(\bm{x}) = \bm{x}$, $G = \bm{x}^T \bm{x}$.
+
+1. Sviluppiamo (in notazione matriciale)
+$$\begin{split}  \sum_{i=1}^n (y_i - x_i \beta)^2 & =  \| \bm{y} - \bm{x} \beta \|^2 = (\bm{y} - \bm{x} \beta)^T (\bm{y} - \bm{x} \beta)\\
+& = \|\bm{y}\|^2  + \beta^T \bm{x}^T \bm{x} \beta - \beta^T \bm{x}^T \bm{y} - \bm{y}^T \bm{x} \beta \end{split} $$
+
+2. **Completiamo il quadrato** con $\bm{y}^T \bm{x} G^{-1} \bm{x}^T \bm{y}$:
+$$\begin{split}  &  \sum_{i=1}^n (y_i - x_i \beta)^2  \\
+& =  \|\bm{y}\|^2  - \bm{y}^T \bm{x} G^{-1} \bm{x}^T \bm{y} + (\beta - G^{-1} \bm{x}^T \bm{y})^T G (\beta - G^{-1} \bm{x}^T \bm{y})\end{split} $$
+
+3. **Minimizziamo** la quantità rispetto a $\beta$:
+$$ \beta_{OLS} = G^{-1} \bm{x}^T \bm{y} $$
+
+## MSE nella regressione multipla
+
+$$ \begin{split}& MSE(h(\cdot ; \beta)) =\\
+& \frac 1 n \sqa{   \|\bm{y}\|^2  - \bm{y}^T \Phi(\bm{x}) G^{-1} \Phi(\bm{x})^T \bm{y} + (\beta - \beta_{OLS})^T G (\beta -\beta_{OLS}) } \\
+& = MSE(h(\cdot; \beta_{OLS})) +  (\beta - \beta_{OLS})^T \frac{G}{n} (\beta -\beta_{OLS}) \end{split}$$
+
+- Per $\beta = \beta_{OLS}$ otteniamo
+$$ \begin{split} MSE(h(; \beta_{OLS})) & = \frac{1}{n} \left( \|\bm{y}\|^2  - \bm{y}^T \Phi(\bm{x}) G^{-1} \Phi(\bm{x})^T \bm{y} \right)\\
+& = \frac 1 n \| (\operatorname{Id}- \Pi_{\Phi(\bm{x})}) \bm{y} \|^2  \end{split} $$
+
+- **Interpetazione geometrica**:  $MSE \propto$  norma al quadrato della proiezione di $\bm{y}$ sul **complemento ortogonale** dello spazio generato dalle colonne di $\Phi(\bm{x})$.
+
+
+
+## Esempio (iris)
+
+```{r}
+library(GGally)
+# esempio di regressione multipla sul dataset iris
+ggpairs(iris, columns=1:4, aes(color=Species))
+```
+
+-----
+
+Confronto dei coefficienti della regressione multipla di Sepal.Length in funzione di Sepal.Width, Petal.Length, Petal.Width tramite comando `lm()` e tramite formula matriciale:
+
+1. Comando `lm()` di R:
+```{r}
+# stima dei coefficienti tramite OLS
+print(lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width, data=iris)$coefficients)
+```
+
+2. Formula matriciale:
+```{r}
+X <- as.matrix(cbind(1, iris[,2:4]))
+y <- as.matrix(iris$Sepal.Length)
+beta_ols <- solve(t(X) %*% X) %*% t(X) %*% y
+print(beta_ols)
+```
+
+
+# Stima dell'incertezza nella regressione
+
+## Problema generale
+
+**Precisare** la stima puntuale dei parametri
+$$ \theta_{OLS} \in \arg \min_{\theta} \sum_{i} (y_i -h(x; \theta))^2$$
+indicandone l'*incertezza* dovuta ai dati:
+$$  \cur{(X_i, Y_i)}_{i} \rightarrow \theta_{OLS} $$
+
+- **Osservazione:** l'incertezza su $\theta_{OLS}$ si *propaga* 
+  - nella **confidenza** sul modello $h(x; \theta)$
+  - nella **previsione** $h(x; \theta)+\varepsilon$
+
+- **Due approcci**:
+  1. Non parametrico (bootstrap)
+  2. Parametrico (bayesiano/frequentista)
+  
+
+
+## Approccio non parametrico: bootstrap
+
+- **Idea:** simulare più volte il processo di apprendimento su dati diversi per stimare la variabilità di $\theta_{OLS}$.
+
+- **Problema:** non conosciamo la distribuzione dei dati $P(X,Y)$.
+
+- **Bootstrap**: 
+  1. generazione di nuovi campioni tramite **estrazione con rimpiazzo** dal training set $D:= \{ (x_i,y_i)\}_{i=1, \ldots, n}$:
+   $$ D_1, D_2, \ldots, D_{B}$$
+  2. training del modello sui dati generati
+   $$ \theta_{OLS,i}, \theta_{OLS, 2}, \ldots, \theta_{OLS, B} \in \R^p$$
+  3. stima della variabilità di $\theta_{OLS}$ tramite distribuzione empirica:
+   $$  m_\theta= \frac 1 B \sum_{i=1}^B \theta_{OLS,i}, \quad \sigma^2_\theta:= \frac 1 {B-1} \sum_{i=1}^B (\theta_{OLS,i} - m_{\theta})(\theta_{OLS,i} - m_{\theta})^T $$
+   
+## Esempio
+
+```{r}
+# stima empirica dei coefficienti modello regressione lineare tramite bootstrap
+
+
+
+# plot model
+ggplot(df, aes(x=x, y=y)) +
+  geom_point() +
+  geom_abline(slope=y_model$coefficients[2], intercept=y_model$coefficients[1], color='red') +
+  ggtitle("Dati generati e modello OLS")
+
+
+# stima dei coefficienti OLS
+print(paste("Coefficienti OLS: intercetta", round(y_model$coefficients[1],2), "pendenza", round(y_model$coefficients[2],2)))
+```
+----
+
+
+```{r}
+
+#bootstrap
+set.seed(42)
+B <- 100
+beta_boot <- matrix(0, nrow=B, ncol=2)
+n <- nrow(df)
+for (b in 1:B) {
+  indices <- sample(1:n, size=n, replace=TRUE)
+  df_b <- df[indices, ]
+  model_b <- lm(y ~ x, data=df_b)
+  beta_boot[b, ] <- model_b$coefficients
+}
+# calcolo media e deviazione standard bootstrap
+beta_mean <- colMeans(beta_boot)
+# istogramma
+beta_df <- data.frame(beta_0 = beta_boot[,1], beta_1 = beta_boot[,2])
+ggplot(beta_df, aes(x=beta_1)) +
+  geom_histogram(bins=30, fill='grey', alpha=0.7) +
+  ggtitle("Distribuzione del coefficiente pendenza (rosso: media bootstrap), (blu: stima OLS)")+
+  # aggiungi linea media
+  geom_vline(xintercept=beta_mean[2], color='red', linetype='dashed')+
+  # aggiungi linea OLS 
+  geom_vline(xintercept=y_model$coefficients[2], color='blue', linetype='dashed')+
+  # aggiungi legenda
+  labs(x='Coefficiente pendenza', y='Frequenza')
+  
+```
+   
+## Differenza tra bootstrap e cross-validation
+
+- **Bootstrap:** $\rightarrow$ stimare la variabilità del modello
+  - si campiona su tutto il training set
+  - i dati possono essere ripetuti (estrazioni con rimpiazzo)
+  - non interessano (primariamente) i dati non campionati
+
+- **Cross-validation**: $\rightarrow$ stimare la performance del modello
+  - si divide il training set in sottoinsiemi disgiunti
+  - i dati non sono ripetuti
+  - interessano (primariamente) i dati non usati per il training
+
+- **Osservazione:** si può comunque usare la generazione di dati mediante bootstrap ai fini della cross-validation (e viceversa). 
+  - I dati non campionati sono detti *Out-Of-Bag* (OoB).
+
+
+## Intervalli di confidenza bootstrap
+
+- Intervallo di confidenza al livello $1-\alpha$ per ciascun $\beta_j$ si ottengono tramite i quantili della distribuzione empirica di bootstrap:
+$$  \left[ q_{\alpha/2}, q_{1-\alpha/2} \right]$$
+dove $q_{\alpha}$ è il quantile di ordine $\alpha$ della distribuzione empirica di $\beta_j$.
+
+- **Interpretazione precisa:** con frequenza $1-\alpha$ sui dati generati dal bootstrap l'intervallo contiene il parametro $\beta_{OLS,j}$.
+
+- **Intepretazione pratica:** l'intervallo fornisce una stima della variabilità del parametro $\beta_{OLS,j}$.
+
+## Esempio di intervalli di confidenza
+
+```{r}
+beta_df <- data.frame(beta_0 = beta_boot[,1], beta_1 = beta_boot[,2])
+
+# Calcolo della CDF empirica
+beta_ecdf <- ecdf(beta_df$beta_1)
+
+# Creazione del grafico
+ggplot(beta_df, aes(x=beta_1)) +
+  geom_histogram(aes(y=..density..), bins=30, fill='grey', alpha=1) +
+  stat_function(fun=beta_ecdf, aes(color="CDF Empirica"), size=1) +
+  ggtitle("Distribuzione del coefficiente di pendenza con CDF empirica") +
+  # Aggiungi linea media
+  geom_vline(xintercept=beta_mean[2], color='red', linetype='dashed') +
+  # Aggiungi linea OLS 
+  geom_vline(xintercept=lm(y ~ x, data=df)$coefficients[2], color='blue', linetype='dashed') +
+  # Aggiungi legenda
+  labs(x='Coefficiente pendenza', y='Frequenza') +
+  scale_color_manual(name = "Legenda", values = "black", labels = "CDF Empirica") +
+  theme_minimal()
+```
+  
+
+## Esempio intervalli di confidenza bootstrap (dati generati)
+
+Intervalli di confidenza bootstrap al 95% i per i coefficienti:
+
+```{r}
+# calcolo intervalli di confidenza bootstrap al 95%
+alpha <- 0.05
+ci_beta_0 <- quantile(beta_boot[,1], probs=c(alpha/2, 1-alpha/2))
+ci_beta_1 <- quantile(beta_boot[,2], probs=c(alpha/2, 1-alpha/2))
+```
+
+- intercetta: [``r round(ci_beta_0[1],2)``, ``r round(ci_beta_0[2],2)``]
+- pendenza: [``r round(ci_beta_1[1],2)``, ``r round(ci_beta_1[2],2)``]
+
+## Intervalli di confidenza bootstrap per il modello
+
+- Dato $x$ fisso, si può stimare un intervallo di confidenza per la previsione del modello
+$h(x; \beta_{OLS})$
+- Procedura: sui dati di bootstrap $D_i$ si calcolano i parametri $\beta_{OLS, i}$ e si ottengono i valori
+$$ h(x; \beta_{OLS,i}) \quad i=1, \ldots, B $$
+- Si calcolano indicatori: media, deviazione standard, quantili \ldots
+
+
+## Esempio intervalli di confidenza bootstrap per il modello
+
+```{r}
+# calcolo intervalli di confidenza per il modello in un punto x_new
+
+x_new <- 1.5
+h_boot <- numeric(B)
+for (b in 1:B) {
+  h_boot[b] <- beta_boot[b,1] + beta_boot[b,2] * x_new
+}
+# calcolo media e intervallo di confidenza al 95%
+h_mean <- mean(h_boot)
+ci_h <- quantile(h_boot, probs=c(alpha/2, 1-alpha/2))
+
+```
+- Media bootstrap di $h$ in $x=$``r x_new``: ``r round(h_mean,2)``
+- Intervallo di confidenza bootstrap al 95% per $h$ in $x =$``r x_new``: [``r round(ci_h[1],2)``, ``r round(ci_h[2],2)`` ]
+
+----
+
+
+```{r}
+
+# plot di barre di intervalli di confidenza bootstrap
+
+x_seq <- seq(min(x)-1, max(x)+1, length.out=50)
+h_seq <- numeric(length(x_seq))
+ci_lower <- numeric(length(x_seq))
+ci_upper <- numeric(length(x_seq))
+for (i in 1:length(x_seq)) {
+  x_val <- x_seq[i]
+  h_boot <- numeric(B)
+  for (b in 1:B) {
+    h_boot[b] <- beta_boot[b,1] + beta_boot[b,2] * x_val
+  }
+  h_seq[i] <- mean(h_boot)
+  ci <- quantile(h_boot, probs=c(alpha/2, 1-alpha/2))
+  ci_lower[i] <- ci[1]
+  ci_upper[i] <- ci[2]
+}
+# plot
+ci_df <- data.frame(x = x_seq, h = h_seq, ci_lower = ci_lower, ci_upper = ci_upper)
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_line(data = ci_df, aes(x = x, y = h), color='red') +
+  geom_ribbon(data = ci_df, aes(x = x, ymin = ci_lower, ymax = ci_upper), alpha=0.2, fill='orange') +
+  ggtitle("Intervalli di confidenza bootstrap al 95% per il modello lineare semplice")
+```
+
+## Intervalli di previsione
+
+- Si può stimare un intervallo di previsione per una nuova osservazione
+$$ y_{new} := h(x_{new}; \beta_{OLS}) + \varepsilon $$
+
+- **Procedura**: sui dati di bootstrap $D_i$ si calcolano i parametri $\beta_{OLS, i}$ e si ottengono i valori
+$$ y_{new,i} = h(x_{new}; \beta_{OLS,i}) + \varepsilon_i \quad i=1, \ldots, B $$
+dove $\varepsilon_i$ sono campioni del rumore stimato sui residui del modello OLS.
+
+-  la distribuzione dei residui $\varepsilon_i$ è stimata usando una cross-validation sui punti out-of-bag (OoB) per ogni campione bootstrap.
+
+- Si calcolano indicatori: media, deviazione standard, quantili \ldots
+
+- **Attenzione:** gli intervalli di previsione sono più ampi degli intervalli di confidenza sul modello, in quanto tengono conto della variabilità del rumore.
+
+## Esempio intervalli di previsione bootstrap
+
+```{r}
+
+# calcolo intervalli di previsione per una nuova osservazione in x_new
+# stima residui OoB
+residuals_oob <- numeric(0)
+for (b in 1:B) {
+  indices <- sample(1:n, size=n, replace=TRUE)
+  oob_indices <- setdiff(1:n, unique(indices))
+  if (length(oob_indices) > 0) {
+    df_b <- df[indices, ]
+    model_b <- lm(y ~ x, data=df_b)
+    preds_oob <- predict(model_b, newdata=df[oob_indices, ])
+    residuals_oob <- c(residuals_oob, df$y[oob_indices] - preds_oob)
+  }
+}
+# calcolo previsioni bootstrap
+y_new_boot <- numeric(B)
+for (b in 1:B) {
+  h_b <- beta_boot[b,1] + beta_boot[b,2] * x_new
+  epsilon_b <- sample(residuals_oob, size=1)
+  y_new_boot[b] <- h_b + epsilon_b
+}
+# calcolo media e intervallo di previsione al 95%
+y_new_mean <- mean(y_new_boot)
+ci_y_new <- quantile(y_new_boot, probs=c(alpha/2, 1-alpha/2))
+
+```
+
+- Media bootstrap di $y_{new}$ in $x=$``r x_new``: ``r round(y_new_mean,2)``
+
+- Intervallo di previsione bootstrap al 95% per $y_{new}$ in $x =$``r x_new``: [``r round(ci_y_new[1],2)``, ``r round(ci_y_new[2],2)`` ]
+
+- confronto con l'intervallo di confidenza del modello: [``r round(ci_h[1],2)``, ``r round(ci_h[2],2)`` ]
+
+
+----
+
+
+```{r}
+
+# plot di barre di intervalli di previsione bootstrap
+ci_pred_lower <- numeric(length(x_seq))
+ci_pred_upper <- numeric(length(x_seq))
+for (i in 1:length(x_seq)) {
+  x_val <- x_seq[i]
+  y_new_boot <- numeric(B)
+  for (b in 1:B) {
+    h_b <- beta_boot[b,1] + beta_boot[b,2] * x_val
+    epsilon_b <- sample(residuals_oob, size=1)
+    y_new_boot[b] <- h_b + epsilon_b
+  }
+  ci_pred <- quantile(y_new_boot, probs=c(alpha/2, 1-alpha/2))
+  ci_pred_lower[i] <- ci_pred[1]
+  ci_pred_upper[i] <- ci_pred[2]
+}
+# plot
+ci_pred_df <- data.frame(x = x_seq, h = h_seq, ci_lower = ci_lower, ci_upper = ci_upper,
+                          ci_pred_lower = ci_pred_lower, ci_pred_upper = ci_pred_upper)
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_line(data = ci_pred_df, aes(x = x, y = h), color='red') +
+  geom_ribbon(data = ci_pred_df, aes(x = x, ymin = ci_lower, ymax = ci_upper), alpha=0.2, fill='orange') +
+  geom_ribbon(data = ci_pred_df, aes(x = x, ymin = ci_pred_lower, ymax = ci_pred_upper), alpha=0.2, fill='blue') +
+  ggtitle("Intervalli di confidenza (arancione) e di previsione (blu) bootstrap al 95% per il modello lineare semplice")
+```
+
+
+
+## Approccio parametrico
+
+- Modello probabilistico (rumore gaussiano):
+$$ Y = h(X; \beta) + \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, \sigma^2) $$
+- Minimi quadrati $\leftrightarrow$ massima verosimiglianza:
+  $$ (\beta_{OLS}, \sigma^2_{OLS}) = \arg \max_{\beta, \sigma^2} P(D | \beta, \sigma^2)$$
+
+- $\sigma^2_{OLS} = \frac 1 n \sum_{i=1}^n (y_i - h(x_i; \beta_{OLS}))^2 = MSE(h(\cdot; \beta_{OLS}))$.
+
+
+- **Obiettivo**: fornire una stima dell'incertezza sui parametri $(\beta, \sigma^2)$ e sulla previsione.
+
+## Confronto approccio bayesiano e frequentista
+
+- **Bayesiano:** i parametri sono *aleatori* (perché non noti), i dati sono *fissi* (osservati).
+  - fissa una distribuzione a priori $P(\theta)$
+  - calcola la densità a posteriori $P(\theta | D) \propto P(\theta) \mathcal{L}(\theta; D)$
+  - si stima di incertezza con intervalli di credibilità (via quantili)
+  $$ P( \theta \in I(D) |D) \ge  1-\alpha  $$
+  - decisioni bayesiane (test)
+
+- **Frequentista:** i parametri sono *fissi* ma sconosciuti, i dati sono *aleatori* (da osservare).
+  - si lavora con la verosimiglianza $\mathcal{L}(\theta; D) = P(D | \theta)$
+  - stima di incertezza con intervalli di fiducia
+  $$ P( \theta \in I(D) | \theta) \ge 1-\alpha \quad \text{per ogni $\theta$} $$
+  - test frequentisti
+  
+## Esempio: modello costante gaussiano
+
+Consideriamo il modello *costante* (in $X$):
+$$ Y = \beta_0 + \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, \sigma^2) $$
+
+**Problema:** stima della media e varianza in un campione gaussiano $(y_i)_{i=1, \ldots, n}$
+
+- **Parametri**: $\theta = (\beta_0, \sigma)$
+- **Dati**: $D = \{Y_i = y_i\}_{i=1}^n$
+- **Verosimiglianza**:
+$$ \mathcal{L}(\theta; D) = P(D | \theta) = \prod_{i=1}^n \exp\bra{- \frac 1 2 \sum_{i=1}^n \bra{ \frac{ y_i - \beta_0 } {\sigma}}^2 } \frac{1}{\sqrt{2 \pi \sigma^2}}. $$
+- Stima MLE (OLS): $\beta_{0, MLE} = \bar{y}_n$,
+$$ \sigma^2_{MLE} = \Var{y}_n = \frac 1 n \sum_{i=1}^n (y_i-\bar{y})^2 = MSE(h(\cdot; \beta_{0, MLE})$$
+
+## Approccio bayesiano
+
+
+- Densità a priori *uniforme* (completa ignoranza)
+$$ P(\beta_0, \sigma) \propto \frac{1}{\sigma} \quad \text{per $\beta_0 \in \mathbb{R},\sigma>0$ } $$
+
+- Verosimiglianza:
+$$\begin{split}
+P(D | \beta_0, \sigma) & = \prod_{i=1}^n \exp\bra{- \frac 1 2 \sum_{i=1}^n \bra{ \frac{ y_i - \beta_0 } {\sigma}}^2 } \frac{1}{\sqrt{2 \pi \sigma^2}} \\
+& \propto \exp\bra{ - \frac 1 {2 \sigma^2} \sum_{i=1}^n (y_i - \beta_0)^2 } \sigma^{-n}
+\end{split}$$
+
+- **Densità a posteriori**:
+  $$\begin{split}
+  P(\beta_0, \sigma | D) \propto \exp\bra{ - \frac{n}{2 \sigma^2 } \sqa{ \Var{y}_n +  \bra{\beta_0 - \bar{y}_n}^2 } }  \sigma^{-(n+1)}
+  \end{split}
+  $$
+  
+## Densità Student
+
+- Integrando su $\sigma$ si ottiene la densità a posteriori di $\beta_0$:
+$$\begin{split}
+p(\beta_0 | D) & \propto \int_0^\infty P(\beta_0, \sigma | D) d\sigma \\
+& \propto \int_0^\infty \exp\bra{ - \frac{n}{2 \sigma^2 } \sqa{  \Var{y}_n  + \bra{\beta_0 - \bar{y}_n}^2  } }  \sigma^{-(n+1)} d\sigma\\
+& \propto \bra{  \Var{y}  + (\beta_0 - \bar{y})^2 }^{-n/2}\\
+& \propto \bra{ 1 + \frac{1}{n-1} \frac{(\beta_0 - \bar{y})^2}{\var(y)_n/n} }^{-n/2}
+\end{split}$$
+
+
+- Si riconosce una distribuzione di Student-$t$ con $n-1$ gradi di libertà, media $\bar{y}_n$ e scala al quadrato $\frac{ \var(y)_n }{n}$.
+$$ p(\beta_0 |D) = t\bra{ \bar{y}_n, \frac{ \var(y)_n }{n}, n-1 } $$
+
+## Densità di Student-t
+
+La formula generale della densità di Student-$t$ con $df$ gradi di libertà parametri di media $\mu$ e scala al quadrato $\sigma^2$ è:
+$$ p(Z=z) \propto  \bra{ 1 + \frac{1}{df} \frac{(z-\mu)^2}{\sigma^2} }^{-\frac{df+1}{2}} $$
+
+- **Notazione:** $p(Z) =  t(\mu, \sigma^2, df)$
+
+- **Osservazioni:** 
+  1. code più pesanti della distribuzione normale per $df$ piccoli (maggiore incertezza)
+  2. per $df \to \infty$ la distribuzione di Student-t converge alla distribuzione gaussiana $\mathcal{N}(\mu, \sigma^2)$ (in pratica, per $df>30$ la differenza è trascurabile).
+
+## Grafici della densità al variare dei gradi di libertà
+
+```{r}
+# grafico densità di Student-t al variare dei gradi di libertà
+library(ggplot2)
+x_seq <- seq(-4, 4, length.out=200)
+df_values <- c(1, 3, 5, 10, 30)
+t_df <- data.frame()
+for (df in df_values) {
+  y_seq <- dt((x_seq), df=df)
+  t_df <- rbind(t_df, data.frame(x=x_seq, y=y_seq, df=as.factor(df)))
+}
+ggplot(t_df, aes(x=x, y=y, color=df)) +
+  geom_line(size=1) +
+  ggtitle("Densità di Student-t al variare dei gradi di libertà") +
+  labs(x="x", y="Densità", color="Gradi di libertà")
+```
+
+
+## Stime e incertezza
+
+- Incertezza su $\beta_0$:
+  1. **Approssimata** (usando stima $MLE$ per $\sigma$, valida per $n \to \infty$):
+  $$ p(\beta_0 | D) = \mathcal{N}\bra{ \bar{y}, \frac{\var(y)}{n} } $$
+  2. **Bayesiana esatta**: Student-$t$ con $n-1$ gradi di libertà:
+  $$ p(\beta_0 | D) = t\bra{ \bar{y}, \frac{\var(y)}{n}, n-1 } $$
+  
+- Intervalli di credibilità per $\beta_0$ tramite quantili della distribuzione a posteriori.
+$$ P\bra{ | \beta_0 - \bar{y}_n| \le  q_{1-\alpha/2} \sqrt{\frac{ \var(y) }{n} } \Bigg| D} = 1-\alpha $$
+dove $q_{1-\alpha/2}$ è il quantile di ordine $1-\alpha/2$ della distribuzione di Student-$t$ con $n-1$ gradi di libertà (oppure della distribuzione gaussiana se si usa l'approssimazione).
+
+
+
+## Previsione bayesiana
+
+- Incertezza su previsione di nuova osservazione $Y_{n+1}$:
+  1. **Approssimata** (usando stima $MLE$): $$ p(Y_{n+1} | D) = \mathcal{N}\bra{ \bar{y}_n, \bra{1 + \frac 1 n} \var(y)_n}$$
+  2. **Bayesiana esatta**: Student-$t$ con $n-1$ gradi di libertà:
+  $$p(Y_{n+1} ) = t\bra{ \bar{y}_n, \bra{1+\frac 1 n } \var(y)_n, n-1 } $$
+  
+- Intervalli di credibilità per la previsione:
+$$ P\bra{|Y_{n+1}-\bar{y}| \le q_{1-\alpha/2} \sqrt{ \bra{1 + \frac 1 n}\var(y)_n } \Bigg| D } = 1-\alpha $$
+dove $q_{1-\alpha/2}$ è il quantile di ordine $1-\alpha/2$ della distribuzione di Student-$t$ con $n-1$ gradi di libertà (oppure della distribuzione gaussiana se si usa l'approssimazione).
+
+## Esempio
+
+```{r}
+# esempio di stima bayesiana per il modello costante
+set.seed(42)
+n <- 10
+y <- 5 + rnorm(n, 10) # rumore pesante
+df <- data.frame(y = y)
+
+# stima bayesiana
+y_mean <- mean(df$y)
+y_var <- var(df$y)
+# intervallo di credibilità al 95% per beta_0
+alpha <- 0.05
+t_quantile <- qt(1 - alpha/2, df=n-1)
+ci_beta_0_lower <- y_mean - t_quantile * sqrt(y_var / n)
+ci_beta_0_upper <- y_mean + t_quantile * sqrt(y_var / n)
+#print(paste("Intervallo di credibilità bayesiano al 95% per beta_0: [", round(ci_beta_0_lower,2), ",", round(ci_beta_0_upper,2), "]"))
+# intervallo di credibilità al 95% per la previsione
+ci_y_lower <- y_mean - t_quantile * sqrt((n+1)/n * y_var)
+ci_y_upper <- y_mean + t_quantile * sqrt((n+1)/n * y_var)
+#print(paste("Intervallo di credibilità bayesiano al 95% per la previsione: [", round(ci_y_lower,2), ",", round(ci_y_upper,2), "]"))
+
+## Istogramma delle osservazioni y e intervalli di credibilità 
+ggplot(df, aes(x=y)) +
+  geom_histogram(bins=30, fill='grey', alpha=1) + xlim(12,18)+
+  ggtitle(paste("n=", n, " osservazioni di  y, (rosso: IC per la media) (blu: IC per previsione"))+
+  # aggiungi linea intervallo di credibilità per beta_0
+  geom_vline(xintercept=ci_beta_0_lower, color='red', linetype='dashed')+
+  geom_vline(xintercept=ci_beta_0_upper, color='red', linetype='dashed')+
+  geom_polygon(data=data.frame(x=c(ci_beta_0_lower, ci_beta_0_upper, ci_beta_0_upper, ci_beta_0_lower),
+                           y=c(0,0,Inf,Inf)),
+               aes(x=x, y=y), fill='red', alpha=0.1)+
+  
+  # aggiungi linea intervallo di credibilità per la previsione
+  geom_vline(xintercept=ci_y_lower, color='blue', linetype='dashed')+
+  geom_vline(xintercept=ci_y_upper, color='blue', linetype='dashed')+
+  geom_polygon(data=data.frame(x=c(ci_y_lower, ci_y_upper, ci_y_upper, ci_y_lower),
+                           y=c(0,0,Inf,Inf)),
+               aes(x=x, y=y), fill='blue', alpha=0.1)+
+  # aggiungi legenda
+  labs(x='Osservazioni y', y='Frequenza')+
+  theme_minimal()
+```
+
+## Esempio
+
+
+```{r}
+# esempio di stima bayesiana per il modello costante
+set.seed(42)
+n <- 100
+y <- 5 + rnorm(n, 10) # rumore pesante
+df <- data.frame(y = y)
+
+# stima bayesiana
+y_mean <- mean(df$y)
+y_var <- var(df$y)
+# intervallo di credibilità al 95% per beta_0
+alpha <- 0.05
+t_quantile <- qt(1 - alpha/2, df=n-1)
+ci_beta_0_lower <- y_mean - t_quantile * sqrt(y_var / n)
+ci_beta_0_upper <- y_mean + t_quantile * sqrt(y_var / n)
+#print(paste("Intervallo di credibilità bayesiano al 95% per beta_0: [", round(ci_beta_0_lower,2), ",", round(ci_beta_0_upper,2), "]"))
+# intervallo di credibilità al 95% per la previsione
+ci_y_lower <- y_mean - t_quantile * sqrt((n+1)/n * y_var)
+ci_y_upper <- y_mean + t_quantile * sqrt((n+1)/n * y_var)
+#print(paste("Intervallo di credibilità bayesiano al 95% per la previsione: [", round(ci_y_lower,2), ",", round(ci_y_upper,2), "]"))
+
+## Istogramma delle osservazioni y e intervalli di credibilità 
+ggplot(df, aes(x=y)) +
+  geom_histogram(bins=30, fill='grey', alpha=1) + xlim(12,18)+
+  ggtitle(paste("n=", n, " osservazioni di  y, (rosso: IC per la media) (blu: IC per previsione"))+
+  # aggiungi linea intervallo di credibilità per beta_0
+  geom_vline(xintercept=ci_beta_0_lower, color='red', linetype='dashed')+
+  geom_vline(xintercept=ci_beta_0_upper, color='red', linetype='dashed')+
+  geom_polygon(data=data.frame(x=c(ci_beta_0_lower, ci_beta_0_upper, ci_beta_0_upper, ci_beta_0_lower),
+                           y=c(0,0,Inf,Inf)),
+               aes(x=x, y=y), fill='red', alpha=0.1)+
+  
+  # aggiungi linea intervallo di credibilità per la previsione
+  geom_vline(xintercept=ci_y_lower, color='blue', linetype='dashed')+
+  geom_vline(xintercept=ci_y_upper, color='blue', linetype='dashed')+
+  geom_polygon(data=data.frame(x=c(ci_y_lower, ci_y_upper, ci_y_upper, ci_y_lower),
+                           y=c(0,0,Inf,Inf)),
+               aes(x=x, y=y), fill='blue', alpha=0.1)+
+  # aggiungi legenda
+  labs(x='Osservazioni y', y='Frequenza')+theme_minimal()
+```
+
+
+## Esempio
+
+
+```{r}
+# esempio di stima bayesiana per il modello costante
+set.seed(42)
+n <- 1000
+y <- 5 + rnorm(n, 10) # rumore pesante
+df <- data.frame(y = y)
+
+# stima bayesiana
+y_mean <- mean(df$y)
+y_var <- var(df$y)
+# intervallo di credibilità al 95% per beta_0
+alpha <- 0.05
+t_quantile <- qt(1 - alpha/2, df=n-1)
+ci_beta_0_lower <- y_mean - t_quantile * sqrt(y_var / n)
+ci_beta_0_upper <- y_mean + t_quantile * sqrt(y_var / n)
+#print(paste("Intervallo di credibilità bayesiano al 95% per beta_0: [", round(ci_beta_0_lower,2), ",", round(ci_beta_0_upper,2), "]"))
+# intervallo di credibilità al 95% per la previsione
+ci_y_lower <- y_mean - t_quantile * sqrt((n+1)/n * y_var)
+ci_y_upper <- y_mean + t_quantile * sqrt((n+1)/n * y_var)
+#print(paste("Intervallo di credibilità bayesiano al 95% per la previsione: [", round(ci_y_lower,2), ",", round(ci_y_upper,2), "]"))
+
+## Istogramma delle osservazioni y e intervalli di credibilità 
+ggplot(df, aes(x=y)) +
+  geom_histogram(bins=30, fill='grey', alpha=1) + xlim(12,18)+
+  ggtitle(paste("n=", n, " osservazioni di  y, (rosso: IC per la media) (blu: IC per previsione"))+
+  # aggiungi linea intervallo di credibilità per beta_0
+  geom_vline(xintercept=ci_beta_0_lower, color='red', linetype='dashed')+
+  geom_vline(xintercept=ci_beta_0_upper, color='red', linetype='dashed')+
+  geom_polygon(data=data.frame(x=c(ci_beta_0_lower, ci_beta_0_upper, ci_beta_0_upper, ci_beta_0_lower),
+                           y=c(0,0,Inf,Inf)),
+               aes(x=x, y=y), fill='red', alpha=0.1)+
+  
+  # aggiungi linea intervallo di credibilità per la previsione
+  geom_vline(xintercept=ci_y_lower, color='blue', linetype='dashed')+
+  geom_vline(xintercept=ci_y_upper, color='blue', linetype='dashed')+
+  geom_polygon(data=data.frame(x=c(ci_y_lower, ci_y_upper, ci_y_upper, ci_y_lower),
+                           y=c(0,0,Inf,Inf)),
+               aes(x=x, y=y), fill='blue', alpha=0.1)+
+  # aggiungi legenda
+  labs(x='Osservazioni y', y='Frequenza')+theme_minimal()
+```
+
+
+## Approccio frequentista
+
+- Parametri fissi ma sconosciuti: $\theta = (\beta_0, \sigma^2)$
+ 
+- Training set $D = \{(X_i, Y_i)\}_{i=1}^n$ aleatorio.
+
+- **Intervallo di fiducia**: con frequenza  $1-\alpha$ sui possibili dati di training $D$, l'intervallo $I(D)$ contiene il parametro $\theta$ *"vero"*:
+$$ P\bra{ \theta \in I(D) | \theta } \ge  1-\alpha \quad \text{per ogni $\theta$.}$$
+
+- **Intepretazione:** l'intervallo di fiducia è una *procedura* che, ripetuta su più campioni, contiene il vero parametro con frequenza (almeno) $1-\alpha$.
+
+
+## Caso costante (modello gaussiano)
+
+Torniamo al modello costante (in $X$):
+$$ Y = \beta_0 + \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, \sigma^2) $$
+
+**Problema:** stima della media e varianza in un campione gaussiano $(Y_i)_{i=1, \ldots, n}$
+
+- **Intervallo di fiducia per $\beta_0$**:
+$$ P\bra{ |\beta_0 - \bar{Y}_n| \le q_{1-\alpha/2} \sqrt{\frac{ \var(Y)_n }{n} } \Bigg| \beta_0} = 1-\alpha $$
+- **Intervallo di fiducia per la previsione**:
+$$ P\bra{|Y_{n+1}-\bar{Y}_n| \le q_{1-\alpha/2} \sqrt{ \bra{1 + \frac 1 n}\var(Y)_n } \Bigg| \beta_0 } = 1-\alpha $$
+dove $q_{1-\alpha/2}$ è il quantile di ordine $1-\alpha/2$ della distribuzione di Student-$t$ con $n-1$ gradi di libertà.
+
+- **Come le formule bayesiane ma interpretazione diversa!**
+
+
+## Modello lineare generale: stime bayesiane
+
+- Modello probabilistico sui dati:
+$$ Y = \Phi(X) \beta + \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, \sigma^2 I) $$
+
+- Distribuzione a priori *uniforme*: $p(\beta, \sigma) = \frac{1}{\sigma}$ per $\beta \in \R^p, \sigma>0$
+
+- Verosimiglianza (notazione matriciale): 
+$$ P(D | \beta, \sigma) \propto \exp\bra{ - \frac 1 {2 \sigma^2} \| \bm{y} - \Phi(\bm{x}) \beta \|^2 } \sigma^{-n} $$
+
+- Densità a posteriori (usando l'identità per i minimi quadrati):
+$$ \begin{split} & p(\beta, \sigma | D) \\
+& \propto \exp\bra{ -  \frac{ n MSE(h(; \beta_{OLS})) + (\beta - \beta_{OLS})^T G (\beta-\beta_{OLS})} {2 \sigma^2}}  \sigma^{-(n+1)} \end{split} $$
+
+- con $G = \Phi(\bm{x})^T \Phi(\bm{x})$ matrice di Gram.
+
+## Stime dell'incertezza
+
+- Densità marginale per $\beta$:
+$$ p(\beta | D) \propto \bra{ 1 + \frac{1}{n-p} \frac{(\beta - \beta_{OLS})^T G (\beta - \beta_{OLS})}{ RSE^2 } }^{-n/2} $$
+
+- **Residual Standard Error** $RSE = \sqrt{ \frac 1 {n-p} \sum_{i=1}^n (y_i- \Phi(x_i)\beta_{OLS}) }$.
+
+- **Densità di Student multivariata**.
+
+
+## Densità di Student multivariata
+
+**Densità Student-$t$ multivariata** a valori in $\R^p$, con $df$ gradi di libertà parametri di media $\mu$ e scala al quadrato $\Sigma$:
+$$ P(Z=z) \propto \bra{ 1 + \frac{1}{df} (\bm{z}-\mu)^T \Sigma^{-1} (\bm{z}-\mu) }^{-\frac{df+p}{2}} $$
+
+- Generalizza la densità di Student univariata.
+- **Notazione:** $p(Z) =  t_p(\mu, \Sigma, df)$.
+
+- **Trasformazioni lineari:** se $P(Z) = t_p(\mu, \Sigma, df)$ e $A$ è una matrice $m \times p$, allora
+$$ P(AZ) = t_m\bra{ A \mu, A \Sigma A^T, df } $$
+- Le marginali di una distribuzione di Student multivariata sono distribuzioni di Student univariate:
+$$ Z_j \sim t\bra{ \mu_j, \Sigma_{jj}, df } $$
+
+## Incertezza sui parametri e sul modello
+
+- Con la notazione della Student multivariata:
+$$ P(\beta | D) = t_p\bra{ \beta_{OLS}, RSE^2 \cdot  G^{-1}, n-p } $$
+- Ciascun $\beta_j$ ha distribuzione di Student univariata:
+$$ P(\beta_j|D) = t_1\bra{ \beta_{OLS, j}, RSE^2 \cdot (G^{-1})_{jj}, n-p } $$
+- Intervalli di credibilità per ciascun $\beta_j$:
+$$ P\bra{ |\beta_j - \beta_{OLS, j}| \le q_{1-\alpha/2}  RSE \sqrt{(G^{-1})_{jj} } \Bigg| D } = 1-\alpha $$
+dove $q_{1-\alpha/2}$ è il quantile di ordine $1-\alpha/2$ della distribuzione di Student-$t$ con $n-p$ gradi di libertà.
+
+## Esempio (iris)
+
+- Calcoliamo gli intervalli di credibilità bayesiani al 95% per i coefficienti di un modello di regressione lineare multipla sul dataset iris in cui si predice la lunghezza del sepalo in funzione della larghezza del sepalo e delle dimensioni del petalo.
+
+- $p=4$ (incluso l'intercetta), $n=150$.
+
+```{r}
+iris_model <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width, data=iris)
+#summary(iris_model)
+
+# Calcolo della matrice di Gram
+X <- model.matrix(iris_model)
+G <- t(X) %*% X
+n <- nrow(X)
+p <- ncol(X)
+RSE <- sum(residuals(iris_model)^2) / (n - p)
+# Stima bayesiana dei coefficienti
+beta_ols <- coef(iris_model)
+# Intervalli di credibilità bayesiani al 95% per i coefficienti
+for (j in 1:p) {
+  se_beta_j <- sqrt(RSE /  diag(solve(G))[j])
+  t_quantile <- qt(1 - 0.05/2, df=n - p)
+  ci_lower <- beta_ols[j] - t_quantile * se_beta_j
+  ci_upper <- beta_ols[j] + t_quantile * se_beta_j
+  print(paste("Intervallo di credibilità al 95% per beta_", j-1, ":"))
+  print( paste("[", round(ci_lower,2), ",", round(ci_upper,2), "]", sep=""))  
+}
+```
+
+## Intervalli di credibilità per il modello
+
+- Dato $x$, il modello $\Phi(x)\beta$ è una trasformazione lineare di $\beta$:
+$$ P(h(x; \beta) | D) = t_1\bra{ h(x; \beta_{OLS}),  RSE^2 \cdot  s^2(x), n-p } $$
+dove $s^2(x) = \phi(x)^T G^{-1} \phi(x)$.
+
+- Intervalli di credibilità
+$$ P\bra{ | h(x; \beta) - h(x; \beta_{OLS}) | \le q_{1-\alpha/2}  RSE \sqrt{ s^2(x) } \Bigg| D } = 1-\alpha $$
+dove $q_{1-\alpha/2}$ è il quantile di ordine $1-\alpha/2$ della distribuzione di Student-$t$ con $n-p$ gradi di libertà.
+
+
+## Esempio (regressione lineare semplice) 
+
+```{r}
+set.seed(42)
+n <- 100
+x <- rt(n, df=10)
+# sort x
+y <- 4*x+3 + rt(n,df=5) # rumore pesante
+df <- data.frame(x = x, y = y)
+
+y_model <- lm(y ~ x, data=df)
+
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_abline(slope = y_model$coefficients[2], intercept = y_model$coefficients[1], colour='red')+
+  ggtitle("Regressione lineare semplice")
+```
+
+
+## Esempio (regressione lineare semplice)
+
+```{r}
+# aggiungi gli intervalli di credibilità bayesiani al 95% per i coefficienti
+x_seq <- seq(min(df$x), max(df$x), length.out=100)
+ci_lower <- numeric(length(x_seq))
+ci_upper <- numeric(length(x_seq))
+for (i in 1:length(x_seq)) {
+  x_val <- x_seq[i]
+  X <- cbind(1, df$x)
+  n <- nrow(X)
+  RSE <- sum(residuals(y_model)^2) / (n - 2)
+  
+  s2_x <- matrix(c(1, x_val), nrow=1) %*% solve(t(X) %*% X) %*% matrix(c(1, x_val), ncol=1)
+  t_quantile <- qt(1 - 0.05/2, df=n - 2)
+  ci_lower[i] <- (y_model$coefficients[1] + y_model$coefficients[2] * x_val) - t_quantile * sqrt(RSE * s2_x)
+  ci_upper[i] <- (y_model$coefficients[1] + y_model$coefficients[2] * x_val) + t_quantile * sqrt(RSE * s2_x)
+}
+ci_df <- data.frame(x = x_seq, ci_lower = ci_lower, ci_upper = ci_upper)
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_abline(slope = y_model$coefficients[2], intercept = y_model$coefficients[1], colour='red')+
+  geom_ribbon(data = ci_df, aes(x = x, ymin = ci_lower, ymax = ci_upper), alpha=0.2, fill='orange') +
+  ggtitle("Intervalli di credibilità bayesiani al 95% per il modello lineare semplice")
+
+
+```
+
+## Previsione bayesiana
+
+- Densità a posteriori della previsione per un valore $X=x$ fissato: $Y = h(x; \beta) + \varepsilon$
+$$ p(Y=y | X=x, D) \propto \bra{ 1 + \frac{1}{n-p} \frac{(y - h(x; \beta_{OLS}))^2}{ RSE^2 (1+ s^2(x)) } }^{-\frac{n-p+1}{2}} $$
+dove $s^2(x) = \phi(x)^T G^{-1} \phi(x)$.
+
+- Densità Student-$t$ univariata con $n-p$ gradi di libertà:
+$$ P(Y | X=x, D) = t_1\bra{ h(x; \beta_{OLS}), RSE^2 \cdot (1 + s^2(x)), n-p } $$ 
+
+- Intervalli di credibilità per la previsione tramite quantili della distribuzione a posteriori.
+
+
+## Esempio (regressione lineare semplice)
+
+```{r}
+# aggiungi gli intervalli di credibilità bayesiani al 95% per la previsione
+
+x_seq <- seq(min(df$x), max(df$x), length.out=100)
+ci_lower <- numeric(length(x_seq))
+ci_upper <- numeric(length(x_seq))
+for (i in 1:length(x_seq)) {
+  x_val <- x_seq[i]
+  X <- cbind(1, df$x)
+  n <- nrow(X)
+  RSE <- sum(residuals(y_model)^2) / (n - 2)
+  
+  s2_x <- matrix(c(1, x_val), nrow=1) %*% solve(t(X) %*% X) %*% matrix(c(1, x_val), ncol=1)
+  t_quantile <- qt(1 - 0.05/2, df=n - 2)
+  ci_lower[i] <- (y_model$coefficients[1] + y_model$coefficients[2] * x_val) - t_quantile * sqrt(RSE * (1+s2_x))
+  ci_upper[i] <- (y_model$coefficients[1] + y_model$coefficients[2] * x_val) + t_quantile * sqrt(RSE * (1+s2_x))
+}
+ci_df <- data.frame(x = x_seq, ci_lower = ci_lower, ci_upper = ci_upper)
+ggplot() +
+  geom_point(data = df, aes(x = x, y = y)) +
+  geom_abline(slope = y_model$coefficients[2], intercept = y_model$coefficients[1], colour='red')+
+  geom_ribbon(data = ci_df, aes(x = x, ymin = ci_lower, ymax = ci_upper), alpha=0.2, fill='blue') +
+  ggtitle("Intervalli di credibilità bayesiani al 95% per la previsione")
+
+```
+
+
+## Modello lineare generale: stime frequentiste
+- Intervallo di fiducia per i parametri:
+$$  P\bra{ |\beta_j - \beta_{OLS, j}| \le q_{1-\alpha/2}  RSE \sqrt{(G^{-1})_{jj} } \Bigg| \beta } = 1-\alpha $$
+- Intervallo di fiducia per il modello:
+$$ P\bra{ | h(x; \beta) - h(x; \beta_{OLS}) | \le q_{1-\alpha/2} RSE\sqrt{s^2(x) } \Bigg| \beta } = 1-\alpha $$
+- Intervallo di fiducia per la previsione:
+$$ P\bra{ |Y - h(x; \beta_{OLS})| \le q_{1-\alpha/2}RSE \sqrt{  1 + s^2(x) } \Bigg| \beta } = 1-\alpha $$
+dove $q_{1-\alpha/2}$ è il quantile di ordine $1-\alpha/2$ della distribuzione di Student-$t$ con $n-p$ gradi di libertà.
+
+
+## Test di significatività dei parametri (frequentista)
+
+- Ipotesi nulla: $H_0: \beta_j = 0$ contro l'alternativa $H_1: \beta_j \neq 0$.
+
+- **Decisione:** rifiutare $H_0$ se $0$ non appartiene all'intervallo di fiducia per $\beta_j$ per un determinato livello $1-\alpha$.
+
+- **Errore di I specie** (falsi positivi): probabilità di rifiutare $H_0$ quando è vera:
+$$\begin{split} \alpha & =  P(\text{rifiuto } H_0 | H_0 \text{ vera}) \\
+& = P( \text{$0$ non appartiene all'intervallo di fiducia} | \beta_j = 0) \\
+& = P( |\beta_{OLS, j}| > q_{1-\alpha/2}RSE \sqrt{(G^{-1})_{jj} } | \beta_j = 0) 
+\end{split}$$
+
+- Il **p-value** è il più piccolo livello di significatività $\alpha$ per cui si rifiuta $H_0$, una volta osservati i dati.
+
+## Test di significatività del modello (F-test)
+
+- Ipotesi nulla: $H_0$: il modello non spiega nulla, cioè tutti i coefficienti sono nulli: $\beta = 0$.
+- Alternativa: almeno un coefficiente è diverso da zero.
+- Statistica del test:
+$$ F = \frac{ \frac{1}{p-1} \sum_{i=1}^n ( \hat{y}_i - \bar{y} )^2 }{ \frac{1}{n-p} \sum_{i=1}^n (y_i - h(x_i, \beta_{OLS}))^2 } = \frac{ \text{Explained Variance} / (p-1) }{ RSE ^2} $$
+- Sotto $H_0$, $F$ ha distribuzione $F$ di Fisher con $(p-1, n-p)$ gradi di libertà.
+- **Decisione:** rifiutare $H_0$ se $F > F_{1-\alpha}(p-1, n-p)$, dove $F_{1-\alpha}(p-1, n-p)$ è il quantile di ordine $1-\alpha$ della distribuzione di Fisher con $(p-1, n-p)$ gradi di libertà.
+- Il **p-value** è il più piccolo livello di significatività $\alpha$ per cui si rifiuta $H_0$, una volta osservati i dati.
+
+

@@ -1,0 +1,756 @@
+---
+title: "Statistica II (750AA)"
+author: "Dario Trevisan -- _<https://web.dm.unipi.it/trevisan>_"
+date: "24/11/2025"
+output:
+  beamer_presentation:
+    includes:
+      in_header: "preamble.tex"
+    colortheme: orchid
+    fonttheme: structurebold
+    incremental: yes
+    keep_tex: yes
+    theme: default
+  slidy_presentation:
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+    widescreen: yes
+    transition: faster
+subtitle: 'Lezione 10'
+editor_options: 
+  markdown: 
+    wrap: sentence
+header-includes:
+  - \setbeamertemplate{footline}[frame number]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE) 
+library(ggplot2)
+library(class)
+library(caret)
+library(glmnet)
+library(car)
+library(tidyr)
+
+```
+
+
+# Serie storiche II
+
+
+
+
+##  Piano della lezione
+<!-- *Modelli SE Holt–Winters, Stima dei Parametri, Intervalli di Previsione e Valutazione* -->
+
+
+In questa lezione vediamo alcuni modelli *parametrici* per serie storiche:
+
+- **Smorzamento** (smoothing) esponenziale: Holt-Winters, ETS.
+
+- **Stima dei parametri** mediante ottimizzazione dell'errore, collegamento con OLS.
+
+- **Selezione di modello** tramite indicatori AIC/BIC.
+
+- **Intervalli di predizione**:  parametrici e bootstrap.
+
+
+
+## Previsioni da modelli parametrici
+
+Data una serie storica $(y_t)_{t =1, \ldots, T}$: 
+
+1. Introduciamo un modello parametrico $f(t; \theta)$, $\theta \in \R^p$.
+
+2. Stimiamo i parametri $\theta$ dai dati osservati $f(t; \theta) \approx y_t$ $\rightarrow$ troviamo $\hat{\theta}$ ottimale.
+
+3. Effettuiamo previsioni  (puntuali) future: $\hat y_{T+h|T} = f(T+h; \hat \theta)$.
+
+4. Indichiamo l'incertezza tramite intervalli di previsione.
+
+
+## Smoothing esponenziale semplice (modello SES)
+
+- Modello più elementare: un solo parametro $\theta = \alpha \in [0,1] \subseteq \R$.
+
+  1. Definiamo il *livello* $\ell_t$ mediante una formula *ricorsiva*:
+$$\ell_t := \alpha y_t + (1-\alpha)\ell_{t-1}$$
+
+  2. Effettuiamo la previsione:
+$$\hat y_{t+h|t} = \ell_t$$
+
+- **Intepretazione**: $\ell_t$ è una media pesata delle osservazioni passate: $\alpha$ pesa l'osservazione recente rispetto al passato.
+
+- **Formula esplicita**: $$ \ell_t = \alpha y_t +\alpha(1-\alpha)y_{t-1}+ \alpha (1-\alpha)^2 y_{t-2} +\alpha(1-\alpha)^3 y_{t-3}\ldots $$
+
+## Esempio
+
+```{r}
+library(forecast)
+#split train e test
+nottem_train <- window(nottem, end=c(1937,12))
+nottem_test <- window(nottem, start=c(1938,1))
+#fit SES
+fit_ses_05 <- ses(nottem_train, h=24, alpha=0.5, initial="simple")
+#fit_ses_0 <- ses(nottem_train, h=24, alpha=0, initial="simple")
+
+autoplot(nottem_train)+ggtitle("Smoothing esponenziale semplice (SES) alpha=0.5, serie nottem")+
+  autolayer(nottem_test)+autolayer(fit_ses_05, PI=FALSE, colour="blue") +theme(legend.position = "none")
+
+```
+
+---
+
+
+
+```{r}
+library(forecast)
+#split train e test
+nottem_train <- window(nottem, end=c(1937,12))
+nottem_test <- window(nottem, start=c(1938,1))
+#fit SES
+fit_ses_05 <- ses(nottem_train, h=24, alpha=1, initial="simple")
+#fit_ses_0 <- ses(nottem_train, h=24, alpha=0, initial="simple")
+
+autoplot(nottem_train)+ggtitle("Smoothing esponenziale semplice (SES) alpha=1, serie nottem")+
+  autolayer(nottem_test)+autolayer(fit_ses_05, PI=FALSE, colour="blue") +theme(legend.position = "none")
+```
+
+
+----
+
+
+```{r}
+library(forecast)
+#split train e test
+nottem_train <- window(nottem, end=c(1937,12))
+nottem_test <- window(nottem, start=c(1938,1))
+#fit SES
+fit_ses_05 <- ses(nottem_train, h=24, alpha=1, initial="simple")
+#fit_ses_0 <- ses(nottem_train, h=24, alpha=0, initial="simple")
+
+autoplot(nottem_train)+ggtitle("Smoothing esponenziale semplice (SES) alpha=1, serie nottem")+
+  autolayer(nottem_test)+autolayer(fit_ses_05, PI=FALSE, colour="blue") +theme(legend.position = "none")
+```
+
+
+## Modelli Error-Trend-Seasonal (ETS)
+
+Dato un modello predittivo $\hat{y}_{t+h|t}$, introduciamo il **residuo/errore**
+$$ \varepsilon_{t+h|t} := y_{t+h} - \hat{y}_{t+h|t}, \quad \varepsilon_t := y_t - \hat{y}_{t|t-1}$$
+
+- Riscriviamo SES in termini dei livelli e degli errori:
+$$ \hat y_{t|t-1} = \ell_{t-1} \, \rightarrow \, \ell_t = \alpha y_t + (1-\alpha)\ell_{t-1} = \alpha(y_t-\ell_{t-1}) + \ell_{t-1}$$
+
+- otteniamo due equazioni:
+$$ \begin{cases} \ell_{t} := \ell_{t-1} + \alpha \varepsilon_t & \text{(equazione di stato/transizione)} \\
+y_t := \ell_{t-1} + \varepsilon_t & \text{(equazione dell'osservazione/misurazione)} \end{cases}$$
+
+- **Intepretazione:** 
+  - la serie misurata è una versione *rumorosa* dello stato (nascosto)
+  - lo stato evolve come lo stato precedente corretto con il rumore amplificato/smorzato dal parametro
+  
+- **Notazione**: $ETS(A,N,N)$
+
+
+## Decomposizone moltiplicativa
+
+Se la struttura è moltiplicativa, introduciamo gli *errori relativi*:
+$$ \varepsilon_t := \frac{y_t - \hat{y}_{t|t-1}}{\hat{y}_{t|t-1}}$$
+
+- Scriviamo le equazioni $ETS(M, N, N)$:
+$$ \begin{cases} \ell_{t} = \ell_{t-1} (1+ \alpha \varepsilon_t) & \text{(equazione di stato/transizione)} \\
+y_t = \ell_{t-1}(1 + \varepsilon_t) & \text{(equazione dell'osservazione/misurazione)} \end{cases}$$
+
+
+## Stima dei parametri tramite SSE (OLS)
+
+**Ipotesi**: gli errori $(\varepsilon_t)_{t}$ sono i.i.d. $\mathcal{N}(0, \sigma^2)$. 
+
+- Metodo SSE (OLS):
+$$ \theta_{SSE} \in \arg \min_{\theta} \sum_{t=1}^T(y_t - \hat y_{t|t-1})^2 $$
+
+- **Problema**: per modelli SES $\hat{y}_{t|t-1} = \ell_{t-1}$ **non** è una funzione lineare di $\alpha$ $\rightarrow$ metodi numerici
+
+## Esempio serie Nottem
+
+```{r}
+
+#fit SES
+fit_ses <- ses(nottem_train, h=24, alpha=NULL)
+
+print(paste("Modello", fit_ses$model, "; alpha stimato =", round(fit_ses$model$par[1], 3)))
+
+
+autoplot(fit_ses, PI=FALSE)+ggtitle("Smoothing esponenziale semplice (SES) alpha stimato, serie nottem")+
+  autolayer(nottem_test)+theme(legend.position = "none")
+
+```
+
+## Esempio: serie EuStockMarkets
+
+```{r}
+#fit SES
+EU_train <- window(EuStockMarkets[,1], start = c(1994, 1), end=c(1995, 1))
+EU_test <- window(EuStockMarkets[,1], start=c(1995, 1), end = c(1995, 20))
+
+fit_ses <- ses(EU_train, h=20, alpha=NULL)
+print(paste("Modello", fit_ses$model, "; alpha stimato =", round(fit_ses$model$par[1], 3)))
+
+autoplot(fit_ses, PI=FALSE, main="Serie DAX - EuStockMarkets 1994, SES", ylab="")+autolayer(EU_test)+theme(legend.position = "none")
+
+
+```
+
+
+## Esempio: serie AirPassengers
+
+
+
+```{r}
+library(forecast)
+#split train e test
+AirPassengers_train <- window(AirPassengers, end=c(1958,12))
+AirPassengers_test <- window(AirPassengers, start=c(1959,1))
+
+#fit SES
+fit_ses <- ses(AirPassengers_train, h=24, alpha=NULL)
+
+print(paste("Modello", fit_ses$model, "; alpha =", round(fit_ses$model$par[1], 3)))
+
+autoplot(fit_ses, PI=FALSE)+ggtitle("Smoothing esponenziale semplice (SES) alpha stimato, serie AirPassengers")+
+  autolayer(AirPassengers_test)+theme(legend.position = "none")
+
+```
+
+## Esempio: serie log(AirPassengers) differenziata
+
+```{r}
+library(forecast)
+#split train e test
+AirPassengers_train <- window(AirPassengers, end=c(1958,12))
+AirPassengers_test <- window(AirPassengers, start=c(1959,1))
+
+#fit SES
+fit_ses <- ses(diff(log(AirPassengers_train)), h=24, alpha=NULL)
+
+print(paste("Modello", fit_ses$model, "; alpha =", round(fit_ses$model$par[1], 3)))
+
+autoplot(fit_ses, PI=FALSE)+ggtitle("Smoothing esponenziale semplice (SES) alpha stimato, serie AirPassengers")+
+  autolayer(diff(log(AirPassengers_test)))+theme(legend.position = "none")
+```
+
+
+
+##  Modello di Holt (trend)
+
+Il modello SES non coglie il trend né la stagionalità.
+
+Il modello di Holt aggiunge un componente di trend stimato linearmente:
+
+  - **Variabili**: livello $\ell_t$, pendenza/trend $b_t$
+  
+  - **Parametri** smoothing livello $\alpha\in [0,1]$, trend $\beta \in [0,1]$
+  
+  - **Equazioni** (caso additivo):
+$$ \begin{split} \hat y_{t+h|t} & := \ell_t + hb_t \quad \text{(previsione)} \\
+   \ell_t & := \alpha y_t + (1-\alpha)(\ell_{t-1} + b_{t-1}) \quad  \text{(livello)}\\
+ b_t & := \beta(\ell_t - \ell_{t-1}) + (1-\beta)b_{t-1} \quad \text{(trend)}
+ \end{split} $$
+ 
+ 
+ -  **Notazione**: $ETS(A,A,N)$
+ - I parametri $\alpha$ e $\beta$ sono stimati tramite SSE.
+ 
+
+ 
+ 
+## Esempio: serie BJsales
+
+
+```{r}
+
+library(forecast)
+#split train e test
+bj_train <- window(BJsales, end=110)
+bj_test <- window(BJsales, start=111)
+
+autoplot(bj_train, main = "serie BJsales", ylab=NULL)+
+  autolayer(bj_test)+theme(legend.position = "none")
+
+```
+
+---
+
+```{r}
+#fit Holt
+fit_holt <- holt(bj_train, h=40, alpha=NULL, beta=NULL)
+print(paste("Modello", fit_holt$model, "; alpha =", round(fit_holt$model$par[1], 3), "; beta =", round(fit_holt$model$par[2], 3)))
+autoplot(bj_train, , ylab=NULL)+ggtitle("Modello di Holt, serie BJsales")+
+  autolayer(bj_test)+autolayer(fit_holt, PI=FALSE, colour="blue") +theme(legend.position = "none")
+``` 
+
+
+
+
+## Modello di Holt con trend smorzato
+
+Il trend nelle previsioni di Holt è costante nel futuro. Questo porta spesso a sovrastimare le previsioni future.
+
+Modello di Holt con trend smorzato (damped):
+
+  - **Variabili**: livello $\ell_t$, pendenza/trend $b_t$
+  
+  - **Parametri**: smoothing livello $\alpha\in [0,1]$, trend $\beta \in [0,1]$, smorzamento trend $\phi \in [0,1]$
+  
+  - **Equazioni** (caso additivo):
+$$ \begin{split} \hat y_{t+h|t} & := \ell_t + (\phi+\phi^2 + \phi^2+ \ldots + \phi^h) b_t \quad \text{(previsione)} \\
+   \ell_t & := \alpha y_t + (1-\alpha)(\ell_{t-1} + \phi b_{t-1}) \quad  \text{(livello)}\\
+ b_t & := \beta(\ell_t - \ell_{t-1}) + (1-\beta)\phi b_{t-1} \quad \text{(trend)}
+ \end{split} $$
+ 
+- **Notazione**: $ETS(A, A_d, N)$
+
+- Se $\phi =1$ $\rightarrow$ Holt semplice
+
+- Per $\phi <1$ e $h \to \infty$, la previsione converge $$\hat{y}_{t+h|t} \to \ell_t + \frac{\phi}{1-\phi} b_t$$
+
+
+## Esempio BJsales
+
+
+```{r}
+#fit Holt
+fit_holt_damped <- holt(bj_train, damped=TRUE, h=40, alpha=NULL, beta=NULL)
+print(paste(fit_holt_damped$model, "; alpha =", round(fit_holt_damped$model$par[1], 2), "; beta =", round(fit_holt_damped$model$par[2], 2), "; phi=", round(fit_holt_damped$model$par[3], 2) ))
+autoplot(bj_train, , ylab=NULL)+ggtitle("Modello di Holt, serie BJsales")+
+  autolayer(bj_test)+autolayer(fit_holt_damped, PI=FALSE, colour="blue") +theme(legend.position = "none")
+``` 
+
+
+## Esempio BJsales (altra finestra)
+
+
+```{r}
+
+library(forecast)
+#split train e test
+bj_train <- window(BJsales, end=94)
+bj_test <- window(BJsales, start=95)
+
+autoplot(bj_train, main = "serie BJsales",  ylab=NULL)+
+  autolayer(bj_test)+theme(legend.position = "none")
+
+```
+
+
+-----
+
+
+```{r}
+#fit Holt
+fit_holt <- holt(bj_train, damped=FALSE, h=40, alpha=NULL, beta=NULL)
+print(paste(fit_holt_damped$model, ";alpha =", round(fit_holt_damped$model$par[1], 2), ";beta =", round(fit_holt_damped$model$par[2], 2)))
+fit_holt_damped <- holt(bj_train, damped=TRUE, h=40, alpha=NULL, beta=NULL)
+print(paste(fit_holt_damped$model, ";alpha =", round(fit_holt_damped$model$par[1], 2), ";beta =", round(fit_holt_damped$model$par[2], 2), ";phi=", round(fit_holt_damped$model$par[3], 2) ))
+autoplot(bj_train, ylab=NULL)+ggtitle("Modello di Holt, serie BJsales")+
+  autolayer(bj_test)+autolayer(fit_holt_damped, PI=FALSE, colour="blue") +theme(legend.position = "none")+  autolayer(fit_holt, PI=FALSE, colour="green")
+``` 
+
+
+## Esempio AirPassengers (moltiplicativo)
+
+
+ 
+```{r}
+#fit Holt
+fit_holt <- holt(log(AirPassengers_train), damped=FALSE, h=96, exponential=FALSE )
+fit_holt_damped <- holt(log(AirPassengers_train), damped=TRUE, h=48, exponential=FALSE, alpha=NULL, beta=NULL)
+autoplot(window(AirPassengers_train), ylab=NULL)+ggtitle("Modello di Holt, serie AirPassengers")+
+  autolayer(AirPassengers_test)+autolayer(exp(fit_holt$mean)) + theme(legend.position = "none") 
+``` 
+ 
+ 
+## Modello di Holt–Winters (trend + stagionalità)
+  
+Il modello Holt-Winters include stagionalità e trend.
+  
+- **Forma Additiva** (ampiezza stagionalità circa costante):
+
+  - **Variabili**: livello $\ell_t$, pendenza/trend $b_t$, stagionalità $s_t$
+  
+  - **Parametri** smoothing livello $\alpha\in [0,1]$, trend $\beta \in [0,1]$, stagionalità  $\gamma \in [0,1]$
+  
+  - **Equazioni** (caso additivo):
+$$ \begin{split} \hat y_{t+h|t} & := \ell_t + h b_t + s_{t+h - m k} \quad \text{(previsione, $k=\lceil h/m\rceil$)} \\
+   \ell_t & := \alpha (y_t-s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1}) \quad  \text{(livello)}\\
+ b_t & := \beta(\ell_t - \ell_{t-1}) + (1-\beta)\phi b_{t-1} \quad \text{(trend)}\\
+  s_t & := \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma) s_{t-m} \quad \text{(trend)}
+ \end{split} $$
+
+- Notazione: $ETS(A, A, A)$
+ 
+- C'è pure la variante moltiplicativa e/o trend smorzato (non scriviamo le equazioni).
+
+
+## Esempio
+
+```{r}
+#fit Holt Winters
+fit_holt_winters <- hw(nottem_train, damped=FALSE, h=24 )
+autoplot(window(nottem_train, start=c(1935, 1)), ylab=NULL)+ggtitle("Modello di Holt-Winters additivo, serie nottem")+
+  autolayer(nottem_test)+autolayer(fit_holt_winters, PI=FALSE) +theme(legend.position = "none")
+``` 
+
+
+-----
+
+
+
+```{r}
+#fit Holt Winters
+fit_holt_winters <- hw(AirPassengers_train, damped=FALSE, h=24 )
+autoplot(window(AirPassengers_train, start=c(1956,1)), ylab=NULL)+ggtitle("Modello di Holt-Winters additivo, serie AirPassengers")+
+  autolayer(AirPassengers_test)+autolayer(fit_holt_winters, PI=FALSE) +theme(legend.position = "none")
+``` 
+
+
+-----
+
+```{r}
+#fit Holt Winters
+fit_holt_winters <- hw(AirPassengers_train, damped=FALSE, seasonal="multiplicative", h=24 )
+autoplot(window(AirPassengers_train, start=c(1956,1)), ylab=NULL)+ggtitle("Holt-Winters con stagionalità moltiplicativa, serie AirPassengers")+
+  autolayer(AirPassengers_test)+autolayer(fit_holt_winters, PI=FALSE) +theme(legend.position = "none")
+``` 
+
+
+-----
+
+
+```{r}
+#fit Holt Winters
+fit_holt_winters <- hw(AirPassengers_train, damped=FALSE, seasonal="multiplicative",exponential=TRUE, h=24 )
+autoplot(window(AirPassengers_train, start=c(1956,1)), ylab=NULL)+ggtitle("Holt-Winters trend/stagionalità moltiplicative, serie AirPassengers")+
+  autolayer(AirPassengers_test)+autolayer(fit_holt_winters, PI=FALSE) +theme(legend.position = "none")
+``` 
+
+
+## Modelli ETS
+
+La notazione ETS classifica i modelli visti finora:
+
+  - Tre componenti: Error (E), Trend (T), Seasonal (S)
+  
+  - Ogni componente può essere additiva (A), moltiplicativa (M) o assente (N)
+  
+  - **Esempi**:
+    - $ETS(A, N, N)$: SES
+    - $ETS(A, A, N)$: Holt
+    - $ETS(A, A_d, N)$: Holt con trend smorzato
+    - $ETS(A, A, A)$: Holt-Winters additivo
+
+
+## SSE come MLE
+
+- Le equazioni di previsone possono essere riscritte in termini dei residui
+$$ \varepsilon_t := \hat{y}_{t|t-1} - y_{t-1}$$
+- La stima SSE 
+$$ \theta_{SSE} = \arg \min_{\theta} \sum_{s=1}^{t} \varepsilon_t^2 $$
+diventa una stima MLE supponendo residui i.i.d.\ e gaussiani 
+$$ \varepsilon_t \sim \mathcal{N}(0, \sigma^2).$$
+
+
+- L'intepretazione MLE permette di introdurre:
+  1. intervalli di confidenza/previsione parametrici
+  2. indicatori basati sulla verosimiglianza (AIC, BIC)
+  
+  
+## BJsales con intervalli di previsione al 95\%
+
+```{r}
+#fit Holt
+fit_holt <- holt(bj_train, damped=FALSE, h=50, level=90, alpha=NULL, beta=NULL)
+fit_holt_damped <- holt(bj_train, damped=TRUE, h=40, level=90, alpha=NULL, beta=NULL)
+autoplot(bj_train, ylab=NULL)+ggtitle("Modello di Holt damped trend, serie BJsales")+autolayer(fit_holt_damped, PI=TRUE, colour="blue", alpha=0.8) +theme(legend.position = "none") +  autolayer(bj_test) #+  autolayer(fit_holt, PI=TRUE, colour="green")
+``` 
+
+
+
+## AirPassengers con intervalli di previsione al 95\%
+
+
+```{r}
+#fit Holt Winters
+fit_holt_winters <- hw(AirPassengers_train, damped=FALSE, seasonal="multiplicative", level= 90, exponential=TRUE, h=24 )
+autoplot(window(AirPassengers_train, start=c(1958, 1)), ylab=NULL)+ggtitle("Holt-Winters trend/stagionalità moltiplicative, serie AirPassengers")+
+ autolayer(fit_holt_winters, PI=TRUE, alpha=0.8) +theme(legend.position = "none")+ autolayer(AirPassengers_test)
+```
+ 
+## Selezione modello mediante AIC/BIC, serie nottem
+
+```{r}
+
+#fit vari modelli ETS
+fit_ets_AAN <- ets(nottem_train, model="AAN")
+fit_ets_AAdN <- ets(nottem_train, model="AAN", damped=TRUE)
+fit_ets_AAA <- ets(nottem_train, model="AAA")
+fit_ets_MMM <- ets(nottem_train, model="MAM")
+
+#confronto AIC/BIC
+aic_values <- c(AAN = AIC(fit_ets_AAN), AAdN = AIC(fit_ets_AAdN), AAA = AIC(fit_ets_AAA), MMM=AIC(fit_ets_MMM))
+bic_values <- c(AAN = BIC(fit_ets_AAN), AAdN = BIC(fit_ets_AAdN), AAA = BIC(fit_ets_AAA), MMM=BIC(fit_ets_MMM))
+
+data_bic_aic <- data.frame(
+  Model = names(aic_values),
+  AIC = as.numeric(aic_values),
+  BIC = as.numeric(bic_values)
+)
+
+data_bic_aic
+```
+
+```{r}
+
+#plot vari modelli forecast a 24 mesi
+AAN_forecast <- forecast(fit_ets_AAN, h=24)
+AAdN_forecast <- forecast(fit_ets_AAdN, h=24)
+AAA_forecast <- forecast(fit_ets_AAA, h=24)
+MMM_forecast <- forecast(fit_ets_MMM, h=24)
+
+autoplot(window(nottem_train, start=c(1935,1)), ylab=NULL)+ggtitle("Confronto modelli ETS, serie nottem")+
+  autolayer(nottem_test)+
+  autolayer(AAN_forecast, PI=FALSE, colour="purple") +
+ autolayer(AAdN_forecast, PI=FALSE, colour="gold") +
+  autolayer(AAA_forecast, PI=FALSE, colour="green") +
+    autolayer(AAA_forecast, PI=FALSE, colour="blue") +
+  theme(legend.position = "none")
+
+```
+
+
+
+## Test di gaussianità
+
+Come nella regressione, gli intervalli di fiducia parametrici si appoggiano all'ipotesi di gaussianità (ed omoschedasticità) dei residui.
+
+- Possiamo supportare l'ipotesi con metodi
+  - qualitativi (istogrammi, qqplot)
+  - quantitativi (test di gaussianità)
+  
+  
+- I test di gaussianità valutano l'ipotesi nulla $H_0$: i residui sono gaussiani vs l'alternativa $H_1$: i residui non sono gaussiani.
+
+- un p-value basso (es. $<0.05$) porta a rifiutare l'ipotesi nulla, ossia a scartare la gaussianità dei residui.
+
+- Esempi comuni di test di gaussianità sono **Shapiro-Wilk**, Anderson-Darling, **Jarque-Bera**.
+
+
+
+
+
+
+
+## Esempio: residui BJsales, Holt damped trend
+
+
+```{r}
+library(tseries)
+#fit Holt
+fit_holt <- holt(BJsales, h=10, damped = TRUE, alpha=NULL, beta=NULL)
+residuals_holt <- residuals(fit_holt)
+library(patchwork)
+
+# istogramma residui con sovrapposta curva densità gaussiana
+p1 <- ggplot(data.frame(residuals_holt), aes(x=residuals_holt)) +
+  geom_histogram(aes(y=..density..), bins=15, fill="lightblue", color="black") +
+  stat_function(fun=dnorm, args=list(mean=mean(residuals_holt), sd=sd(residuals_holt)), color="red", size=1) +
+  ggtitle("Istogramma dei residui con densità gaussiana") +
+  xlab("Residui") + ylab("Densità")
+
+# qqnorm
+p2 <- ggplot(data.frame(residuals_holt), aes(sample=residuals_holt)) +
+  stat_qq() +
+  stat_qq_line(color="red") +
+  ggtitle("QQ-Plot dei residui") +
+  xlab("Quantili teorici") + ylab("Quantili campionari")
+
+p1/p2
+
+
+shapiro_test_result <- shapiro.test(residuals_holt)
+jb_test <- jarque.bera.test(residuals_holt)
+print(paste("p-value: Shapiro-Wilk", round(shapiro_test_result$p.value, 3),"; Jarque-Bera ", round(jb_test$p.value, 3) ))
+
+```
+
+
+
+## Esempio: residui AirPassengers, Holt-Winters (molt)
+
+
+```{r}
+library(tseries)
+#fit Holt
+fit_holt <- hw(AirPassengers_train, seasonal="multiplicative", alpha=NULL, beta=NULL)
+residuals_holt <- residuals(fit_holt)
+library(patchwork)
+
+# istogramma residui con sovrapposta curva densità gaussiana
+p1 <- ggplot(data.frame(residuals_holt), aes(x=residuals_holt)) +
+  geom_histogram(aes(y=..density..), bins=15, fill="lightblue", color="black") +
+  stat_function(fun=dnorm, args=list(mean=mean(residuals_holt), sd=sd(residuals_holt)), color="red", size=1) +
+  ggtitle("Istogramma dei residui con densità gaussiana") +
+  xlab("Residui") + ylab("Densità")
+
+# qqnorm
+p2 <- ggplot(data.frame(residuals_holt), aes(sample=residuals_holt)) +
+  stat_qq() +
+  stat_qq_line(color="red") +
+  ggtitle("QQ-Plot dei residui") +
+  xlab("Quantili teorici") + ylab("Quantili campionari")
+
+p1/p2
+
+
+shapiro_test_result <- shapiro.test(residuals_holt)
+jb_test <- jarque.bera.test(residuals_holt)
+print(paste("p-value: Shapiro-Wilk", round(shapiro_test_result$p.value, 3),"; Jarque-Bera ", round(jb_test$p.value, 3) ))
+```
+
+## Esempio: residui nottem, Holt-Winters (additivo)
+
+
+```{r}
+library(tseries)
+#fit Holt
+fit_holt <- hw(nottem_train, seasonal="additive",damped=FALSE, alpha=NULL, beta=NULL)
+residuals_holt <- residuals(fit_holt)
+library(patchwork)
+
+# istogramma residui con sovrapposta curva densità gaussiana
+p1 <- ggplot(data.frame(residuals_holt), aes(x=residuals_holt)) +
+  geom_histogram(aes(y=..density..), bins=15, fill="lightblue", color="black") +
+  stat_function(fun=dnorm, args=list(mean=mean(residuals_holt), sd=sd(residuals_holt)), color="red", size=1) +
+  ggtitle("Istogramma dei residui con densità gaussiana") +
+  xlab("Residui") + ylab("Densità")
+
+# qqnorm
+p2 <- ggplot(data.frame(residuals_holt), aes(sample=residuals_holt)) +
+  stat_qq() +
+  stat_qq_line(color="red") +
+  ggtitle("QQ-Plot dei residui") +
+  xlab("Quantili teorici") + ylab("Quantili campionari")
+
+p1/p2
+
+shapiro_test_result <- shapiro.test(residuals_holt)
+jb_test <- jarque.bera.test(residuals_holt)
+print(paste("p-value: Shapiro-Wilk", round(shapiro_test_result$p.value, 3),"; Jarque-Bera ", round(jb_test$p.value, 3) ))
+
+```
+
+## Esempio: residui AirPassengers, ETS(M,N,M)
+
+```{r}
+library(tseries)
+#fit Holt
+fit_holt <- ets(nottem_train,model="MNM")
+
+residuals_holt <- residuals(fit_holt)
+library(patchwork)
+
+# istogramma residui con sovrapposta curva densità gaussiana
+p1 <- ggplot(data.frame(residuals_holt), aes(x=residuals_holt)) +
+  geom_histogram(aes(y=..density..), bins=15, fill="lightblue", color="black") +
+  stat_function(fun=dnorm, args=list(mean=mean(residuals_holt), sd=sd(residuals_holt)), color="red", size=1) +
+  ggtitle("Istogramma dei residui con densità gaussiana") +
+  xlab("Residui") + ylab("Densità")
+
+# qqnorm
+p2 <- ggplot(data.frame(residuals_holt), aes(sample=residuals_holt)) +
+  stat_qq() +
+  stat_qq_line(color="red") +
+  ggtitle("QQ-Plot dei residui") +
+  xlab("Quantili teorici") + ylab("Quantili campionari")
+
+p1/p2
+
+shapiro_test_result <- shapiro.test(residuals_holt)
+jb_test <- jarque.bera.test(residuals_holt)
+print(paste("p-value: Shapiro-Wilk", round(shapiro_test_result$p.value, 3),"; Jarque-Bera ", round(jb_test$p.value, 3) ))
+
+```
+
+
+
+
+##  Intervalli bootstrap (non parametrici)
+
+Quando i residui/errori non sono gaussiani (o eteroschedastici) possiamo ricorrere al bootstrap *dei residui* per gli intervalli di previsione.
+
+- **Idea:** usare gli errori osservati $\varepsilon_t = \hat{y}_{t|t-1} -y_{t}$ come insieme da cui campionare gli errori futuri.
+
+- **Esempio**:
+  - Previsione naive $\hat{y}_{t+1|t} = y_t$
+  - Residui (osservati): $(\varepsilon_t)_{t=1, \ldots, T}$
+  - Orizzonte di previsione $h$ $\rightarrow$ campionamento di residui (ripetuto $B$ volte):
+  $$ \varepsilon_{T+1}^*, \varepsilon_{2}^*, \ldots, \varepsilon_{T+h}^*$$
+  - Previsone bootstrap: 
+  $$ \hat{y}^*_{T+s|T} = \hat{y}^*_{T+s-1| T} + \varepsilon^*_{T+s}$$ 
+  
+- Gli intervalli si ottengono dai quantili empirici di $\hat{y}^*_{T+h|T}$
+
+
+## Esempio nottem
+
+```{r}
+
+#Intervalli bootstrap modello naive
+
+model <- ets(nottem_train, model="AAA")
+
+predictions<-forecast(model, h=24, bootstrap=TRUE, times=1000, level= 95)
+
+autoplot(window(nottem_train, start=c(1935,1)), main="Intervalli di previsione bootstrap livello 95%, serie nottem, modello ETS(A,N,A)", ylab="temperatura")+autolayer(predictions, alpha=0.8) +autolayer(nottem_test, color="red")+theme(legend.position = "none")
+    
+    
+```
+
+## Metodi a confronto
+
+
+```{r}
+
+#Intervalli bootstrap modello naive
+
+model <- ets(nottem_train, model="ANA")
+
+predictions<-forecast(model, h=24, bootstrap=TRUE, times=5000, level= 95)
+
+
+p2 <- autoplot(window(nottem_train, start=c(1937,1)), PI=FALSE,main="Intervalli di previsione bootstrap (blu) e parametrici (rosso) livello 95%, ETS(A,A,A)",  ylab="temperatura")+autolayer(forecast(model, h=24, bootstrap=FALSE, PI=TRUE, level=95), alpha=0.8, color="red")+autolayer(predictions, col="blue", alpha =0.8) +autolayer(nottem_test, color="red")+theme(legend.position = "none")
+
+p2 
+```
+
+
+
+## Esempio AirPassengers ETS(M,N,M)
+
+```{r}
+
+#Intervalli bootstrap modello naive
+
+model <- ets(AirPassengers_train, model="MNM")
+
+predictions<-forecast(model, h=24, bootstrap=TRUE, times=5000, level= 95)
+
+p2 <- autoplot(window(AirPassengers_train, start=c(1956,1)), main="Intervalli di previsione bootstrap (blu) e parametrici (rosso) livello 95%, ETS(A,N,A)", ylab="temperatura")+autolayer(forecast(model, h=24, bootstrap=FALSE, PI=TRUE, level=95), alpha=0.8, color="red")+autolayer(predictions, col="blue", alpha =0.8) +autolayer(AirPassengers_test, color="red")+theme(legend.position = "none")
+
+p2
+```
+

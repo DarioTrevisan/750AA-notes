@@ -1,0 +1,2263 @@
+
+IT
+750AA 2025 10 20 lezione 9
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+237 views  20 Oct 2025
+Formula di Bayes, stimatori MAP e MLE. Esempi: stima del parametro di una Bernoulli (estrazioni con rimpiazzo), previsioni (regolarizzazione di Laplace); stima dei parametri di una gaussiana (media, deviazione standard), previsioni (t-student). Modelli generativi e discriminativi per classificazione. Modello Naive Bayes: descrizione generale, esempio Bernoulli, esempio Gaussiano. Funzioni di score, curva ROC, AUC come indicatore di performance. LDA e QDA come modello generativo con Gaussiane generali (stima dei parametri tramite MLE). Regressione logistica come modello discriminativo (caso binario). Funzione di verosimiglianza (stima di massima verosimiglianza non ha formula elementare). Euristiche One-vs-All, One-vs-One per classificazione multi classe. Cenno alla regressione soft-max (logistica multi classe).
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+DARIO TREVISAN
+Add a comment…
+Transcript
+Search transcript
+0:03
+3 seconds
+Bene, iniziamo puntuale come al solito.
+0:09
+9 seconds
+Dunque, eh sì, un paio di cose. Quindi questa settimana ci rivediamo mercoledì anche e
+0:17
+17 seconds
+poi ho predisposto questo form, ho usato quello di Microsoft perché abbiamo lo spazio nel Drive su OneDrive. mi sono
+0:26
+26 seconds
+reso conto, poi vi dirò, c'è un piccolo problema perché non si può caricare documenti che non siano di estensioni che decidono, insomma, decise dall'alto
+0:34
+34 seconds
+o da Microsoft. Quindi, ad esempio, non si può neanche caricare un CSV, cioè si possono calcolare gli Excel, caricare, però mi sembra che se uno a mano cambia
+0:42
+42 seconds
+l'estensione in punto CSV di un Excel o vi poi aggiungete insomma un'estensione CSV potete caricare, cioè dovete fare
+0:51
+51 seconds
+viceversa, scusate, il CSV dovete rinominarlo in punto Excel e poi me lo può caricare, va bene? Casomai poi vediamo mercoledì di darvi qualche
+0:59
+59 seconds
+indicazione, quindi non preoccupatevi, non è che eh insomma ce la faremo. Voi lavorate pure con formati aperti tipo CSV. Purtroppo è la scelta di usare il
+1:08
+1 minute, 8 seconds
+form che che è un pochino rallenta. Poi non mi aspetto neanche che siano pronte le le insomma questi questi progetti
+1:16
+1 minute, 16 seconds
+venerdì o sabato, cioè magari li apro nel fine settimana perché però ho capito che molti di voi stanno già lavorando,
+1:22
+1 minute, 22 seconds
+quindi vale la pena di aprire questo questa possibilità.
+1:27
+1 minute, 27 seconds
+Poi mercoledì faremo anche un paio di così domandine di riepilogo simili a quelle che potrebbero intervenire nella
+1:34
+1 minute, 34 seconds
+prova. Nella prova. D'accordo? Quindi invece andiamo avanti con
+1:41
+1 minute, 41 seconds
+eh la teoria e oggi parliamo di altri classificatori perché fino ora abbiamo visto solamente KN, i ke rest nebor gli
+1:50
+1 minute, 50 seconds
+n i K vicini, no? E però ci sono classificatori ben più potenti. Quindi il punto è che questi classificatori
+1:58
+1 minute, 58 seconds
+sono basati su modelli, modelli inferenziali e sotto sotto sono basati, almeno quelli che vi presento, sulla formula di Bayes. Va bene? Poi ci sono
+2:07
+2 minutes, 7 seconds
+ulteriori classificatori un po' si va verso il machine learning, sono evoluzioni di questi. Allora, ricominciamo dalla probabilità e in
+2:16
+2 minutes, 16 seconds
+particolare della formula di BES. Questa ve l'avevo già richiamata la volta scorsa facendo un po' di eh richiami generali di probabilità. Adesso
+2:24
+2 minutes, 24 seconds
+diciamolo esattamente nel nostro contesto. Cosa significa? Significa che possiamo, se abbiamo un campione test che ha certe
+2:33
+2 minutes, 33 seconds
+caratteristiche X, pensate, no, di caratteristiche un RD, ma potrebbero essere anche discrete o altra natura. e
+2:41
+2 minutes, 41 seconds
+poi avremo, diciamo, dei parametri nel nostro modello che potrebbero essere se stesse le caratteristiche, ma potrebbero essere anche dei modelli di un
+2:49
+2 minutes, 49 seconds
+parametro. Ok? In questo caso facciamo finta che siano le caratteristiche, va bene, le labels che dobbiamo stimare. Allora, cosa dice la formula di bases?
+2:57
+2 minutes, 57 seconds
+Cioè, ci dice che se abbiamo un input x piccolo, una vera, sappiamo che abbiamo osservato le caratteristiche x piccolo,
+3:06
+3 minutes, 6 seconds
+beh, possiamo aggiornare la probabilità dei parametri, quindi delle delle etichette, nel nostro caso della classificazione. In che modo? Beh, ci
+3:14
+3 minutes, 14 seconds
+sono le vecchie probabilità, quelle a priori sono dette anche per questo fattore che è la verosimiglianza, ossia
+3:22
+3 minutes, 22 seconds
+la probabilità di osservare quelle caratteristiche se sappiamo che il parametro che la label era teta. E poi c'è un fattore, ma questo fattore
+3:29
+3 minutes, 29 seconds
+vedremo che poi nell'assegnazione, no, nel metodo di ehm insomma di classificazione non conta, ok? La probabilità soltanto di osservare le caratteristiche.
+3:40
+3 minutes, 40 seconds
+Allora, come si interpreta questo?
+3:41
+3 minutes, 41 seconds
+Appunto, ve l'ho già detto, no? Abbiamo la probabilità posteriori, viene anche chiamata questa dopo che abbiamo osservato le caratteristiche del nostro punto da classificare e poi abbiamo la
+3:50
+3 minutes, 50 seconds
+probabilità a priori delle label l'ho scritta, sì, o del parametro e poi la verosimiglianza. Questo appunto viene anche detta verosimiglianza quando si
+3:59
+3 minutes, 59 seconds
+pone l'accento più sul parametro, sul sul teta, diciamo, sulle etichette piuttosto che sulle osservazioni, però è la stessa cosa.
+4:09
+4 minutes, 9 seconds
+Ok? E vabbè, poi c'è la marginale delle caratteristiche, ma il denominatore, vi ricordo, non è non è così importante.
+4:15
+4 minutes, 15 seconds
+Infatti spesso uno scrive anche soltanto questo, dice che la densità posteriori è proporzionale, usa questo simbolo, a una
+4:22
+4 minutes, 22 seconds
+densità a priori moltiplicata, quindi ripesata, con questo fattore di versianza. in alcuni punti verrà magari soppressa, viene messa a zero, in altri
+4:30
+4 minutes, 30 seconds
+punti viene mantenuta e complessivamente quindi abbiamo un riscalamento di tutto.
+4:37
+4 minutes, 37 seconds
+Allora, una volta che abbiamo, diciamo, la stima, supponiamo di avere un qualche modello che per qualche motivo riesce a
+4:44
+4 minutes, 44 seconds
+produrci questa probabilità posteriori delle classi, quindi delle nostre etichette, avendo osservate le X, le caratteristiche, come facciamo a
+4:52
+4 minutes, 52 seconds
+trasformare queste probabilità in una vera eh classificazione? Quindi dobbiamo fare una decisione, ok? Dobbiamo
+5:00
+5 minutes
+decidere, anche se abbiamo calcolato queste, vedremo che i modelli in effetti calcolano queste. Come si fa andare a decidere? Beh, questo è un problema
+5:08
+5 minutes, 8 seconds
+generale di decisione, no? Anche quando facevamo una stima puntuale, no? Abbiamo tutti i nostri dati, decidiamo che li approssimiamo con la media o con la
+5:15
+5 minutes, 15 seconds
+mediana e così via. Allora, data una densità, qual è la cosa più semplice? Se non chiediamo troppe cose, che sia
+5:23
+5 minutes, 23 seconds
+discreta o continua, a posteriori a priori, un modo per decidere ce l'abbiamo sempre, è quello della moda, ok? Decidiamo sempre il teta, la classe
+5:32
+5 minutes, 32 seconds
+più probabile. Ok? Allora, precisamente questo contesto baesiano della formula di Bayes, alla fine si traduce in questa
+5:40
+5 minutes, 40 seconds
+cosa, no? Nella stima del massimo a posteriori. Perché uno cosa fa? Osserva le caratteristiche, calcola le probabilità per ciascuna classe e poi va
+5:49
+5 minutes, 49 seconds
+a trovare la moda, cioè la l'etichetta che ha la più grande probabilità. Ok?
+5:54
+5 minutes, 54 seconds
+Come al solito, vedete compare un problema di massimizzare, quindi un problema variazionale, massimizzare questa probabilità a posteriori. Ma la
+6:03
+6 minutes, 3 seconds
+probabilità posteriori non è nient'altro, come dicevamo, per la formula di Bayes, che la probabilità a priori moltiplicata per l'avversosimiglianza. Perché ho tolto il
+6:11
+6 minutes, 11 seconds
+denominatore? Perché il denominatore, vedete, sarebbe lo stesso per tutti i teta, quindi massimizzare quella o massimizzare quella non riscalata è lo
+6:19
+6 minutes, 19 seconds
+stesso. Ok? Quindi, capite? Quindi è è per questo che il denominatore non ci interessa perché stiamo calcolando delle
+6:26
+6 minutes, 26 seconds
+mode. Ok? Eh, in realtà poi c'è un altro tipo di stima che è quella della statistica più classica frequentista che è quella invece di massimizzare solo la
+6:35
+6 minutes, 35 seconds
+verosimiglianza. Ok? Massimizzare solo la verosimiglianza cosa vuol dire? Beh, in pratica vuol dire che questo fattore
+6:41
+6 minutes, 41 seconds
+pi teta qui scompare perché perché stiamo dicendo che pi teta è costante, è la stessa probabilità a
+6:49
+6 minutes, 49 seconds
+tutte. significa che abbiamo messo la stessa, o meglio densità uniforme, se volete, densità
+6:57
+6 minutes, 57 seconds
+uniforme, la stessa probabilità a priori prima di vedere i dati per
+7:04
+7 minutes, 4 seconds
+teta. Ok? Quindi, come dire, noè noi all'inizio pensiamo che le classi più o meno sono tutte uguali con la stessa probabilità e quindi andiamo solo a
+7:12
+7 minutes, 12 seconds
+massimizzare l'evidenza, la la probabilità, la la verosimiglianza, appunto. Ok? Però, appunto, ci potrebbero essere altre situazioni in
+7:19
+7 minutes, 19 seconds
+cui a priori noi sappiamo che le classi non sono tutte qui probabili, sappiamo che, non so, una malattia rara e allora avremo che uno su un milione è la
+7:26
+7 minutes, 26 seconds
+probabilità che avremo la classe di una persona malata, ok? E quindi magari questo è più flessibile, ok? Di introdurre quindi una probabilità a priori che sappiamo già. Ok?
+7:37
+7 minutes, 37 seconds
+E vabbè, però attenti sempre a questo discorso. Noi stiamo dicendo che abbiamo la formula di Beers che ci dà delle probabilità e poi facciamo una decisione. Attenti che questa stima è
+7:46
+7 minutes, 46 seconds
+una stima puntuale. Li chiamavamo gli stimatori, no, nel corso di statistica uno. Ma uno stimatore e basta contiene
+7:54
+7 minutes, 54 seconds
+molta meno informazione. Non c'è, ad esempio, l'incertezza sulla nostra decisione. Noi abbiamo detto stimiamo la moda, ma magari la moda erano più o meno
+8:02
+8 minutes, 2 seconds
+tutte qui probabili e casualmente è venuto fuori che la moda era una di queste e non altre. Non abbiamo informazioni sull'incertezza, ok? Quindi
+8:09
+8 minutes, 9 seconds
+attenti che gli stimatori puntuali di per sé non vi danno l'informazione su quanto siete sicuri in questa decisione.
+8:17
+8 minutes, 17 seconds
+Sì, scusi, non la differenza fra le due proprio nel senso anche di formula matematica.
+8:22
+8 minutes, 22 seconds
+Eh, vedi vedi, uno è pi teta. Qua c'è un fattore pi teta che moltiplica la verosimiglianza e qui non c'è. è sparito che io
+8:30
+8 minutes, 30 seconds
+beh, perché se uno assume che pi teta sia lo stesso, tipo è uno su un numero dei possibili classi, no? Mettercelo o
+8:38
+8 minutes, 38 seconds
+non mettercelo non fa nessuna differenza perché è come avere un fattore che sia comune a tutti, no? Se uno suppone che pi theta sia uniforme è un fattore che
+8:46
+8 minutes, 46 seconds
+sta lì, come il denominatore di prima, è un fattore che sta lì ed è comune a tutti. Quindi se io peso tutti allo stesso modo, vi ripeso tutti per 100,
+8:54
+8 minutes, 54 seconds
+tutte le vostre classi, però alla fine non cambia niente. Quello che era più grande resta più grande, quello che è più piccolo resta più piccolo. Quindi la
+9:02
+9 minutes, 2 seconds
+massima verosimiglianza è un caso speciale della massimo posteriori, ok?
+9:06
+9 minutes, 6 seconds
+Ed è precisamente si usa spesso in statistica all'inizio quella statistica uno perché non ci non ci vuole tenere
+9:12
+9 minutes, 12 seconds
+presente che magari ci sono delle degli sbilanciamenti a priori tra le tra le classi, ad esempio. Ok. Quindi secondo
+9:20
+9 minutes, 20 seconds
+mette la stessa probabilità a tutti. Ok, funziona.
+9:24
+9 minutes, 24 seconds
+Ok, quindi questo spero che chiarisca un po' la differenza, però sono della stessa natura, eh, anzi spesso li confondiamo. Uno dice massima verosimiglianza, massima posteriori.
+9:34
+9 minutes, 34 seconds
+Allora, facciamo un esempio, faccio un paio di esempi concreti, non so se avete mai visto, perché non mi sembra che Statistica uno insistiamo molto su questo e magari c'è qualcuno che non ha
+9:43
+9 minutes, 43 seconds
+mai studiato statistica 1, quindi sono degli esempi, secondo me, chiariscono poi quello che facciamo ora con modelli più complicati di classificazione.
+9:51
+9 minutes, 51 seconds
+Allora, questo è un problema molto semplice. Dobbiamo stimare sarebbe il parametro di una Bernulli. Allora, vi ricordate cos'era una Bernulli? Era una
+9:59
+9 minutes, 59 seconds
+variabile che aveva soltanto valori zero oppure 1. Ok? Allora, nella pratica concretamente, cosa significa? Che
+10:07
+10 minutes, 7 seconds
+abbiamo un esperimento e ci sarà un successo con una certa probabilità, chiamiamola teta. questo parametro
+10:16
+10 minutes, 16 seconds
+attenti che ora non è più discreta, prima erano le classi, ora questo esempio è un continuo, va bene? E comunque avremo questa probabilità,
+10:24
+10 minutes, 24 seconds
+questa frazione di che so che potrebbe essere la frazione di palline rosse in un'urna e il successo è proprio estrarre la rossa. Ma pensate a esperimenti che
+10:32
+10 minutes, 32 seconds
+so in laboratorio, uno fa degli esperimenti e con una certa probabilità ottiene successo. Allora uno dice, "Va
+10:39
+10 minutes, 39 seconds
+bene, allora faccio tanti esperimenti e a quel punto saprò stimare la probabilità del successo".
+10:47
+10 minutes, 47 seconds
+E già forse ve lo ricordate, ma lo richiamiamo. Se avete esperimenti indipendenti
+10:55
+10 minutes, 55 seconds
+e tra di loro, come dicevamo anche nel modello della classificazione, ci aspettiamo che le singole istanze siano tra di loro indipendenti, non c'è
+11:02
+11 minutes, 2 seconds
+associazione tra una e l'altra e quindi le modellizziamo con variabiliatorie indipendenti.
+11:10
+11 minutes, 10 seconds
+Eh, quando parliamo di estrazione si tratta di un modello molto semplice. Si tratta di un modello in cui prendete una pallina dalla scatola, guardate il colore e poi rimettete la pallina dentro
+11:19
+11 minutes, 19 seconds
+e mescolate. Ok? E a quel punto uno dice: "Ok, quello che è successo nelle estrazioni precedenti non influenza quello che succederà dopo". Allora, in
+11:27
+11 minutes, 27 seconds
+questo modello, se uno va a vedere, no, in n esperimenti, n estrazioni, va a vedere quante volte ha successo, che diciamo è il numero delle rosse, può
+11:36
+11 minutes, 36 seconds
+dimostrare che appunto questo è un conto di di statistica, di probabilità di base che c'è una formula precisa, cioè se io
+11:43
+11 minutes, 43 seconds
+conosco quante erano quant'è la probabilità di successo, posso dire che vedrò un certo numero x di successi pari
+11:52
+11 minutes, 52 seconds
+a cosa? Beh, pari a questa densità binomiale. Si chiama densità binomiale. Adesso vi richiamo anche perché è così.
+12:01
+12 minutes, 1 second
+Densità binomiale. Allora, cosa significa? Beh, vedete, teta è la probabilità di successo. Teta^ x sono
+12:09
+12 minutes, 9 seconds
+teta * teta per teta. X volte quanti successi ho? E poi ho i fallimenti.
+12:14
+12 minutes, 14 seconds
+Ciascun fallimento, cioè ho estratto una pallina che non è rossa e allora sarà 1 - teta. Ma quante volte compare 1 - teta
+12:21
+12 minutes, 21 seconds
+* 1 - teta n ^ - x perché sono i fallimenti.
+12:25
+12 minutes, 25 seconds
+Ok? Quindi qui avreste successo per eh per fallimenti, però attenti, c'è un altro coefficiente che è quello che dà il nome, si chiama densità binomiale e
+12:34
+12 minutes, 34 seconds
+questo è il coefficiente binomiale, quello che compare anche nel nel binomio di Newton. Coefficiente binomiale.
+12:42
+12 minutes, 42 seconds
+Perché è qui? Beh, perché un conto è vedere la sequenza successo successo successo x vol e poi insuccesso in
+12:49
+12 minutes, 49 seconds
+successo n - x vol. Ma quello è solo un modo in cui si possono verificare questi successi. Potrei vedere una frequenza
+12:56
+12 minutes, 56 seconds
+con un con un ordine diverso. E allora a seconda di quante sono le sequenze, cioè otteniamo un coefficiente binomiale
+13:02
+13 minutes, 2 seconds
+diverso. Ok? Questo conta quante sono le possibili sequenze in cui compariranno successi. X volte comparirà successo, n
+13:11
+13 minutes, 11 seconds
+- x vol insuccesso. Per ciascuna di queste sequenze la probabilità è quella lì. X t^ x 1 - t^ n - x. Ok? Ora questo
+13:20
+13 minutes, 20 seconds
+l'avevamo visto, credo al corso di di probabilità di statistica 1. Comunque altrimenti prendetela come una formula che insomma è ben nota e di base, ok?
+13:30
+13 minutes, 30 seconds
+per ora, quindi non è questo il nostro obiettivo, modalizzare questo. Questo a volte è già dato nei modelli. Voglio farvi capire però il meccanismo della formula di Bes. Adesso uno dice: "Ok,
+13:39
+13 minutes, 39 seconds
+all'inizio non conosco niente sul mio parametro, non so quant'è la probabilità di successo, non ho ancora fatto esperimenti, non so niente e quindi che
+13:47
+13 minutes, 47 seconds
+densità metto?" Eh, come prima dicevamo, se uno non sa, non ha motivi per favorire una ipotesi a un'altra, mette una densità uniforme.
+13:57
+13 minutes, 57 seconds
+Ok? P di tetto = 1. Allora, vediamo che insieme questo questo specifica già il modello perché avete la verosimiglianza,
+14:04
+14 minutes, 4 seconds
+la probabilità a priori e ora le mettiamo insieme, facciamolo con bases per una volta o facciamo semplicemente
+14:11
+14 minutes, 11 seconds
+le teta la teta di massimo verimiglianza che è uguale la teta di massimo posteriori, cioè significa di
+14:19
+14 minutes, 19 seconds
+massimizzare che cosa? Beh, dobbiamo massimizzare pi teta, che è 1, che è già 1 e per
+14:26
+14 minutes, 26 seconds
+quest'altra funzione qui, n su x teta^ 1 - t^ n - x. Attenti, massimizzare dove?
+14:35
+14 minutes, 35 seconds
+Massimizzare sul parametro teta. Cioè, io ho fatto i miei esperimenti, immaginiamo, ho fatto 100 estrazioni, ne
+14:42
+14 minutes, 42 seconds
+ho viste 20 di successo. Allora, n, x è 20. Quello che rimane da specificare è
+14:49
+14 minutes, 49 seconds
+teta. Allora, vado a trovare quello più probabile, ok? Quello che è la che massimizza la densità posteriori o la verossimilanza. Quindi qui si tratta di massimizzare questa funzione in teta.
+15:01
+15 minutes, 1 second
+Poi vedete questa non dipende da teta, infatti questo coefficiente binomiale sta lì, è importante che ci sia, ma non ci serve per i nostri scopi. Quindi si tratta solo di massimizzare che cosa?
+15:12
+15 minutes, 12 seconds
+Togliamo pure il 2 di mezzo.
+15:14
+15 minutes, 14 seconds
+Massimizzare solo la e. Ok? Abbiamo una funzione che è teta^ x. x potrebbe essere 20 30, immaginatevi un numero
+15:23
+15 minutes, 23 seconds
+fissato per 1 - teta^ n - x che sono i fallimenti, 70, non so, dipende da quanti esperimenti avete fatto e cosa vedete in pratica. Però questa funzione
+15:31
+15 minutes, 31 seconds
+è molto semplice perché c'è teta^ x * 1 - teta^ n - x. Vediamo se eh No, questo era per il giochino. E allora vediamo se ho un po' di spazio per farlo qui.
+15:43
+15 minutes, 43 seconds
+Comunque qualche formula, dopo qualche grafico ve lo mostro.
+15:47
+15 minutes, 47 seconds
+Eh, come'è fatta? Come si fa a massimizzare una funzione in teta? Se teta è un parametro continuo, fate la derivata, no? Fate la derivata.
+15:58
+15 minutes, 58 seconds
+Vi ricordate come si massimizzano le funzioni? Deriviamo e imponiamo che la derivata si annulli, ok? Quindi, quando derivate trovate derivata di teta all x
+16:07
+16 minutes, 7 seconds
+in teta, eh, non derivate in x. X è l'ho chiamato X un po' sfortunato forse.
+16:11
+16 minutes, 11 seconds
+Quindi derivate allora in teta e quindi pensatelo come un polinomio di teta, no?
+16:16
+16 minutes, 16 seconds
+Quindi è un polinomio di teta. Quindi avete teta^ x derivata vi dà x * t^ x - 1. Quindi devo imporre che la derivata
+16:24
+16 minutes, 24 seconds
+si annulli. Calcoliamo sta derivata, viene x * t^ x - 1
+16:31
+16 minutes, 31 seconds
+perché è semplicemente il derivato la rispetto a teta. E l'altro termine, beh, devo fare più la derivata rispetto a
+16:39
+16 minutes, 39 seconds
+teta dell'altro, quindi t^ x e devo derivare qui, no? La regola della derivata del prodotto. Quindi qui mi
+16:44
+16 minutes, 44 seconds
+scende un n - x e 1 - t^ n - x - 1 e c'è anche un segno meno perché derivo dentro, ok? Quindi alla fine viene meno.
+16:58
+16 minutes, 58 seconds
+Ok? Adesso, quindi questa è un'espressione che può sembrare complicata, però vedete c'è un teta all x che compare e un 1 - teta all^ n - x
+17:05
+17 minutes, 5 seconds
+che compaiono un po' di volte. Quindi uno può semplificare, ad esempio, qui può togliere t^ x e scomparire anche
+17:13
+17 minutes, 13 seconds
+lui. Teta all 1 - t^ n - x scomparirà anche lui. E quindi alla fine si trova un'equazione molto semplice. Ok, vi
+17:21
+17 minutes, 21 seconds
+lascio. Non è proprio parte del del corso. Questo si faceva già in statistica uno anche e allora trovo un'equazione molto semplice. Trovo
+17:28
+17 minutes, 28 seconds
+effettivamente che la stima è quello che uno saspetta, ok? La stima per teta è x numero di successi su n esperimenti
+17:37
+17 minutes, 37 seconds
+totali. Ok? Molto semplice. Uno poteva dirlo anche prima. Uno dice "Ho fatto 100 esperimenti, 30 volte ho visto successo." Qual è la probabilità di
+17:45
+17 minutes, 45 seconds
+avere successo? Eh, la probabilità sarà casi, cioè successi su esperimenti totali, no? Che è diverso da dire casi
+17:52
+17 minutes, 52 seconds
+favorevoli su casi possibili, se ci pensate, no? È quello che hai osservato.
+17:57
+17 minutes, 57 seconds
+Va bene? Quindi effettivamente, quindi, un po' di conti ci sono, ma non è tanto il punto del del corso farvi fare questi conti. Invece è più simpatico che
+18:05
+18 minutes, 5 seconds
+capiate un po' la dinamica di questa formula di Bayes. Allora, ho fatto questa piccola demo molto semplice, giocateci anche voi. Vediamo se riesco a
+18:14
+18 minutes, 14 seconds
+farla girare anch'io. M forse lo faccio girare.
+18:21
+18 minutes, 21 seconds
+Sì, eccolo qua. C'è si è disconnesso. Vediamo se si riconnesse. Cioè, è molto semplice. Voi potete
+18:29
+18 minutes, 29 seconds
+in effetti stabilire in generale una densità a priori. È sempre questo discorso delle delle estrazioni e col
+18:36
+18 minutes, 36 seconds
+col rimpiazzo, cioè questi successi e fallimenti. Allora, diciamo che stabiliamo una densità a priori, magari anche diversa dall'uniforme. Ok? Ecco
+18:46
+18 minutes, 46 seconds
+questo esempietto. In questo esempietto noi siamo convinti, diciamo, che la probabilità eh insomma questa è la probabilità di
+18:53
+18 minutes, 53 seconds
+avere successo, non so se si legge, 0,5, no? E in questo caso è abbastanza vicina a 0,4, ok? Però invece più bassa la
+19:01
+19 minutes, 1 second
+probabilità che sia zero il parametro del nostro teta o la probabilità che sia 1. Ok? Questa non è l'uniforme, facciamo
+19:09
+19 minutes, 9 seconds
+così, togliamo, facciamo il caso uniforme che è il più semplice di tutti.
+19:13
+19 minutes, 13 seconds
+Cosa significa uniforme? Significa che la mia pi teta, la mia densità a priori è piatta. Ok? Adesso cosa succede?
+19:22
+19 minutes, 22 seconds
+Facciamo un po' di esperimenti di cui c'è la verosimiglianza. Facciamo due tre esperimenti, anche uno solo. Facciamo un
+19:29
+19 minutes, 29 seconds
+uno solo. Ho fatto un primo lancio e questa è la funzione di verosimiglianza, quella che è sarebbe il coefficiente
+19:36
+19 minutes, 36 seconds
+binomiale, no? Un esperimento, un successo. In questo caso ho visto fallimento, vedete? Ho visto 0 e quindi
+19:44
+19 minutes, 44 seconds
+la funzione è 1 - x. Effettivamente la la vedete, è una retta. Allora, cosa devo fare per la formula di bases? Devo moltiplicarli.
+19:52
+19 minutes, 52 seconds
+moltiplichiamoli e otterrò, quindi premo qui, applico, li moltiplico e ottengo una densità, beh, se volete era costante
+20:00
+20 minutes
+per 1 - x, ottengo 1 - x. Ok? Facciamo qualcosa di un po' più complicato. Facciamo adesso tipo 15 lanci.
+20:07
+20 minutes, 7 seconds
+Ecco qui i miei esiti dei miei lanci. Ho simulato i lanci e adesso ho questa funzione di verosimiglianza. Questo tiene conto di quello che ho visto. Ho
+20:16
+20 minutes, 16 seconds
+visto questi esiti qui, uno zer successo insuccesso, successo, tanti fallimenti, qualche successo e così via. Inglobati in questa funzione di verosimiglianza.
+20:25
+20 minutes, 25 seconds
+Questa sarebbe la probabilità, per ogni teta avete la probabilità di osservare quello che effettivamente avete osservato, ok? Se il parametro vero
+20:32
+20 minutes, 32 seconds
+fosse teta. Allora, mettiamolo insieme, no? la eh nuova verosimiglianza per quella che credevo prima, la probabilità
+20:40
+20 minutes, 40 seconds
+che avevo già fatto un lancio, quindi tengo presente che avevo fatto un lancio, quindi adesso era questa la mia la mia probabilità. Se li metto insieme basta moltiplicarli. Cosa succede?
+20:50
+20 minutes, 50 seconds
+Vedete in zero c'era una una verosimiglianza molto bassa che era zero praticamente, anche se la probabilità
+20:57
+20 minutes, 57 seconds
+all'inizio era alta e è stata rimandata giù. Adesso questa è talmente alta che probabilmente normalizziamo tutto una probabilità di
+21:05
+21 minutes, 5 seconds
+densità. Ecco, vabbè, avrei dovuto predisporre anche il fatto che potesse sforare. Ok, lì è andata molto in alto e
+21:12
+21 minutes, 12 seconds
+sulla scala delle X delle Y viene calcolata in automatico ogni volta. Ok? Allora, provateci pure a a giocare.
+21:21
+21 minutes, 21 seconds
+Meccanismo molto semplice, quindi uno stabilisce delle probabilità a priori, facciamole un po' diverse. Ecco qua.
+21:29
+21 minutes, 29 seconds
+Questa potrebbe essere una probabilità a priori un po' strana. Cosa rappresenta questo? che siamo abbastanza convinti che potrebbe esserci zero probabilità di
+21:37
+21 minutes, 37 seconds
+successo, quindi siamo c'è tipo un fallimento assicurato, oppure se le cose ci vanno bene siamo intorno a 0607,
+21:44
+21 minutes, 44 seconds
+quindi o non vedremo mai successi oppure in realtà li vedremo con probabilità 07. Questo un po' rappresenta questa curva.
+21:52
+21 minutes, 52 seconds
+Ok? Allora, uno cosa fa? Poi questo ha stabilito quello che credeva, va a fare gli esperimenti. Diciamo che abbiamo invece una moneta che non fa mai
+22:00
+22 minutes
+successi, ok? O molto bassi. Qui questo posso scegliere il vero parametro. È una cosa un po' così, non è quello che fate
+22:07
+22 minutes, 7 seconds
+in pratica. Io sto adesso dico, faccio finta che la moneta abbia probabilità di successo 0.02. Veramente il teta vero è 0.02.
+22:16
+22 minutes, 16 seconds
+Cosa succede se faccio, che so cinque lanci? Beh, vedo tutti zeri. Allora, le mie osservazioni mi portano a credere
+22:25
+22 minutes, 25 seconds
+che in effetti, vedete, la verosimiglianza mi pesa molto il fatto che teta sia uguale a 0, quindi mi porta molto lì. Quando vado a moltiplicarle,
+22:34
+22 minutes, 34 seconds
+tac, vedete la probabilità ora si è aggiornata e la mia probabilità è tutta spostata in zero. È quello che all'inizio credevo che forse era molto probabile di avere successo è sparito.
+22:45
+22 minutes, 45 seconds
+Ok? Vedete? Quindi la forma di bases aggiorna in modo automatico, almeno in questo esempio molto semplice, la quello che crediamo in base a quello che
+22:53
+22 minutes, 53 seconds
+osserviamo. Ok? Allora, se volete giocarci, vi consiglio di farlo molto simpatico, almeno ho avuto dei feedback
+23:00
+23 minutes
+positivi in questo caso, ci sono i i vari livelli e vi danno un'informazione.
+23:05
+23 minutes, 5 seconds
+Voi dovete comunque stabilire la la densità a priori, ok? Come facevamo prima, la curva arancione, però non
+23:12
+23 minutes, 12 seconds
+dovete definirla a caso. C'è un piccolo indizio lì in alto che però è molto, cioè sono generati tramite c GPT questi
+23:20
+23 minutes, 20 seconds
+piccoli indizi. Ok? Con questo indizio forse potreste capire se è più probabile che sia zero, è più probabile che sia uno. Poi chiaramente potete lanciare le
+23:28
+23 minutes, 28 seconds
+monete e vedere effettivamente qual è la vostra, cioè se avevate ragione oppure se vedete che cambia molto la vostra la
+23:37
+23 minutes, 37 seconds
+vostra stima. Ok? Quando siete abbastanza convinti confermate. Ecco, la stima posteriori è segnata, il massimo posteriore è segnata qui con la
+23:44
+23 minutes, 44 seconds
+crocetta. Va bene? Quindi, in questo caso, il massimo a posteriori sembra essere uno. Dopo tre lanci siamo non c'è
+23:52
+23 minutes, 52 seconds
+molto convinti, vedete, la probabilità è comunque abbastanza alta anche qui, però diciamo io sono convinto che sia uno,
+24:00
+24 minutes
+visto anche l'indizio, vediamo se avevo ragione. Eh, il vero valore invece era 0.6. Vabbè, comunque comunque giocateci
+24:08
+24 minutes, 8 seconds
+e e vedete che gli indizi sono abbastanza Come si fa a cambiare il livello? Non ricordo. Conferma la stima e is the broad. Ok. Sì, andate avanti.
+24:18
+24 minutes, 18 seconds
+Va bene? Divertitevi un po' così capite per bene la forma di Bes se non l'avete già capita in altre situazioni che
+24:26
+24 minutes, 26 seconds
+invece è secondo me la cosa più importante che può dire la probabilità.
+24:31
+24 minutes, 31 seconds
+Ok? Dubbi su questo? Allora, forma di Be, giocateci un pochino e abbiamo capito eh un po' il discorso. Ora, in
+24:39
+24 minutes, 39 seconds
+effetti, cosa puoi cosa può dire questo stesso esempio? quello che abbiamo fatto un attimo fa, non il giochino che dove potete giocare la densità a priori come
+24:46
+24 minutes, 46 seconds
+volete. Beh, che ci sono a volte delle densità comode che se uno va a vedere bene come funziona il meccanismo dei
+24:53
+24 minutes, 53 seconds
+conti conviene osservare. Ad esempio, cosa si nota? Se uno dice a priori, non metto una curva a caso, che decido io,
+25:02
+25 minutes, 2 seconds
+ma metto una curva di questo tipo, del tipo teta all alfa - 1 * 1 - t^ beta - 1, quello che si scopre è che la densità
+25:11
+25 minutes, 11 seconds
+a posteriori è della stessa è della stessa forma. Ok? Allora, qual è l'interpretazione di queste curve? Come sono fatte queste curve? Beh, queste
+25:19
+25 minutes, 19 seconds
+curve ci dicono in un certo senso che a priori, ma poi anche a posteriori, vedete che la la struttura è molto
+25:26
+25 minutes, 26 seconds
+simile. Allora, a priori avete alfa -1 successi, avete come se aveste osservato alfa -1 successi e beta -1 fallimenti.
+25:36
+25 minutes, 36 seconds
+Perché dico questo? Perché avevamo visto che all'inizio se pi teta era uniforme a posteriori avevamo trovato teta^ x * 1 - teta^ n - x.
+25:47
+25 minutes, 47 seconds
+Questa era la p di teta dopo x = x pic su n tentativi e avevamo visto che x era
+25:54
+25 minutes, 54 seconds
+il numero di successi e n - x i fallimenti. Quindi dice ok, facciamo una cosa un po' più astratta. Prendo la densità della forma teta alfa -1 più ora
+26:03
+26 minutes, 3 seconds
+il -1 è soltanto una convenzione, eh però ehm l'interpretazione è questa appunto che alfa - 1, vedete qui sarebbe
+26:10
+26 minutes, 10 seconds
+x più che x - 1, però e l'interpretazione se volete sì, infatti scusate interpretazione, voi
+26:17
+26 minutes, 17 seconds
+toglieteci pure questi uni che è un po' stupido, ok? Alfa è il numero di successi e beta, no, scusate, mi
+26:25
+26 minutes, 25 seconds
+confondo. È giusto, no? Così corrisponde esattamente, vedete? alfa - 1 diventa x e beta - 1 n - x. Ok? Faccio confusione
+26:34
+26 minutes, 34 seconds
+con questi -1 un po' noiosi. Allora, come sono fatte queste densità? Adesso vediamo un grafico, però il punto è che la moda, il punto più probabile è dato
+26:42
+26 minutes, 42 seconds
+proprio dal rapporto come prima era x su n, cioè viene alfa - alfa + beta - 2. Ok? Un punto molto
+26:52
+26 minutes, 52 seconds
+preciso. Altre proprietà che si può dire di questa densità è che vedete la moda è un punto, ma la media che cos'è la
+26:59
+26 minutes, 59 seconds
+media? È l'integrale è la media. Quindi fate l'integrale tra 0 e 1 del valore per la densità.
+27:07
+27 minutes, 7 seconds
+La media, attenti, non è sempre la moda, come il valor medio, non è sempre, anche nei per i dati che osservate non è sempre la moda il valor medio. Ok?
+27:16
+27 minutes, 16 seconds
+Quindi la media teorica è l'integrale, infatti è una media teorica, quindi integrate su tutti i possibili valori il valore per la densità di probabilità di
+27:24
+27 minutes, 24 seconds
+quel valore. E viene un po' diverso, vedete? alfa su alfa + beta. Vabbè, però molto lì vicino, insomma, non è E la
+27:32
+27 minutes, 32 seconds
+varianza pure questa si calcola, non è non dovete ricordarvela, però ve la mostro, appunto. Si calcola e viene questo numero alfa beta alfa + beta qu +
+27:41
+27 minutes, 41 seconds
+alfa + beta + 1 denominatore che proprietà ha questo numero che quando alfa + beta, che è il numero totale di
+27:48
+27 minutes, 48 seconds
+esperimenti va infinito, la varianza va a zero. Questo vi ricorda un po' la legge dei grandi numeri. Quando uno fa tanti tanti esperimenti è sempre più
+27:56
+27 minutes, 56 seconds
+convinto di di quello che sta osservando, ok? Che il vero parametro sia la frazione che sta osservando. E questo è reso preciso dalla legge dei
+28:04
+28 minutes, 4 seconds
+grandi numeri. Ecco, facciamo degli esempi come son questo, se come se fossero quelle curve arancioni del gioco, però sono questa famiglia
+28:11
+28 minutes, 11 seconds
+particolare. Ad esempio, ho fatto beta = 2, quindi un solo eh fallimento e alfa = 4 5 10. sempre più successi.
+28:22
+28 minutes, 22 seconds
+Allora, alfa uguale 4 era quello arancione qui, questo che è convinto, ma non troppo, che la probabilità di
+28:30
+28 minutes, 30 seconds
+successo sia alta. Poi, vedete, cinque si sposta ancora più a destra e 10 dopo 10 successi è molto spostata. Però attenti, non va mai a coprire uno perché
+28:39
+28 minutes, 39 seconds
+abbiamo visto un fallimento, quindi vedete poi scende a zero, scende a zero perché non è non può essere 100% la probabilità di successo perché abbiamo visto un fallimento con beta uguale 2.
+28:49
+28 minutes, 49 seconds
+Ok? Allora, la densità beta è molto molto comoda e si può dire molto partendo dalla densità beta. Ad esempio, eh
+28:59
+28 minutes, 59 seconds
+nel momento in cui avete stimato il vostro parametro, potete chiedervi, ok, facciamo una previsione, vediamo cosa posso dire della pallina successiva che
+29:07
+29 minutes, 7 seconds
+andrò a estrarre. Ok? Quindi facciamoci poniamoci questo problema per la prima volta credo di di previsione, cioè avendo osservato n estrazioni e ne
+29:16
+29 minutes, 16 seconds
+abbiamo viste rosse e n - r che non sono rosse, chiamiamole blu. Qual è? Ops.
+29:23
+29 minutes, 23 seconds
+Beh, eh nell'estrazione successiva servino una rossa. Questo è prendiamo solo una pallina dopo si può
+29:31
+29 minutes, 31 seconds
+anche fare certamente una previsione, se volete su su molte estrazioni successive, ma parliamo di una sola. Ok?
+29:38
+29 minutes, 38 seconds
+Allora, cosa posso dire della estrazione successiva? Beh, allora ci sono diverse risposte, se volete, a questa domanda,
+29:44
+29 minutes, 44 seconds
+no? E gli approcci sono uno dice questo, io ho stimato, io so dalla stima che abbiamo fatto prima, la stima di massima
+29:53
+29 minutes, 53 seconds
+verosimiglianza, no, che la frazione di palline rosse era il numero di palline rosse osservate sul numero di
+30:00
+30 minutes
+estrazioni, quindi r su N, che era stima di massima verosimiglianza o massimo posteriori e quindi la pallina
+30:07
+30 minutes, 7 seconds
+successiva sarà circa la probabilità di vederla rossa sarà circa R su N. Ok?
+30:14
+30 minutes, 14 seconds
+Però attenti, qui è un problema è approssimato perché perché stiamo dicendo che siamo sicuri che il vero parametro sia la stima di massima
+30:23
+30 minutes, 23 seconds
+verosimiglianza. Capite? Quando uno dice "Sono sicuro che sia questa, sono certamente sicuro che è questa la frazione", allora sì, l'estrazione
+30:32
+30 minutes, 32 seconds
+successiva sarà r su n, sarà quel parametro la probabilità, però nella realtà stiamo quindi trascurando l'incertezza che abbiamo su questo
+30:40
+30 minutes, 40 seconds
+parametro. Quindi attenti che ci sarà molto da dire più avanti anche sull'incertezza eh relativa alle stime. E allora, quindi
+30:47
+30 minutes, 47 seconds
+come si fa? O si aggiunge un intervallo di confidenza, cosa che facevamo nel corso di statistica uno, uno cerca di dire "Ok,
+30:56
+30 minutes, 56 seconds
+sarà questo, però attenti che non siamo completamente sicuri di qual è veramente il parametro usando gli intervalli di confidenza". Oppure, visto che vi sto
+31:04
+31 minutes, 4 seconds
+raccontando di di Bayes, cosa possiamo dire? Beh, noi sappiamo che non sappiamo al momento qual è il vero
+31:12
+31 minutes, 12 seconds
+parametro teta, ma vedete, se sappiamo che le estrazioni n estrazioni ci hanno dato rosse,
+31:20
+31 minutes, 20 seconds
+possiamo introdurre l'informazione su teta.
+31:24
+31 minutes, 24 seconds
+Aggiungiamo, facciamo finta di sapere che teta di conoscere il teta e calcoliamo questa, ok? Calcoliamo la probabilità che la
+31:33
+31 minutes, 33 seconds
+successiva sia rossa quando siamo sicuri di qual è il vero teta. Ok? Quindi per ogni teta calcoliamo quella probabilità, poi però non sappiamo qual è il vero
+31:41
+31 minutes, 41 seconds
+teta. Quindi come facciamo a rimettere insieme queste varie probabilità? Beh, eh uso la cosiddetta disintegrazione, la legge della della probabilità totale.
+31:50
+31 minutes, 50 seconds
+Quindi avete la probabilità quando condizionate a sapere che teta è vero per la probabilità di teta sapendo
+31:58
+31 minutes, 58 seconds
+quello che sapevate, cioè che avete trovato r estrazioni. Quindi, attenti, di questi di queste integrale che sono un integrale su tutto l'intervallo dei
+32:06
+32 minutes, 6 seconds
+valori di teta, uno di questi teta sarà la stima di massima verosimiglianza.
+32:11
+32 minutes, 11 seconds
+Quindi qui dentro uno di questi lo state prendendo quando fate l'approccio approssimativo, ma in realtà è più preciso questo perché state dicendo per
+32:18
+32 minutes, 18 seconds
+ogni teta, io non sono sicuro di quale sarà, però per ogni teta vado a vedere la probabilità prevista e poi faccio una
+32:27
+32 minutes, 27 seconds
+somma pesata su tutti i vari teta in base a quello che credevo. Ok? È chiaro un po' la differenza qui? Cioè, approssimato stiamo è come dire che
+32:34
+32 minutes, 34 seconds
+quell'integrale è soltanto un punto in realtà e siete molto sicuri che il vero parametro è r su n, quello di massima.
+32:42
+32 minutes, 42 seconds
+Esatto. Tiene più presente tutta la densità e quindi sta integrando su tutti i possibili valori. Ok? Questa
+32:49
+32 minutes, 49 seconds
+differenza c'è sempre, appunto, e ed è un po' la la differenza tra avere una stima puntuale e avere un intervallo di fiducia. Anche un intervallo di fiducia,
+32:58
+32 minutes, 58 seconds
+in un certo senso, è una cosa approssimata. L'intervallo di fiducia, se vi ricordate, sta un po' a metà, cioè non vi dà esattamente quello, ma vi dice
+33:05
+33 minutes, 5 seconds
+che R su il teta vero non è R su N, ma sarà lì vicino. State comunque quantificando l'incertezza. Ok,
+33:13
+33 minutes, 13 seconds
+va bene. Allora, se uno usa l'approccio approssimato, usa trova questo. Trova appunto che la probabilità di vedere una
+33:20
+33 minutes, 20 seconds
+nuova pallina rossa, un nuovo successo è frazione dei successi già visti diviso numero totale degli esperimenti. Se usa
+33:27
+33 minutes, 27 seconds
+l'approccio esatto invece trova quest'altra probabilità, deve calcolare questa integrale, trova una formula simile, non è che trova qualcosa di
+33:35
+33 minutes, 35 seconds
+totalmente opposto, ovviamente sarebbe folle, no? trova questa che si chiama la regola di successione di la plus che
+33:42
+33 minutes, 42 seconds
+vedete non è proprio r su n ma è r / n + 2. Ok? Uno dice ho fatto tanto lavoro ma il numero più o meno è simile? Eh, in
+33:50
+33 minutes, 50 seconds
+effetti sì, però attenti che c'è è un esempio molto semplice. Anche la Plus non è che avesse detto che questo era fondamentale. Poi l'hanno anche preso un po' in giro per questo tipo di conto.
+34:01
+34 minutes, 1 second
+Però il punto qual è? che c'è una piccola differenza tra eh prendere una stima che sappiamo non essere esatta e usarla fare finta poi che sia esatta.
+34:10
+34 minutes, 10 seconds
+Invece nell'altro approccio stiamo dicendo c'è una stima, c'è un'incertezza, quindi cerco di tenere presente un po' l'incertezza anche. Ok?
+34:17
+34 minutes, 17 seconds
+Questa incertezza si traduce in questa questa possibilità. Vedete che qui c'è un R + 1 e qui c'è un N + 2 e questa
+34:24
+34 minutes, 24 seconds
+volta si chiama anche smoothing o in italiano non saprei come lis lisciamento, regolarizzazione di la plus.
+34:34
+34 minutes, 34 seconds
+Ok? sta tenendo presente che pensate se non ho visto nessun successo se R è 0,
+34:42
+34 minutes, 42 seconds
+comunque non sta dicendo che sarà esattamente zero, cioè non sta dicendo che finora non ho visto successi, quindi non vedrò mai successi. Quello lo
+34:50
+34 minutes, 50 seconds
+direbbe la stima sopra. Se R0 non ho mai visto successi non ne vedrò più. Proprio pessimista. La plus, lo smoothing di la
+34:58
+34 minutes, 58 seconds
+plus, questa tecnica dice sì, beh, non sarà proprio 0, è 1 / n + 2, quindi un minimo di, insomma, lascia ancora un po'
+35:06
+35 minutes, 6 seconds
+di possibilità che ci sia qualche successo dopo. Ok, va bene. Quindi questo succede spesso quando uno tiene presente tutta l'incertezza, non va
+35:14
+35 minutes, 14 seconds
+direttamente alla conclusione che potrebbe essere sbagliato, ma si mantiene un piccolo margine di sicurezza. Ok, va bene. Allora, questo dell'esempio
+35:22
+35 minutes, 22 seconds
+della Gaussiana, io forse lo Beh, vabbè, vi dico solo il risultato, non facciamo tutti i commenti, però quello
+35:30
+35 minutes, 30 seconds
+dell'estrazione di all'urna adesso è fondamentale per la classificazione perché è molto simile a quello che andiamo a fare. Facciamo un esempio invece sul continuo che è più simile a
+35:38
+35 minutes, 38 seconds
+quello che vedremo settimana prossima con la regressione. Allora, abbiamo una distribuzione gaussiana.
+35:45
+35 minutes, 45 seconds
+Queste sono anche cose che abbiamo visto a statistica 1, quindi riprendiamole. E di queste vogliamo stimare sulla base di
+35:53
+35 minutes, 53 seconds
+osservazioni la media m e la deviazione standard sigma o la varianza sigma quadro. Ok? Quindi il modello come lo
+36:01
+36 minutes, 1 second
+specifichiamo? Beh, abbiamo le nostre osservazioni e vi ricordate la verosimiglianza? Andiamo a dire prima cos'è la verosimiglianza. La
+36:09
+36 minutes, 9 seconds
+verosimiglianza è la probabilità, se conosciamo media e varianza, in questo caso, che sono i parametri teta del modello, e la
+36:18
+36 minutes, 18 seconds
+probabilità di avere queste osservazioni x1, x2, xn. Allora, ogni osservazione è gaussiana e conosciamo la densità
+36:26
+36 minutes, 26 seconds
+gaussiana, chi non se la ricorda è scritta qui. Per ciascuna osservazione è l'esponenziale di - 1/2.
+36:36
+36 minutes, 36 seconds
+Scusate, ho fatto troppe cose insieme qui, eh. Togliete eh togliete questa somma. Volevo metterla e qua da chi non
+36:44
+36 minutes, 44 seconds
+se la ricorda ora se la ricorda anche chi non chi se la ricorda ehm se la ricordi giusta. Chi non l'ha vista mai è
+36:52
+36 minutes, 52 seconds
+questa qui. La densità gaussiana è questa qui. Per una singola osservazione avete esponenziale - 1/2. Poi avete il
+37:00
+37 minutes
+valore xi che abbiamo osservato - m la media teorica diviso deviazione standard al quadrato. Poi questa di per sé non dà una densità di probabilità, c'è anche un
+37:09
+37 minutes, 9 seconds
+piccolo fattore che normalizza in modo da avere una curva che che ha area complessiva 1. Ok? Ora queste però sono
+37:16
+37 minutes, 16 seconds
+n osservazioni, quindi la verossimiglianza, siccome sono indipendenti le osservazioni del prodotto e e questo specifica la verosimiglianza.
+37:25
+37 minutes, 25 seconds
+Questo basterebbe già a dire qual è la stima di massima verosimiglianza che abbiamo fatto nel corso. Poi se uno vuole dire qual è una stima eh di
+37:33
+37 minutes, 33 seconds
+massimo posteriori, una bella, cioè dipende un po' da quello che si sa a priori, una densità a priori che si può mettere è questa che è uniforme,
+37:42
+37 minutes, 42 seconds
+diciamo, uno sul mante e eh uno su sigma sulla deviazione standard.
+37:50
+37 minutes, 50 seconds
+È una scelta, è una scelta che uno può fare, eh, come ce ne sono mille altre che sono valide. Questa è particolarmente bella per i conti e le formule che verranno fuori.
+38:00
+38 minutes
+In ogni caso, quindi, se uno fa questa scelta trova una densità posteriori per i parametri. Allora, la densità posteriori è scritta esplicitamente per
+38:07
+38 minutes, 7 seconds
+dirvi che si può calcolare, ok? I parametri posso dire qual è la densità a posteriori, come prima nell'esempio del
+38:16
+38 minutes, 16 seconds
+no del lancio della moneta. Questa volta ho due parametri più complicato da descrivere, però vedete somiglia un po', vedete a una gaussiana, almeno per la m
+38:24
+38 minutes, 24 seconds
+è una gausiana, per la sigma un po' più complicato. Parametro sigma compare qui e compare qui. Vabbè, questa è la stima dei parametri.
+38:32
+38 minutes, 32 seconds
+Cosa posso dire della previsione?
+38:35
+38 minutes, 35 seconds
+Beh, allora eh innanzitutto posso dire qual è la stima di massima verosimiglianza e questa ve la doveste ricordare da
+38:42
+38 minutes, 42 seconds
+statistica 1. Innanzitutto, se invece di usare tutta la densità voglio usare solo una stima puntuale per i parametri, vi
+38:49
+38 minutes, 49 seconds
+ricordo, bisogna prendere quella formula di prima, trovare il massimo in m e il massimo in sigma. un conto che si può
+38:56
+38 minutes, 56 seconds
+fare, non è forse agevolissimo, ma si può fare e quindi uno trova che il massimo in M è questo è facile da ricordare, è la media campionaria.
+39:06
+39 minutes, 6 seconds
+Ottimo. Media campionaria, quindi quando uno ha una gaussiana, non conosce il valor medio, stimarlo, usa la
+39:14
+39 minutes, 14 seconds
+media campionaria. Ecco, sulla varianza, soltanto piccola osservazione, la varianza, la stima della varianza non è
+39:21
+39 minutes, 21 seconds
+esattamente la varianza campionaria perché c'è un fattore 1 su n, va bene, invece di 1 su n - 1, ma non ci spaventa perché n di solito è grande, insomma.
+39:31
+39 minutes, 31 seconds
+Quindi, attenti, non è esattamente la varianza campionaria, infatti lo scrivo con VAR grande. Va bene? La stima di massimo a posteriori.
+39:40
+39 minutes, 40 seconds
+Eh, questa è pure interessante. Il massimo a posteriori, se usate quella densità che era uno su sigma cambia pure un pochino, vedete? Non trovate esat la
+39:47
+39 minutes, 47 seconds
+media resta sempre la stessa, la varianza viene pure riscalata, va bene?
+39:53
+39 minutes, 53 seconds
+E però queste sono stime puntuali, vi dico se vogliamo fare una previsione, cioè quale sarà il prossimo valore della
+40:00
+40 minutes
+gausiana, se prendo un altro un'altra gausiana con gli stessi parametri di media varianza che all'inizio non conoscevo, adesso li ho stimati usando
+40:08
+40 minutes, 8 seconds
+le mie osservazioni e vado a fare una previsione. Allora, cosa si può fare? Vi ricordate nel corso di di statistica 1?
+40:17
+40 minutes, 17 seconds
+questa scelta, cioè di dire faccio come prima, faccio finta che i parametri veri siano quelli stimati, è una scelta
+40:24
+40 minutes, 24 seconds
+approssimativa, ok? Però è sempre plausibile, insomma, non è che uno deve buttarla via, trova la media campionaria
+40:31
+40 minutes, 31 seconds
+e la varianza, la stima della varianza campionaria.
+40:35
+40 minutes, 35 seconds
+Ok? Però questa, dicevo, è comunque una stima approssimata, come prima dicevamo, non stiamo tenendo conto dell'incertezza che abbiamo sulla stima dei nostri parametri. Quindi uno cosa può fare?
+40:46
+40 minutes, 46 seconds
+Beh, uno può fare quello che facevamo nel corso di statistica 1, dire se suppongo che sigma quadro che la varianza sia nota,
+40:54
+40 minutes, 54 seconds
+allora trovo che il nuovo il nuovo esperimento, la nuova osservazione sarà una gaussiana che ha la media sempre sulla media campionaria e tutto si gioca
+41:03
+41 minutes, 3 seconds
+sulla deviazione standard. la deviazione standard, almeno se uno fa la stima baesiana, trova che sigma quella nota un
+41:12
+41 minutes, 12 seconds
+po' amplificata, cioè moltiplicata per n + 1 su n, perché perché sta tenendo conto che, ok, sigma
+41:19
+41 minutes, 19 seconds
+quadro la conoscevo, ma la media non la conoscevo e quindi ho ancora un po' di incertezza in più rispetto a conoscere
+41:26
+41 minutes, 26 seconds
+tutto. Certo, se conosco tutto è m Sma qu, però m non lo conosco. Allora, cosa dice invece la stima baiesiana esatta?
+41:35
+41 minutes, 35 seconds
+Cioè, se integro tutto quanto, faccio appunto lo stesso procedimento che aveva fatto la Plus per l'estrazione, beh, si
+41:42
+41 minutes, 42 seconds
+trova quella che qualcuno forse si ricorda dal corso di statistica 1, una distribuzione di di student, va bene? Si
+41:49
+41 minutes, 49 seconds
+trova una T di student con n -1 gradi di libertà e vi ricordate questo ricorda anche gli intervalli di confidenza e i
+41:57
+41 minutes, 57 seconds
+test. Quando non avete eh non sapete che la varianza è esattamente quella che avete, cioè non la conoscete all'inizio,
+42:04
+42 minutes, 4 seconds
+la cosa giusta da usare sia per i test che per gli intervalli di fiducia era una distribuzione di student, vi ricordate questo? Succede anche qui,
+42:13
+42 minutes, 13 seconds
+cioè si trova una student con n - 1° di libertà, ok? Quindi la stima è di dire che la densità del nuovo
+42:22
+42 minutes, 22 seconds
+esperimento non sarà una gausiana, ma viene questa densità qui. Ora non serve che ve la ricordiate, ma era per richiamarvi l'idea che c'è una
+42:30
+42 minutes, 30 seconds
+distribuzione di student, così se qualcuno non ha mai visto una distribuzione di student magari viene il dubbio, dice "Ma io non la conosco cos'è
+42:38
+42 minutes, 38 seconds
+sta cosa? Magari venite a chiedermi". Vi spiego un po' la la parte degli intervalli di fiducia che era più semplice. Ok? Allora, come mettiamo
+42:46
+42 minutes, 46 seconds
+insieme tutte queste cose a livello di classificazione? Quindi abbandoniamo un po' Bayes, poi ci torniamo anche le
+42:52
+42 minutes, 52 seconds
+gaussiane, però cominciamo da una cosa più semplice. Ora, per ora abbiamo visto soltanto esperimenti indipendenti con un
+43:01
+43 minutes, 1 second
+parametro nascosto, va bene? In realtà noi vogliamo fare la classificazione che è già un contesto più complicato, no? E
+43:08
+43 minutes, 8 seconds
+allora si può fare due due approcci tendenzialmente vogliamo modellizzare.
+43:14
+43 minutes, 14 seconds
+Ma modellizzare cosa? Beh, da un lato possiamo fare direttamente un modello cosiddetto generativo,
+43:21
+43 minutes, 21 seconds
+cioè fissata una classe, un'etichetta, vado a chiedermi qual è la probabilità di osservare certe caratteristiche.
+43:29
+43 minutes, 29 seconds
+Questi sono proprio, se volete, versione baby, dei modelli generativi che si usano adesso, tipo uno fissa quelli per le immagini, ad esempio, non so se avete
+43:37
+43 minutes, 37 seconds
+mai giocato, cioè uno fissa una classe, una descrizione e poi il modello va a darci un campione, va a crearci
+43:45
+43 minutes, 45 seconds
+un'osservazione di certe caratteristiche che è un'immagine per i modelli generativi di immagini, no? Con quelle caratteristiche, ok? Quindi i modelli
+43:53
+43 minutes, 53 seconds
+generativi sono la versione più semplice di questa stessa idea e quindi andiamo a modellizzare la probabilità di osservare certe caratteristiche sapendo la classe.
+44:04
+44 minutes, 4 seconds
+Attenti che non è quello che vogliamo per la classificazione direttamente perché noi vorremmo invece la probabilità della classe sapendo le caratteristiche, ma poi li li rigiriamo
+44:13
+44 minutes, 13 seconds
+grazie a Bayes. Allora, vediamo un paio di esempi che sono quelli di Naive Bayes e LDA QDA. Va bene? Questi ora ve li
+44:22
+44 minutes, 22 seconds
+descrivo in più precisamente, eh, però uno può dire faccio l'altra cosa direttamente, posso anche fare i
+44:29
+44 minutes, 29 seconds
+cosiddetti modelli discriminativi, cioè vado a modellizzare, ora vedremo in che modo, direttamente la probabilità che
+44:36
+44 minutes, 36 seconds
+sapendo eh le caratteristiche X eh la mia etichetta sia C, cioè conosco la mia etichetta. Ok? Quindi andiamo a
+44:45
+44 minutes, 45 seconds
+modellizzare direttamente questa. Vedete che non sono la stessa cosa, però sono collegate. Ovviamente un modello che
+44:52
+44 minutes, 52 seconds
+ricade nella classe dei discriminativi è la regressione logistica. Va bene? In un certo senso anche KNN potrebbe ricadere
+45:01
+45 minutes, 1 second
+qui, eh anche KNN, anche se l'abbiamo visto come modellino un po' così a sé, va bene? volendo e modellizza direttamente la probabilità
+45:09
+45 minutes, 9 seconds
+di una classe avendo certe caratteristiche perché va a vedere le le i K vicini e potremmo dire invece di modizzare direttamente dirmi
+45:18
+45 minutes, 18 seconds
+direttamente chi è la classe più probabile vai a calcolarmi delle probabilità che appartenga a una certa classe. Va bene? Allora, qual è il
+45:26
+45 minutes, 26 seconds
+collegamento ovviamente tra questi due modelli? visto che vi ho vi ho raccontato tutto sulla formula di Bayes, almeno la prima slide spero che ve la ricordiate, eh possiamo collegarli, cioè
+45:36
+45 minutes, 36 seconds
+se abbiamo il nostro obiettivo è sempre discriminare, classificare, quindi vogliamo la probabilità della classe condizionata alle feature, alle
+45:45
+45 minutes, 45 seconds
+caratteristiche, eh beh, questa è proporzionale alla probabilità a priori che davamo alle classi per la probabilità della eh della feature
+45:53
+45 minutes, 53 seconds
+sapendo la classe, questa che è la verosimiglianza, questa era likelihood, ok? Quindi, allora, a seconda dei due
+46:01
+46 minutes, 1 second
+modelli, noi eh poi alla fine ricadiamo sempre nello stimare la probabilità della classe, sapendo le feature e poi
+46:08
+46 minutes, 8 seconds
+ovviamente se vogliamo dare una stima a un vero classificatore ci darà una classe, una funzione che date le caratteristiche dalla classe e allora
+46:16
+46 minutes, 16 seconds
+scegliamo la moda. Ok? Quindi quello che andiamo a fare è modizzare queste oppure queste e poi di conseguenza calcolare il
+46:26
+46 minutes, 26 seconds
+classificatore in questo modo. Cioè andiamo a prendere la classe più probabile, date le feature, date le caratteristiche osservate. Ok? Ok. Spero
+46:35
+46 minutes, 35 seconds
+che questo schema sia chiaro, che non ci perdiamo ora nei dettagli ovviamente. Quindi, dobbiamo modellizzare queste cose.
+46:44
+46 minutes, 44 seconds
+Altra cosa importante, dobbiamo modernizzarle, ma anche addestrarre il modello, cioè stimare queste probabilità sulla base delle osservazioni
+46:52
+46 minutes, 52 seconds
+e e poi eventualmente valutarne poi la performance, ma sulla performance abbiamo già detto molto la volta scorsa,
+47:00
+47 minutes
+quindi attenti e che se modellizzate questo siete già a posto perché era quello che vogliamo calcolare, no? che vedete torno anche qui. Se modellizziamo
+47:08
+47 minutes, 8 seconds
+invece la nei modelli generativi, in realtà bisogna anche modellizzare la probabilità della classe a priori, ma di solito si fanno scelte molto semplici su questo. Ok?
+47:20
+47 minutes, 20 seconds
+Allora, dai, cominciamo con il primo.
+47:22
+47 minutes, 22 seconds
+Poi mercoledì li vediamo in pratica oggi, vediamo solo come sono costruiti.
+47:26
+47 minutes, 26 seconds
+Allora, il modello nave bases, quindi il usa la formula di Beyes, ma in un modo naive, cioè cosa vuol dire in modo
+47:34
+47 minutes, 34 seconds
+semplice da sempliciotti, ok? però in realtà è un modello che funziona benissimo e soprattutto risolve un problema eh che c'è spesso che è quello
+47:44
+47 minutes, 44 seconds
+della course of dimensionality, cioè legato al fatto che abbiamo le osservazioni ma tantissime caratteristiche, ok? Quindi quando
+47:52
+47 minutes, 52 seconds
+abbiamo tantissime caratteristiche D molto grande, vi ricordo KN aveva problemi perché usa sempre le distanze.
+47:59
+47 minutes, 59 seconds
+Tutti gli algoritmi che usano le distanze hanno magari dei problemi. E invece Nate Bayes, vedete, risolve le
+48:06
+48 minutes, 6 seconds
+cose in modo semplice, ok? Dice, "Ok, ho tantissime caratteristiche, mi chiedo se ho un dato che sta in una certa classe,
+48:15
+48 minutes, 15 seconds
+no? Eh, dovrò descrivere un modello generativo, dovrò dire con quali probabilità vengono fuori tutte le caratteristiche X1, X2, Xn, XD. Ok? D
+48:25
+48 minutes, 25 seconds
+caratteristiche. Quindi devo specificare una grande distribuzione di probabilità in dimensione molto elevata. Beh, cosa faccio? Dico che le caratteristiche sono
+48:33
+48 minutes, 33 seconds
+tra di loro indipendenti, ok? Quindi vado a dire avrò una certa probabilità per la caratteristica 1, per una certa densità per la caratteristica 2, per la
+48:41
+48 minutes, 41 seconds
+3 e così via fino a D. Ovviamente è una scelta che butta via che cosa? Tutte le possibili correlazioni, i legami tra le
+48:48
+48 minutes, 48 seconds
+varie caratteristiche. Immaginate se una caratteristica è la stessa che si è ripetuta, no? Qualcuno è stato un po' pigro e ha messo due volte la stessa
+48:57
+48 minutes, 57 seconds
+colonna, quindi ho in realtà le stesse caratteristiche, io vado a modellizzarli in modo totalmente sbagliato perché sto dicendo che sono tra di loro indipendenti, ok? Però molto spesso se
+49:06
+49 minutes, 6 seconds
+uno ha scelto bene le caratteristiche o o magari la dimensione elevata, questo funziona molto bene, quindi è proprio la
+49:13
+49 minutes, 13 seconds
+soluzione, infatti si chiama anche bases degli idioti, però funziona. Ok? Eh, allora facciamo due esempi.
+49:22
+49 minutes, 22 seconds
+Ovviamente non ho ancora detto come modellizzo poi i singoli fattori, ok?
+49:28
+49 minutes, 28 seconds
+Quindi ho detto che voglio dire che la grande probabilità in dimensione D si spezza in probabilità sulle singole marginali perché voglio dire che sono
+49:35
+49 minutes, 35 seconds
+indipendenti, ma devo dire anche come poi modellizzo questi. Allora, qui si scelgono delle distribuzioni facili. Ad esempio, se le caratteristiche sono solo
+49:44
+49 minutes, 44 seconds
+0 1, no, allora metto delle bernulli, quindi avrò un parametro solo. Se le caratteristiche sono un sono una
+49:52
+49 minutes, 52 seconds
+caratteristica reale, non so, l'altezza, il peso, lunghezza, allora dirò che quella caratteristica è la caratteristica una gausiana e poi vado a stimarmi i parametri in base alle
+50:01
+50 minutes, 1 second
+osservazioni. Per questo vi ho detto prima che c'è quel discorso di stimare il parametro della Bernulli, il parametro della Gaussiana, stanno qui
+50:08
+50 minutes, 8 seconds
+dentro. Ok? Poi non lo facciamo noi, lo facciamo fare la macchina, però è importante sapere che insomma che è quello che stiamo facendo. Ok? Quindi
+50:17
+50 minutes, 17 seconds
+facciamo il caso più semplice. Bernulli, cosa dico? Ho una caratteristica, facciamo che tutte le caratteristiche poi si può mescolare, alcune sono bernulli, altre gausiane, altre sono poon, si può scegliere altre densità.
+50:29
+50 minutes, 29 seconds
+Facciamo finta che ciascuna caratteristica sia binaria, va bene? E quindi abbiamo un dataset in cui abbiamo registrato per ogni individuo tante
+50:36
+50 minutes, 36 seconds
+caratteristiche che sono solo presente o assente, tipo non so, dopo vedremo qualche esempio, ma tipo una malattia o
+50:44
+50 minutes, 44 seconds
+espressione di un gene, pensate cose del genere, ok? Assente o presente, vero o falso? E quindi per ogni classe, per
+50:52
+50 minutes, 52 seconds
+ogni label, per ogni eh etichetta e per ogni eh componente delle mie feature, quindi per ogni J, devo andare a
+51:00
+51 minutes
+modellizzare e modellizzo come con una Bernulli.
+51:04
+51 minutes, 4 seconds
+Bernulli che alla fine è una binomiale con una sola estrazione, ok? Quindi non trovo il coefficiente binomiale, trovo
+51:11
+51 minutes, 11 seconds
+il suo parametro di successo per x^ j'è successo e 1 - p di j sapendo c * 1^ eh
+51:22
+51 minutes, 22 seconds
+all 1 - x. Quindi cosa stai dicendo? È p quando c'è successo e 1 - p quando c'è il fallimento. Però attenti che le caratteristiche diverse e le classi diverse hanno tutti i parametri diversi.
+51:33
+51 minutes, 33 seconds
+Non sto dicendo che devono essere tutte uguali, no? Sarebbe anche troppo restrittivo.
+51:37
+51 minutes, 37 seconds
+Ok? È chiaro? Questo quindi quanti sono i parametri per ogni classe avrò di parametri che sono le probabilità di
+51:44
+51 minutes, 44 seconds
+successi per ogni singola caratteristica e quindi ho numero di classi per dmenso
+51:52
+51 minutes, 52 seconds
+di colonne del mio dataset. Ok? Quindi questo è il numero di parametri.
+51:57
+51 minutes, 57 seconds
+Sono parametri che devo andare a stimare sulla base delle osservazioni.
+52:02
+52 minutes, 2 seconds
+È chiaro questo? Eh, come vado a stimarli? vado a stimarli. È un po' come prima, no? Quei lanci di moneta.
+52:09
+52 minutes, 9 seconds
+Immaginate, ora so però che devo dire che per ogni classe diversa e per ogni osservazione diversa ho il suo ho il mio parametro di successo. E allora capite
+52:18
+52 minutes, 18 seconds
+che stimare sarà meglio magari accontentarci di una stima puntuale. Poi chiaramente uno può fare stime più più raffinate.
+52:26
+52 minutes, 26 seconds
+Quindi intanto uno va a dire la probabilità di eh avere una certa etichetta C è il numero nel mio
+52:34
+52 minutes, 34 seconds
+campione, nel mio dataset di elementi che hanno quell'etichetta lì. Quindi numero di righe che hanno effettivamente l'etichetta C diviso il numero totale.
+52:43
+52 minutes, 43 seconds
+Ok? Vado a fare una frazione che se volete i casi favorevoli diviso i casi totali. Attenti. Poi devo fare la
+52:50
+52 minutes, 50 seconds
+probabilità invece della Bernulli relativa alla feature J rretta alla classe C. Allora cosa vado a
+52:58
+52 minutes, 58 seconds
+fare? Vado a vedere il numero di osservazioni, no? che hanno effettivamente la la feature j, la caratteristica j presente
+53:07
+53 minutes, 7 seconds
+e la classe C. E attenti, non vado a fare diviso tutte perché sapendo che sono ristretto alla classe C, quindi
+53:15
+53 minutes, 15 seconds
+vado a dividerlo di nuovo per il numero di osservazioni che hanno soltanto la classe C. Ok? Quindi questa, se volete è l'addestramento di Naive byes, molto
+53:23
+53 minutes, 23 seconds
+molto semplice, almeno nel caso Bernulli si tratta solo di mettere le giuste frazioni che sono abbastanza naturali,
+53:30
+53 minutes, 30 seconds
+ok? Ed è una stima, se volete, sarebbe più una stima di di massima verosimiglianza questa.
+53:37
+53 minutes, 37 seconds
+In effetti quello che si fa a volte, questo è molto utile in pratica, vedete che la Plus non ci aveva visto male all'epoca e nella pratica si aggiunge un
+53:46
+53 minutes, 46 seconds
+parametro di smoothing, come prima era n + 1/ n + 2, no? Vi ricordate? R + 1/ n + 2, a volte si introduce un piccolo
+53:53
+53 minutes, 53 seconds
+parametro di regolarizzazione perché perché non si vuole essere troppo pessimisti, no? Come dicevamo prima, se uno non ha mai visto quella feature e la
+54:00
+54 minutes
+stima sarebbe zero, quindi non la vedrà mai, invece eh magari qualche volta si si permette di vederla. Ok? Quindi si
+54:08
+54 minutes, 8 seconds
+può giocare un piccolo parametro di regolarizzazione, poi anche quello va deciso, un po' come il K del di KNL.
+54:16
+54 minutes, 16 seconds
+Ok? Nel momento che abbiamo stimato, quindi abbiamo addestrato il nostro modello, cioè abbiamo messo questi pesi che dipenderanno dalle osservazioni,
+54:24
+54 minutes, 24 seconds
+andiamo a fare le previsioni. Il classificatore è quello che mi va a predire, no? Quindi prendiamo un nuovo punto X di cui però non conosco l'etichetta.
+54:35
+54 minutes, 35 seconds
+Come vado a eh calcolare, no, la probabilità delle varie etichette? Beh, usando la formula di Bes. Quindi, dicevamo, c'è la probabilità a priori
+54:44
+54 minutes, 44 seconds
+che è questa N su NC su N per eh vado a usare di nuovo la verosimiglianza, che è quella che ho modizzato, ma stavolta le
+54:53
+54 minutes, 53 seconds
+probabilità sono quelle che ho già stimato. Ok? Quindi alla fine mi dà semplicemente una probabilità che posso confrontare con le altre probabilità al
+55:01
+55 minutes, 1 second
+variare delle classi e vado a scegliere la più probabile, la moda. Ok? È chiaro come funziona? è molto semplice, non è,
+55:09
+55 minutes, 9 seconds
+insomma, appunto, sembrerebbe anche troppo semplice, però in realtà funziona bene. Funziona molto bene, soprattutto,
+55:17
+55 minutes, 17 seconds
+ad esempio, in situazioni in cui non voglio avere modelli troppo complicati e voglio avere risposte veloci, capite? Ci vuole un secondo per calcolare, cioè
+55:25
+55 minutes, 25 seconds
+queste probabilità le ho calcolate, ci vuole un secondo per fare i prodotti e via. Immaginate invece, no, di elaborare una risposta con modelli molto molto
+55:32
+55 minutes, 32 seconds
+grandi può essere complicato. Quindi Native Bayes è molto utile, tenetelo presente. Allora, facciamo un esempio proprio concreto.
+55:42
+55 minutes, 42 seconds
+Prendiamo un caso binario, no? Vi ricordate? Nel caso binario abbiamo tantissime indicatori, falsi positivi,
+55:49
+55 minutes, 49 seconds
+falsi negativi e così via. Eh, allora, nel caso binario, tra l'altro, un'altra cosa interessante, abbiamo solo due probabilità. la probabilità che la
+55:57
+55 minutes, 57 seconds
+classe sia 1 e la probabilità che la classe sia -1.
+56:01
+56 minutes, 1 second
+Entrambe le formule sono dei bei prodotti, vedete?
+56:05
+56 minutes, 5 seconds
+Questa sarà ci sarà una formula così per la classe 1 e una e una formula per la classe -1. Se faccio il rapporto ottengo
+56:13
+56 minutes, 13 seconds
+una bella espressione e se infatti il rapporto, no, di due probabilità della probabilità di A diviso la probabilità del complementare
+56:21
+56 minutes, 21 seconds
+è quello che in inglese si chiama le ODS, le le quote, ok? E quindi in effetti la quota di +1 della classe 1 è
+56:29
+56 minutes, 29 seconds
+la vecchia quota, vedete quella che ho stabilito a priori che ho stimato coi dati, eh quelle lì e
+56:36
+56 minutes, 36 seconds
+pure quelle le ho stimate e ora abbiamo queste altro rapporto, ok? che ancora
+56:43
+56 minutes, 43 seconds
+non ci piace tantissimo, però attenti, il nostro x è un punto di test, quindi alla fine questi numeri, questi queste basi le avrò già calcolate. Quello che
+56:52
+56 minutes, 52 seconds
+mi interessa è solo la dipendenza da dalla X j, dalle caratteristiche del del mio dato. In effetti, vedete, siccome stanno lì a esponente, eh che si fa
+57:01
+57 minutes, 1 second
+spesso anche con la verosimiglianza, passiamo al logaritmo, ok? Passiamo al logaritmo. Prendiamo logaritmo di qua, logaritmo di là. Vediamo un po' queste log odso.
+57:12
+57 minutes, 12 seconds
+E cosa si trova? Vedete? Se passate al logaritmo, vabbè, questo vi dà un numero. Questo vi dà un numero, però
+57:19
+57 minutes, 19 seconds
+vedete, è l'esponente comune è xj, quindi quando passate al logaritmo vi scende xj e e chiamo beta quel numero che è il logaritmo di quel prodotto lì.
+57:31
+57 minutes, 31 seconds
+Anzi, a dire il vero, anche da qui mi scende 1 - xj e 1 - x e quindi è un altro termine in cui c'è un xj, però
+57:39
+57 minutes, 39 seconds
+vedete, alla fine compariranno soltanto xj oppure termini che non hanno caratteristiche della x, quindi che
+57:46
+57 minutes, 46 seconds
+posso pensare come delle costanti. Qui, in effetti alla fine il mio la mia probabilità, a meno di passare al logaritmo, è un'espressione molto
+57:55
+57 minutes, 55 seconds
+semplice, ok? Non voglio tediarvi con l'espressione esplicita, non dovete neanche ricordarvela, però il punto è
+58:02
+58 minutes, 2 seconds
+questo che date le caratteristiche, cosa stiamo andando a calcolare? Andiamo a calcolare una combinazione lineare a
+58:10
+58 minutes, 10 seconds
+fine perché c'è anche un beta0, quindi beta 0 + somma dei beta j xj e l' xj sarà 1 o 0. Quindi in realtà c'è una
+58:18
+58 minutes, 18 seconds
+combinazione lineare molto semplice. O mettiamo quel peso beta J o non lo mettiamo. E alla fine sommando su tutte le caratteristiche abbiamo questa che
+58:26
+58 minutes, 26 seconds
+potremmo chiamare un punteggio, uno score. Ok? Allora, questo score come può essere? attenti, è il logaritmo delle
+58:35
+58 minutes, 35 seconds
+ods, quindi uno torna indietro, allora vorrebbe dire che se la probabilità è maggiore di 1/2, cioè se le quote sono maggiori di 1 a 1, quindi se il
+58:43
+58 minutes, 43 seconds
+logaritmo è maggiore di 0, valuteremo classe positiva. Se la quota invece è negativa, valuteremo classe negativa.
+58:52
+58 minutes, 52 seconds
+Ok? Quindi il segno di questo score, di questo punteggio mi dice com'è il classificatore. Atentti che funziona solo nel caso binario, eh, questa
+59:00
+59 minutes
+situazione, cioè se ho più di di due classi sarà bene confrontare le varie probabilità. Qui in effetti alla fine la situazione è molto semplice. Abbiamo uno
+59:08
+59 minutes, 8 seconds
+stimatore, un scusate uno score, un punteggio e ne calcoliamo il segno e questo ci dà il classificatore.
+59:17
+59 minutes, 17 seconds
+Come abbiamo calcolato questi pesi, però attenti, c'è c'è di mezzo, no, la forma di bases eccetera. però è una un'idea molto semplice.
+59:25
+59 minutes, 25 seconds
+Vedremo che anche gli altri modelli alla fine si riducono a questo. Ok? calcolare uno score, un punteggio e a seconda, no,
+59:32
+59 minutes, 32 seconds
+del segno, alla fine se se siamo nel caso binario, valutiamo classe positiva o negativa.
+59:40
+59 minutes, 40 seconds
+Allora, altra cosa da notare è che spesso, appunto, questo score eh appunto potremmo usare il segno come indicatore, se è positivo o negativo, ma potremmo
+59:48
+59 minutes, 48 seconds
+fissare anche una soglia, una soglia, una threshold t, una soglia e dire in realtà non vogliamo soltanto se lo score
+59:57
+59 minutes, 57 seconds
+è positivo o negativo, ma vogliamo dire positivo quando la lo score è maggiore della certa soglia oppure se se titiva,
+1:00:05
+1 hour, 5 seconds
+quindi staremo chiedendo di più, no, per classificare il positivo oppure se t è negativo. di meno. Ora, nella pratica, cioè, tornando alle probabilità, cosa
+1:00:14
+1 hour, 14 seconds
+sta dicendo? Sta dicendo che che in realtà vogliamo, se pensiamo ad esempio un t positivo, prendiamo una soglia
+1:00:21
+1 hour, 21 seconds
+positiva, eh, dobbiamo accumulare molta più probabilità, vogliamo essere più sicuri nel classificare positivo, ok?
+1:00:29
+1 hour, 29 seconds
+oppure se negativo vogliamo essere basta essere meno sicuri. In altre parole sta dicendo che stiamo ci stiamo giocando un po' alla probabilità a priori perché
+1:00:38
+1 hour, 38 seconds
+questa soglia se tornate alle ODS non col logaritmo non è molto chiaro secondo me è come se modificaste la Qua c'è un
+1:00:46
+1 hour, 46 seconds
+e^ - t, scusate, la- T è come se modificaste la la densità, le quote a priori. Ok?
+1:00:55
+1 hour, 55 seconds
+Comunque pensatel appunto in due modi, ma è possibile introdurre una soglia, no, per la classificazione e ad esempio anche studiare i casi
+1:01:03
+1 hour, 1 minute, 3 seconds
+estremi. Quando mettete una soglia troppo stringente, mettete t uguale più infinito, vuol dire che lo score deve essere altissimo e tendenzialmente
+1:01:11
+1 hour, 1 minute, 11 seconds
+otterrete che valutate sempre negativo, classe negativa e viceversa se andate giù a meno infinito vedete che la soglia è talmente bassa e valutate sempre
+1:01:20
+1 hour, 1 minute, 20 seconds
+positivo. Ok? Quindi questa soglia vi permette di giocarvi un un parametro in più, non soltanto quindi lo score è importante, ma potete introdurre una
+1:01:28
+1 hour, 1 minute, 28 seconds
+soglia. E allora cosa si fa tipicamente quando c'è questa soglia naturale?
+1:01:34
+1 hour, 1 minute, 34 seconds
+Vi ricordate nel caso binario avevamo questo piano, no, dei falsi positivi, falsi dei veri positivi, cioè false
+1:01:41
+1 hour, 1 minute, 41 seconds
+positive rate e true positive rate, errore di prima specie su errore di seconda specie. E allora andavate, andiamo a definire per ogni valore della
+1:01:50
+1 hour, 1 minute, 50 seconds
+soglia, questo è un indicatore di performance che a volte si usa, forse anche troppo spesso, secondo me, è di
+1:01:57
+1 hour, 1 minute, 57 seconds
+indicare per ogni valore della soglia il tasso, appunto, i valori di eh errori di prima specie, errore di seconda specie,
+1:02:04
+1 hour, 2 minutes, 4 seconds
+no? False positive rate e true positive rate, o meglio, sarebbe errore di prima specie e potenza del test.
+1:02:12
+1 hour, 2 minutes, 12 seconds
+Eh, ok. Quindi capite che per ogni valore di t avete un punto e quindi alla fine andate, non come l'altra volta che segnavamo dei singoli punti su questo su
+1:02:21
+1 hour, 2 minutes, 21 seconds
+questo piano, ma andate proprio a disegnare una curva. Al variare di T avete quindi una curva, questa si chiama curva rock, receiver operating
+1:02:29
+1 hour, 2 minutes, 29 seconds
+characteristics, ma una storia un po' lunga, ma è se volete un modo di di indicare la bontà di un classificatore
+1:02:36
+1 hour, 2 minutes, 36 seconds
+dove però non vogliamo fissare noi la soglia. Cioè, se volete noi lasciamo, quando indicate una curva rock, lasciate
+1:02:44
+1 hour, 2 minutes, 44 seconds
+all'utente finale di scegliere qual è la soglia perché alla fine a seconda della soglia che scegliete avrete un classificatore diverso. Ok? Quindi
+1:02:51
+1 hour, 2 minutes, 51 seconds
+tendenzialmente uno potrebbe dire: "Ok, a me interessa trovarmi più vicino possibile a a all'angolo in alto a sinistra, vi ricordate? Quindi questa
+1:02:59
+1 hour, 2 minutes, 59 seconds
+potrebbe essere una una scelta buona della soglia. Quindi a seconda di qual era il t, vado a recuperarmi che è il tado a recuperare ad esempio ma magari
+1:03:08
+1 hour, 3 minutes, 8 seconds
+per altre situazioni vorrei un tasso molto basso di di falsi positivi, quindi magari questo è un T che mi piace di più. Ok? Però attenti, quindi la curva
+1:03:16
+1 hour, 3 minutes, 16 seconds
+di per sé non è soltanto per un classificatore, è piuttosto per una funzione di score. Poi lascia un po' eh
+1:03:23
+1 hour, 3 minutes, 23 seconds
+l'uso, insomma, l'uso della curva a volte si sfuma tra classificatore e funzione di score, però attenti, bisogna comunque fissare una soglia per avere il vero classificatore.
+1:03:33
+1 hour, 3 minutes, 33 seconds
+Ok? Questo è un dataset molto semplice.
+1:03:35
+1 hour, 3 minutes, 35 seconds
+Vi ricordo che c'era una una non una soglia, diciamo, una curva molto banale che era quella dei classificatori totalmente casuali che era la
+1:03:42
+1 hour, 3 minutes, 42 seconds
+bisettrice. Ok? Cioè, sperate almeno, cioè controllate almeno che la vostra curva rock sia sopra, altrimenti se sta
+1:03:49
+1 hour, 3 minutes, 49 seconds
+sotto vuol dire che è un classificatore decisamente cattivo e si può anzi rovesciare e migliorerà la performance.
+1:03:57
+1 hour, 3 minutes, 57 seconds
+E vediamo un dataset non generato, ma di questi già presenti in R, comeè fatta veramente poi una curva rock. Se prendete un classificatore na bases su
+1:04:05
+1 hour, 4 minutes, 5 seconds
+questo, quantomeno a me la performance era veramente pessima, ok? Quindi attenti, insomma, però comunque vi dà un indizio di quale potrebbe essere un T
+1:04:14
+1 hour, 4 minutes, 14 seconds
+buono, ecco, dove, cioè andate a avvicinarvi il più possibile verso eh l'angolo di alto a sinistra. Ok? Ecco la
+1:04:22
+1 hour, 4 minutes, 22 seconds
+curva rock, appunto, dicevamo, è più più buono il classificatore, significa che la curva rock è più vicina, no, a all'angolo in
+1:04:31
+1 hour, 4 minutes, 31 seconds
+alto a sinistra. E allora cosa significa? Significa che l'area sotto il grafico della curva, andiamo a vedere l'area, no?
+1:04:39
+1 hour, 4 minutes, 39 seconds
+va a vedere l'area qua sotto. Beh, in questo caso l'area è praticamente un mezzo perché non è un granché di classificatore.
+1:04:46
+1 hour, 4 minutes, 46 seconds
+In quest'altro esempio di un dataset generato avevo tanta area, era quasi uno l'area. Allora, spesso si usa invece di mostrare la curva di dare solo l'area
+1:04:55
+1 hour, 4 minutes, 55 seconds
+sotto la curva. È un altro possibile indicatore di performance. Quindi l'area sotto la curva, sottointeso la curva
+1:05:03
+1 hour, 5 minutes, 3 seconds
+rock e a E a AUC è il un altro indicatore di di performance. Quest'area
+1:05:09
+1 hour, 5 minutes, 9 seconds
+ovviamente viaggerà tra 0 potenzialmente e 1. Di solito è sempre più grande di 1/2 perché insomma il classificatore
+1:05:16
+1 hour, 5 minutes, 16 seconds
+casuale copre già il triangolo in basso a destra. Ok? Però attenti a non usare questo che vabbè formalmente potete
+1:05:25
+1 hour, 5 minutes, 25 seconds
+definire anche insomma come un integrale, ma ricordatevelo insomma geometricamente.
+1:05:31
+1 hour, 5 minutes, 31 seconds
+Ehm, attenti a non usarlo semplicemente come l'unico indicatore di bontà, perché anzi è molto criticabile che questo sia un indicatore di performance.
+1:05:41
+1 hour, 5 minutes, 41 seconds
+In effetti ci sono proprio dei problemi a usarlo attraverso diversi classificatori e però anche un'interpretazione
+1:05:49
+1 hour, 5 minutes, 49 seconds
+abbastanza interessante probabilisticamente l'area sotto la curva di una funzione di score.
+1:05:55
+1 hour, 5 minutes, 55 seconds
+E cos'è? è la probabilità che lo score di un di un elemento con classe positiva
+1:06:03
+1 hour, 6 minutes, 3 seconds
+preso a caso della classe positiva presa a caso sia maggiore dello score di un elemento della classe negativa preso a caso. Ok? Quindi questo ce
+1:06:12
+1 hour, 6 minutes, 12 seconds
+l'aspetteremo, no? che se il classificatore è buono darà eh per gli elementi che hanno classe positiva uno score maggiore di quelli della score negativa. Non abbiamo fissato una
+1:06:20
+1 hour, 6 minutes, 20 seconds
+soglia, ovviamente di solito uno fissa poi una soglia e dice quelli sopra quella soglia sono positivi e sotto sono negativi. L'area sotto la curva è
+1:06:28
+1 hour, 6 minutes, 28 seconds
+proprio questa, la probabilità che la soglia di un elemento positivo della classe positiva sia maggiore della
+1:06:34
+1 hour, 6 minutes, 34 seconds
+soglia della dello score, scusate, della di un elemento di classe negativa. Ok?
+1:06:41
+1 hour, 6 minutes, 41 seconds
+Questi sono anche presi in modo indipendente, eh, un negativo e positivo reale indipendenti. Quindi, allora, ha una buona interpretazione. Vabbè, c'è
+1:06:50
+1 hour, 6 minutes, 50 seconds
+anche una parente della dell'area che è due volte l'area -1 perché così si toglie di mezzo quel triangolo in basso
+1:06:57
+1 hour, 6 minutes, 57 seconds
+a destra. Si chiama coefficiente di gini in quel caso. Però qual è? Attenzione, un problema è di usare solo questo numero per confrontare curve rock
+1:07:06
+1 hour, 7 minutes, 6 seconds
+diverse. Attenti che la curva rock possono avere area diverse ma essere ben diverse in regioni diverse. Quindi secondo me è bene non dare soltanto
+1:07:14
+1 hour, 7 minutes, 14 seconds
+l'area, ma plottare anche la curva, tanto non costa molto. Nel momento in cui ha calcolato eh l'indicatore plotta anche la curva. Ok? e attenti anche a
+1:07:23
+1 hour, 7 minutes, 23 seconds
+utilizzare l'area area sotto la curva come singolo indicatore da ottimizzare, appunto, perché ci potrebbero essere eh
+1:07:30
+1 hour, 7 minutes, 30 seconds
+classificatori che hanno simile area ma curve rock molto diverse. Ok? Quindi attenti all'area sotto la curva, ma
+1:07:38
+1 hour, 7 minutes, 38 seconds
+usatela pure, insomma, se volete indicarla è un buon indicatore, ma mettete soprattutto la curva. Ecco,
+1:07:46
+1 hour, 7 minutes, 46 seconds
+va bene. Allora, questo questo era un esempio di nave Bay e Sbernulli. Ora questa cosa dell'area sotto la curva vale per tutti gli altri
+1:07:54
+1 hour, 7 minutes, 54 seconds
+classificatori e gli score. Vediamo un esempio un po' diverso, quello con le gaussiane e poi passiamo a agli altri modelli.
+1:08:03
+1 hour, 8 minutes, 3 seconds
+Allora, cosa succede se invece le caratteristiche sono continue? Ok, abbiamo detto se sono discrete prendiamo
+1:08:10
+1 hour, 8 minutes, 10 seconds
+bernulli, molto semplice. E se sono continue allora la distribuzione più facile nelle continue è una gaussiana.
+1:08:18
+1 hour, 8 minutes, 18 seconds
+Quindi cosa facciamo? Modellizziamo sempre in modo naive bases. Quindi data la classe, data l'etichetta, ciascuna
+1:08:26
+1 hour, 8 minutes, 26 seconds
+feature, ciascuna caratteristica è indipendente dalle altre e ciascuna ha la sua bella distribuzione gaussiana che ho riscritto qui. Quindi c'è la sua media e la sua varianza.
+1:08:37
+1 hour, 8 minutes, 37 seconds
+Di nuovo, quanti parametri abbiamo? non tantissimi perché per ogni classe, quindi avremo tanti quanti le classi per
+1:08:45
+1 hour, 8 minutes, 45 seconds
+ora attenzione per ogni feature ne abbiamo due media e varianza, quindi diciamo ne abbiamo il doppio di prima, ma sono comunque ragionevoli. Detente
+1:08:54
+1 hour, 8 minutes, 54 seconds
+che se uno modellizzasse in generale avrebbe molti più parametri eh perché avrebbe d* d, cioè d feature avrebbe di
+1:09:01
+1 hour, 9 minutes, 1 second
+quadro se usasse una causiana multidimensionale.
+1:09:06
+1 hour, 9 minutes, 6 seconds
+E di nuovo l'addestramento, il training, come si può fare? Eh beh, non è troppo difficile perché vabbè, come prima a priori mettiamo il numero di elementi
+1:09:13
+1 hour, 9 minutes, 13 seconds
+nella classe sulla frazione totale, una buona possibilità e e dopo le medie cosa saranno? La media sarà la media
+1:09:20
+1 hour, 9 minutes, 20 seconds
+campionaria delle feature J, però ristretta a quelli gli elementi della classe C, quindi bisogna un po' restringere. E la varianza di nuovo
+1:09:29
+1 hour, 9 minutes, 29 seconds
+faccio la varianza campionaria o quella massima verossimiglianza, non cambia tanto, degli elementi della feature J
+1:09:36
+1 hour, 9 minutes, 36 seconds
+che cioè della classe C che hanno la feature J, cioè vado a vedere soltanto la feature J. Vabbè, componente per componente, quindi trovo questi
+1:09:44
+1 hour, 9 minutes, 44 seconds
+parametri. Vedete le formule che si scrivono si implementano in un attimo.
+1:09:49
+1 hour, 9 minutes, 49 seconds
+Di conseguenza, cosa faccio? Dato un elemento con delle classi con delle feature nuove x in f. Vado a calcolare
+1:09:57
+1 hour, 9 minutes, 57 seconds
+di nuovo la probabilità usando la formula di ves. Stavolta è cambiata però no la formula perché qui non ho più le bernulli ma ho le gaussiane
+1:10:06
+1 hour, 10 minutes, 6 seconds
+e uso la stessa strategia di prima. Vado a classificare eh HDC HDX, scusate, è
+1:10:14
+1 hour, 10 minutes, 14 seconds
+arg sulle label della probabilità che C sia uguale a L sapendo le le feature. Quindi
+1:10:22
+1 hour, 10 minutes, 22 seconds
+vado proprio a prendere, vado a vedere tutte le varie classi e prendo quella con la probabilità maggiore. Ok? Bene,
+1:10:30
+1 hour, 10 minutes, 30 seconds
+facciamo lo stesso discorso che abbiamo appena fatto per la Bernulli. Cosa succede alla gaussiana nel caso binario?
+1:10:36
+1 hour, 10 minutes, 36 seconds
+Cerchiamo di capire bene cosa sta effettivamente calcolando. C'è uno score anche in questo caso? Beh, sì. Allora, se faccio le log od ODS, cioè faccio il
+1:10:44
+1 hour, 10 minutes, 44 seconds
+rapporto tra le probabilità, passo al logaritmo, vedete? Tornate qui, vedete la x compare qui le mie feature, qua ci vuole x, ok? sulla componente giesima.
+1:10:56
+1 hour, 10 minutes, 56 seconds
+Eh, allora se passo al logaritmo, quel prodotto diventa una somma all'esponenziale, logaritmo dell'esponenziale scompare e quindi ottengo delle formule che sono eh
+1:11:05
+1 hour, 11 minutes, 5 seconds
+abbastanza semplici, diciamo, non ancora semplicissime. Qua è Xj, perdonate, altrimenti
+1:11:12
+1 hour, 11 minutes, 12 seconds
+Ecco qui. E allora cosa succede? Beh, se sviluppo un po' i quadrati, non dobbiamo farlo effettivamente, però tenete presente, no? Vedete? C'è X che compare
+1:11:21
+1 hour, 11 minutes, 21 seconds
+al quadrato, comparirà anche con grado 1. Quindi alla fine sarà un'espressione di che tipo? Vediamo se l'ho scritta già. Eccolo qua. Sarà una score sempre, ma quadratica.
+1:11:31
+1 hour, 11 minutes, 31 seconds
+Quindi alla fine stiamo calcolando un punteggio con dei coefficienti non banali, per carità li abbiamo stimati, però alla fine stiamo assegnando a un
+1:11:38
+1 hour, 11 minutes, 38 seconds
+punto, andiamo a vedere le sue feature, andiamo eventualmente a vedere i quadrati delle feature per via delle varianze e alla fine calcoliamo un
+1:11:45
+1 hour, 11 minutes, 45 seconds
+punteggio dato da una formula di questo tipo. Cioè ora non dovete ricordarvi che sono i beta e gli alfa, però sapere che
+1:11:52
+1 hour, 11 minutes, 52 seconds
+è una un punteggio di questo tipo. C'è in realtà un caso abbastanza speciale in cui in realtà il punteggio si semplifica ancora di più perché vedete qui c'è x,
+1:12:02
+1 hour, 12 minutes, 2 seconds
+no? Quando sviluppate al quadrato avreste x² e il denominatore è questo.
+1:12:08
+1 hour, 12 minutes, 8 seconds
+Anche qui quando ho sviluppato il quadrato ho trovate x quadro e il denominatore è questo. Qua quei denominatori sono le varianze, cioè
+1:12:16
+1 hour, 12 minutes, 16 seconds
+quando le varianze, vedete, una è la varianza della feature j nella classe -1, quanto è variabile e nella classe -1
+1:12:24
+1 hour, 12 minutes, 24 seconds
+la feature j e l'altra è la varianza sempre della stessa feature nella classe + 1. Allora, se per caso quelle lì sono uguali, siccome c'è una differenza qui
+1:12:33
+1 hour, 12 minutes, 33 seconds
+si semplifica. Ok? Quindi in effetti può anche accadere che se le varianze, le deviazioni standard nelle varie feature
+1:12:40
+1 hour, 12 minutes, 40 seconds
+sono uguali, questa formula si semplifica ancora di più. Questa parte non c'è ed è di nuovo un classificatore
+1:12:49
+1 hour, 12 minutes, 49 seconds
+che è appunto lineare, uno score, scusate, che è lineare nelle feature.
+1:12:53
+1 hour, 12 minutes, 53 seconds
+Poi il classificatore di per sé è come prima, si prende il segno dello score.
+1:12:58
+1 hour, 12 minutes, 58 seconds
+Va bene? Il classificatore come prima, potete fare una soglia, potete fare tutto il discorso che abbiamo detto prima sui rock e così via.
+1:13:06
+1 hour, 13 minutes, 6 seconds
+Ecco, qua. Vabbè, dopo lo vediamo mercoledì, giusto per dirvi che che funziona. Cioè, prendete Iris, non è proprio chissà quale dataset, però vedete il classificatore naives
+1:13:15
+1 hour, 13 minutes, 15 seconds
+gaussiano vi classifica per bene, questa è una matrice di confusione 3x3, ma avete esattamente quasi tutti le classi eh che coincidono con quelle reali, ok?
+1:13:27
+1 hour, 13 minutes, 27 seconds
+Quindi non è poi un'ipotesi così strana questa di Knives. Ok?
+1:13:33
+1 hour, 13 minutes, 33 seconds
+E la curva rock? Vabbè, ora questi sono dataset molto semplici, quindi funziona molto bene.
+1:13:40
+1 hour, 13 minutes, 40 seconds
+Ok, allora questo termina un po' nave bases. Adesso prendiamo due direzioni e la prima è quella di eh LDE e LDA e
+1:13:50
+1 hour, 13 minutes, 50 seconds
+QDA che sono parenti e cercano un po' di estendere l'idea del naives gausiano
+1:13:57
+1 hour, 13 minutes, 57 seconds
+dicendo "Ok, io non voglio fare l'ipotesi che le feature siano indipendenti." Questo magari è troppo restringente, troppo restrittivo. Allora, cosa faccio?
+1:14:08
+1 hour, 14 minutes, 8 seconds
+Faccio sempre un modello generativo, quindi dico se conosco la classe C, le mie feature X che sono in RD sono
+1:14:17
+1 hour, 14 minutes, 17 seconds
+gaussiane, ma attenzione, sono delle gaussiane in più variabili, multidimensionali.
+1:14:25
+1 hour, 14 minutes, 25 seconds
+Ora su questo magari ci torniamo perché non ricordo adesso esattamente se statistica 1 abbiamo mai menzionato le gausiane più variabili.
+1:14:33
+1 hour, 14 minutes, 33 seconds
+Qual è la differenza sostanziale? è che mentre per una gaussiana in una variabile bisogna specificare la media e
+1:14:39
+1 hour, 14 minutes, 39 seconds
+la varianza, per una densità gausiana in più variabili, vedete la formula è molto simile, avete l'esponenziale,
+1:14:47
+1 hour, 14 minutes, 47 seconds
+poi specificate una media M di Core di medie, sarebbe appunto la la media, nel caso vettoriale è un vettore e poi
+1:14:55
+1 hour, 14 minutes, 55 seconds
+specificate questa che è la matrice matrice delle covarianze.
+1:15:04
+1 hour, 15 minutes, 4 seconds
+Ok? Quindi vado proprio a dire che non necessariamente sono indipendenti. Posso specificare una un'associazione tramite un'opportuna matrice delle covarianze.
+1:15:13
+1 hour, 15 minutes, 13 seconds
+Le matrici delle covarianze sono matrici di per d, quindi sigma C è in r * D, come nel caso
+1:15:23
+1 hour, 15 minutes, 23 seconds
+delle matrici di converglianze campionarie. Ok? Invece i vettori delle medie sono vettori in RD.
+1:15:31
+1 hour, 15 minutes, 31 seconds
+Quindi capite che se D è grande D quadro non ci piace. Cioè questo avrebbe la matrice delle covarianze avete ordine di
+1:15:37
+1 hour, 15 minutes, 37 seconds
+quadro parametri per ogni classe, quindi potrebbe esserci un'esplosione di di parametri, ok? cosa che non vogliamo
+1:15:44
+1 hour, 15 minutes, 44 seconds
+perché poi diventa magari complicato. E allora in effetti allora ci sono delle possibilità in questo caso, quindi uno
+1:15:52
+1 hour, 15 minutes, 52 seconds
+dice facciamo una ipotesi, supponiamo, ad esempio, nella LDA, nelle analisi discriminante lineare si fa questa
+1:16:01
+1 hour, 16 minutes, 1 second
+ipotesi, cioè la matrice delle covarianze è sempre la stessa, ok? Ci giochiamo solo la media, ok? Dove collocare queste le medie?
+1:16:10
+1 hour, 16 minutes, 10 seconds
+Quindi sigma di C è sempre sigma. Questo un po' riduce, non tantissimo, resta sempre, insomma, di qua D per D, però è
+1:16:18
+1 hour, 16 minutes, 18 seconds
+un'ipotesi comoda e soprattutto vedremo che lo score diventa una funzione lineare molto semplice. E poi c'è anche la variante invece in cui davvero uno
+1:16:26
+1 hour, 16 minutes, 26 seconds
+dice non faccio questa ipotesi, ognuno ha la sua matrice delle covarianze, ogni classe ha la sua matrice di covarianza e
+1:16:32
+1 hour, 16 minutes, 32 seconds
+quindi in generale si va nella quadratic discriminant analysis QDA. Ok? Però attenti che abbiamo quindi abbandonato
+1:16:40
+1 hour, 16 minutes, 40 seconds
+questa ipotesi di bees di indipendenza tra le varie feature e magari questo potrebbe essere più eh funzionare
+1:16:47
+1 hour, 16 minutes, 47 seconds
+meglio. Va bene? Facciamo un esempio nel caso binario che mi sembra più eh più semplice. Ora qua si è perso un
+1:16:55
+1 hour, 16 minutes, 55 seconds
+pezzetto. Allora, scriviamola. Questa è la probabilità che x sia uguale x piccolo sapendo c.
+1:17:05
+1 hour, 17 minutes, 5 seconds
+Ok?
+1:17:07
+1 hour, 17 minutes, 7 seconds
+proporzionale a questo, non è necessariamente uguale a questo. C'è sempre un fattore comune che è questo denominatore di di bases.
+1:17:15
+1 hour, 17 minutes, 15 seconds
+Ok? E allora se ne sono nel caso binario, cosa posso fare? Prendo questa espressione qui in alto, vedete? Eh,
+1:17:23
+1 hour, 17 minutes, 23 seconds
+prendo l'espressione con c = 1 e c = -1, come abbiamo fatto prima in altri casi, no? Eh, faccio le OD, quindi faccio il
+1:17:30
+1 hour, 17 minutes, 30 seconds
+rapporto e faccio il logaritmo, quindi non la sto scrivendo perché è qui, però prendete questa espressione e alla fine,
+1:17:38
+1 hour, 17 minutes, 38 seconds
+come abbiamo fatto prima per Naifes, vedete, faccio il logaritmo, faccio del rapporto, alla fine quelle espressioni
+1:17:46
+1 hour, 17 minutes, 46 seconds
+in altro sono polinomi di secondo grado in x, ok? polinomi
+1:17:54
+1 hour, 17 minutes, 54 seconds
+di secondo grado nelle feature, però sì, così la quello che aveva scritto prima
+1:18:02
+1 hour, 18 minutes, 2 seconds
+che avevo detto la probabilità di x uguale Sì, sì, questa è la probabilità, la densità di probabilità della mia classe
+1:18:08
+1 hour, 18 minutes, 8 seconds
+sapendo questa è la è la previsione del modello eh, scusate, della classe. Sì, generale C = C sapendo che X = X. Ok?
+1:18:18
+1 hour, 18 minutes, 18 seconds
+Questo è quello che prevede il modello perché vedete c'è la densità a priori per questa che è la mia verosimiglianza.
+1:18:27
+1 hour, 18 minutes, 27 seconds
+Ok? Ora non è proprio uguale in effetti come ho detto prima, perché è è proporzionale perché c'è sempre c'è sempre di mezzo quel denominatore che
+1:18:35
+1 hour, 18 minutes, 35 seconds
+non ci interessa mai, no? Quel denominatore che è la probabilità che x ug x piccolo, ma è comune a tutte le classi, quindi non è utile per la classificazione.
+1:18:46
+1 hour, 18 minutes, 46 seconds
+Ora, qual è il punto? Eh, sì. termine alto.
+1:18:48
+1 hour, 18 minutes, 48 seconds
+Sì, sì, che sarebbe appunto quello lì che si è semplicemente spostato male.
+1:18:52
+1 hour, 18 minutes, 52 seconds
+Dopo magari lo correggo. Ok, quello è finito a destra.
+1:18:57
+1 hour, 18 minutes, 57 seconds
+Sì, non preoccupatevi troppo dell'espressione per il momento, insomma, l'importante è che capiate un po' l'uso di questa di questa tecnica che cerca di allontanarsi da knife
+1:19:05
+1 hour, 19 minutes, 5 seconds
+bases, però poi non si allontana troppo perché vedete alla fine la funzione di score,
+1:19:13
+1 hour, 19 minutes, 13 seconds
+se uno va a fare i conti, no, ha il logaritmo di quella roba e lì in alto c'è una funzione all'esponente che è quadratica, no? è una gausiana
+1:19:21
+1 hour, 19 minutes, 21 seconds
+multidimensionale, ma comunque all'esponente c'è un vettore x trasposto per la matrice delle covarianze era -1
+1:19:28
+1 hour, 19 minutes, 28 seconds
+per x. Quindi alla fine l'espressione sarà complicata quanto volete, ma è un polinomio di secondo grado nelle x.
+1:19:34
+1 hour, 19 minutes, 34 seconds
+Quindi quando faccio poi il logaritmo, il mio la mia score, il mio funzione di insomma come al solito di di punteggio è una funzione quadratica. Cosa è
+1:19:43
+1 hour, 19 minutes, 43 seconds
+successo? In generale, rispetto a Nai Bayes, qui avete anche i prodotti misti, termini misti,
+1:19:52
+1 hour, 19 minutes, 52 seconds
+ok? Termini misti che in Nive Bayes non avete perché in Nive bases può essere anche quadratica, ma siccome avete detto
+1:19:59
+1 hour, 19 minutes, 59 seconds
+che sono tutte indipendenti, le feature non compare. Ok? Quindi questa è la differenza se volete tra QDA e e na bases.
+1:20:09
+1 hour, 20 minutes, 9 seconds
+Cos'altro succede? Succede che se ora la sigma è comune a tutte, bisognerebbe farci il conto, non lo facciamo, ma se
+1:20:16
+1 hour, 20 minutes, 16 seconds
+la sigma di C è la stessa per tutte, come prima in Aive Bayes, i termini quadratici si semplificano e trovate una funzione di score che è lineare.
+1:20:27
+1 hour, 20 minutes, 27 seconds
+Ok?
+1:20:28
+1 hour, 20 minutes, 28 seconds
+Quindi è molto simile nave bases, ma state aumentando un pochino la la state cercando di sfruttare le correlazioni tra i vari tra le varie feature.
+1:20:39
+1 hour, 20 minutes, 39 seconds
+E ora però andiamo a vedere come si stimano questi parametri in LDA. Poi alla fine sarà una riga di codice, non
+1:20:46
+1 hour, 20 minutes, 46 seconds
+voglio che insomma vi spaventiate, però la differenza concettuale è appunto quella che abbiamo introdotto le correlazioni, ma e i parametri però si
+1:20:54
+1 hour, 20 minutes, 54 seconds
+stimano allo solito modo, sempre massima verosimiglianza. Quindi le vettori di media, cosa vado a fare? Vado a fare le
+1:21:00
+1 hour, 21 minutes
+medie eh dei vettori nella classe C eh e vado a fare le medie delle singole feature. Ok? Ora questo sarebbe un
+1:21:09
+1 hour, 21 minutes, 9 seconds
+vettore in RD. Ok? Quindi andate a prendervi le osservazioni che stanno nella classe C e andate a fare la media
+1:21:16
+1 hour, 21 minutes, 16 seconds
+dei vettori che stanno in RD. Trovate un vettore in RD o la matrice, scusate qua.
+1:21:25
+1 hour, 21 minutes, 25 seconds
+Come mai?
+1:21:27
+1 hour, 21 minutes, 27 seconds
+La matrice delle covarianze invece sta scaricando. Eh, sarà bene. La
+1:21:37
+1 hour, 21 minutes, 37 seconds
+matrice delle covarianze invece è stimata anche questa per massima verosimiglianza.
+1:21:45
+1 hour, 21 minutes, 45 seconds
+Ora vi do la formula, ma non è che dovete, ripeto, impararvela.
+1:21:56
+1 hour, 21 minutes, 56 seconds
+Qua mi metto di qua, altrimenti se si scarica poi. Allora, eh la matrice delle covarianze,
+1:22:03
+1 hour, 22 minutes, 3 seconds
+eccolo qua. Cosa si fa? La media, appunto, si va a fare per ogni classe di quelle dati osservati. Vado a mediare le feature nella classe per la matrice
+1:22:11
+1 hour, 22 minutes, 11 seconds
+delle covarianze. Uno direbbe uso la la covarianza campionaria. Sì, posso farla.
+1:22:17
+1 hour, 22 minutes, 17 seconds
+Quindi lì, scusate, non sta aggiornando.
+1:22:30
+1 hour, 22 minutes, 30 seconds
+Vediamo se aggiorna. Oh, ragazzi, delicato.
+1:22:41
+1 hour, 22 minutes, 41 seconds
+Lo aggiorniamo.
+1:23:00
+1 hour, 23 minutes
+Ah.
+1:23:06
+1 hour, 23 minutes, 6 seconds
+Non gli è piaciuto. M vabbè, visto che abbiamo 5 minuti, faccio soltanto dal senza puntarle. Ah, no, è tornato.
+1:23:15
+1 hour, 23 minutes, 15 seconds
+Perfetto. Ok, dai, tornato.
+1:23:20
+1 hour, 23 minutes, 20 seconds
+Ok, allora per le covarianze, sì, ci siamo. Ma come si fa a stimare le
+1:23:30
+1 hour, 23 minutes, 30 seconds
+covarianze? Vi ricordate? c'è la covarianza campionaria e vi ricordate anche com'era definita. Ora qui sono scambiati trasposto perché penso alle X
+1:23:38
+1 hour, 23 minutes, 38 seconds
+come vettori colonna. Vabbè, perché ehm
+1:23:48
+1 hour, 23 minutes, 48 seconds
+però appunto al di là di questo il punto è molto semplice. Voi restringete la singola classe C, ecco, forse è più
+1:23:55
+1 hour, 23 minutes, 55 seconds
+chiaro QDA, no? QDA. Dite, "Ok, vado a vedere le osservazioni della mia classe C. E soltanto per i dati che hanno
+1:24:03
+1 hour, 24 minutes, 3 seconds
+l'etichetta nella classe C vado a prendere la matrice delle covarianze campionaria. Cosa fate nel caso del LDA?
+1:24:10
+1 hour, 24 minutes, 10 seconds
+In quella lineare volete forzare che le covarianze siano le stesse per tutti e allora fate la media di quelle di quelle
+1:24:17
+1 hour, 24 minutes, 17 seconds
+stimate da prima. Ok? Quindi va bene. Ci sono comunque altri criteri per stimare i parametri. In realtà questa analisi è
+1:24:25
+1 hour, 24 minutes, 25 seconds
+molto indietro nel tempo, addirittura risale a Fisher questa idea della linear discriminant analysis, però diciamo tradizionalmente ci sono anche altri
+1:24:32
+1 hour, 24 minutes, 32 seconds
+criteri, ma questo è quello più comune, la stima di massima verosimiglianza.
+1:24:36
+1 hour, 24 minutes, 36 seconds
+Quindi quando avete stimato i parametri, nel senso che li fa il codice per voi, potete appunto fare previsioni un po' come facevamo con Ibases.
+1:24:46
+1 hour, 24 minutes, 46 seconds
+Allora, vediamo l'ultimo modello, poi lo vediamo in pratica mercoledì. Allora, abbiamo detto che in tante situazioni
+1:24:55
+1 hour, 24 minutes, 55 seconds
+eh linear discriminato analysis, vabbè, quadratic esce una funzione quadratica, ma anche perfe esce una funzione di
+1:25:02
+1 hour, 25 minutes, 2 seconds
+score che è lineare, lineare nelle mie caratteristiche. Allora, l'idea è qual è? ci hanno messo molto in realtà per arrivare a questa idea eh gli
+1:25:11
+1 hour, 25 minutes, 11 seconds
+statistici, ma eh l'idea è molto semplice. Dico, facciamo direttamente un modello che in cui ci sia una funzione
+1:25:19
+1 hour, 25 minutes, 19 seconds
+di score lineare. Ok? Quindi cosa vado a definire? Facciamo il caso binario, le mie classi sono due. Invece di partire
+1:25:27
+1 hour, 25 minutes, 27 seconds
+dal modello generativo e poi usare la formula di bases per avere la mia probabilità delle classi, vado a dire direttamente come deve essere la
+1:25:35
+1 hour, 25 minutes, 35 seconds
+funzione di score. Cioè dico che la funzione di score, cioè il logaritmo delle Os, quindi la probabilità che la classe sia positiva sapendo le mie
+1:25:44
+1 hour, 25 minutes, 44 seconds
+caratteristiche, diviso la probabilità che la classe sia negativa sapendo le caratteristiche, non deve essere una funzione troppo complicata, è una
+1:25:50
+1 hour, 25 minutes, 50 seconds
+funzione lineare a fine, ok? Allora, la indico per brevità come beta x, ok? Però attenti che ci mette anche appunto
+1:25:59
+1 hour, 25 minutes, 59 seconds
+un termine di grado 0 beta 0. Poi alla fine significa cambiare la la soglia di eh di accettazione, no? La soglia per la classificazione.
+1:26:10
+1 hour, 26 minutes, 10 seconds
+Ok? Quindi dice "Ok, questa è il mio modello. Il mio modello è trovare i beta in modo tale che questa sia una buona funzione di score." Quindi cosa faccio?
+1:26:20
+1 hour, 26 minutes, 20 seconds
+Beh, nel momento in cui ho definito la funzione di score, posso recuperare anche le probabilità. Come si fa?
+1:26:26
+1 hour, 26 minutes, 26 seconds
+Bisogna invertire, no? Eh, se passo all'esponenziale, faccio l'esponenziale di beta x, ottengo le ODS e poi dalle
+1:26:33
+1 hour, 26 minutes, 33 seconds
+ODS, se siete scommettitori sapete anche come recuperare delle probabilità, no?
+1:26:37
+1 hour, 26 minutes, 37 seconds
+Oz 1 a 1 è probabilità 50%, quindi la formula finale è questa qui. Quindi la probabilità che sia positivo e che sia negativo le recuperate dalla funzione di
+1:26:46
+1 hour, 26 minutes, 46 seconds
+score. Però la cosa più interessante qual è? Perché a quel punto uno dice, se ho la mia funzione di score riesco anche a scrivere la verosimiglianza.
+1:26:58
+1 hour, 26 minutes, 58 seconds
+Ok? Perché la verosimiglianza qual è la verosimiglianza? per l'indipendenza tra le mie varie ehm eh tra le mie varie osservazioni.
+1:27:09
+1 hour, 27 minutes, 9 seconds
+Attenti che non facciamo l'indipendenza delle classi, eh ma delle osservazioni.
+1:27:18
+1 hour, 27 minutes, 18 seconds
+Allora, per l'indipendenza delleosservazioni posso scrivere che la verosimiglianza è appunto che cos'è? è la probabilità
+1:27:27
+1 hour, 27 minutes, 27 seconds
+che io osservi, no, le caratteristiche Xi sapendo che la classe è quella che ho osservato. È lì. Ok, v dire vero, vabbè,
+1:27:35
+1 hour, 27 minutes, 35 seconds
+qui ci sarebbe da dire qualcosina, però allora cosa mi dà questo? Mi dà un'espressione perché io sostituisco le
+1:27:42
+1 hour, 27 minutes, 42 seconds
+probabilità che conosco e a quel punto ho qualcosa che posso massimizzare. Quindi cosa faccio? Stimo i parametri.
+1:27:55
+1 hour, 27 minutes, 55 seconds
+Quindi questa volta, se volete, è la verossimilanza dei parametri, date le osservazioni. Quindi stimo i parametri beta tramite massima verosimiglianza.
+1:28:06
+1 hour, 28 minutes, 6 seconds
+Quindi devo prendere questa funzione, andare a vedere i miei dati. Qua c'è una i che manca. Ecco qua. X così. Ora, non
+1:28:14
+1 hour, 28 minutes, 14 seconds
+è un'espressione facilissima, eh, perché avete l'esponenziale di beta, la somma di tutti quelli con classe 1 dei vostri dati, il numeratore ancora ragionevole,
+1:28:22
+1 hour, 28 minutes, 22 seconds
+denominatore, avete un prodotto di tutte queste esponenziali, ok? Forse è per questo che il metodo, insomma, non è che risalga 100 anni fa, ma un po' meno,
+1:28:31
+1 hour, 28 minutes, 31 seconds
+perché il punto è che non ci sono formule chiuse per avere le stime dei beta, ok? Quindi, come bisogna fare, bisogna ricorrere a metodi numerici, ok?
+1:28:42
+1 hour, 28 minutes, 42 seconds
+Quindi uno dice: "Ok, il modello può essere molto bello, molto semplice, però non ho una formula semplice comera nave bases come linear discriminant
+1:28:49
+1 hour, 28 minutes, 49 seconds
+analysis". Quindi la stima dei miei parametri e rimane sul lato numerico.
+1:28:54
+1 hour, 28 minutes, 54 seconds
+Poi per le applicazioni è quello che basta, eh, cioè quindi l'importante è avere dei buoni solutori numerici e quindi in effetti questa funzione di verosimiglianza è convessa in beta, si
+1:29:04
+1 hour, 29 minutes, 4 seconds
+trova un unico minimo e è un ottimo problema dal punto di vista numerico.
+1:29:09
+1 hour, 29 minutes, 9 seconds
+Ok? Quindi attenti che quindi lo spirito è sempre lo stesso, ma c'è un passaggio numerico, quindi non c'è una formula. Se
+1:29:16
+1 hour, 29 minutes, 16 seconds
+vi chiedo qual è la formula per i parametri ottimali eh della regressione logistica, la risposta è no, non c'è una formula, si trovano numericamente. Ok?
+1:29:27
+1 hour, 29 minutes, 27 seconds
+Ecco, questo è il caso binario. Come si fa a fare il caso multiclasse? Poi in realtà la regressionione logistica si
+1:29:34
+1 hour, 29 minutes, 34 seconds
+usa perlop più nel caso binario. Beh, infatti questo è più piuttosto una parentesi interessante, cioè nel momento in cui avete un classificatore binario è
+1:29:42
+1 hour, 29 minutes, 42 seconds
+quello che vi basta in realtà perché potete fare tante uristiche, tante strategie anche per confrontare diverse classi. Ad esempio, una possibilità è di
+1:29:51
+1 hour, 29 minutes, 51 seconds
+dire: "Ok, io so classificare, ho un classificatore binario e allora lo uso in questo modo. Per ogni classe, cioè
+1:29:59
+1 hour, 29 minutes, 59 seconds
+per ogni etichetta C, vado a fare il classificatore che classifica C contro tutti gli altri. Questa si chiama la strategia one versus all, cioè una
+1:30:07
+1 hour, 30 minutes, 7 seconds
+contro tutti gli altri. Allora, cosa faccio? Per ogni per ogni classe vado a fare questi classificatori, ok? E alla fine cosa vado a fare? Se
+1:30:17
+1 hour, 30 minutes, 17 seconds
+sono della stessa natura, vado a vedere gli score, ok? Quello che ha score più alto vince e dico: "Ok, stabilisco che
+1:30:25
+1 hour, 30 minutes, 25 seconds
+la vera classe del punto è quello con lo score maggiore. Faccio una specie di stima anche qui di moda." Ok?
+1:30:33
+1 hour, 30 minutes, 33 seconds
+si può fare anche un'altra cosa un po' più delicata è di dire "Ok, per ogni coppia vado a fare la classificazione della coppia di di etichette, vado a
+1:30:41
+1 hour, 30 minutes, 41 seconds
+fare la classe C contro la classe L, quindi ho delle coppie eh per ogni coppia di di classi ho un classificatore
+1:30:50
+1 hour, 30 minutes, 50 seconds
+e a quel punto vado a fare una votazione." è come se ogni coppia, no, uno dicesse "Ok, voto C o voto L, quindi un sistema
+1:30:59
+1 hour, 30 minutes, 59 seconds
+volete a due partiti, però ci sono in realtà nella realtà molti più partiti, quindi si fa per ogni coppia di partiti scelgo quello che mi piace di più e alla
+1:31:07
+1 hour, 31 minutes, 7 seconds
+fine vado veramente a votare e classifico quello che ha preso più voti." Ok? Questo è un po', se volete,
+1:31:14
+1 hour, 31 minutes, 14 seconds
+eh sono due strategie molto utili da sapere che, appunto, non vi limitano veramente al caso eh binario, ma sapere
+1:31:21
+1 hour, 31 minutes, 21 seconds
+che quando un classificatore è buono, una strategia buona per il caso binario, poi posso estenderla anche per classificatori multiclasse,
+1:31:29
+1 hour, 31 minutes, 29 seconds
+ok? Per questo che ci si concentra anche molto sul caso binario, perché poi multiclasse uno lo tratta in questo modo. Eh, in realtà la regressione
+1:31:37
+1 hour, 31 minutes, 37 seconds
+logistica avrebbe la variante multiclasse, non è molto complicata.
+1:31:42
+1 hour, 31 minutes, 42 seconds
+Eccola qua. E l'idea qual è? Che per ogni classe C uno usa dei parametri beta C e fa una specie di funzione score,
+1:31:52
+1 hour, 31 minutes, 52 seconds
+cioè o meglio recupera le probabilità con questa funzione che si chiama soft max. Quindi per ogni
+1:31:59
+1 hour, 31 minutes, 59 seconds
+per ogni eh classe calcolo uno score beta cx. Ok? Allora, invece di fare il
+1:32:07
+1 hour, 32 minutes, 7 seconds
+massimo delle score, che sarebbe una specie di di stima come prima, one versus all, faccio questa che è la
+1:32:15
+1 hour, 32 minutes, 15 seconds
+funzione soft max, ok? Vado a fare appunto il l'esponenziale di beta cx diviso normalizzo in modo da avere delle
+1:32:23
+1 hour, 32 minutes, 23 seconds
+probabilità, ok? E quindi ho poi delle probabilità che posso usare per calcolare ulteriori score e così via. Va
+1:32:29
+1 hour, 32 minutes, 29 seconds
+bene? Quindi si può fare anche logistica multiclasse, non è che la trovate spesso, anzi in R vedremo che è implementata naturalmente quella
+1:32:37
+1 hour, 32 minutes, 37 seconds
+binaria, ok? Bisogna andare verso libreria per avere quella multiclasse.
+1:32:41
+1 hour, 32 minutes, 41 seconds
+Quindi allora anche qui, insomma, non è non è necessario, ma insomma sappiate che esiste, appunto. Allora, mercoledì
+1:32:49
+1 hour, 32 minutes, 49 seconds
+vedremo in pratica questi classificatori e poi concludiamo con facciamo anche un paio di domandine di tipo compito,
+1:32:58
+1 hour, 32 minutes, 58 seconds
+insomma. Vabbè, scusate se ho sforato 2 minuti. Vabbè.
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+47:24
+III Lezione Magistrale: Bruno Canino
+Scuola di Musica di Fiesole
+18k 6 yr ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+80 watching
+5:23
+2026 Fields Medal: Hong Wang
+Simons Foundation
+554k 1 mo ago
+1:38
+Atlas Airborne | Boston Dynamics & @rai-inst
+Boston Dynamics
+and RAI Institute
+2.3m 7 mo ago
+5:01
+Inventing Spanish - SNL
+Saturday Night Live
+8.3m 11 mo ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+223k 13 hr ago
+New
+Mix
+My Mix
+Relja Lukic, Ezio Bosso, Kristen Bell and more
+3:04
+The Orville 1:7 Majority Rule, Absolute Unstructured Democracy
+Brooke Marino
+633k 3 yr ago
+5:43
+How does Atlas learn? | Inside the Lab | Boston Dynamics
+Boston Dynamics
+938k 4 mo ago
+8:58
+Martha Argerich, il pianoforte raccontato dal violino - Via dei Matti n.0 del 15/01/2026
+Rai
+21k 8 mo ago
+14:47
+Tutta la Verità dietro il DISASTRO di Eataly
+Fegialo
+556k 3 mo ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+1:07
+Mark Carney IMITATES Trump in HILARIOUS MOMENT: The room ERUPTS in laughter
+Diario AS
+1.4m 2 days ago
+New
+8:13
+Chi se ne frega di Jev?
+Salvatore Sanfilippo
+6.1k 3 hr ago
+New
+13:50
+Why Navier-Stokes Pushes Math and Physics to the Edge
+Quanta Magazine
+481k 3 days ago
+New
+2:13
+Rogue Robot Launches Kung Fu Kicks, While Handlers Attempt to Subdue It
+New York Post
+2.6m 2 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+12:10
+Chloe Chua – Waxman: Carmen Fantasie
+Jake Zhou
+64k 1 mo ago
+5:24
+1986: How to Spot the Upper Class | That's Life! | BBC Archive
+BBC Archive
+2.7m 5 mo ago
+1:21
+Atlas Gets a Grip | Boston Dynamics
+Boston Dynamics
+11m 3 yr ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+14:25
+The longevity bean: Dr. Berrino’s guide to eating legumes for a longer life
+Il Fatto Quotidiano
+and TvLoftOfficial
+622k 3 mo ago
+29:08
+Top 50 FUNNIEST Crashes from Red Bull Soapbox Race
+Red Bull Soapbox
+3.7m 3 mo ago

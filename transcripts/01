@@ -1,0 +1,1625 @@
+
+IT
+750AA 2025 09 22 lezione1
+Unlisted
+DARIO TREVISAN
+DARIO TREVISAN
+272 subscribers
+Analytics
+Edit video
+Promote
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+310 views  22 Sept 2025
+Richiami di statistica descrittiva, media, moda, mediana, quantili, varianza e deviazione standard. Minimizzazione del rischio empirico: esempi di funzione di costo (quadratica, assoluto, 0-1, esponenziale). Statistica multivariata: organizzazione dei dati osservati in data frame, cenni alle distanze multidimensionali (Euclidea, Manhattan, del massimo).
+Transcript
+
+Follow along using the transcript.
+DARIO TREVISAN
+272 subscribers
+Videos
+About
+0 Comments
+Add a comment…
+Transcript
+Search transcript
+0:00
+0 seconds
+Ok, allora vi carico le slide in anticipo, così potete mettere gli appunti.
+0:09
+9 seconds
+Altra cosa che mi è stata chiesta importante, sì, non tanto per per chi va bene, ma per chi fa delle
+0:18
+18 seconds
+delle relazioni che vanno male. Cioè, se la relazione è insufficiente, cosa potete fare? Però in effetti non ci avevo pensato, ma è la cosa più semplice
+0:27
+27 seconds
+è permettervi di rifare relazioni a piacimento. Quindi in realtà sia che se non siete soddisfatti del voto della
+0:35
+35 seconds
+relazione potete di una di queste potete sottomettere una nuova relazione su nuovi dati. La cosa importante è che
+0:42
+42 seconds
+prendiate nuovi dataset e anche ehm state fate attenzione agli argomenti, ok? se è andata male la relazione sulla
+0:50
+50 seconds
+regressione, non vi è piaciuto il voto, eh non è che poi e ne avete fatta una invece che vi piace sul tema di classificazione, non è che poi dovete
+0:59
+59 seconds
+fare una relazione, quindi un'altra relazione sulla classificazione, cioè dovete avere due relazioni buone su due argomenti diversi, ok? Quindi potete
+1:07
+1 minute, 7 seconds
+sempre eh insomma compatibilmente, non spammate, ecco, però cercate di fare per bene delle relazioni e insomma se non
+1:15
+1 minute, 15 seconds
+siete soddisfatti per qualche motivo mi avvisate, dite questo lo ne farò un'altra su questo tema, ok? D'accordo?
+1:22
+1 minute, 22 seconds
+Così si cioè sia il problema di chi ha fatto delle relazioni insufficienti e dirò no, non va bene e automaticamente quindi sa che deve per forza rifarne
+1:29
+1 minute, 29 seconds
+un'altra magari sullo stesso tema o comunque può sceglierne un altro, purché vi ripeto ne facciate almeno due su tre.
+1:36
+1 minute, 36 seconds
+e sia chi magari ha preso 27 voleva invece un 30 lode sulle relazioni. Non ho ancora capito bene come classifica, cioè come valutare, se usare anche qui.
+1:46
+1 minute, 46 seconds
+Probabilmente saranno delle fasce di voto, quindi dopo il il voto complessivo
+1:54
+1 minute, 54 seconds
+devo ancora capire bene l'algoritmo perché ce la faremo, però appunto potete in teoria risottomettere nuove relazioni, purché alla fine ne abbiate fatte due.
+2:04
+2 minutes, 4 seconds
+Ecco, la cosa importante è che se ne sottomettete di nuove, le precedenti vanno a cancellarsi, ok? Quindi se ne valgono sempre le ultime due che avete
+2:13
+2 minutes, 13 seconds
+consegnato, ok? Quindi fate attenzione, se avete fatto molto bene la prima e male la seconda, che è una cosa che non vorrei vedere perché vuol dire che in
+2:22
+2 minutes, 22 seconds
+qualche modo avevate capito qualcosa e poi il corso vi ha invece portato su una strada sbagliata. Eh, allora attenzione,
+2:29
+2 minutes, 29 seconds
+in quella situazione se mandate una nuova relazione, a meno che non sia proprio insufficiente, diciamo, la seconda se è insufficiente dovete
+2:36
+2 minutes, 36 seconds
+rifarla. Se invece vi è andata male, ma malino, se mandate una nuova, perdete la più vecchia, ok? Quindi valgono sempre
+2:43
+2 minutes, 43 seconds
+le ultime due relazioni, eccetto per le insufficienze, per cui vi chiedo io proprio di rifare qualcosa.
+2:51
+2 minutes, 51 seconds
+Va bene, dai, spero che ci capiamo su questo. Eh, c'è la possibilità di fare un preappello a dicembre? Allora, preappello. Stavo
+2:58
+2 minutes, 58 seconds
+valutando sicuramente di fare un una simulazione di di appello a dicembre, però se volete proprio un appello vero,
+3:05
+3 minutes, 5 seconds
+tanto un'ora sola, secondo me il tempo ce l'abbiamo, quindi potremmo fare un'esercitazione in cui vi do un finto compitino e forse l'ultima lezione
+3:13
+3 minutes, 13 seconds
+potrebbe essere dedicata proprio a questo. Mh, che dite? C'è ora di fare i compitini in mezzo? No, magari faremo tipo delle discussioni, esercitazioni in
+3:21
+3 minutes, 21 seconds
+cui vi do delle domande tipo vero o falso e ne discutiamo, però di fare i compitini no, perché è solo un'ora. È meglio se vi concentrate sulle relazioni durante il corso. Ok?
+3:31
+3 minutes, 31 seconds
+Va bene.
+3:33
+3 minutes, 33 seconds
+Allora, quindi aspettate che mi segno cosa ho promesso. Preappelli. Allora, si può risottomettere?
+3:44
+3 minutes, 44 seconds
+No, si può sottomettere nuove relazioni?
+3:52
+3 minutes, 52 seconds
+su nuovi dati, eh, non potete riciclare. Io vi dico, quella è andata male perché non avete fatto
+4:00
+4 minutes
+questo e questo, non è che me la mandate correggendola, no, dovete fare una cosa nuova, ok? Quindi così ci pensate due volte prima di mandare la relazione e
+4:09
+4 minutes, 9 seconds
+valgono sempre le ultime due, ok?
+4:15
+4 minutes, 15 seconds
+due più recenti.
+4:20
+4 minutes, 20 seconds
+Idealmente fate bene la prima, fate meglio la seconda e io sono felicissimo perché vedo un trend e dico e la terza sarebbe ottima in realtà non è vero. Ok.
+4:28
+4 minutes, 28 seconds
+E e altra cosa abbiamo, dicevamo, compitino o esame, insomma preappello.
+4:34
+4 minutes, 34 seconds
+Ecco, preappello a dicembre.
+4:39
+4 minutes, 39 seconds
+Ok, questo me le sono segnate così me le ricordo anch'io. Perfetto. Vai. Allora, statistica descrittiva. C'è qualcuno che
+4:47
+4 minutes, 47 seconds
+non ha mai studiato statistica? Allora, nel testo del ROS, ora se andate nella pagina web, è
+4:54
+4 minutes, 54 seconds
+indicato. Eh, se trovate l'ultima edizione del Ross, c'è anche un po' di codice R. Eh, c'è anche nella versione
+5:02
+5 minutes, 2 seconds
+c'è anche una versione tradotta in italiano e però anche quello in inglese va bene.
+5:07
+5 minutes, 7 seconds
+È un po' richiamato tutta la parte di statistica uno e anche molte più cose e quindi se qualcuno non ha mai proprio visto nulla di statistica può partire da
+5:16
+5 minutes, 16 seconds
+quello, altrimenti mi appoggio a qualcosa che dovreste aver già visto nel corso di statistica 1. Ok? In particolare, ricordiamoci, no, che
+5:25
+5 minutes, 25 seconds
+questo è un campione statistico. Avete l'idea che c'è una popolazione da cui pescate, no? Pensate un lago, un mare,
+5:32
+5 minutes, 32 seconds
+pescate n ehm individui, no? E quindi parlate e fate delle osservazioni su ciascun individuo e queste osservazioni
+5:41
+5 minutes, 41 seconds
+le raccogliete questi dati in un cosiddetto campione statistico di taglia, vi ricordo che c'è questo
+5:48
+5 minutes, 48 seconds
+termine taglia n, la numerosità del vostro campione. Ora, al momento le osservazioni, pensiamo nel caso più
+5:55
+5 minutes, 55 seconds
+semplice, sono o dei numeri, ok? Quindi, ad esempio, per ciascuno di voi vado a misurare o magari solo per quelli che
+6:02
+6 minutes, 2 seconds
+stanno alla mia sinistra vado a misurare eh l'altezza che sarà una una variabile statistica eh numerica e oppure potrebbe
+6:11
+6 minutes, 11 seconds
+essere qualitativo. Ok? E in tal caso vedremo anche che in R si usano tipi di dati diversi, classi di dati diversi. In
+6:19
+6 minutes, 19 seconds
+ogni caso uno vorrebbe essere interessato ad avere degli indicatori, dei riassunti, insomma, degli indicatori di centralità e anche degli indicatori
+6:27
+6 minutes, 27 seconds
+di variabilità o di dispersione. Allora, vi ricordo la moda che cos'era? Era il valore
+6:35
+6 minutes, 35 seconds
+il valore che si presenta eh con maggior frequenza, ok? Che osserviamo
+6:43
+6 minutes, 43 seconds
+con maggior frequenza. se è unico, perché non è detto frequenza.
+6:51
+6 minutes, 51 seconds
+Frequenza, fatemi scrivere frequenza.
+6:55
+6 minutes, 55 seconds
+Quindi cosa andiamo a fare? Andiamo a prendere l' Beh, ora dovremmo dire quali sono le frequenze, no? Quindi immaginiamo, facciamo un esempio più
+7:03
+7 minutes, 3 seconds
+concreto, immaginiamo che sia non il numero perché la moda si presta meglio per variabili, diciamo, qualitative. Ad esempio, pensiamo il colore degli occhi.
+7:11
+7 minutes, 11 seconds
+Vado a vedere i colori degli occhi. Potrebbe essere grigio, verde, azzurro.
+7:15
+7 minutes, 15 seconds
+marrone, nero. Vado a vedere per ciascun colore eh la frequenza con cui ho osservato, quindi numero di individui,
+7:23
+7 minutes, 23 seconds
+frequenza assoluta, numero di individui che appresenta quel quella caratteristica e poi ad esempio scopro che nero, gli occhi neri sono la
+7:31
+7 minutes, 31 seconds
+maggioranza e dico è la moda, ok? Nero è il colore degli occhi che va di moda, si dice anche, no, nel linguaggio di tutti i giorni, quindi la maggior frequenza,
+7:39
+7 minutes, 39 seconds
+la massima frequenza. Attenzione che potrebbe non essere unico, ci sono distribuzioni di dati che presentano più di una moda. Ok. Altro indicatore, vi
+7:49
+7 minutes, 49 seconds
+ricordo, è la mediana. La mediana come si faceva? Si ordinavano, questo è importante che siano dati ordinati, quindi numerici o ordinabili. Potrebbero
+7:57
+7 minutes, 57 seconds
+anche non essere numeri, ma c'è bisogno di una relazione d'ordine, no? Vi ricordate? si ordinavano,
+8:05
+8 minutes, 5 seconds
+si mettono in ordine, si ordinano i dati in ordine crescente, diciamo, non è importantissimo, ma in ordine crescente.
+8:18
+8 minutes, 18 seconds
+Ok? Quindi avremo x, le indico così, x1 che è il più piccolo, poi sarà x2 un po' quello il secondo più piccolo, x3 e così
+8:27
+8 minutes, 27 seconds
+via fino a xn. Quindi le ordinate in ordine crescente cosa si faceva? Vi ricordate la mediana?
+8:37
+8 minutes, 37 seconds
+Una volta che li avete ordinati in ordine crescente la mediana è il valore di mezzo, no? Quello centrale. Però attenti, c'è una piccola difficoltà.
+8:45
+8 minutes, 45 seconds
+Cosa succede se il numero n dispari?
+8:48
+8 minutes, 48 seconds
+Certamente ne trovo uno in mezzo e ne lascio, no? N - 1 diventa pari, no? n - 1/2 a destra, n - 1/2 a sinistra e quel
+8:56
+8 minutes, 56 seconds
+valore mi spezza per bene in due. Se invece n è pari, cosa si faceva? E si prendeva la media, questa è una
+9:03
+9 minutes, 3 seconds
+possibile scelta, eh, ci sono tante convenzioni, si prende la media tra, appunto, il valore n/2 e n2 + 1, no?
+9:10
+9 minutes, 10 seconds
+Perché non c'è effettivamente il valore centrale, quindi si prendeva poi il valore centrale. Ok, questa è l'idea. E infatti è un indicatore di centralità.
+9:20
+9 minutes, 20 seconds
+Eh, perché uno dice la moda è meglio della mediana? Ma no, dipende da quello che dobbiamo valutare. C'è un terzo indicatore che invece è facilissimo e
+9:29
+9 minutes, 29 seconds
+tutti se lo ricordano, è la media. Media campionaria, a volte si chiama anche così, no? Media campionaria.
+9:36
+9 minutes, 36 seconds
+Media campionaria. Cosa se ne fa della media campionaria? Beh, intanto, com'è definita? E la notazione standard è una bella barra sopra la X
+9:45
+9 minutes, 45 seconds
+e si può anche mettere un pice n, ma facciamo di no, altrimenti sembra che l'ho applicato Xn, va bene? X barrato, cioè la nostra taglia rimane fissa per
+9:53
+9 minutes, 53 seconds
+il momento. Abbiamo osservato questi dati. Allora si fa la media aritmetica.
+9:58
+9 minutes, 58 seconds
+Devono essere stavolta per forza dei numeri, eh x con e. Mentre per la mediana potevano anche non essere numeri, bastava avere la possibilità di
+10:06
+10 minutes, 6 seconds
+ordinarli. Eh, invece la media campionaria devo poterli sommare, quindi è bene che siano numeri, ok? E ho x barrato la media campionaria.
+10:18
+10 minutes, 18 seconds
+Ecco, uno si può chiedere quanto differiscono. Ci sono osservazioni, ci sono campioni per cui la moda è un certo valore e la media è tutt'altro e la
+10:26
+10 minutes, 26 seconds
+mediana pure l'altro. Cioè, possono essere abbastanza diversi questi indicatori. Sì, questo sarebbe un bell'esercizio. Magari mercoledì proviamo a costruire noi dei delle
+10:34
+10 minutes, 34 seconds
+osservazioni in portiali per mostrare quanto possono essere diversi, però tendenzialmente tutti e tre hanno danno idea della centralità di un valore
+10:43
+10 minutes, 43 seconds
+tipico delle nostre osservazioni. Quindi se dobbiamo riassumere con un solo numero, possiamo scegliere o la moda, la mediana o la media.
+10:51
+10 minutes, 51 seconds
+Diverso il discorso per gli indicatori di variabilità o della dispersione. Cioè possiamo dire intorno a quel valore
+10:58
+10 minutes, 58 seconds
+tipico effettivamente ci sono molti valori o pochi valori oppure i valori stanno molto lontano, tipo potrebbero
+11:06
+11 minutes, 6 seconds
+essere che la media appunto è eh non so la media del numero di scarpe, no? Siamo in questa in questa stanza. La
+11:14
+11 minutes, 14 seconds
+media del numero di scarpe è 40, ma in realtà succede che c'è la sottopolazione, diciamo, femminile, per cui il numero è più basso e quella
+11:22
+11 minutes, 22 seconds
+maschile, per cui più alto, quindi magari sono ben lontani dal 40. Ok?
+11:27
+11 minutes, 27 seconds
+Quindi per questo si indicano, ci sono indicatori di variabilità o di dispersione, cioè andiamo a misurare quanto effettivamente i valori sono
+11:34
+11 minutes, 34 seconds
+lontani da questo indicatore di centralità. Allora, potrebbe immaginare che per ogni indicatore di centralità poi andiamo a fare una misura della
+11:42
+11 minutes, 42 seconds
+distanza tipica dei valori. Allora, anche qui cerchiamo un indicatore, quindi solo un numero. Eh, allora vi ricordo beh, uno o magari pochi numeri e
+11:52
+11 minutes, 52 seconds
+vi ricordo c'erano i quantili, no? Vi ricordate il quantile? Il quartile è definito in particolare il quartile era
+12:01
+12 minutes, 1 second
+quello definendo eh con le insomma diciamo tagliando in quattro la nostra popolazione e i percentili tagliando in
+12:09
+12 minutes, 9 seconds
+centinaia. In più in generale c'era il quantile. Vi ricordo come si faceva? Si fissava un livello
+12:16
+12 minutes, 16 seconds
+alfa che è una un numero, diciamo, tra 0 e 1. E cosa si faceva? Sempre come abbiamo ordinato prima, no? la nostra
+12:24
+12 minutes, 24 seconds
+popolazione X2 fino a Xn.
+12:32
+12 minutes, 32 seconds
+Allora, cos'era il quantile di livello alfa, il quantile campionario o empirico? Cosa si andava a fare? Beh, si
+12:38
+12 minutes, 38 seconds
+spezzava la popolazione dicendo ne prendiamo n * alfa a sinistra e n * 1 -
+12:46
+12 minutes, 46 seconds
+alfa a destra. E di nuovo, attenzione, se si riesce a fare questo taglio esatto, allora è perfetto. Come la mediana, no? La media, altrimenti, se
+12:55
+12 minutes, 55 seconds
+non si riesce a fare esattamente bisogna un po' fare come abbiamo fatto per la per la media, per la mediana, scusate.
+13:02
+13 minutes, 2 seconds
+Però questa è l'idea, no? Ne lasciamo una frazione alfa a sinistra e una frazione 1- alfa a destra di valori una volta che li abbiamo ordinati. Ora non
+13:10
+13 minutes, 10 seconds
+non vi ridò la definizione perché è un po' noiosa. Vediamo mercoledì anche la insomma qual è il comando per calcolare
+13:16
+13 minutes, 16 seconds
+il quante. Il quartile. I quartili sono quelli corrispondenti a alfa = 1/4. Il primo quartile 2/4 è la mediana, quindi
+13:25
+13 minutes, 25 seconds
+tagliamo con un mezzo a sinistra mezzo a destra e 3/4 ne prendiamo 3/4 a sinistra e 1/4 a destra. Ora perché questi sono indicatori di variabilità? Perché vi
+13:34
+13 minutes, 34 seconds
+ricordo c'è anche sono i cosiddetti box plot i diagrammi a scatola, no? eh possiamo indicare, riassumere, no, la
+13:41
+13 minutes, 41 seconds
+popolazione con la mediana e poi il primo quartile e il terzo quartile che ci danno un po' un'indicazione di dove sta metà della nostra del nostro
+13:49
+13 minutes, 49 seconds
+campione. Ok? E l'altra metà invece sarà fuori. Ci saranno i cosiddetti poi eventualmente outlier che sanno molto lontani dalla dalla mediana.
+13:59
+13 minutes, 59 seconds
+Ecco, questo è un buon indicatore di variabilità, si usa spesso, accompagnato alla mediana insieme ai nei box plot. E
+14:06
+14 minutes, 6 seconds
+l'altro indicatore di variabilità che avete già visto e ne abbiamo parlato è la varianza e questa si appoggia,
+14:14
+14 minutes, 14 seconds
+insomma, è abbastanza naturale associarlo alla media alla media campionaria e abbiamo la varianza campionaria
+14:22
+14 minutes, 22 seconds
+o eventualmente la sua radice quadrata che è detta la deviazione standard. Vi ricordo qui la definizione. Allora, quando avete una popolazione di taglia N, cosa andate a fare?
+14:34
+14 minutes, 34 seconds
+Andiamo a sottrarre per ciascuna osservazione la sua media, la media campionaria su tutto su tutta la
+14:42
+14 minutes, 42 seconds
+popolazione che abbiamo già calcolato prima, ricordo X barrato e la media campionaria. Questo ci dà un residuo, un'oscillazione che sarà positiva o
+14:50
+14 minutes, 50 seconds
+negativa a seconda che siamo in eccesso in difetto rispetto alla media. Noi eleviamo al quadrato, così abbiamo qualcosa di sempre positivo, sommiamo su
+14:58
+14 minutes, 58 seconds
+tutto. Ecco, l'unica cosa un po' forse noiosa è che uno non si ricorda mai è questo fattore 1 su n - 1, ma questo è
+15:07
+15 minutes, 7 seconds
+più per fini, insomma, per questioni un po' più raffinate. Eh, nel momento in cui dobbiamo abbiamo n che è molto grande, dividere per n o
+15:15
+15 minutes, 15 seconds
+dividere per n - 1 non cambierà tantissimo. Certo, però se i dati non sono tanti fa la differenza. Ok? Questa è la varianza campionaria e la
+15:24
+15 minutes, 24 seconds
+deviazione standard è sigma è semplicemente la radice della varianza campionaria, ok? Positiva. Allora, anche questo, appunto, a seconda dei dati di
+15:32
+15 minutes, 32 seconds
+quanto siamo lontani o vicini alla media campionaria, ci daranno un peso maggiore o minore, no? Avete X lo scarto, poi
+15:40
+15 minutes, 40 seconds
+elevato al quadrato. Ok? Come dicevamo, forse nel corso di statistica 1, ma comunque si si può notare, il fatto di
+15:49
+15 minutes, 49 seconds
+elevare al quadrato ci dà delle proprietà molto buone dal punto di vista del calcolo. Infatti, se vi ricordate la
+15:56
+15 minutes, 56 seconds
+varianza, ha tante buone proprietà quando trasformate i vostri dati o quando anche sommate, magari fate somme
+16:03
+16 minutes, 3 seconds
+di variabili aleatorie e così via, però eh quando ci sono degli outlier, quando
+16:11
+16 minutes, 11 seconds
+ci sono dei valori molto lontani, questo quadrato va a pesare molto, ok? Quindi è
+16:18
+16 minutes, 18 seconds
+molto sensibile, diciamo, al fatto che ci siano magari anche pochi valori molto lontani dalla media. Ok? Quindi la varianza ha un po' questo difetto, si
+16:26
+16 minutes, 26 seconds
+dice è poco robusta, è molto sensibile ai valori estremi. Se ci sono dei valori fuori fuori scala questa la varianza sembrerà molto eh grande.
+16:38
+16 minutes, 38 seconds
+Sì, scusate. E beh, in realtà, appunto, questo difetto che c'è anche nella media, eh ora ne parliamo un po' meglio di questo fatto, ok? Quindi, mentre la
+16:46
+16 minutes, 46 seconds
+mediana accompagnata ai quartili e ai quantili è un po' più robusta. Ok? Ora però cerchiamo di inquadrare un po' meglio tutte queste cose che è un
+16:55
+16 minutes, 55 seconds
+semplice richiamo da un punto di vista un po' diverso.
+16:59
+16 minutes, 59 seconds
+Anzi, mi sa che mi ero preparato per bene tutto quanto, però forse questa discussione è già sufficiente.
+17:08
+17 minutes, 8 seconds
+Sì, dai.
+17:10
+17 minutes, 10 seconds
+C'è qualcuno che non ha mai visto queste definizioni di media, moda, mediana?
+17:16
+17 minutes, 16 seconds
+Lei non le ha mai viste. Ok, vogliamo fare un esempio concreto proprio con i numeri, così ci chiariamo un po' la Vai, vai, facciamolo tanto.
+17:26
+17 minutes, 26 seconds
+Sì, dai, anzi no, non lo facciamo, va bene, lo facciamo al calcolatore mercoledì, così li vediamo concretamente, è più facile,
+17:35
+17 minutes, 35 seconds
+altrimenti diventa noiosissimo fare a mano i conti. Ok? Quindi, se volete, ecco, vi do come compito, se vi siete scaricati le slide,
+17:43
+17 minutes, 43 seconds
+ripassatevi qui la definizione, scrivetevelo per bene, così ripassate questi concetti. Quello che voglio presentarvi però è un punto di vista un
+17:50
+17 minutes, 50 seconds
+po' diverso, un punto di vista cosiddetto variazionale. Questo ci apre la possibilità di fare tante cose che semplicemente elencando questi concetti statistici non riusciamo a vedere, ok?
+18:02
+18 minutes, 2 seconds
+ed è il punto di vista del cosiddetto eh rischio empirico da minimizzare.
+18:08
+18 minutes, 8 seconds
+Allora, il punto chiave qual è? è che l'osservazione chiave, che non ricordo se abbiamo mai fatto al corsi di statistica 1, ma questa si può fare in
+18:16
+18 minutes, 16 seconds
+un attimo, è che la media, la media campionaria eh non nasce a caso, cioè oo non è che ci piace soltanto sommare e mediare, è
+18:24
+18 minutes, 24 seconds
+una bella operazione, però in realtà si può dimostrare che la media campionaria è quella che è quel numero che minimizza
+18:32
+18 minutes, 32 seconds
+il rischio quadratico medio, il cosiddetto mean squared error, ok?
+18:37
+18 minutes, 37 seconds
+Errore quadratico medio. Che cos'è questo errore? Abbiamo le nostre osservazioni x con i. Scegliamo un
+18:44
+18 minutes, 44 seconds
+numero h che l'ho chiamato h per dire un'ipotesi di un numero che vorremmo usare per stimare tutte queste osservazioni. Allora, facciamo lo scarto
+18:53
+18 minutes, 53 seconds
+tra x con i ed h, eleviamo al quadrato e questo poi lo sommiamo su tutte le osservazioni. Così abbiamo una quantità
+19:01
+19 minutes, 1 second
+che va a dipendere da h è molto lontano dalle nostre osservazioni questi questi scarti
+19:08
+19 minutes, 8 seconds
+saranno molto grandi e quindi quello sarà un rischio molto grande. Quindi, se noi scegliamo h molto lontano dalle osservazioni, avremo un rischio grande.
+19:16
+19 minutes, 16 seconds
+Se però avviciniamo h alle osservazioni, immaginate, no, sono tutto intorno, sono numeri di scarpe. Se prendiamo h 120 sarà molto grande su questo rischio. Se
+19:24
+19 minutes, 24 seconds
+invece ci avviciniamo al valore centrale, un valore tipico, questo rischio diventerà via più piccolo per poi magari diventare più grande se
+19:31
+19 minutes, 31 seconds
+sbagliamo dell'altro verso. Quindi il punto è cerchiamo H in modo da minimizzare questo rischio quadratico
+19:40
+19 minutes, 40 seconds
+medio. In questo caso medio, vabbè, se fate uno su n rischio quadratico medio, altrimenti comunque minimizzare lui o minimizzare lui diviso n è la stessa
+19:48
+19 minutes, 48 seconds
+cosa, ok? Il valore che minimizza, l'h che minimizza sarà lo stesso. Allora, vediamo perché è vero questo per la varianza, dai, così lo vediamo. Allora,
+19:56
+19 minutes, 56 seconds
+la varianza era sigma quadro, no? che era ora c'era 1 su n - 1.
+20:03
+20 minutes, 3 seconds
+Allora, la varianza era questo x con i - x barrato. Ok? Allora, l'idea cos'è?
+20:10
+20 minutes, 10 seconds
+Questo dovrebbe essere il minimo su tutte le h in rosa dicevamo. Vabbè, ora c'è il fattore 1 su n - 1, me lo porto dietro.
+20:21
+20 minutes, 21 seconds
+An, attenzione, h è quella che devo andare a sottrarre qui ed elevare al quadrato. Ok? e h che minimizza lo
+20:30
+20 minutes, 30 seconds
+indico h star è uguale a x bar. Ok? Sto dicendo proprio questo, cioè se scegliete questo rischio, ma ho messo un
+20:37
+20 minutes, 37 seconds
+fattore 1 su n - 1 perché ci piaceva nel corso di statistica 1, ma dal punto di vista del della minimizzazione del rischio metterci 1 su n - 1 o non
+20:45
+20 minutes, 45 seconds
+mettercelo non cambia niente. Se vogliamo cercare l'h ottimale devo proprio mettere la media. Allora, vediamo un po' come si fa. Semplicemente prendete così, no? Fate x con e.
+20:56
+20 minutes, 56 seconds
+No, facciamo una cosa un po' più matura, scusate. Allora, abbiamo 1 su n - 1 somma.
+21:05
+21 minutes, 5 seconds
+Se dovete minimizzare una funzione, come fate?
+21:09
+21 minutes, 9 seconds
+Avete h e in questa funzione, queste sono tutte n, eh, perdonate la scelta dell'H po' infelice. Come si fa a
+21:16
+21 minutes, 16 seconds
+minimizzare una funzione di un di un parametro?
+21:20
+21 minutes, 20 seconds
+Avete una funzione. Questa farà farà una bella curva, no?
+21:24
+21 minutes, 24 seconds
+farà una bella curva. Avete h come fate a trovare un punto h star che minimizza
+21:34
+21 minutes, 34 seconds
+derivate e imponete che la derivata si annulli. Ok? Ora questo non vi dice proprio che è il minimo, però insomma dopo insomma intanto vediamo cosa troviamo, no? Allora, deriviamo in h.
+21:44
+21 minutes, 44 seconds
+Facciamo la derivata in h. Ora questo 1 c n - 1, se perdonate non me lo voglio più portare avanti, ok? toglietelo.
+21:52
+21 minutes, 52 seconds
+Tanto è un fattore che vi riscala soltanto il valore di questa funzione, ma dove sarà il minimo rimane sempre lì, anche se riscalate.
+22:01
+22 minutes, 1 second
+Quindi derivata in h da 1 sommiamo da 1 a n.
+22:08
+22 minutes, 8 seconds
+Allora, se deriviamo in h cosa troviamo?
+22:10
+22 minutes, 10 seconds
+Sempre la somma perché la derivata passa dentro. Deriviamo quello 2
+22:17
+22 minutes, 17 seconds
+vol xi - h. Ora a dire vero per come l'ho scritto ho anche un fattore -1
+22:25
+22 minutes, 25 seconds
+perché ho derivato quello che c'è dentro camo - h. Ora, comunque, dobbiamo imporre che questa derivata si annulli, quindi imponiamo che è zero.
+22:35
+22 minutes, 35 seconds
+Eh, allora il fattore 2 non cambia niente se posso portarlo fuori, il fattore -1 posso portarlo fuori. Quindi, affinché si annulli la derivata devo
+22:44
+22 minutes, 44 seconds
+trovare un h per cui la somma delle x con i
+22:51
+22 minutes, 51 seconds
+- h. Però h quante volte è ripetuto? N volte. N volte per h. deve fare zero e
+22:59
+22 minutes, 59 seconds
+quindi abbiamo scoperto che l'h star che minimizza, beh, quantomeno che annulla la derivata, ma comunque vi dico io, minimizza, beh,
+23:07
+23 minutes, 7 seconds
+portate di là la h dividete per n, trovate che è proprio 1 su n la somma
+23:15
+23 minutes, 15 seconds
+per le nostre osservazioni, cioè quindi x barrat. Ok? Quindi la media campionaria è legata alla varianza a
+23:23
+23 minutes, 23 seconds
+doppio filo, non soltanto per quando lo usiamo nella definizione, ma anche da questo punto di vista variazionale. Se noi abbiamo definito che questo è il rischio che ti interessa, questo è il
+23:31
+23 minutes, 31 seconds
+costo che vogliamo minimizzare, troviamo proprio la media campionaria e quando mettiamo l'H che minimizza, troviamo
+23:39
+23 minutes, 39 seconds
+proprio la varianza a meno del fattore lì 1 su n - 1. Ok? quello è un po' legato a altre, però se vogliamo solo trovare la media campionaria, questo
+23:48
+23 minutes, 48 seconds
+modo per far emergere la media. E allora capite, ora siamo liberi di scegliere tante altre cose, perché dobbiamo fare i
+23:56
+23 minutes, 56 seconds
+quadrati. Anzi, prima di fare il quadrato si sceglievano altre funzioni, ad esempio, si faceva il valore assoluto. La Plus aveva proposto di
+24:04
+24 minutes, 4 seconds
+lavorare con il valore assoluto degli scarti, non con i quadrati. e quello dà altre cose e quindi più in generale uno
+24:11
+24 minutes, 11 seconds
+può dire ok se io uso un valore h per stimare per dare un indicatore di centralità potrei che pensare che per
+24:19
+24 minutes, 19 seconds
+ogni osservazione x ho un qualche costo, una funzione di costo, di perdita, di errore, chiamatela come volete, sono tutti i termini più o meno equivalenti.
+24:29
+24 minutes, 29 seconds
+Chiamiamola L per dire loss perdita di X quando invece uso H. Allora, per ogni
+24:36
+24 minutes, 36 seconds
+osservazione avrò una certa perdita, un certo errore se uso H al posto dell'osservazione. E complessivamente
+24:43
+24 minutes, 43 seconds
+cosa posso fare? Eh, posso cercare l'H che minimizza questa perdita totale, questo rischio
+24:51
+24 minutes, 51 seconds
+empirico, si chiama così il termine chiave, la somma di tutte le loss.
+24:55
+24 minutes, 55 seconds
+Adesso facciamo degli esempi concreti eh di funzioni di loss abbastanza naturali di costo, però questo è un è un paradigma importantissimo. Se aprite un
+25:02
+25 minutes, 2 seconds
+testo di machine learning, questo vi dice, "Beh, la statistica è soltanto questo, dovete trovare un h che
+25:10
+25 minutes, 10 seconds
+minimizza una certa loss e ora tutto il resto è machine learning." Ora noi stiamo facendo un corso di statistica, quindi cercherò di mostrarvi che non è
+25:18
+25 minutes, 18 seconds
+solo questo la statistica, però questo è un modello che al giorno d'oggi è centrale, ok? nessuno usa più, insomma,
+25:27
+25 minutes, 27 seconds
+indicatori strani, cioè tutto deve essere costruito, se volete, su un paradigma di questo tipo, di minimizzazione di una qualche funzione di loss di perdita o di rischio empirico, appunto. Ok? Allora, vediamo.
+25:39
+25 minutes, 39 seconds
+Quindi è chiaro questo approccio, cioè vi ho mostrato la varianza e vi ho detto che la media campionaria nasce minimizzando e l'errore quadratico
+25:47
+25 minutes, 47 seconds
+medio. Adesso cerchiamo di cambiare un po' l'errore, la funzione di loss e vediamo cosa troviamo. Ok.
+25:55
+25 minutes, 55 seconds
+Allora, vediamo un po' l'errore assoluto. Cosa succede se io prendo come funzione di loss di perdita
+26:03
+26 minutes, 3 seconds
+l'errore assoluto? Cosa vuol dire errore assoluto? Invece di fare il quadrato, faccio semplicemente il valore assoluto della differenza x - h.
+26:13
+26 minutes, 13 seconds
+Allora, cos'è il rischio? Il rischio diventa rischio è il rischio assoluto, quindi è la somma.
+26:22
+26 minutes, 22 seconds
+Vedete? Ecco, stiamo pesando tutte le osservazioni allo stesso modo. Qui anche ci potrebbe uno dubitare perché una osservazione non è più importante delle
+26:30
+26 minutes, 30 seconds
+altre. Beh, pesiamole tutte allo stesso modo e invece di fare i quadrati degli scarti fatti in valore assoluti. Ok?
+26:38
+26 minutes, 38 seconds
+Allora, secondo voi se trovo H star che minimizza il rischio, no? Questa somma rischio
+26:48
+26 minutes, 48 seconds
+assoluto cosa sarà?
+26:57
+26 minutes, 57 seconds
+Quando facevo i quadrati trovato la media.
+27:03
+27 minutes, 3 seconds
+Innanzitutto, come sarà fatta più o meno questa funzione? No, vedete, ciascuna funzione L, ciascuna funzione di loss è
+27:11
+27 minutes, 11 seconds
+fatta così, no? Se pensatela sempre come una funzione di h, eh, la x è quello che avete osservato, quindi se prendete una singola osservazione sarà un valore
+27:18
+27 minutes, 18 seconds
+assoluto, però col minimo in x, quindi avrete questa funzione. Così quando poi andate a sommare tante di queste, avete una somma di queste
+27:27
+27 minutes, 27 seconds
+funzioni, quindi avrete comunque qualcosa che, diciamo, all'infinito crescerà linearmente.
+27:32
+27 minutes, 32 seconds
+Però cosa succede in mezzo? Magari è un po' meno chiaro, no? Andate a sommare tante di queste funzioni. Allora, secondo voi che tipo di
+27:41
+27 minutes, 41 seconds
+h minimizzerà? Che tipo di indicatore troveremo? Sarà sempre un indicatore di centralità che però pesa in modo diverso, no? Gli scarti.
+27:52
+27 minutes, 52 seconds
+Qualcuno si vuole? Quindi è chiaro cosa ho fatto? No, ho cambiato la funzione di loss, ci ho messo un valore assoluto.
+28:01
+28 minutes, 1 second
+Ora non è che ne abbiamo visti tanti di indicatori di centralità, quindi è uno di quelli che abbiamo già visto. Quindi cosa potrebbe essere? Potrebbe essere
+28:10
+28 minutes, 10 seconds
+anche di nuovo la media, perché no? La media campionaria magari minimizza anche questo.
+28:16
+28 minutes, 16 seconds
+La mediana potrebbe essere, ok? Oppure potrebbe essere la moda perché ne abbiamo visti tre. Ora vediamo un po'
+28:22
+28 minutes, 22 seconds
+cosa succede se deriviamo. Ora non voglio fare dimostrazioni in questo corso, però capite lo spirito è facciamo una derivata e imponiamo che la derivata
+28:30
+28 minutes, 30 seconds
+si cancelli. Adesso qualcuno dirà: "Eh, ma io mi ricordo che quella funzione non è derivabile". Va bene, non è derivabile
+28:38
+28 minutes, 38 seconds
+in questo punto qui, non è derivabile in x perché avete avete una tangente da un lato e ripartite. Però in tutti gli altri punti è derivabile. Quanto vale la
+28:47
+28 minutes, 47 seconds
+derivata qui? la derivata vale -1 perché scendete con con pendenza -1 e poi ripartite con pendenza + 1, no?
+28:58
+28 minutes, 58 seconds
+Quindi quando fate facciamolo un po' così in modo rozo, senza preoccuparci troppo, quando deriviamo rispetto ad hoviamo?
+29:10
+29 minutes, 10 seconds
+Beh, troviamo la somma.
+29:13
+29 minutes, 13 seconds
+Allora, attenzione, questa varrà + 1, avremo un derivata di quella quantità,
+29:19
+29 minutes, 19 seconds
+no? Che quindi sarà + 1 se
+29:24
+29 minutes, 24 seconds
+h è più grande, no? Quindi se h è mag-1
+29:35
+29 minutes, 35 seconds
+se h è minore dell x e. Ora, se è proprio uguale, vabbè, siamo un po' sfortunati perché lì non c'è la derivata, potremmo contare zero, non lo so.
+29:43
+29 minutes, 43 seconds
+Però capite, dobbiamo sommare tutte le osservazioni. Pesiamo +1 se h è più a destra e -1 se è a sinistra e dobbiamo imporre che la derivata si cancelli, no?
+29:52
+29 minutes, 52 seconds
+Immaginate, avete se siete troppo a destra avete troppi più troppi -1, no?
+29:58
+29 minutes, 58 seconds
+Quindi vi porta un po' a sinistra. Se siete troppo a sinistra avete + un e dovete andare a destra. Quindi alla fine, se volete che proprio si equilibria, eh la situazione sia in
+30:06
+30 minutes, 6 seconds
+equilibrio, scusate, eh vuol dire che dovete avere tante x con i a sinistra quante ne avete a destra. H deve stare
+30:13
+30 minutes, 13 seconds
+proprio nel mezzo, ok? E questo non era quello che faceva la mediana. La mediana ordinavate i valori, troviamo un valore
+30:20
+30 minutes, 20 seconds
+che ne lasci esattamente metà a sinistra e metà a destra. Ora non preoccupatevi, c'è quel problema, se n dispari si può fare, no? Ci metteremo proprio lì. N è
+30:29
+30 minutes, 29 seconds
+pari non abbiamo individuato un singolo valore perché tutti quelli in mezzo, no, tra n + 1 ci andranno bene, però almeno
+30:37
+30 minutes, 37 seconds
+abbiamo trovato qui qualcosa che somiglia alla mediana.
+30:40
+30 minutes, 40 seconds
+Hastar è una mediana, diciamo, è diciamo così, una mediana, non è esattamente magari quella del
+30:48
+30 minutes, 48 seconds
+corso di statistica 1, però capite, è più importante avere un metodo che ci ha trovato la mediana partendo da una
+30:56
+30 minutes, 56 seconds
+semplice funzione di loss piuttosto che dare tutta questa definizione di mediana iniziale. Ok? Facciamo un altro esempio.
+31:06
+31 minutes, 6 seconds
+Eh, ecco cosa succede. Questo magari ve lo lascio.
+31:09
+31 minutes, 9 seconds
+Cosa succede se prendiamo un errore diverso? Prendiamo, scusate, facciamo così, prendiamo una funzione asimmetrica XH.
+31:20
+31 minutes, 20 seconds
+Prendiamo una funzione di questo tipo.
+31:23
+31 minutes, 23 seconds
+Prendiamo eh dunque cosa vogliamo fare?
+31:29
+31 minutes, 29 seconds
+Sì, facciamo forse la cosa più semplice fare x - hte positiva. Ora vi spiego cosa sono questi
+31:36
+31 minutes, 36 seconds
+termini. Più diciamo un parametro, chiamiamolo P, non l'abbiamo mai usato. X - H
+31:46
+31 minutes, 46 seconds
+negativa dove P è un parametro maggiore di 0. Cioè, cosa voglio fare? Voglio fare non una funzione perfettamente
+31:53
+31 minutes, 53 seconds
+simmetrica come il valore assoluto, ma qualcosa che pesi un po' di più a destra oppure un po' di più a sinistra. Ok?
+32:00
+32 minutes
+Quindi in questo caso x- cioè cosa intendo più X+ o Z+
+32:07
+32 minutes, 7 seconds
+è cos'è? è il massimo tra 0 e z, cioè una funzione fatta così che finché è
+32:13
+32 minutes, 13 seconds
+negativo trovate 0 e poi parte con pendenza 1. Z- è il massimo
+32:23
+32 minutes, 23 seconds
+tra - z e 0, cioè questa è semplicemente una funzione opposta che fa così, ok? Z
+32:31
+32 minutes, 31 seconds
++ e z- ok? Semplicemente questa funzione o dopo lo vediamo nelle simulazioni, cioè vi pesa in modo asimmetrico la parte destra
+32:40
+32 minutes, 40 seconds
+e la parte sinistra. Allora, secondo voi cosa succederà a quel punto? Se date più peso a a quello che trovate a destra,
+32:48
+32 minutes, 48 seconds
+invece di fare +1 ogni volta che avete a destra, dovete fare un + P, ok? Oppure a sinistra lo stesso. Quindi trovate qualcosa che è meno bilanciato rispetto
+32:56
+32 minutes, 56 seconds
+alla mediana e con una scelta del genere potete recuperare tutti i quartili, i quant. Ok.
+33:04
+33 minutes, 4 seconds
+i quantili.
+33:06
+33 minutes, 6 seconds
+Vabbè, questo magari dopo nel nel giochetto nella demo lo vediamo un po' più direttamente.
+33:13
+33 minutes, 13 seconds
+Quindi anche i quantili in realtà nascono dallo stesso paradigma. Ok?
+33:18
+33 minutes, 18 seconds
+Vediamo un errore invece molto più semplice, così non dobbiamo fare derivate e prendiamo questo errore 01.
+33:25
+33 minutes, 25 seconds
+Cioè cosa facciamo? Pesiamo cosa? Spesiamo uno se l'H che sto usando
+33:32
+33 minutes, 32 seconds
+è diverso dall'osservazione e zero se invece abbiamo trovato l'H
+33:43
+33 minutes, 43 seconds
+giusta. Ora questo tipo di errore per ora se abbiamo delle osservazioni potrebbe tipo numeriche sembrerebbe un po' strano perché dice perché sbaglio
+33:52
+33 minutes, 52 seconds
+così tanto se sbaglio di poco e penso comunque uno, no? Però questo, diciamo, per osservazioni, per dati discreti va bene, diciamo, devo trovare il colore
+34:01
+34 minutes, 1 second
+degli occhi. Se ho indovinato il colore degli occhi giusti, pago zero. Se invece ho sbagliato il colore degli occhi, pago
+34:08
+34 minutes, 8 seconds
+uno, perché non c'è una vera distanza tra i colori degli occhi. Ok? Quindi, allora cosa faccio? trovo un h
+34:15
+34 minutes, 15 seconds
+che minimizza la somma degli errori sulle mie osservazioni. Il rischio empirico.
+34:25
+34 minutes, 25 seconds
+Cosa significa? Significa che minimizzo che cosa? 1, no, se h è diverso da x,
+34:35
+34 minutes, 35 seconds
+quindi faccio la somma, metto 1 se h è diverso da x, da x con i dalla mia osservazioni i esima.
+34:46
+34 minutes, 46 seconds
+Ok?
+34:48
+34 minutes, 48 seconds
+Allora, secondo voi con questa scelta che tipo di
+34:56
+34 minutes, 56 seconds
+indicatore trovo sempre di centralità, no? Vi ho già detto che la il quantile si trova con quella cosa simmetrica,
+35:03
+35 minutes, 3 seconds
+quindi non è rimasto tantissimo. Che cosa troveremo secondo voi? Quindi dobbiamo trovare un valore.
+35:11
+35 minutes, 11 seconds
+Noi dobbiamo fare in modo che questo rischio sia il più piccolo possibile.
+35:16
+35 minutes, 16 seconds
+Qui dobbiamo trovare un valore, no? Per cui ci azzecchiamo la maggior parte delle volte, no? Un numero maggiore di volte. moda.
+35:25
+35 minutes, 25 seconds
+La moda, perché basterà scegliere quel valore che compare con maggior frequenza, no? Immaginate, facciamo che avete due valori, no? Avete gli occhi rossi oppure
+35:34
+35 minutes, 34 seconds
+gli occhi rossi, gli occhi gli occhi neri o gli occhi blu, no? Immaginiamo, avete 50 occhi neri e 70 occhi blu.
+35:43
+35 minutes, 43 seconds
+Allora, se scegliete H che sono nero, eh, certo, mettete a zero quel 50, però pagate 70. Se invece scegliete H che è
+35:52
+35 minutes, 52 seconds
+blu, mettete a zero quei 70 e pagate solo 50, quindi converrà scegliere quello che compare di più. Ok? Qui in effetti Hstar è la moda.
+36:03
+36 minutes, 3 seconds
+Anche qui attenzione è una moda perché non necessariamente la moda è unica. Ok?
+36:10
+36 minutes, 10 seconds
+In effetti questo ci dice ci potrebbe essere più HAR che minimizzano. Tutte quelle che minimizzano sono mode.
+36:17
+36 minutes, 17 seconds
+Ok. Bene, vediamo se ce ne sono altri.
+36:20
+36 minutes, 20 seconds
+Eh, però nulla vieta di inventarsi altri errori. Eh, potete sbizzarrirvi, anzi sarebbe un bell'esercizio in R, così
+36:27
+36 minutes, 27 seconds
+imparate un po' a eh vi inventate una vostra funzione di errore, a quel punto fate il rischio eh associato e trovate
+36:35
+36 minutes, 35 seconds
+l'h che minimizza. Un esempio che adesso perché vi menziono questo per dirvi che si può inventare altre cose, ad esempio, potrebbe essere questo. Uno prende la loss tra x e h.
+36:46
+36 minutes, 46 seconds
+Cosa facciamo? Beh, invece di fare il quadrato, facciamo un esponenziale.
+36:50
+36 minutes, 50 seconds
+Metto l'esponenziale del valore assoluto di x - h.
+36:57
+36 minutes, 57 seconds
+Ok? Or cosa dice questo? Il quadrato ci aveva dato la media.
+37:03
+37 minutes, 3 seconds
+Fare la potenza 1, il valore assoluto ci aveva dato la mediana, no? Allora, l'esponenziale cosa fa? Se h
+37:10
+37 minutes, 10 seconds
+è sbaglia di poco rispetto a X, vabbè, pagate esponenziale di un esponente piccolo. Ma se H sbaglia non di molto,
+37:18
+37 minutes, 18 seconds
+ma basta che sbagli un pochino di più, l'esponenziale esplode, no? La funzione esponenziale, qualsiasi sia la base qui in base naturale cresce molto
+37:26
+37 minutes, 26 seconds
+rapidamente. Quindi questo H cercherà di trovarsi nel mezzo, ma sarà molto sensibile, no, a a dei valori tipo
+37:34
+37 minutes, 34 seconds
+outlier, no? Se c'è, per esempio, tanti valori sono concentrati in un punto e ce n'è uno molto lontano, uno solo, nonostante la maggioranza
+37:43
+37 minutes, 43 seconds
+siano tutti qui, beh, lui cercherà il minimizzante cercherà di mettersi comunque a metà, ok? Perché quel singolo
+37:50
+37 minutes, 50 seconds
+valore che sta molto lontano va pesato con un esponenziale, quindi va va a costare tantissimo. Questo vi vi spiega anche un po' di più, esalta un po' il
+37:58
+37 minutes, 58 seconds
+discorso tra indicatori della media e della mediana, ok? Cioè più grande l'esponente, quindi da uno passate a due, ma se da due addirittura passate a
+38:06
+38 minutes, 6 seconds
+quattro a esponente 8 o esponente esponenziale, appunto, che è grandissimo, e a quel punto diventate molto più sensibili agli outli. Ok?
+38:15
+38 minutes, 15 seconds
+Questo potreste pensare che sia un outlier, qualcuno che appunto è fuori dalla vostra distribuzione tipica, valore tipico e l'indicatore HStar si va a piazzare lì.
+38:27
+38 minutes, 27 seconds
+Ok?
+38:28
+38 minutes, 28 seconds
+Questo per farvi un esempio, per estremizzare un po' il discorso che perché c'è questa differenza di sensibilità tra la mediana e la media. E
+38:36
+38 minutes, 36 seconds
+questo è un esempio. Allora, vediamo un po' se c'è il tempo. Eccolo qui. Dai.
+38:41
+38 minutes, 41 seconds
+Allora, voglio fare un po' di eh di demo interattive e ma soprattutto
+38:48
+38 minutes, 48 seconds
+vorrei che ci giocaste voi, così è più divertente.
+38:53
+38 minutes, 53 seconds
+Allora, se avete il computer, provate a andare a questo indirizzo qui, altrimenti ci andate quando non c'è la
+39:02
+39 minutes, 2 seconds
+lezione. Però la cosa più semplice sarà poi che ve lo scarichiate e ci giocate in locale.
+39:10
+39 minutes, 10 seconds
+Allora, abbiamo questa mini demo. Adesso potrebbe essere un bell esame alternativo, magari per chi fa ingegneria informatica, di aiutarmi a
+39:18
+39 minutes, 18 seconds
+fare altre di queste demo, perché dopo un po' diventa noioso. Eh, allora questa mini demo ve la mostro al volo, se non
+39:25
+39 minutes, 25 seconds
+riuscite ad andarci ci giocate a casa e poi ve lo scaricate appena avete installato R. Eh, dunque, andiamo qui.
+39:34
+39 minutes, 34 seconds
+Eccolo qua.
+39:37
+39 minutes, 37 seconds
+Allora, vediamo se riusciamo a Ok, allora questa è una mini demo proprio per farvi intuire un po' di più questo concetto di minimizzazione del rischio
+39:46
+39 minutes, 46 seconds
+empirico che è fondamentale. Eh, non è soltanto una questione di statistica descrittiva, è un paradigma che c'è in tutta la statistica contemporanea. Ok?
+39:54
+39 minutes, 54 seconds
+Allora, qui potete giocarvi.
+39:56
+39 minutes, 56 seconds
+Queste demo sono fatte anche in R, eh, quindi volendo potete fare cose simpatiche con R. Allora, cosa vi do in
+40:04
+40 minutes, 4 seconds
+questo piccolo esempio? Avete un campione, diciamo, unidimensionale. Qui potete scegliere la taglia, facciamo che
+40:11
+40 minutes, 11 seconds
+vogliamo sette punti. Eccoli qua, sette punti.
+40:15
+40 minutes, 15 seconds
+E poi potete giocarvi quale dovete indovinare se volete il gioco e indovinare qual è eh il minimizzante a a occhio, guardando
+40:24
+40 minutes, 24 seconds
+l'occhio. Però ora, visto come demo è interessante perché posso mostrarvi, ad esempio, qual è il rischio
+40:32
+40 minutes, 32 seconds
+effettivamente associato al costo quadratico. Vedete qui avevo scelto il costo quadratico. Quindi, vedete, il costo quadratico cosa significa? Per ogni dato osservato, questa è proprio la funzione del rischio in funzione di h.
+40:43
+40 minutes, 43 seconds
+Se h è troppo lontano, no, rispetto alla media che abbiamo visto, che è quello che minimizza la media, se è troppo lontano il rischio è troppo grande. Ok?
+40:53
+40 minutes, 53 seconds
+Quindi, andando a cercare il minimo andate a finire più o meno qua. Anzi, posso mostrarlo direttamente.
+41:01
+41 minutes, 1 second
+No, non lo mostra. Beh, forse avrei dovuto Eccolo qua. Sì, dovevo cliccare e c'ho proprio azzeccato vicinissimo.
+41:08
+41 minutes, 8 seconds
+Però cosa succede se cambio il Cosa succede se cambio la funzione di loss e
+41:15
+41 minutes, 15 seconds
+la mia funzione di rischio? Facciamo ad esempio il valore assoluto.
+41:21
+41 minutes, 21 seconds
+Vi ricordate? Valore assoluto è quello che dovrebbe andare a selezionare la mediana. Allora, vedete, la funzione di loss diventa è una somma di quei valori
+41:29
+41 minutes, 29 seconds
+assoluti e quindi alla fine ha una funzione lineare a tratti. Vedete? Non è più curva, ma ci sono tutti questi segmenti eh di retta, appunto, perché è una somma di questi di queste funzioni.
+41:39
+41 minutes, 39 seconds
+E se andiamo a vedere chi è che minimizza, ora vedete, dovrebbe essere proprio la mediana. Ne ho presi sette di punti, quindi ne lasciamo tre a sinistra.
+41:48
+41 minutes, 48 seconds
+Questo è la nostra mediana, che è proprio questo. E ne abbiamo altri tre a destra. Qui non si vede tantissimo, ma sono due punti sovrapposti.
+41:56
+41 minutes, 56 seconds
+Effettivamente il minimizzante è lì, è quel punto lì.
+42:02
+42 minutes, 2 seconds
+Cosa succede se scegliamo altri funzioni di loss? Ad esempio, per avere il primo quartile, ecco, come vi dicevo, si può
+42:09
+42 minutes, 9 seconds
+fare qualcosa di asimmetrico. Se volete fare qualcosa di asimmetrico, come vi dicevo, potete fare una combinazione tra
+42:17
+42 minutes, 17 seconds
+parte positiva e parte negativa, cioè avete questo peso diverso destra e sinistra. Vedete, con questa funzione di
+42:23
+42 minutes, 23 seconds
+loss che è 3 volte z- + z+, quindi pesate tre con pendenza 3 quando ci arrivate da sinistra e con pendenza 1
+42:32
+42 minutes, 32 seconds
+quando andate verso destra. Beh, allora vedete che la funzione di loss è sbilanciata, vedete quel grafico ora è sbilanciato verso sinistra e il minimo si raggiunge, qui abbiamo sette punti.
+42:42
+42 minutes, 42 seconds
+Allora, il minimo effettivamente è quello che sarebbe il primo quartile.
+42:46
+42 minutes, 46 seconds
+Ok? un primo quartiere, bisogna stare un po' attenti perché non si recupera esattamente la definizione del corso di statistica 1, ma è appunto un valore che
+42:54
+42 minutes, 54 seconds
+corrisponde a al primo quartile. Se invece sbilanciate, non so se l'ho presentato, no, vabbè, il terzo quartile
+43:01
+43 minutes, 1 second
+si otterrebbe invece sbilanciando e cambiando il parametro, invece di fare tre volte z- + z+, mettete Z- + 3 volte Z+. Andate a pesare di più a destra, ok?
+43:13
+43 minutes, 13 seconds
+e così avresti il terzo quartile. Allora, e ci sono altre forme di costo.
+43:19
+43 minutes, 19 seconds
+Eh, qui c'è la ad esempio Huber è una è una combinazione tra costo quadratico e costo invece assoluto, che pure è
+43:28
+43 minutes, 28 seconds
+interessante, ma comunque più o meno si comportano tutte in modo simile. E questo ad esempio il costo esponenziale.
+43:33
+43 minutes, 33 seconds
+Vedete quello che vi dicevo, quando il Vedete quando siete molto lontani, no?
+43:39
+43 minutes, 39 seconds
+Se siete in questo punto e il costo che pagate è esponenziale, vedete, questi punti qui vi vanno a a costare tantissimo, quindi alla fine il costo esponenziale si colloca bene in centro.
+43:51
+43 minutes, 51 seconds
+Ora, in questa piccola demo non possiamo scegliere i punti, però possiamo campionare punti a caso. Eccoli qua.
+44:02
+44 minutes, 2 seconds
+Ecco, vediamo se con pochi punti riusciamo a far vedere questo effetto.
+44:08
+44 minutes, 8 seconds
+Allora, questi sono solo due punti e poco, però facciamo tre punti. Ecco qua.
+44:12
+44 minutes, 12 seconds
+Allora, con questi tre punti il costo esponenziale, mentre la mediana sta proprio sul punto, il costo esponenziale sarà più o meno qua. Cioè, vado a vedere il minimo e il massimo e faccio la metà.
+44:23
+44 minutes, 23 seconds
+Vediamo se c'ho azzeccato.
+44:26
+44 minutes, 26 seconds
+Eh sì, beh, ora espondenziale è talmente schiacciata, però vediamo se mi mostri il minimizer. Eccolo qua, vedete? è proprio a metà.
+44:34
+44 minutes, 34 seconds
+Cioè, se scegliete un costo che penalizza tantissimo gli outlier, andate proprio a fare la metà tra il minimo e il massimo, ok? Che può essere diverso
+44:42
+44 minutes, 42 seconds
+dalla dalla mediana. Ok? Allora, questo non so se vi funziona. Vi funziona?
+44:49
+44 minutes, 49 seconds
+siete riusciti a Allora, scaricatevelo, dopo ve lo ve lo carico anche su su Teams. Potete scaricarlo e giocarci in
+44:56
+44 minutes, 56 seconds
+locale oppure questo indirizzo. Non so quante ore ho di codice attive qui per farvelo giocare, però eh giocateci.
+45:04
+45 minutes, 4 seconds
+Allora, il gioco che cos'è?
+45:05
+45 minutes, 5 seconds
+Semplicemente vi presentiamo una loss e dovete indovinare qual è il minimizer. Ok, io probabilmente sono un po' scarso.
+45:14
+45 minutes, 14 seconds
+Ora vediamo se eh no. Ok, questo sì. Beh, c'ho azzeccato, diciamo, ho impostato una qualche soglia. Vabbè,
+45:22
+45 minutes, 22 seconds
+giocatevi un po', così capite un po' come sono fatti questi grafici delle loss. Va bene? Ora non è proprio il punto importante giocarci, però è per
+45:30
+45 minutes, 30 seconds
+farvi capire questo concetto fondamentale di eh di minimizzazione del rischio empirico
+45:39
+45 minutes, 39 seconds
+che poi vedremo in tanti tanti tanti altri contesti. Quindi questo è il caso forse più semplice in cui abbiamo un
+45:46
+45 minutes, 46 seconds
+solo parametro che sarebbe il che sarebbe il
+45:53
+45 minutes, 53 seconds
+l'indicatore di centralità e però vedete a seconda del rischio che scegliamo può cambiare molto il suo comportamento.
+46:01
+46 minutes, 1 second
+Ecco, allora per finire così ci portiamo avanti per la prossima volta c'è una seconda
+46:09
+46 minutes, 9 seconds
+questione che dobbiamo analizzare, cioè finora e forse anche in tutto il corso di statistica uno abbiamo solo fatto
+46:16
+46 minutes, 16 seconds
+osservazioni univariate. Forse proprio raramente abbiamo parlato di coppie di valori, però nella realtà se io ho una popolazione non vado a misurare solo il
+46:25
+46 minutes, 25 seconds
+numero di scarpe. Per ciascun individuo vado a misurare numero di scarpe, altezza, peso, colore degli occhi, numero di matricola, cerco di
+46:34
+46 minutes, 34 seconds
+raccogliere più informazioni possibili, no? Cioè per ogni eh individuo avrò un vettore di osservazione.
+46:41
+46 minutes, 41 seconds
+Quindi dobbiamo passare da osservazioni univariate al caso della statistica multivariata. Ok? Vogliamo capire come
+46:49
+46 minutes, 49 seconds
+osservazioni diverse ci possono aiutare per fare inferenza su altre magari quantità che non osserviamo.
+46:56
+46 minutes, 56 seconds
+Ora, qui stiamo ancora parlando di descrittiva, quindi sicuramente la prima domanda è: "Ok, come organizzo i miei dati nel caso multivariato?" Beh, il mio
+47:05
+47 minutes, 5 seconds
+campione è sempre di n individui, sempre di taglia n.
+47:10
+47 minutes, 10 seconds
+Ah, qua non ha fatto bene la l'elenco, purtroppo. Vabbè, avete n individui, quindi ciascun individuo si porta sempre il suo indice i da 1 a N. Però poi per
+47:19
+47 minutes, 19 seconds
+ciascuno individuo i non ho soltanto una singola osservazione, ma ho un vettore di osservazioni. Quindi immaginate che
+47:26
+47 minutes, 26 seconds
+questo xi è un vettore. Quindi per ciascuno diciamo che ho misurato di caratteristiche che so altezza, peso,
+47:34
+47 minutes, 34 seconds
+numero di scarpe, occhi, colori degli occhi, numero di occhi e invece queste le raccolgo in un vettore di taglia D e
+47:44
+47 minutes, 44 seconds
+quindi immaginate complessivamente avremo una grossa tabella. Allora, se facciamo la convenzione è questa. I vari
+47:50
+47 minutes, 50 seconds
+individui occupano varie righe, tendenzialmente perché avete molti individui, quindi avete molte molte
+47:57
+47 minutes, 57 seconds
+righe e ciascuna variabile che andiamo a osservare, quindi ciascuna feature, ciascuna caratteristica, occuperà una colonna diversa. Quindi complessivamente
+48:07
+48 minutes, 7 seconds
+avete una colonna che ha questa forma, quindi avete il tipo di variabile, tipo altezza,
+48:15
+48 minutes, 15 seconds
+peso, numero di scarpe e poi avete individuo 1, individuo 2,
+48:22
+48 minutes, 22 seconds
+individuo 3 e così via. E qua riempiamo i vari dati. Ok? Ora questo tipo di tabella uno dice è una matrice? Sì, è una matrice. In effetti se sono tutti
+48:31
+48 minutes, 31 seconds
+numeri è bene pensarla come anche come matrice, eh, però in effetti il problema è che potrebbero essere tipi diversi a
+48:38
+48 minutes, 38 seconds
+seconda delle colonne. Allora, in R vedremo che il concetto giusto, la classe giusta è quella che si chiama il data frame, ok? Quindi ricordatevi
+48:46
+48 minutes, 46 seconds
+questa parola chiave, quindi non chiamiamo le matrici, anche se poi in effetti poi sono matrici, ma eh è hanno occupano un ruolo un po' diverso perché
+48:54
+48 minutes, 54 seconds
+le colonne sono quantità diverse, però se sono tutti numeri possiamo pensarla come una grossa matrice con quante righe
+49:03
+49 minutes, 3 seconds
+n righe n righe e di colonne.
+49:09
+49 minutes, 9 seconds
+Ora ve l'ho presentata così perché tendenzialmente avete tanti individui e poche caratteristiche, non tantissime caratteristiche per ciascun individuo.
+49:17
+49 minutes, 17 seconds
+Attenzione che però ci sono contesti, ad esempio, nell'ambito medico dove magari è molto costoso fare un'osservazione,
+49:25
+49 minutes, 25 seconds
+cioè tipo potete sequenziare, non so, il DNA di qualcuno e lì per il singolo individuo potete avere tantissime caratteristiche, tantissime features,
+49:34
+49 minutes, 34 seconds
+però è molto costoso, quindi alla fine avete pochi individui o magari avete, che so una malattia rara e quindi avete comunque poche osservazioni, però tantissime caratteristiche. Quindi,
+49:42
+49 minutes, 42 seconds
+allora, nella statistica tipica avete n molto grande e d troppo grande, però può essere anche viceversa in certe situazioni. Ok?
+49:52
+49 minutes, 52 seconds
+Va bene. L'importante è che sia chiaro che organizziamo quindi i dati in matrici e le osservazioni ora sono promosse a vettori. E allora il punto è
+49:59
+49 minutes, 59 seconds
+con questo sì, chiudiamo e possiamo fare diverse distanze, no? Mentre prima abbiamo detto dobbiamo fissare una loss,
+50:07
+50 minutes, 7 seconds
+abbiamo preso il valore assoluto, il quadrato, l'esponenziale e così via. E ora però potremmo pensare di dire "Ok,
+50:14
+50 minutes, 14 seconds
+ho due vettori, come faccio a confrontarli? Che tipo di distanza posso inserire?" E quindi non soltanto posso fare che so esponenziali o distanza al
+50:23
+50 minutes, 23 seconds
+quadrato, ma posso scegliere anche il tipo di distanza. Quindi ho un nuova libertà che mi posso prendere, mentre prima più o meno farò sempre la
+50:31
+50 minutes, 31 seconds
+differenza tra i dati e una qualche trasformazione. Ora, tra i punti nello spazio ci sono diverse nozioni di
+50:38
+50 minutes, 38 seconds
+distanza. Ok? Allora, vi ricordo, appunto, se pensiamo a un vettore Xi, facciamo finta che sia un vettore di
+50:46
+50 minutes, 46 seconds
+taglia D e una H che questa volta è la nostra, potrebbe essere la media, la mediana, vogliamo trovare un sostituto
+50:54
+50 minutes, 54 seconds
+del concetto di media e di mediana. Beh, allora cosa faccio? Posso fare esempio la distanza euclidea. Cosa faccio? La distanza euclidea la indico così. a
+51:02
+51 minutes, 2 seconds
+volte x - h è la radice quadrata della somma
+51:11
+51 minutes, 11 seconds
+delle componenti della differenza delle componenti al quadrato. Ok? Quindi dice ma questa è più o meno la varianza. Sì, però attenti
+51:20
+51 minutes, 20 seconds
+e o devezione standard, attenti. Qui stiamo pensando di un singolo individuo, una singola osservazione che ha le sue d caratteristiche e la confrontiamo o con
+51:28
+51 minutes, 28 seconds
+un'altra osservazione o con la nostra ipotesi H, che sarà anche lei un vettore con d caratteristiche, ok? Stiamo
+51:35
+51 minutes, 35 seconds
+dicendo questo e questa è un modo di misurare la distanza in uno spazio. Se sono uno spazio duimensionale, la solita
+51:43
+51 minutes, 43 seconds
+distanza la lunghezza di vettori. Se siete in dimensione D è una distanza un po' più difficile da visualizzare, però capite che la la dimensione D non è così
+51:51
+51 minutes, 51 seconds
+artificiale, dipende da quante caratteristiche abbiamo raccolto e ora però uno dice: "Ok, questa mi piaceva, ma posso scegliere altre
+51:59
+51 minutes, 59 seconds
+distanze". Ad esempio, perché eh quando vado dal punto A, dal punto X al punto
+52:06
+52 minutes, 6 seconds
+H, vedete, ci posso andare così e quindi sto facendo la lunghezza di questo segmento, oppure magari sono a New York
+52:14
+52 minutes, 14 seconds
+e appunto a Manattan e devo per forza seguire, dipende un po', eh tipicamente dovrò andare, sapete, è
+52:22
+52 minutes, 22 seconds
+una griglia di strade, quindi dovrò per forza andare a un certo punto dove andrò sempre dritto e poi all'incrocio, l'intersezione giusta taglio di qua.
+52:30
+52 minutes, 30 seconds
+Quindi potrei usare come distanza non effettivamente la via più breve in aria, ma magari sono costretto dalle strade a fare questi percorsi. Ecco, allora
+52:39
+52 minutes, 39 seconds
+questa distanza si chiama distanza L piccolo 1 o distanza di Manattano del tassista. E la formula è molto semplice,
+52:47
+52 minutes, 47 seconds
+cioè x - h si mette a volte un 1 per distinguere dalla da quella euclidea.
+52:55
+52 minutes, 55 seconds
+Fate, invece di radice quadrate e così via, fate la somma dei valori assoluti delle differenze.
+53:04
+53 minutes, 4 seconds
+Adesso potete anche pensare che questa ha la somma di valori assoluti non ha i quadrati, quindi magari questa è una distanza che per alcuni aspetti potrebbe
+53:13
+53 minutes, 13 seconds
+somigliare di più a quello che ci dà la mediana di solito. In effetti questa è una distanza che anch'essa è un po' più robusta
+53:21
+53 minutes, 21 seconds
+diciamo rispetto a quell'euclidea, rispetto a magari a osservazioni che sono ben fuori scala.
+53:27
+53 minutes, 27 seconds
+D'accordo? E poi si può generalizzare, si può fare la distanza LP, ma forse non è neanche necessario che vi dia la formula. Ecco, questo è pure importante.
+53:38
+53 minutes, 38 seconds
+X - h, la distanza cosiddetta del massimo.
+53:43
+53 minutes, 43 seconds
+Cosa andate a fare? Invece di sommare, fate proprio il massimo delle differenze tra le componenti in valore assoluto.
+53:53
+53 minutes, 53 seconds
+Ok?
+53:54
+53 minutes, 54 seconds
+Allora, tutte queste distanze portano con sé delle geometrie diverse. Uno dice, "Perché sono utili in statistica?" Beh, perché in realtà la scelta di
+54:02
+54 minutes, 2 seconds
+determinate distanze può favorire o meno alcune alcune proprietà dei nostri
+54:10
+54 minutes, 10 seconds
+minimizzanti. Ok? Ora questa cosa si vede bene anche se uno cerca di disegnare quelle che si chiamano le
+54:17
+54 minutes, 17 seconds
+palle o le i dischi se volete, eh relative alle varie distanze. Cioè cosa possiamo fare? Per ciascuna distanza
+54:24
+54 minutes, 24 seconds
+andiamo a disegnare i punti X che stanno a distanza più piccola di 1 dall'origine.
+54:33
+54 minutes, 33 seconds
+Allora, voi sapete bene che se prendete la distanza euclidea, quali sono i punti che distano -1 in distan al massimo dal dall'origine?
+54:43
+54 minutes, 43 seconds
+La distanza al massimo uno e la distanza euclidea fate proprio un disco. Ok? Se facciamo dimensione due è proprio un bel
+54:51
+54 minutes, 51 seconds
+disco. Ora non lo disegno bene, ma forse si poteva fare Euclideo sarebbe questo. Ok? Però se
+54:59
+54 minutes, 59 seconds
+facciamo la distanza, ad esempio, del massimo, quindi questo èo,
+55:05
+55 minutes, 5 seconds
+se facciamo la distanza del massimo, qual è un disco di distanza 1? Vuol dire che il massimo delle componenti, cioè un
+55:14
+55 minutes, 14 seconds
+vettore il cui massimo delle componenti deve essere sempre più piccolo di 1, quindi possiamo viaggiare di più, mentre con la distanza e clidea abbiamo la
+55:22
+55 minutes, 22 seconds
+somma dei quadrati, il massimo delle componenti deve essere massimo uno, quindi vuol dire che possiamo andare fino agli estremi di un quadrato
+55:30
+55 minutes, 30 seconds
+o di un cubo. Questo è 1, questo è -1 - 1 1. Tutto questo è quello che sarebbe
+55:38
+55 minutes, 38 seconds
+un disco dal punto di vista di quest'altra distanza. Ora così sembra un po' artificiale, però ci sta dicendo che
+55:45
+55 minutes, 45 seconds
+il modo in cui scegliamo una distanza eh favorisce o meno certe geometrie. Va bene? Questo poi interviene. Ora non so
+55:53
+55 minutes, 53 seconds
+quanto entreremo poi nel livello di regolarizzazione, però la scelta L1 L infinito rispetto all'Euclidea ha degli
+56:01
+56 minutes, 1 second
+effetti importanti e questo per dirvi che c'è molta flessibilità. Quindi, quando andiamo a distanze diverse ehm
+56:09
+56 minutes, 9 seconds
+abbiamo eh abbiamo geometrie diverse.
+56:15
+56 minutes, 15 seconds
+Ecco, allora fermiamoci qui così media e medoide la vediamo la prossima volta
+56:22
+56 minutes, 22 seconds
+e quindi fermiamoci a questo. Ok, per il momento vorrei che capisse bene, giocate un pochino con quella demo e poi ci
+56:30
+56 minutes, 30 seconds
+vediamo mercoledì e portate il computer o anche il tablet, ok? Perché R si può girare anche su cloud, quindi se non avete un computer, avete solo il tablet,
+56:38
+56 minutes, 38 seconds
+iPad, potete comunque usare R.
+57:17
+57 minutes, 17 seconds
+[Musica]
+57:31
+57 minutes, 31 seconds
+Io non sono di gestionale, io sono di forse è mutuato. Ok, perfetto. E noi non facciamo statistica, cioè noi abbiamo
+57:38
+57 minutes, 38 seconds
+soltanto a comunicazioni numeriche crediti, però sono a volte alla fine, appunto per la comunicazione, quindi
+57:46
+57 minutes, 46 seconds
+densità spettrale di potenza, queste cose qua. Quindi lei cos'è che mi consiglierebbe di passare di passage.
+58:21
+58 minutes, 21 seconds
+È un libro che è un po' di trova anche tanti eventi trova anche più
+58:28
+58 minutes, 28 seconds
+da po inglese tanto italiano
+58:35
+58 minutes, 35 seconds
+però appunto il cato però appunto ripassatevi la parte di
+58:44
+58 minutes, 44 seconds
+descrittiva poi ora passeremo a parlare di clustering classificazione di difficoltà
+58:51
+58 minutes, 51 seconds
+Poi servirà di fiducia e un po' di testa parte avete anche un po' di di margine queste
+58:59
+58 minutes, 59 seconds
+cose media mediante il passato delle funzioni. Mercoledì vediamo anche i conti.
+59:07
+59 minutes, 7 seconds
+Sì, sì, la ringrazio per poi Ross tanto più cose, ma non
+59:13
+59 minutes, 13 seconds
+anche questo no il capitolo du
+59:20
+59 minutes, 20 seconds
+introduzione non neanche però appunto la media mediana e slot questo può essere perfetto.
+59:29
+59 minutes, 29 seconds
+La ringrazio. Un attimo che carico anche.
+1:00:03
+1 hour, 3 seconds
+Allora, ditemi pure. Vai.
+1:00:05
+1 hour, 5 seconds
+Allora, io avevo una domanda per quanto riguarda il master, quello action. Ah, sì, sì.
+1:00:13
+1 hour, 13 seconds
+Ehm, allora, sono 18 crediti, ho letto, non frazionabili e avevo il dubbio sul fatto poi
+1:00:19
+1 hour, 19 seconds
+eventualmente di fare il s e sì, hai già fatto la domanda o no? Io non ho fatto la domanda perché devo iscrivermi adesso il primo anno,
+1:00:27
+1 hour, 27 seconds
+quindi eventualmente andrei andrei l'anno prossimo, però mi sto facendo due conti perché ho detto farmi adesso il corso. Questi qui magari mi
+1:00:36
+1 hour, 36 seconds
+preclude di farmi eventualmente dei corsi lì. Sì e però perché comunque potete sempre fare corsi su Eh, infatti quello mi chiedevo.
+1:00:45
+1 hour, 45 seconds
+Eh, il punto è che il secondo me a quel punto la cosa più ragionevole è sfruttare il per la tesi. C in realà un
+1:00:55
+1 hour, 55 seconds
+altro ragazzo che ha ricevuto domande e che ha appena iniziato a registrarle, posso anche dire nozz però l'ho detto di
+1:01:03
+1 hour, 1 minute, 3 seconds
+valutare bene il corso di che tipo di esami fare nel set perché appunto Sì, perché a me hanno detto al CNR che
+1:01:12
+1 hour, 1 minute, 12 seconds
+c'è questo progetto Blue Brain lì a Losanna. Ah, sì, sì, sì, sì.
+1:01:16
+1 hour, 1 minute, 16 seconds
+Ehm, che mi interesserebbe. Ho visto perché a me piacciono molto le neuroscienze, quindi anche la parte di topological data analysis. Sì, esatto.
+1:01:23
+1 hour, 1 minute, 23 seconds
+E ho visto che lì hanno proprio degli esami tipo neuroscienze, cioè Sì. Quindi non so se eventualmente farlo
+1:01:31
+1 hour, 1 minute, 31 seconds
+per la tesi o farlo per però non lo so, c'è una cosa che sto guardando adesso, secondo me, però eventualmente
+1:02:02
+1 hour, 2 minutes, 2 seconds
+e poi ok Ok,
+1:02:13
+1 hour, 2 minutes, 13 seconds
+quindi potrei fare un altro sempre con due costi.
+1:02:20
+1 hour, 2 minutes, 20 seconds
+prendiamo da ma lo stesso fanno qui che hanno davvero tanti esami, c'è tanti esami
+1:02:29
+1 hour, 2 minutes, 29 seconds
+rispetto e quindi anche questo difficoltà esione
+1:02:38
+1 hour, 2 minutes, 38 seconds
+di buona cosa il secondo anno
+1:02:52
+1 hour, 2 minutes, 52 seconds
+e avevo detto che ero interessata questo video, non so se insegnata.
+1:03:00
+1 hour, 3 minutes
+Allora Ah, sì, sì. Aspetta
+1:03:09
+1 hour, 3 minutes, 9 seconds
+facci no perché adesso vuole sapere contatteranno poi sì mando informazioni. Io devo solo nominarvi a quel punto vi scrivono loro.
+1:03:20
+1 hour, 3 minutes, 20 seconds
+Non devo fare altro adesso vi arriverà forse già stasera ve li ve li mando dato
+1:03:27
+1 hour, 3 minutes, 27 seconds
+martedì come scadenza, mi sa. E mi di sì, domani aspetto domani, poi ve li mando e
+1:03:35
+1 hour, 3 minutes, 35 seconds
+Sì, sì. E tra l'altro devo anche perfezionare l'iscrizione alla magistrale, quindi è meglio che lo faccia tempo. Sì, quello credo di sì.
+1:03:45
+1 hour, 3 minutes, 45 seconds
+Ah, sì, allora
+1:03:51
+1 hour, 3 minutes, 51 seconds
+allora 2526. Sì, aspetta.
+1:03:58
+1 hour, 3 minutes, 58 seconds
+Ok, poi anche gli altri comunque si 45
+1:04:16
+1 hour, 4 minutes, 16 seconds
+interessatamente un'altra cosa non è importantissima però
+1:04:27
+1 hour, 4 minutes, 27 seconds
+questo non rit il modulo perché ci siamo dimenticati di si può
+1:04:35
+1 hour, 4 minutes, 35 seconds
+fare due cose o se primo anno magistrato così che l'ho
+1:04:42
+1 hour, 4 minutes, 42 seconds
+seduto quest'anno. Sì e però l'ho seduta dell'altro modo
+1:04:48
+1 hour, 4 minutes, 48 seconds
+Sì. E a quel punto l'anno prossimo come si può anche dare quest'anno
+1:05:04
+1 hour, 5 minutes, 4 seconds
+meglio gioco noi siamo totalmente
+1:05:12
+1 hour, 5 minutes, 12 seconds
+cioè nel senso cosa che non si può fare è dire
+1:05:23
+1 hour, 5 minutes, 23 seconds
+la magistrale dovremmo pure valere che possiamo comunque registrare come se avesse controllare questo perché quando sono
+1:05:32
+1 hour, 5 minutes, 32 seconds
+iscrizione che si può registrare ci sono appena iscritto fuori
+1:05:39
+1 hour, 5 minutes, 39 seconds
+dimenticare infatti però cosa che facciamo noi sì
+1:05:48
+1 hour, 5 minutes, 48 seconds
+così è registrato
+1:06:18
+1 hour, 6 minutes, 18 seconds
+Ah.
+1:06:28
+1 hour, 6 minutes, 28 seconds
+เฮ
+41:56
+Rachmaninoff Piano Concerto No. 2. Khatia Buniatishvili's LEGENDARY Performance (Full Concerto)
+RoxBlog Classical Music
+435k 10 mo ago
+57:02
+[4K Live] Chopin Complete Ballades & Liszt Ballade No.2 - Yejin Noh | 쇼팽 발라드 전곡 & 리스트 발라드 2번 - 노예진
+NCM KLASSIK
+234k 5 mo ago
+46:45
+Commodore: aveva il C64, l’Amiga e milioni di clienti. Perché fallì?
+L’Italia che Costruiva
+42k 4 days ago
+New
+6 songs
+Play all
+Symphony No.1 "Oceans"
+Ezio Bosso • 24 Sept 2025
+View full playlist
+39:47
+Beethoven - Triple Concerto in C Major, op. 56 | Morgenstern Trio, Casco Phil, Benjamin Haemhouts
+CASCO Phil
+15k 2 mo ago
+LIVE
+LIVE | SpaceX Launches Falcon 9 Carrying 24 Starlink Satellites From California Tonight | APT
+APT
+109 watching
+4:18
+Ezio Bosso – Following a Bird (Live in Sanremo, 2016)
+Nights with Almas
+170k 8 yr ago
+Mix
+My Mix
+Relja Lukic, Ezio Bosso, Kristen Bell and more
+9:20
+The Things That Remain
+Ezio Bosso
+14k 2 yr ago
+5:43
+Gigi Proietti - La pioggia nel pineto (Gabriele D'Annunzio)
+Gigi Proietti Fans
+1.3m 9 yr ago
+33:00
+The Butterfly Lovers Violin Concerto《梁祝小提琴协奏曲》
+Singapore Symphony and Chloe Chua - Classical Violinist
+538k 3 wk ago
+41:05
+Martha Argerich Ravel Piano Concerto In G 2025
+Martha Argerich Archive
+8.6k 3 mo ago
+7:44
+Ezio Bosso - Unconditioned (Following, A Bird)
+Ezio Bosso
+760k 9 yr ago
+28:30
+Starship - The Holy Grail of Rocketry
+SpaceX
+1m 2 days ago
+New
+23:16
+Zofia Neugebauer, C.P.E. Bach - Flute Concerto in d-minor Wq.22, Deutsches Kammerorchester  Berlin
+Zofia Neugebauer
+240k 1 yr ago
+11:38
+Bollani: perché "odiavo" la musica classica
+oidoidooi
+215k 10 yr ago
+1:04:36
+Vivaldi & the Orphan Girls of Venice with Les Cris de Paris (Full performance) | Ambronay Festival
+Total Baroque
+75k 2 mo ago
+3:25
+Travaglio: la balla del bollo auto
+Luca Sommi
+221k 13 hr ago
+New
+53:55
+Claire Huangci Semifinal Recital - Queen Elisabeth Competition
+Y
+12k 3 wk ago
+1:29:01
+The 12 Cellists of the Berlin Philharmonic Orchestra in Moscow | Piazzolla, Debussy, Verdi & more
+CMajorEntertainment
+67k 1 mo ago
+32:18
+J.S.Bach Partita n°6 e-moll, Alexandra Dovgan, La Chaux-de-Fonds, 05.12.2023
+Александра Довгань (Alexandra Dovgan)
+392k 1 yr ago
+24:13
+Shostakowitsch Sonata, Julia Hagen, Naoko Sonoda
+ruggieri1684
+47k 8 yr ago
+30:59
+Mozart Violin Concerto No.5 in A-Major KV.219 | Ilva Eigus - Kevin Griffiths - Empyrean Orchestra
+ILVA EIGUS
+762k 4 mo ago
+40:22
+Martha Argerich Plays Chopin Piano Concerto 1 With Jacek Kaspszyk (2010 Warsaw HD)
+Martha Argerich Archive
+92k 4 wk ago
+1:13:40
+Le tecniche del comporre - Alessandro Solbiati 09.05.2017
+Fondazione Collegio San Carlo
+30k 9 yr ago
+41:02
+Dvořák: Cello Concerto,  Op. 104 | Marie-Elisabeth Hecker & Orchestre Philharmonique de Monte-Carlo
+DW Classical Music
+412k 1 yr ago
