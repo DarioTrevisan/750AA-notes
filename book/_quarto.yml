@@ -40,6 +40,27 @@ format:
     fig-height: 4.5
     fig-align: center
     mainfont: "Georgia, serif"
+  pdf:
+    documentclass: scrbook
+    papersize: a4
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-width: 6
+    fig-height: 3.8
+    fig-align: center
+    geometry:
+      - top=2.5cm
+      - bottom=2.5cm
+      - left=2.7cm
+      - right=2.7cm
+    colorlinks: true
+    fontsize: 11pt
+    keep-tex: false
+    include-in-header:
+      text: |
+        \providecommand{\bm}{}
+        \renewcommand{\bm}[1]{\boldsymbol{#1}}
 
 execute:
   freeze: auto

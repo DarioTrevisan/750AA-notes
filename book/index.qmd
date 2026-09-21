@@ -1,5 +1,9 @@
 # Prefazione {.unnumbered}
 
+::: {.callout-warning title="Disclaimer"}
+Queste note sono state generate via LLM (Claude Sonnet 5) partendo dalle trascrizioni delle lezioni disponibili su YouTube dello scorso anno (2025-2026) e dalle sorgenti delle slide delle lezioni. Ci possono essere errori: ogni segnalazione è benvenuta e verrà pubblicamente riconosciuta.
+:::
+
 Queste note accompagnano il corso di **Statistica II / Introduzione alla Statistica Computazionale** (750AA). Coprono le undici lezioni di teoria del corso, organizzate in quattro blocchi tematici: statistica descrittiva e clustering, classificazione, regressione, serie storiche.
 
 ## Cosa sono (e cosa non sono) queste note

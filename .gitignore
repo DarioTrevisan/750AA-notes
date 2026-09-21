@@ -15,3 +15,5 @@ book/.quarto/
 
 # Claude Code session state
 .claude/
+
+**/*.quarto_ipynb
